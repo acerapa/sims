@@ -1,0 +1,28 @@
+##### -success registration
+POST http://localhost:3000/api/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"username": "Master",
+	"password": "bluelock"
+}
+
+##### -failed registration
+POST http://localhost:3000/api/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"username": "Master"
+}
+
+#### - error response
+POST http://localhost:3000/api/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+	"username": "Master",
+	"password": "nbgfsdfsd"
+}
