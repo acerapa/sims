@@ -1,5 +1,9 @@
 const express = require('express');
 const app = express();
+
+// enable env config
+require('dotenv').config();
+
 const port = process.env.PORT || 3000;
 
 // setting ups
