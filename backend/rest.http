@@ -17,7 +17,7 @@ Content-Type: application/json
 	"username": "Master"
 }
 
-#### - error response
+#### - failed response
 POST http://localhost:3000/api/auth/login
 Accept: application/json
 Content-Type: application/json
@@ -25,4 +25,32 @@ Content-Type: application/json
 {
 	"username": "Master",
 	"password": "nbgfsdfsd"
+}
+
+#### - success response
+POST http://localhost:3000/api/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+	"username": "Master",
+	"password": "bluelock"
+}
+
+#### - success response
+POST http://localhost:3000/api/auth/token/refresh
+Accept: application/json
+Content-Type: application/json
+
+{
+	"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjp0cnVlLCJpYXQiOjE3MTY1NzM0NDgsImV4cCI6MTcxNzE3ODI0OH0.YVJEuDsEEZqacPdI--ypfPJqOa8cNaCTcmS54n4O8OU"
+}
+
+#### - failed response
+POST http://localhost:3000/api/auth/token/refresh
+Accept: application/json
+Content-Type: application/json
+
+{
+	"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjpmYWxzZSwiaWF0IjoxNzE2NTczNDgyLCJleHAiOjE3MTY1NzQzODJ9.68J7EqN6ss3Rano4MEWuIWp6ExSKZTK-Gx9FzxhwdNw"
 }
