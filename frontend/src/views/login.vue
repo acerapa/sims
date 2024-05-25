@@ -14,10 +14,12 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
+import { api, Method } from '@/api';
 
 const router = useRouter();
 
-const onSubmit = () => {
+const onSubmit = async () => {
+    await api('auth/login', Method.POST);
     router.push({ name: 'dashboard' });
 }
 </script>

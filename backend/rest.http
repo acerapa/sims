@@ -23,6 +23,16 @@ Accept: application/json
 Content-Type: application/json
 
 {
+	"username": "",
+	"password": ""
+}
+
+#### - failed response
+POST http://localhost:3000/api/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
 	"username": "Master",
 	"password": "nbgfsdfsd"
 }
