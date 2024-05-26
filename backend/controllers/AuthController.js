@@ -3,7 +3,7 @@ const bcryptJS = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Validation Schema
-const AuthSchema = require('../validator/Auth');
+const { AuthSchema, VerifyTokenSchema } = require('../validator/Auth');
 
 module.exports = {
 	login: async (req, res) => {
@@ -31,6 +31,8 @@ module.exports = {
 					}
 				}
 			}
+		} else {
+			response.data = error;
 		}
 
 		res.status(response.status).json(response);
@@ -61,10 +63,37 @@ module.exports = {
 		res.status(response.status).json(response);
 	},
 
+	verify: async (req, res) => {
+		const response = {
+			status: 401,
+			message: 'Invalid access token',
+			data: {
+				isValid: false
+			}
+		}
+
+		const { value, error } = VerifyTokenSchema.validate(req.body);
+		let data;
+
+		if (!error) {
+			try {
+				data = jwt.verify(value.token, process.env.SECRET_KEY);
+				response.status = 200;
+				response.message = 'Token is valid';
+				response.data = { isValid: true };
+			} catch (e) {
+				response.message = response.message + ' => ' + e.message;
+			}
+		} else {
+			response.data = { ...response.data, error };
+		}
+
+		return res.status(response.status).json(response);
+	},
+
 	refresh: async (req, res) => {
 		const response = {
 			status: 401,
-			data: {},
 			message: 'Invalid Refresh Token'
 		};
 

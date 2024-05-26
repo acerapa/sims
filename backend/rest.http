@@ -64,3 +64,12 @@ Content-Type: application/json
 {
 	"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjpmYWxzZSwiaWF0IjoxNzE2NTczNDgyLCJleHAiOjE3MTY1NzQzODJ9.68J7EqN6ss3Rano4MEWuIWp6ExSKZTK-Gx9FzxhwdNw"
 }
+
+#### - [Verify access token] failed/success response
+POST http://localhost:3000/api/auth/token/verify
+Accept: application/json
+Content-Type: application/json
+
+{
+	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjpmYWxzZSwiaWF0IjoxNzE2NzQyOTYzLCJleHAiOjE3MTY3NDI5ODN9.u4fyq3zdijY_xwxkDK00oFCac88RD2uGZVkBOua5yXU"
+}

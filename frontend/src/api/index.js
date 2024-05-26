@@ -1,5 +1,3 @@
-const token = '';
-
 const apiConfig = {
 	serverUrls: {
 		development: import.meta.env.VITE_DEV_SERVER,
@@ -7,7 +5,7 @@ const apiConfig = {
 		test: import.meta.VITE_TEST_SERVER
 	},
 	defaultHeaders: {
-		'Content-Type': 'appication/json',
+		'Content-Type': 'application/json',
 		Accept: 'application/json'
 	}
 }
@@ -34,10 +32,69 @@ export const api = async (url, method = Method.GET, payload = null, hdrs = {}) =
 	const request = new Request(`${BASE_PATH}${url}`, requestInit);
 
 	const response = await (await fetch(request));
-	console.log(response.headers.get('Content-Type'));
+
+	const contentType = response.headers.get('Content-Type');
+	let responseData;
+
+	if (contentType) {
+		if (contentType.includes('application/json')) {
+			responseData = await response.json();
+		} else if (contentType.includes('text/')) {
+			responseData = await response.text();
+		} else if (contentType.includes('image/') || contentType.includes('audio/') || contentType.includes('video/') || contentType.includes('application/octet-stream')) {
+			responseData = await response.blob();
+		} else {
+			responseData = await response.text(); // Fallback for other content types
+		}
+	}
+
+	return responseData;
 }
 
 export const authenticatedApi = async (url, method = Method.GET, payload = null, hdrs = {}) => {
+	const verifyToken = await verifyAccessToken();
+	if (!verifyToken.data.isValid) {
+		await getRefreshToken();
+	}
+
+	const token = getTokens().access;
+
 	hdrs = { ...hrds, Authorization: `Bearer ${token}` };
-	console.log(await api(url, method, payload, hdrs));
+	return await api(url, method, payload, hdrs);
+}
+
+// Private functions
+const verifyAccessToken = async () => {
+	const tokens = getTokens();
+	let isValid = false;
+	if (Object.keys(tokens).length) {
+		const res = await api('auth/token/verify', Method.POST, { token: tokens.access });
+		if (res.status == 200 && res.data) isValid = res.data.isValid;
+	}
+
+	return isValid;
+}
+
+const getRefreshToken = async () => {
+	const res = await api('auth/token/refresh', Method.POST, { refresh: getTokens().refresh });
+	if (res.status = 200 && res.data) {
+		// manually set tokens to localstorage
+		localStorage.setItem('tokens', JSON.stringify({
+			access: res.data.access,
+			refresh: res.data.refresh
+		}));
+	}
+
+	return res;
+}
+
+
+const getTokens = () => {
+	const strTokens = localStorage.getItem('tokens');
+	let token = {};
+	if (strTokens) {
+		token = JSON.parse(strTokens);
+	}
+
+	return token;
 }
