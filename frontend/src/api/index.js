@@ -53,13 +53,13 @@ export const api = async (url, method = Method.GET, payload = null, hdrs = {}) =
 
 export const authenticatedApi = async (url, method = Method.GET, payload = null, hdrs = {}) => {
 	const verifyToken = await verifyAccessToken();
-	if (!verifyToken.data.isValid) {
+	if (!verifyToken) {
 		await getRefreshToken();
 	}
 
 	const token = getTokens().access;
 
-	hdrs = { ...hrds, Authorization: `Bearer ${token}` };
+	hdrs = { ...hdrs, Authorization: `Bearer ${token}` };
 	return await api(url, method, payload, hdrs);
 }
 
