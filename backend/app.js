@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
 // enable env config
 require('dotenv').config();
@@ -7,6 +8,7 @@ require('dotenv').config();
 const port = process.env.PORT || 3000;
 
 // setting ups
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

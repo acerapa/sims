@@ -1,23 +1,35 @@
-##### -success registration
+##### - [User Registration] success registration
 POST http://localhost:3000/api/auth/register
 Accept: application/json
 Content-Type: application/json
 
 {
-	"username": "Master",
-	"password": "bluelock"
+	"username": "administrator",
+	"first_name": "Ram",
+	"last_name": "Tech",
+	"password": "bluelock",
+	"type": "admin"
 }
 
-##### -failed registration
+##### - [User Registration] failed registration
 POST http://localhost:3000/api/auth/register
 Accept: application/json
 Content-Type: application/json
 
 {
-	"username": "Master"
 }
 
-#### - failed response
+#### - [Authenticating Users] failed response
+POST http://localhost:3000/api/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+	"username": "",
+	"password": ""
+}
+
+#### - [AUthenticating Users] failed response
 POST http://localhost:3000/api/auth/login
 Accept: application/json
 Content-Type: application/json
@@ -27,7 +39,7 @@ Content-Type: application/json
 	"password": "nbgfsdfsd"
 }
 
-#### - success response
+#### - [Authenticating Users] success response
 POST http://localhost:3000/api/auth/login
 Accept: application/json
 Content-Type: application/json
@@ -37,7 +49,7 @@ Content-Type: application/json
 	"password": "bluelock"
 }
 
-#### - success response
+#### - [Refresh Token] success response
 POST http://localhost:3000/api/auth/token/refresh
 Accept: application/json
 Content-Type: application/json
@@ -46,7 +58,7 @@ Content-Type: application/json
 	"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjp0cnVlLCJpYXQiOjE3MTY1NzM0NDgsImV4cCI6MTcxNzE3ODI0OH0.YVJEuDsEEZqacPdI--ypfPJqOa8cNaCTcmS54n4O8OU"
 }
 
-#### - failed response
+#### - [Refresh Token] failed response
 POST http://localhost:3000/api/auth/token/refresh
 Accept: application/json
 Content-Type: application/json
@@ -54,3 +66,16 @@ Content-Type: application/json
 {
 	"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjpmYWxzZSwiaWF0IjoxNzE2NTczNDgyLCJleHAiOjE3MTY1NzQzODJ9.68J7EqN6ss3Rano4MEWuIWp6ExSKZTK-Gx9FzxhwdNw"
 }
+
+#### - [Verify access token] failed/success response
+POST http://localhost:3000/api/auth/token/verify
+Accept: application/json
+Content-Type: application/json
+
+{
+	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjpmYWxzZSwiaWF0IjoxNzE2NzQyOTYzLCJleHAiOjE3MTY3NDI5ODN9.u4fyq3zdijY_xwxkDK00oFCac88RD2uGZVkBOua5yXU"
+}
+
+### = [GET all users] success
+GET http://localhost:3000/api/auth/all
+Accept: application/json
