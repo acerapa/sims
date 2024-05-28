@@ -1,10 +1,10 @@
 'use strict';
 
-const Product = require('../models/Product');
+const Product = require('../models/product');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     /**
      * Add altering commands here.
      *
@@ -14,7 +14,7 @@ module.exports = {
     await queryInterface.createTable(Product.getTableName(), Product.getAttributes());
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     /**
      * Add reverting commands here.
      *
