@@ -4,7 +4,16 @@ export default {
     './index.html', './src/**/*.{vue,js,ts,jsx,tsx}'
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'lighter-blue': '#12108E',
+        'regular-blue': '#0E0D7A',
+        'dark-blue': '#060658'
+      },
+      spacing: {
+        '15': '72px'
+      }
+    },
   },
   plugins: [],
 }
