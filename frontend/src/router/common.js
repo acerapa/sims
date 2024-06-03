@@ -1,7 +1,7 @@
 export default [
     {
         path: '/',
-        component: () => import('@/views/layout/NavLayout.vue'),
+        component: () => import('@/layout/NavLayout.vue'),
         children: [
             {
                 path: '/dashboard',

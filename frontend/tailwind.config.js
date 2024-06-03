@@ -8,11 +8,16 @@ export default {
       colors: {
         'lighter-blue': '#12108E',
         'regular-blue': '#0E0D7A',
-        'dark-blue': '#060658'
+        'dark-blue': '#060658',
+        'primary': '#726FFF'
       },
       spacing: {
         '15': '72px'
-      }
+      },
+      gridTemplateColumns: {
+        '13': 'repeat(13, minmax(0, 1fr))',
+        '14': 'repeat(14, minmax(0, 1fr))'
+      },
     },
   },
   plugins: [],

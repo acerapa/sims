@@ -43,6 +43,10 @@ User.init(
         'cashier',
         'inventory'
       ]
+    },
+    status: {
+      type: DataTypes.TINYINT,
+      defaultValue: 1
     }
   },
   {
