@@ -6,12 +6,13 @@ const UserSchema = Joi.object({
 	last_name: Joi.string().required(),
 	middle_name: Joi.string(),
 	password: Joi.string().required(),
-	type: Joi.string().valid(
+	position: Joi.string().valid(
 		'admin',
-		'manager',
 		'cashier',
 		'inventory'
-	).required()
+	).required(),
+	status: Joi.number().required(),
+	date_started: Joi.date()
 });
 
 module.exports = { UserSchema };

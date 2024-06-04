@@ -9,7 +9,9 @@ export default {
         'lighter-blue': '#12108E',
         'regular-blue': '#0E0D7A',
         'dark-blue': '#060658',
-        'primary': '#726FFF'
+        'primary': '#726FFF',
+        'danger': '#F44336',
+        'success': '#19BE34'
       },
       spacing: {
         '15': '72px'

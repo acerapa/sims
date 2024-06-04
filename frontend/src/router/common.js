@@ -2,6 +2,7 @@ export default [
     {
         path: '/',
         component: () => import('@/layout/NavLayout.vue'),
+        redirect: '/dashboard',
         children: [
             {
                 path: '/dashboard',

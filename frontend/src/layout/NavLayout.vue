@@ -1,8 +1,7 @@
 <template>
   <SideNav />
-  <div class="flex bg-gray-50 h-screen">
-    <div class="w-64"></div>
-    <div class="flex-1">
+  <div class="bg-gray-50 h-screen">
+    <div class="flex-1 ml-64">
       <Header />
       <div class="w-full px-5 mt-5">
         <RouterView />

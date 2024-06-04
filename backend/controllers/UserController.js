@@ -10,7 +10,16 @@ module.exports = {
 		};
 
 		try {
-			const users = await User.findAll();
+			const users = await User.findAll({
+				attributes: {
+					exclude: [
+						'password'
+					]
+				},
+				order: [
+					['createdAt', 'DESC']
+				]
+			});
 
 			response.message = 'Successfully Fetched!';
 			response.status = 200;
@@ -39,10 +48,9 @@ module.exports = {
 			}
 
 			try {
-				const user = await User.create(data);
+				await User.create(data);
 				response.message = 'Succesfully Registered!';
 				response.status = 200;
-				response.data = { user };
 			} catch (e) {
 				response.message = response.message + ' => ' + e.message;
 				if (e.name == 'SequelizeUniqueConstraintError') {
@@ -53,6 +61,30 @@ module.exports = {
 			response.data = error;
 		}
 
+
+		res.status(response.status).json(response);
+	},
+
+	delete: async (req, res) => {
+		const response = {
+			message: 'Something wen\'t wrong!',
+			status: 400,
+			data: {}
+		};
+
+		try {
+			const user = await User.findByPk(req.body.user_id);
+			if (user === null) {
+				await user.destroy();
+				response.message = 'Successfully deleted!';
+				response.status = 200;
+			} else {
+				response.message = 'User not found!';
+				response.status = 404;
+			}
+		} catch (e) {
+			response.message += e.message;
+		}
 
 		res.status(response.status).json(response);
 	}

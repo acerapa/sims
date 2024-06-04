@@ -8,7 +8,8 @@ Content-Type: application/json
 	"first_name": "Ram",
 	"last_name": "Tech",
 	"password": "bluelock",
-	"type": "admin"
+	"type": "admin",
+	"start_date": "2024-4-2"
 }
 
 ##### - [User Registration] failed registration
@@ -77,5 +78,5 @@ Content-Type: application/json
 }
 
 ### = [GET all users] success
-GET http://localhost:3000/api/auth/all
+GET http://localhost:3000/api/users/all
 Accept: application/json
