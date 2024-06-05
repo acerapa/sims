@@ -80,3 +80,15 @@ Content-Type: application/json
 ### = [GET all users] success
 GET http://localhost:3000/api/users/all
 Accept: application/json
+
+
+### = [UPDATE a user] success
+POST http://localhost:3000/api/users/update
+Accept: application/json
+Content-Type: application/json
+
+{
+	"username": "blue-master",
+	"first_name": "Master",
+	"id": 4
+}

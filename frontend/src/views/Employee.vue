@@ -1,9 +1,26 @@
 <template>
-  <EmployeeModal v-model="showModal" />
-  <div class="table-wrapper bg-white w-full flex flex-col gap-4">
+  <EmployeeModal
+    v-model="showModal"
+    :is-edit="isEdit"
+    :selected-id="idToEdit"
+    v-if="showModal"
+  />
+  <DeleteConfirmModal
+    v-model="showDeleteConfirmModal"
+    v-if="showDeleteConfirmModal"
+    :href="'users/delete'"
+    :data="toDelete"
+  />
+  <div class="table-wrapper bg-white w-full flex flex-col gap-4 relative">
     <div class="flex justify-between items-center">
       <input type="search" class="input w-full max-w-72" placeholder="Search" />
-      <button class="bg-primary p-2 rounded" @click="showModal = true">
+      <button
+        class="bg-primary p-2 rounded"
+        @click="
+          showModal = true;
+          isEdit = false;
+        "
+      >
         <img src="../assets//icons/plus.svg" alt="Plus" />
       </button>
     </div>
@@ -24,42 +41,51 @@
       </div>
       <div class="flex flex-col gap-4">
         <EmployeeRow
-          v-for="user in users"
+          v-for="user in employeeStore.employees"
           :user="user"
           :key="user.id"
           @open-menu="onSelectRow"
           :current-open-menu="selectedMenuRow"
-          @click="sampleClick"
+          @view="viewRow"
+          @delete="deleteRow"
         />
       </div>
     </div>
+    <Pagination />
   </div>
 </template>
 <script setup>
-import { authenticatedApi } from "@/api";
 import EmployeeModal from "@/components/Employee/EmployeeModal.vue";
 import { onMounted, ref } from "vue";
 import EmployeeRow from "@/components/Employee/EmployeeRow.vue";
+import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import Pagination from "@/components/wrappers/Paginate.vue";
+import { useEmployeeStore } from "@/stores/employee";
 
 const showModal = ref(false);
+const showDeleteConfirmModal = ref(false);
+const toDelete = ref();
+const idToEdit = ref();
+const isEdit = ref(false);
 const selectedMenuRow = ref(-1);
-const users = ref([]);
+const employeeStore = useEmployeeStore();
 
 onMounted(async () => {
-  const res = await authenticatedApi("users/all");
-  if (res.status == 200) {
-    users.value = res.data.users;
-  }
+  await employeeStore.fetchAllEmployees();
 });
 
 const onSelectRow = (data) => {
   selectedMenuRow.value = data;
 };
 
-const sampleClick = (event) => {
-  console.log(event.target.classList);
-  if (Array.from(event.target.classList).includes("menu-btn-trigger")) {
-    console.log("Img element!");
-  }
+const viewRow = (user_id) => {
+  isEdit.value = true;
+  showModal.value = true;
+  idToEdit.value = user_id;
+};
+
+const deleteRow = (user_id) => {
+  toDelete.value = { user_id };
+  showDeleteConfirmModal.value = true;
 };
 </script>

@@ -1,6 +1,6 @@
 const User = require('../models/user');
 const bcryptJS = require('bcryptjs');
-const { UserSchema } = require('../validator/User');
+const { UserSchema, UserSchemaUpdate } = require('../validator/User');
 
 module.exports = {
 	all: async (req, res) => {
@@ -40,7 +40,7 @@ module.exports = {
 		}
 
 		const data = req.body;
-		const { error } = await UserSchema.validate(data);
+		const { error } = UserSchema.validate(data);
 
 		if (!error) {
 			if (data.password) {
@@ -65,6 +65,37 @@ module.exports = {
 		res.status(response.status).json(response);
 	},
 
+	update: async (req, res) => {
+		const response = {
+			message: 'Something wen\'t wrong!',
+			status: 400,
+			data: {}
+		}
+
+		const data = {};
+		Object.keys(req.body).forEach(key => {
+			if (key != 'id') {
+				data[key] = req.body[key];
+			}
+		});
+
+		const { error } = UserSchemaUpdate.validate(data);
+
+		if (!error) {
+			try {
+				await User.update(data, { where: { id: req.body.id } });
+				response.message = 'Successfully updated!';
+				response.status = 200;
+			} catch (e) {
+				response.message += e.message;
+			}
+		} else {
+			response.data = error;
+		}
+
+		res.status(response.status).json(response);
+	},
+
 	delete: async (req, res) => {
 		const response = {
 			message: 'Something wen\'t wrong!',
@@ -74,7 +105,7 @@ module.exports = {
 
 		try {
 			const user = await User.findByPk(req.body.user_id);
-			if (user === null) {
+			if (user !== null) {
 				await user.destroy();
 				response.message = 'Successfully deleted!';
 				response.status = 200;

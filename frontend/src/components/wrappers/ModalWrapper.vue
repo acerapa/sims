@@ -1,8 +1,7 @@
 <template>
-  <div class="overlay" v-if="showModal"></div>
+  <div class="overlay"></div>
   <div
     class="fixed w-full max-w-[614px] rounded-xl top-10 left-1/2 -translate-x-1/2 p-4 z-40 bg-white"
-    v-if="showModal"
   >
     <div class="flex justify-between items-center">
       <p class="font-semibold text-xl">{{ props.title }}</p>
@@ -23,7 +22,7 @@
       >
         Cancel
       </button>
-      <button class="btn" @click="onSave">Save</button>
+      <button class="btn" @click="onSave">{{ props.saveBtn }}</button>
     </div>
   </div>
 </template>
@@ -35,6 +34,10 @@ const props = defineProps({
     required: true,
   },
   action: String,
+  saveBtn: {
+    type: String,
+    default: "Save",
+  },
 });
 
 const showModal = defineModel();

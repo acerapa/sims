@@ -15,17 +15,38 @@
 
     <!-- Navigations -->
     <div class="mt-5">
-      <RouterLink
-        v-for="(nav, ndx) in navs"
-        :key="ndx"
-        class="px-5 py-3 flex gap-3"
-        :to="{ name: nav.route }"
-        active-class="bg-dark-blue font-bold"
-        @click="onRouteClick(nav.route)"
-      >
-        <img :src="nav.icon" alt="" />
-        {{ nav.text }}
-      </RouterLink>
+      <div class="flex flex-col gap-3" v-for="(nav, ndx) in navs" :key="ndx">
+        <RouterLink
+          class="px-5 py-3 flex gap-3 items-center"
+          :to="{ name: nav.route }"
+          active-class="bg-dark-blue font-bold"
+          @click="onRouteClick(nav.route)"
+        >
+          <div class="flex-1 flex gap-3">
+            <img :src="nav.icon" alt="" />
+            {{ nav.text }}
+          </div>
+          <img
+            v-if="nav.children"
+            class="w-6 h-6"
+            src="../assets/icons/carret-down.svg"
+            alt="carret"
+          />
+        </RouterLink>
+        <div v-if="nav.children" class="flex flex-col gap-3 pl-8">
+          <RouterLink
+            v-for="(child, child_ndx) in nav.children"
+            :key="child_ndx"
+            class="px-5 py-2 flex gap-3 w-fit rounded-lg text-sm"
+            :to="{ name: child.route }"
+            active-class="bg-dark-blue font-bold"
+            @click="onRouteClick(child.route)"
+          >
+            <img :src="child.icon" alt="" />
+            {{ child.text }}
+          </RouterLink>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -40,6 +61,8 @@ import customers from "@/assets/icons/customers.svg";
 import products from "@/assets/icons/products.svg";
 import reports from "@/assets/icons/reports.svg";
 import employees from "@/assets/icons/employees.svg";
+import settings from "@/assets/icons/settings.svg";
+import dot from "@/assets/icons/dot.svg";
 
 const navs = [
   {
@@ -77,6 +100,18 @@ const navs = [
     route: "employees",
     icon: employees,
   },
+  {
+    text: "Settings",
+    route: "product-categories",
+    icon: settings,
+    children: [
+      {
+        text: "Product Categories",
+        route: "product-categories",
+        icon: dot,
+      },
+    ],
+  },
 ];
 
 const route = useRoute();
@@ -84,6 +119,7 @@ const appStore = useAppStore();
 
 const onRouteClick = (name = route.name) => {
   appStore.currentNav = navs.find((r) => r.route == name);
+  console.log(appStore.currentNav);
 };
 
 // run function upon loading
