@@ -12,5 +12,5 @@
 
 <script setup>
 import Header from "@/components/Header.vue";
-import SideNav from "@/components/SideNav.vue";
+import SideNav from "@/components/Nav/SideNav.vue";
 </script>
