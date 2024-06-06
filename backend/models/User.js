@@ -27,6 +27,14 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true
     },
+    date_started: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    date_ended: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -34,7 +42,7 @@ User.init(
         min: 8
       }
     },
-    type: {
+    position: {
       type: DataTypes.ENUM,
       allowNull: false,
       values: [
@@ -43,6 +51,10 @@ User.init(
         'cashier',
         'inventory'
       ]
+    },
+    status: {
+      type: DataTypes.TINYINT,
+      defaultValue: 1
     }
   },
   {

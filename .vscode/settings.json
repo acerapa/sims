@@ -3,5 +3,6 @@
   "editor.insertSpaces": false,
   "path-autocomplete.pathMappings": {
     "@": "${workspaceFolder}/src"
-  }
+  },
+  "css.format.enable": false
 }
