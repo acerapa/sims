@@ -16,7 +16,10 @@
         alt=""
       />
     </div>
-    <ProductCategoryRowMenu v-if="showActionMenu" />
+    <ProductCategoryRowMenu
+      v-if="showActionMenu"
+      @delete="emit('delete', props.productCategory.id)"
+    />
   </div>
 </template>
 
@@ -35,7 +38,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["openMenu"]);
+const emit = defineEmits(["openMenu", "delete"]);
 
 const openMenu = (id) => {
   emit("openMenu", id);

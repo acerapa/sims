@@ -40,6 +40,8 @@ const apiPath = props.isEdit
 const onSubmit = async () => {
   await authenticatedApi(apiPath, Method.POST, model.value);
 
+  showModal.value = false;
+
   await settingsStore.fetchAllProductCategories();
 };
 </script>

@@ -26,7 +26,10 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["afterDelete"]);
+
 const submit = async () => {
   await authenticatedApi(props.href, Method.DELETE, props.data);
+  emit("afterDelete");
 };
 </script>

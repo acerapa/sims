@@ -18,8 +18,7 @@ ProductCategory.init(
   },
   {
     sequelize,
-    timestamps: true,
-    paranoid: true
+    timestamps: true
   }
 )
 
