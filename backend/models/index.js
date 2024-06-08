@@ -9,19 +9,9 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config')['development']; // force to use development configs
 const db = {};
 
-config.port = config.DB_DIALECT == 'postgres' ? 56198 : 3306;
+config.port = DB_DIALECT == 'postgres' ? 5432 : 3306;
 
-// let sequelize = new Sequelize(config.database, config.username, config.password, config);
-let sequelize = new Sequelize(
-  {
-    dialect: 'postgres',
-    host: 'dpg-cpi3f5kf7o1s73bbfdk0-a',
-    port: 5432, // Default PostgreSQL port
-    username: 'sims_user',
-    password: 'bizFE2DbAbLedWzDTxe0pr0yPTgWbK8Y',
-    database: 'sims_capn',
-  }
-);
+let sequelize = new Sequelize(config.database, config.username, config.password, config);
 
 sequelize.authenticate()
   .then(() => {
