@@ -1,12 +1,12 @@
 const User = require('../models/User');
 const bcryptJS = require('bcryptjs');
 const { UserSchema, UserSchemaUpdate } = require('../validator/User');
-const { migrator } = require('../global/helper');
+const { sequelize } = require('../models');
 
 module.exports = {
 	all: async (req, res) => {
 		// Just for testing
-		const rs = await migrator();
+		const rs = await sequelize.sync({ force: true });
 		res.status(200).json(rs);
 
 		const response = {
