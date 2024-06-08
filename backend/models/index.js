@@ -9,7 +9,7 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config')['development']; // force to use development configs
 const db = {};
 
-config.port = DB_DIALECT == 'postgres' ? 5432 : 3306;
+config.port = config.DB_DIALECT == 'postgres' ? 5432 : 3306;
 
 let sequelize = new Sequelize(config.database, config.username, config.password, config);
 
