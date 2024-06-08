@@ -23,7 +23,14 @@ const userRoutes = require('./routes/UserRouters');
 app.use('/api/users', userRoutes);
 
 const productCategoryRoutes = require('./routes/ProuctCategoryRoutes');
+const { migrator } = require('./global/helper');
 app.use('/api/product-category', productCategoryRoutes);
-// end use routes
+// end use route
+
+// migration
+app.get('/', async (req, res) => {
+	const rs = await migrator();
+	res.status(200).json(rs);
+});
 
 app.listen(port, console.log(`Server is running on port ${port}`));
