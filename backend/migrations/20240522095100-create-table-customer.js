@@ -1,6 +1,6 @@
 'use strict';
 
-const Customer = require('../models/customer');
+const Customer = require('../models/Customer');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
