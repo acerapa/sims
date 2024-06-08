@@ -6,7 +6,7 @@ const Sequelize = require('sequelize');
 const process = require('process');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config')[env];
+const config = require(__dirname + '/../config/config')['development']; // force to use development configs
 const db = {};
 
 let sequelize = new Sequelize(config.database, config.username, config.password, config);
