@@ -1,19 +1,14 @@
 const path = require('path');
 const { Umzug, SequelizeStorage } = require('umzug');
-const { sequelize, Sequelize } = require('../models');
+const { sequelize } = require('../models');
 
 module.exports = {
 	migrator: async () => {
 		const umzug = new Umzug({
-			storage: new SequelizeStorage({sequelize}),
-
-			migrations: {
-				params: [
-					sequelize.getQueryInterface(),
-					Sequelize
-				],
-				path: path.join(__dirname, "./migrations")
-			}
+			migrations: { glob: 'migrations/*.js' },
+			context: sequelize.getQueryInterface(),
+			storage: new SequelizeStorage({ sequelize }),
+			logger: console,
 		});
 
 		return await umzug.up();
