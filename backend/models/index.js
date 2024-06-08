@@ -16,8 +16,12 @@ let sequelize = new Sequelize(config.database, config.username, config.password,
 sequelize.authenticate()
   .then(() => {
     // force run migration up connection to the database
-    sequelize.sync({ force: false });
-    
+    migrator.mirate().success(function () {
+      console.log('Migration Complete!');
+    }).error(function () {
+      console.log('Migration Error!');
+    })
+
     fs
       .readdirSync(__dirname)
       .filter(file => {
