@@ -9,8 +9,6 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config')['development']; // force to use development configs
 const db = {};
 
-config.port = config.DB_DIALECT == 'postgres' ? 5432 : 3306;
-
 let sequelize = new Sequelize(config.database, config.username, config.password, config);
 
 sequelize.authenticate()
@@ -38,6 +36,7 @@ sequelize.authenticate()
   })
   .catch((e) => {
     console.error('Unable to connect to the database \n', e);
+    console.log(e.parent);
   })
 
 db.sequelize = sequelize;
