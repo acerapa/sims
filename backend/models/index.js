@@ -15,6 +15,9 @@ let sequelize = new Sequelize(config.database, config.username, config.password,
 
 sequelize.authenticate()
   .then(() => {
+    // force run migration up connection to the database
+    sequelize.sync({ force: false });
+    
     fs
       .readdirSync(__dirname)
       .filter(file => {
