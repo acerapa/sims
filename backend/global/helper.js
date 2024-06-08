@@ -1,16 +1,18 @@
-const path = require('path');
-const { Umzug, SequelizeStorage } = require('umzug');
-const { sequelize } = require('../models');
+// const path = require('path');
+// const { Umzug, SequelizeStorage } = require('umzug');
+// const { sequelize } = require('../models');
+
+const execSync = require('child_process').execSync;
 
 module.exports = {
 	migrator: async () => {
-		const umzug = new Umzug({
-			migrations: {glob: 'migrations/*.js'},
-			context: sequelize.getQueryInterface(),
-			storage: new SequelizeStorage({sequelize}),
-			logger: console,
-		});
-
-		return await umzug.up();
+			return new Promise((resolve, reject) => {
+				try {
+					execSync('node_modules/.bin/sequelize db:migrate', { stdio: 'inherit' });
+					resolve('OK');
+				} catch (e) {
+					reject(e);
+				}
+			});
 	}
 }
