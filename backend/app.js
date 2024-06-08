@@ -23,14 +23,27 @@ const userRoutes = require('./routes/UserRouters');
 app.use('/api/users', userRoutes);
 
 const productCategoryRoutes = require('./routes/ProuctCategoryRoutes');
-const { migrator } = require('./global/helper');
 app.use('/api/product-category', productCategoryRoutes);
 // end use route
 
 // migration
+const { migrator } = require('./global/helper');
 app.get('/', async (req, res) => {
-	const rs = await migrator();
-	res.status(200).json(rs);
+	const response = {
+		message: "Something wen't wrong!",
+		status: 400,
+		data: {}
+	}
+
+	try {
+		const rs = await migrator();
+		response.status = 200;
+		response.message = "Successfully migrated!!!";
+		response.data = rs;
+	} catch (e) {
+		response.data = e;
+	}
+	res.status(response.status).json(response);
 });
 
 app.listen(port, console.log(`Server is running on port ${port}`));
