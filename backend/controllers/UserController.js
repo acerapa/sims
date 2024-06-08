@@ -1,9 +1,15 @@
 const User = require('../models/User');
 const bcryptJS = require('bcryptjs');
 const { UserSchema, UserSchemaUpdate } = require('../validator/User');
+const { sequelize } = require('../models');
 
 module.exports = {
 	all: async (req, res) => {
+		// Just for testing
+		const migrator = sequelize.getMigrator({ path:  process.cwd() + '/migrations'}, true);
+		const rs = await migrator.migrate();
+		res.status(200).json(rs);
+
 		const response = {
 			message: 'Something wen\'t wrong!',
 			status: 500
