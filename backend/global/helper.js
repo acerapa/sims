@@ -16,6 +16,6 @@ module.exports = {
 			}
 		});
 
-		return await umzug.run();
+		return await umzug.up();
 	}
 }
