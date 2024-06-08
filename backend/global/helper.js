@@ -1,3 +1,4 @@
+const path = require('path');
 const { Umzug } = require('umzug');
 const { sequelize, Sequelize } = require('../models');
 
