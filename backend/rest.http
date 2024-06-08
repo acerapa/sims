@@ -92,3 +92,33 @@ Content-Type: application/json
 	"first_name": "Master",
 	"id": 4
 }
+
+### = [UPDATE a user] failed
+POST http://localhost:3000/api/users/update
+Accept: application/json
+Content-Type: application/json
+
+{
+}
+
+### = [Add new Product Category] success
+POST http://localhost:3000/api/product-category/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"name": "Laptops"
+}
+
+### = [Add new Product Category] failed
+POST http://localhost:3000/api/product-category/register
+Accept: application/json
+Content-Type: application/json
+
+{
+}
+
+### = [Get all Product Category] success
+GET http://localhost:3000/api/product-category/all
+Accept: application/json
+Content-Type: application/json

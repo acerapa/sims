@@ -10,6 +10,7 @@
     v-if="showDeleteConfirmModal"
     :href="'users/delete'"
     :data="toDelete"
+    @after-delete="afterDelete"
   />
   <div class="table-wrapper bg-white w-full flex flex-col gap-4 relative">
     <div class="flex justify-between items-center">
@@ -87,5 +88,10 @@ const viewRow = (user_id) => {
 const deleteRow = (user_id) => {
   toDelete.value = { user_id };
   showDeleteConfirmModal.value = true;
+};
+
+const afterDelete = async () => {
+  await employeeStore.fetchAllEmployees();
+  showDeleteConfirmModal.value = false;
 };
 </script>

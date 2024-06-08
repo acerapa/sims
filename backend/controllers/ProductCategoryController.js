@@ -9,7 +9,9 @@ module.exports = {
 		}
 
 		try {
-			const categories = await ProductCategory.findAll();
+			const categories = await ProductCategory.findAll({
+				order: [['createdAt', 'DESC']]
+			});
 			response.message = 'Successfully fetched!';
 			response.status = 200;
 			response.data = { categories };
@@ -35,6 +37,8 @@ module.exports = {
 		} catch (e) {
 			response.message += e.message;
 		}
+
+		res.status(response.status).json(response);
 	},
 
 	update: async (req, res) => {
