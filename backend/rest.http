@@ -8,8 +8,9 @@ Content-Type: application/json
 	"first_name": "Ram",
 	"last_name": "Tech",
 	"password": "bluelock",
-	"type": "admin",
-	"start_date": "2024-4-2"
+	"position": "admin",
+	"start_date": "2024-06-09",
+	"status": 1
 }
 
 ##### - [User Registration] failed registration

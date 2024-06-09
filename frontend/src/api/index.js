@@ -9,7 +9,7 @@ const apiConfig = {
 		Accept: 'application/json'
 	}
 }
-
+console.log(apiConfig);
 const BASE_PATH = apiConfig.serverUrls[import.meta.env.MODE];
 
 export const Method = Object.freeze({
