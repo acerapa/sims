@@ -4,6 +4,7 @@ import { ref } from 'vue';
 
 export const useSettingsStore = defineStore('settings', () => {
 	const productCategories = ref([]);
+	const accounts = ref([]);
 
 	const fetchAllProductCategories = async () => {
 		const res = await authenticatedApi('product-category/all');
@@ -12,8 +13,17 @@ export const useSettingsStore = defineStore('settings', () => {
 		}
 	};
 
+	const fetchAllAccounts = async () => {
+		const res = await authenticatedApi('settings/accounts/all');
+		if (res.status == 200) {
+			accounts.value = res.data.accounts;
+		}
+	}
+
 	return {
+		accounts,
 		productCategories,
+		fetchAllAccounts,
 		fetchAllProductCategories
 	}
 });

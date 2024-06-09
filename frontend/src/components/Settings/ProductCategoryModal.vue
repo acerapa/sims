@@ -14,7 +14,7 @@
 import { Method, authenticatedApi } from "@/api";
 import ModalWrapper from "@/components/wrappers/ModalWrapper.vue";
 import { useSettingsStore } from "@/stores/settings";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 const showModal = defineModel();
 const settingsStore = useSettingsStore();
@@ -31,6 +31,14 @@ const props = defineProps({
 
 const model = ref({
   name: "",
+});
+
+onMounted(async () => {
+  if (props.isEdit && props.selectedId) {
+    model.value = settingsStore.productCategories.find(
+      (pc) => pc.id == props.selectedId
+    );
+  }
 });
 
 const apiPath = props.isEdit

@@ -1,6 +1,11 @@
 <template>
   <div>
-    <ProductCategoryModal v-model="showModal" v-if="showModal" />
+    <ProductCategoryModal
+      v-model="showModal"
+      :is-edit="isEdit"
+      v-if="showModal"
+      :selected-id="toEdit"
+    />
     <DeleteConfirmModal
       v-if="showDeleteConfirmationModal"
       v-model="showDeleteConfirmationModal"
@@ -8,7 +13,7 @@
       :data="toDelete"
       @after-delete="afterDelete"
     />
-    <div class="table-wrapper bg-white w-full flex flex-col gap-4">
+    <div class="table-wrapper w-full">
       <div class="flex justify-between items-center">
         <input
           type="search"
@@ -47,6 +52,7 @@
             @open-menu="onSelectRow"
             :current-open-menu="selectedMenuRow"
             @delete="onDelete"
+            @view="onView"
           />
         </div>
       </div>
@@ -64,6 +70,7 @@ const showModal = ref(false);
 const showDeleteConfirmationModal = ref(false);
 const isEdit = ref(false);
 const toDelete = ref({});
+const toEdit = ref();
 const selectedMenuRow = ref(-1);
 const settingsStore = useSettingsStore();
 
@@ -78,6 +85,12 @@ const onSelectRow = (data) => {
 const onDelete = (id) => {
   toDelete.value = { id };
   showDeleteConfirmationModal.value = true;
+};
+
+const onView = (id) => {
+  toEdit.value = id;
+  isEdit.value = true;
+  showModal.value = true;
 };
 
 const afterDelete = async () => {
