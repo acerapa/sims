@@ -8,7 +8,11 @@ require('dotenv').config();
 const port = process.env.PORT || 3000;
 
 // setting ups
-app.use(cors());
+app.use(cors({
+	origin: '*',
+	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

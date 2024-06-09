@@ -1,6 +1,6 @@
 'use strict';
 
-const User = require('../models/user');
+const User = require('../models/User');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable('users', User.getAttributes());
+    await queryInterface.createTable(User.getTableName(), User.getAttributes());
   },
 
   async down(queryInterface, Sequelize) {
@@ -22,6 +22,6 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
 
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable(User.getTableName());
   }
 };

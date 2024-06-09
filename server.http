@@ -1,0 +1,14 @@
+##### - [User Registration] success registration
+POST https://sims-1gh9.onrender.com/api/users/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"username": "administrator",
+	"first_name": "Ram",
+	"last_name": "Tech",
+	"password": "bluelock",
+	"position": "admin",
+	"start_date": "2024-04-02",
+	"status": 1
+}
