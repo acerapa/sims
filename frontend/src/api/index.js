@@ -1,15 +1,15 @@
 const apiConfig = {
 	serverUrls: {
 		development: import.meta.env.VITE_DEV_SERVER,
-		production: import.meta.VITE_PROD_SERVER,
-		test: import.meta.VITE_TEST_SERVER
+		production: import.meta.env.VITE_PROD_SERVER,
+		test: import.meta.env.VITE_TEST_SERVER
 	},
 	defaultHeaders: {
 		'Content-Type': 'application/json',
 		Accept: 'application/json'
 	}
 }
-console.log(apiConfig, import.meta.env.MODE, import.meta.env.VITE_SAMPLE_API);
+
 const BASE_PATH = apiConfig.serverUrls[import.meta.env.MODE];
 
 export const Method = Object.freeze({
