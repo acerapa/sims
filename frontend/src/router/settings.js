@@ -3,7 +3,7 @@ export default [
 		path: '/settings',
 		name: 'setting',
 		redirect: {
-			name: 'product-categories'
+			name: 'account-settings'
 		},
 		component: () => import('@/layout/NavLayout.vue'),
 		children: [
@@ -13,9 +13,9 @@ export default [
 				component: () => import('@/views/Settings/ProductCategory.vue')
 			},
 			{
-				path: 'product-settings',
-				name: 'product-settings',
-				component: () => import('@/views/Settings/ProductCategory.vue')
+				path: 'account-settings',
+				name: 'account-settings',
+				component: () => import('@/views/Settings/Account.vue')
 			}
 		]
 	}

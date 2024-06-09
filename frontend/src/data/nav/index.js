@@ -50,13 +50,13 @@ export default [
 		icon: settings,
 		children: [
 			{
-				text: "Product Categories",
-				route: "product-categories",
+				text: "Account Settings",
+				route: "account-settings",
 				icon: dot,
 			},
 			{
-				text: "Product Settings",
-				route: "product-settings",
+				text: "Product Categories",
+				route: "product-categories",
 				icon: dot,
 			},
 		],

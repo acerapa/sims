@@ -12,7 +12,7 @@
     :data="toDelete"
     @after-delete="afterDelete"
   />
-  <div class="table-wrapper bg-white w-full flex flex-col gap-4 relative">
+  <div class="table-wrapper w-full relative">
     <div class="flex justify-between items-center">
       <input type="search" class="input w-full max-w-72" placeholder="Search" />
       <button
