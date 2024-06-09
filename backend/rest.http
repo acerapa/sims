@@ -122,3 +122,9 @@ Content-Type: application/json
 GET http://localhost:3000/api/product-category/all
 Accept: application/json
 Content-Type: application/json
+
+
+### = [Get all accounts] success
+GET http://localhost:3000/api/settings/accounts/all
+Accept: application/json
+Content-Type: application/json

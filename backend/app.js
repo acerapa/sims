@@ -24,6 +24,9 @@ app.use('/api/users', userRoutes);
 
 const productCategoryRoutes = require('./routes/ProuctCategoryRoutes');
 app.use('/api/product-category', productCategoryRoutes);
+
+const accountRoutes = require('./routes/AccountRoutes');
+app.use('/api/settings/accounts', accountRoutes);
 // end use routes
 
 app.listen(port, console.log(`Server is running on port ${port}`));

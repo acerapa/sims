@@ -31,7 +31,7 @@ export const api = async (url, method = Method.GET, payload = null, hdrs = {}) =
 
 	const request = new Request(`${BASE_PATH}${url}`, requestInit);
 
-	const response = await (await fetch(request));
+	const response = await fetch(request);
 
 	const contentType = response.headers.get('Content-Type');
 	let responseData;
