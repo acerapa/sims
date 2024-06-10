@@ -1,97 +1,89 @@
-const User = require('../models/User');
-const bcryptJS = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const User = require("../models/user");
+const bcryptJS = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // Validation Schema
-const { AuthSchema, VerifyTokenSchema } = require('../validator/Auth');
-const { UserSchema } = require('../validator/User');
+const { AuthSchema, VerifyTokenSchema } = require("../validator/Auth");
 
 module.exports = {
-	login: async (req, res) => {
-		const response = {
-			message: 'Incorrect Credentials',
-			status: 401
-		};
+  login: async (req, res) => {
+    const { value, error } = AuthSchema.validate(req.body);
+    if (!error) {
+      const user = await User.findOne({ where: { username: value.username } });
+      if (user) {
+        if (await bcryptJS.compare(value.password, user.password)) {
+          // generate access token and refresh token
+          const accessToken = jwt.sign(
+            { user_id: user.id, refresh: false },
+            process.env.SECRET_KEY,
+            { expiresIn: process.env.TOKEN_EXP }
+          );
+          const refressToken = jwt.sign(
+            { user_id: user.id, refresh: true },
+            process.env.REFRESH_TOKEN_KEY,
+            { expiresIn: process.env.REFRESH_TOKEN_EXP }
+          );
 
-		const { value, error } = AuthSchema.validate(req.body);
-		if (!error) {
-			const user = await User.findOne({ where: { username: value.username } });
+          res.sendResponse(
+            {
+              access: accessToken,
+              refresh: refressToken,
+            },
+            "Successfully login!",
+            200
+          );
+        }
+      }
+    } else {
+      res.sendError(error, "Incorrect Credentials!", 401);
+    }
+  },
 
-			if (user) {
-				if (await bcryptJS.compare(value.password, user.password)) {
+  verify: async (req, res) => {
+    const { value, error } = VerifyTokenSchema.validate(req.body);
+    let data;
 
-					// generate access token and refresh token
-					const accessToken = jwt.sign({ user_id: user.id, refresh: false }, process.env.SECRET_KEY, { expiresIn: process.env.TOKEN_EXP });
-					const refressToken = jwt.sign({ user_id: user.id, refresh: true }, process.env.REFRESH_TOKEN_KEY, { expiresIn: process.env.REFRESH_TOKEN_EXP });
+    if (!error) {
+      try {
+        data = jwt.verify(value.token, process.env.SECRET_KEY);
+        res.sendResponse({ isValid: true }, "Token is valid", 200);
+      } catch (e) {
+        res.sendError(
+          { isValid: false },
+          "Invalid access token! => " + e.message,
+          401
+        );
+      }
+    } else {
+      res.sendError({ isValid: false, ...error }, "Invalid access token!", 401);
+    }
+  },
 
-					response.status = 200;
-					response.message = 'Successfully login!';
-					response.data = {
-						access: accessToken,
-						refresh: refressToken
-					}
-				}
-			}
-		} else {
-			response.data = error;
-		}
+  refresh: async (req, res) => {
+    try {
+      const data = jwt.verify(req.body.refresh, process.env.REFRESH_TOKEN_KEY);
 
-		res.status(response.status).json(response);
-	},
+      if (data && data.refresh) {
+        // generate new access and refresh token
+        const accessToken = jwt.sign(
+          { user_id: data.user_id, refresh: false },
+          process.env.SECRET_KEY,
+          { expiresIn: process.env.TOKEN_EXP }
+        );
+        const refressToken = jwt.sign(
+          { user_id: data.user_id, refresh: true },
+          process.env.REFRESH_TOKEN_KEY,
+          { expiresIn: process.env.REFRESH_TOKEN_EXP }
+        );
 
-	verify: async (req, res) => {
-		const response = {
-			status: 401,
-			message: 'Invalid access token',
-			data: {
-				isValid: false
-			}
-		}
-
-		const { value, error } = VerifyTokenSchema.validate(req.body);
-		let data;
-
-		if (!error) {
-			try {
-				data = jwt.verify(value.token, process.env.SECRET_KEY);
-				response.status = 200;
-				response.message = 'Token is valid';
-				response.data = { isValid: true };
-			} catch (e) {
-				response.message = response.message + ' => ' + e.message;
-			}
-		} else {
-			response.data = { ...response.data, error };
-		}
-
-		return res.status(response.status).json(response);
-	},
-
-	refresh: async (req, res) => {
-		const response = {
-			status: 401,
-			message: 'Invalid Refresh Token'
-		};
-
-		try {
-			const data = jwt.verify(req.body.refresh, process.env.REFRESH_TOKEN_KEY);
-
-			if (data && data.refresh) {
-				// generate new access and refresh token
-				const accessToken = jwt.sign({ user_id: data.user_id, refresh: false }, process.env.SECRET_KEY, { expiresIn: process.env.TOKEN_EXP });
-				const refressToken = jwt.sign({ user_id: data.user_id, refresh: true }, process.env.REFRESH_TOKEN_KEY, { expiresIn: process.env.REFRESH_TOKEN_EXP });
-
-				response.status = 200;
-				response.message = 'Successfully refresh tokens';
-				response.data = {
-					access: accessToken,
-					refresh: refressToken
-				}
-			}
-		} catch (e) {
-			response.message = response.message + ' => ' + e.message;
-		}
-
-		res.status(response.status).json(response);
-	}
-}
+        res.sendResponse(
+          { access: accessToken, refresh: refressToken },
+          "Successfully refresh tokens",
+          200
+        );
+      }
+    } catch (e) {
+      res.sendError(e, "Invalid refresh token =>" + e.message, 401);
+    }
+  },
+};

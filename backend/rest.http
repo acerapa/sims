@@ -129,3 +129,55 @@ Content-Type: application/json
 GET http://localhost:3000/api/settings/accounts/all
 Accept: application/json
 Content-Type: application/json
+
+### = [Get all suppliers] success
+GET http://localhost:3000/api/suppliers/all
+Accept: application/json
+Content-Type: application/json
+
+### = [Add new suppliers] success
+POST http://localhost:3000/api/suppliers/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"company_name": "ABC Company",
+	"first_name": "Rynn Harvey",
+	"last_name": "Aparece",
+	"phone": "09674837534",
+	"address": {
+		"address1": "Sample address",
+		"address2": "Sample address",
+		"city": "Blue City",
+		"postal": "904596"
+	}
+}
+
+### = [Update supplier] success
+POST http://localhost:3000/api/suppliers/update
+Accept: application/json
+Content-Type: application/json
+
+{
+	"id": 1,
+	"company_name": "ABC Company",
+	"first_name": "Rynn",
+	"last_name": "Aparece",
+	"phone": "09674837534",
+	"address": {
+		"id": 1,
+		"address1": "Sample address updated ",
+		"address2": "Sample address updated",
+		"city": "Blue City",
+		"postal": "904596"
+	}
+}
+
+### = [DELETE supplier] success
+DELETE  http://localhost:3000/api/suppliers/delete
+Accept: application/json
+Content-Type: application/json
+
+{
+	"id": 2
+}
