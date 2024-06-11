@@ -35,7 +35,6 @@ const appStore = useAppStore();
 
 const onRouteClick = (name = route.name, hasChild = false) => {
   if (hasChild) {
-    console.log(route.matched);
     name = route.matched[0].redirect.name;
   }
   appStore.currentNav = navs.find((r) => r.route == name);

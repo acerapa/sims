@@ -109,7 +109,7 @@ const onSubmit = async () => {
       model.value.username
     }-${new Date().getFullYear()}`;
   }
-  console.log(model.value);
+  
   const res = await authenticatedApi(apiPath, Method.POST, model.value);
   // TODO: Show alert. Currently we have no alert component so go ahead and create it first
   showModal.value = false;

@@ -1,6 +1,13 @@
 {
   "dependencies": {},
   "private": true,
+  "scripts": {
+    "backend": "yarn workspace backend dev",
+    "frontend": "yarn workspace frontend dev",
+    "migrate": "yarn workspace backend sequelize db:migrate",
+    "migrate-undo": "yarn workspace backend sequelize db:migrate:undo",
+    "migrate-undo-all": "yarn workspace backend sequelize db:migrate:undo:all"
+  },
   "workspaces":[
     "./frontend",
     "./backend"
