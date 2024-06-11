@@ -1,7 +1,7 @@
 <template>
   <div class="overlay"></div>
   <div
-    class="fixed w-full max-w-[614px] rounded-xl top-10 left-1/2 -translate-x-1/2 p-4 z-40 bg-white"
+    class="fixed w-full max-h-[calc(100vh-80px)] max-w-[614px] rounded-xl top-10 left-1/2 -translate-x-1/2 p-4 z-40 bg-white"
   >
     <div class="flex justify-between items-center">
       <p class="font-semibold text-xl">{{ props.title }}</p>
@@ -13,7 +13,9 @@
       />
     </div>
     <form :action="props.action">
-      <slot></slot>
+      <div class="max-h-[calc(100vh-241.33px)] h-auto overflow-y-auto w-full">
+        <slot></slot>
+      </div>
     </form>
     <div class="flex gap-3 mt-10 mx-auto justify-center">
       <button
