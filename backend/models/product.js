@@ -29,7 +29,7 @@ const fields = {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-  sku: {
+  item_code: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
@@ -60,7 +60,7 @@ const fields = {
 const options = {
   sequelize,
   timestamps: true,
-  paranoid: true
+  paranoid: false
 };
 
 Product.init(fields, options);

@@ -142,10 +142,12 @@ const model = ref({
 });
 
 const onSubmit = async () => {
-  await authenticatedApi(apiPath.value, Method.POST, model.value);
+  const res = await authenticatedApi(apiPath.value, Method.POST, model.value);
 	await supplierStore.fetchAllSuppliers();
 
-	showModal.value = false;
+  if (res.status == 200) {
+    showModal.value = false;
+  }
 };
 
 onMounted(() => {
