@@ -54,7 +54,7 @@
 </template>
 <script setup>
 import { Method, authenticatedApi } from "@/api";
-import ModalWrapper from "@/components/wrappers/ModalWrapper.vue";
+import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { Helpers } from "@/helpers";
 import { useEmployeeStore } from "@/stores/employee";
 import { onMounted, ref } from "vue";

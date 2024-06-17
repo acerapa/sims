@@ -12,7 +12,7 @@
 </template>
 <script setup>
 import { Method, authenticatedApi } from "@/api";
-import ModalWrapper from "@/components/wrappers/ModalWrapper.vue";
+import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { useSettingsStore } from "@/stores/settings";
 import { onMounted, ref } from "vue";
 

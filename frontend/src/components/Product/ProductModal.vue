@@ -199,7 +199,7 @@
 
 <script setup>
 import { Method, authenticatedApi } from "@/api";
-import ModalWrapper from "@/components/wrappers/ModalWrapper.vue";
+import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { useProductStore } from "@/stores/product";
 import { useSettingsStore } from "@/stores/settings";
 import { useVendorStore } from "@/stores/supplier";
