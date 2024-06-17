@@ -9,56 +9,68 @@ import settings from "@/assets/icons/settings.svg";
 import dot from "@/assets/icons/dot.svg";
 
 export default [
-	{
-		text: "Dashboard",
-		route: "dashboard",
-		icon: dashboard,
-	},
-	{
-		text: "Inventory",
-		route: "inventory",
-		icon: inventory,
-	},
-	{
-		text: "Vendors/Suppliers",
-		route: "vendors",
-		icon: vendors,
-	},
-	{
-		text: "Customers",
-		route: "customers",
-		icon: customers,
-	},
-	{
-		text: "Products",
-		route: "products",
-		icon: products,
-	},
-	{
-		text: "Reports",
-		route: "reports",
-		icon: reports,
-	},
-	{
-		text: "Employees",
-		route: "employees",
-		icon: employees,
-	},
-	{
-		text: "Settings",
-		route: "setting",
-		icon: settings,
-		children: [
-			{
-				text: "Account Settings",
-				route: "account-settings",
-				icon: dot,
-			},
-			{
-				text: "Product Categories",
-				route: "product-categories",
-				icon: dot,
-			},
-		],
-	},
-]
+  {
+    text: "Dashboard",
+    route: "dashboard",
+    icon: dashboard,
+  },
+  {
+    text: "Inventory",
+    route: "inventory",
+    icon: inventory,
+    children: [
+      {
+        text: "Purchase Order",
+        route: "purchase-order",
+        icon: dot,
+      },
+      {
+        text: "My Inventory",
+        route: "my-inventory",
+        icon: dot,
+      },
+    ],
+  },
+  {
+    text: "Vendors/Suppliers",
+    route: "vendors",
+    icon: vendors,
+  },
+  {
+    text: "Customers",
+    route: "customers",
+    icon: customers,
+  },
+  {
+    text: "Products",
+    route: "products",
+    icon: products,
+  },
+  {
+    text: "Reports",
+    route: "reports",
+    icon: reports,
+  },
+  {
+    text: "Employees",
+    route: "employees",
+    icon: employees,
+  },
+  {
+    text: "Settings",
+    route: "setting",
+    icon: settings,
+    children: [
+      {
+        text: "Account Settings",
+        route: "account-settings",
+        icon: dot,
+      },
+      {
+        text: "Product Categories",
+        route: "product-categories",
+        icon: dot,
+      },
+    ],
+  },
+];

@@ -8,7 +8,7 @@
       {{ props.product.name }}
     </p>
     <p class="col-span-1 text-sm">{{ props.product.item_code }}</p>
-    <p class="col-span-3 text-sm line-clamp-2">{{ props.product.description }}</p>
+    <p class="col-span-3 text-sm line-clamp-2">{{ props.product.purchase_description }}</p>
     <p class="col-span-1 text-sm">{{ props.product.quantityInStock }}</p>
     <p class="col-span-1 text-sm">{{ props.product.added_on }}</p>
     <div class="col-span-1 text-sm">{{ props.product.status }}</div>
