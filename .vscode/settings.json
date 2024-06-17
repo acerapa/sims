@@ -4,5 +4,17 @@
   "path-autocomplete.pathMappings": {
     "@": "${workspaceFolder}/src"
   },
-  "css.format.enable": false
+  "css.format.enable": false,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/dist": true
+  },
+  "javascript.referencesCodeLens.enabled": true,
+  "javascript.updateImportsOnFileMove.enabled": "always"
 }

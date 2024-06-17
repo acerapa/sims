@@ -6,7 +6,8 @@
     "frontend": "yarn workspace frontend dev",
     "migrate": "yarn workspace backend sequelize db:migrate",
     "migrate-undo": "yarn workspace backend sequelize db:migrate:undo",
-    "migrate-undo-all": "yarn workspace backend sequelize db:migrate:undo:all"
+    "migrate-undo-all": "yarn workspace backend sequelize db:migrate:undo:all",
+    "sequelize": "yarn workspace backend sequelize"
   },
   "workspaces":[
     "./frontend",
