@@ -117,7 +117,7 @@ const props = defineProps({
   },
 	selectedId: {
 		type: Number,
-		required: true
+		required: false
 	}
 });
 

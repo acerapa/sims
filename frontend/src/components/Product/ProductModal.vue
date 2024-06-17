@@ -36,6 +36,7 @@
                 :disabled="!supplierStore.suppliers.length"
               >
                 <option value="" hidden>*Select Preferred Supplier</option>
+                <option value="ADD NEW">&lt;&lt;Add New&gt;&gt;</option>
                 <option
                   v-for="(sup, ndx) in supplierStore.suppliers"
                   :value="sup.id"
@@ -64,6 +65,7 @@
                 :disabled="!settingStore.productCategories.length"
               >
                 <option value="" hidden>*Category</option>
+                <option value="ADD NEW">&lt;&lt;Add new&gt;&gt;</option>
                 <option
                   v-for="(category, ndx) in settingStore.productCategories"
                   :key="ndx"
@@ -203,7 +205,7 @@ import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { useProductStore } from "@/stores/product";
 import { useSettingsStore } from "@/stores/settings";
 import { useVendorStore } from "@/stores/supplier";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { AccountType } from "@/types/enums";
 
 const props = defineProps({
@@ -213,8 +215,11 @@ const props = defineProps({
   },
   selectedId: {
     type: Number,
+    required: false,
   },
 });
+
+const emit = defineEmits(["newProductCategory", "newSupplier"]);
 
 const showModal = defineModel();
 
@@ -225,7 +230,6 @@ const model = ref({
   purchase_price: "",
   selling_price: "",
   item_code: "",
-  category: "",
   brand: "",
   quantityInStock: "",
   imageUrl: "",
@@ -255,7 +259,6 @@ const expenseAccounts = computed(() => {
 });
 
 onMounted(() => {
-  console.log(props.isEdit, props.selectedId);
   if (props.isEdit && props.selectedId) {
     model.value = productStore.products.find(
       (product) => product.id == props.selectedId
@@ -268,4 +271,24 @@ const onSubmit = async () => {
   await productStore.fetchAllProducts();
   showModal.value = false;
 };
+
+watch(
+  () => model.value.category_id,
+  (val) => {
+    if (val == "ADD NEW") {
+      emit("newProductCategory", true);
+      model.value.category_id = "";
+    }
+  }
+);
+
+watch(
+  () => model.value.supplier_id,
+  (val) => {
+    if (val == "ADD NEW") {
+      emit("newSupplier", true);
+      model.value.supplier_id = "";
+    }
+  }
+);
 </script>

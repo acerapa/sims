@@ -4,6 +4,18 @@
     v-model="showModal"
     v-if="showModal"
     :selected-id="toEdit"
+    @new-product-category="onNewProductCategory"
+    @new-supplier="onNewSupplier"
+  />
+  <ProductCategoryModal
+    :is-edit="false"
+    v-model="showCategoryModal"
+    v-if="showCategoryModal"
+  />
+  <VendorModal
+    :is-edit="false"
+    v-model="showVendorModal"
+    v-if="showVendorModal"
   />
   <DeleteConfirmModal
     v-if="showDeleteConfirmModal"
@@ -61,10 +73,15 @@ import { onMounted, ref } from "vue";
 import ProductModal from "@/components/Product/ProductModal.vue";
 import ProductRow from "@/components/Product/ProductRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import ProductCategoryModal from "@/components/Settings/ProductCategoryModal.vue";
+import VendorModal from "@/components/Vendor/VendorModal.vue";
+
 import { useProductStore } from "@/stores/product";
 import { useVendorStore } from "@/stores/supplier";
 import { useSettingsStore } from "@/stores/settings";
 
+const showVendorModal = ref(false);
+const showCategoryModal = ref(false);
 const showDeleteConfirmModal = ref(false);
 const showModal = ref(false);
 const isEdit = ref(false);
@@ -91,6 +108,16 @@ const onAfterDelete = async () => {
   toDelete.value = {};
   await productStore.fetchAllProducts();
 };
+
+const onNewProductCategory = () => {
+  showModal.value = false;
+  showCategoryModal.value = true;
+};
+
+const onNewSupplier = () => {
+  showModal.value = false;
+  showVendorModal.value = true;
+}
 
 onMounted(async () => {
   await productStore.fetchAllProducts();

@@ -26,6 +26,7 @@ const props = defineProps({
   },
   selectedId: {
     type: Number,
+    required: false
   },
 });
 
@@ -46,9 +47,11 @@ const apiPath = props.isEdit
   : "product-category/register";
 
 const onSubmit = async () => {
-  await authenticatedApi(apiPath, Method.POST, model.value);
+  const res = await authenticatedApi(apiPath, Method.POST, model.value);
 
-  showModal.value = false;
+  if (res.status == 200) {
+    showModal.value = false;
+  }
 
   await settingsStore.fetchAllProductCategories();
 };
