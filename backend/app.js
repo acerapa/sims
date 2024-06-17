@@ -40,6 +40,9 @@ app.use("/api/settings/accounts", accountRoutes);
 
 const supplierRoutes = require("./routes/SupplierRoutes");
 app.use("/api/suppliers", supplierRoutes);
+
+const productRoutes = require("./routes/ProductRoutes");
+app.use("/api/products", productRoutes);
 // end use routes
 
 app.listen(port, console.log(`Server is running on port ${port}`));

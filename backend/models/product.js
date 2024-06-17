@@ -13,15 +13,23 @@ const fields = {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  description: {
+  purchase_description: {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  price: {
+  salling_description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  purchase_price: {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
-  sku: {
+  selling_price: {
+    type: DataTypes.FLOAT,
+    allowNull: false
+  },
+  item_code: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
@@ -38,16 +46,8 @@ const fields = {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  imageUrl: {
+  imageUrl: { // to be discused
     type: DataTypes.STRING,
-    allowNull: true,
-  },
-  weight: {
-    type: DataTypes.FLOAT,
-    allowNull: true,
-  },
-  dimensions: {
-    type: DataTypes.STRING, // Or JSON if you want to store it as an object
     allowNull: true,
   },
   status: {
@@ -60,7 +60,7 @@ const fields = {
 const options = {
   sequelize,
   timestamps: true,
-  paranoid: true
+  paranoid: false
 };
 
 Product.init(fields, options);

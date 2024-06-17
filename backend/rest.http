@@ -181,3 +181,43 @@ Content-Type: application/json
 {
 	"id": 2
 }
+
+
+### = [GET all products] success
+GET http://localhost:3000/api/products/all
+Accept: application/json
+Content-Type: application/json
+
+### = [Register product] success
+POST http://localhost:3000/api/products/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"name": "Printer",
+	"purchase_price": 5000,
+	"selling_price": 5000,
+	"sku": "PRTN-567-788",
+	"category": 45,
+	"quantityInStock": 8
+}
+
+### = [Update product] success
+POST http://localhost:3000/api/products/update
+Accept: application/json
+Content-Type: application/json
+
+{
+	"id": 1,
+	"name": "PRINTERS"
+}
+
+### = [Delete product] success
+DELETE http://localhost:3000/api/products/delete
+Accept: application/json
+Content-Type: application/json
+
+{
+	"id": 1
+}
+
