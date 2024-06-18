@@ -17,7 +17,7 @@ const fields = {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  salling_description: {
+  selling_description: {
     type: DataTypes.TEXT,
     allowNull: true,
   },
@@ -33,10 +33,6 @@ const fields = {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
-  },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: false,
   },
   brand: {
     type: DataTypes.STRING,
@@ -54,6 +50,10 @@ const fields = {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: 'active',
+  },
+  category_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false
   }
 };
 
