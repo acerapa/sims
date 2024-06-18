@@ -169,7 +169,7 @@
               v-model="model.quantityInStock"
             />
             <input
-              type="number"
+              type="text"
               class="input flex-1"
               placeholder="Item Code"
               v-model="model.item_code"
@@ -258,11 +258,22 @@ const expenseAccounts = computed(() => {
   );
 });
 
-onMounted(() => {
+const generateItemCode = async () => {
+  const res = await authenticatedApi('products/item-code');
+  if (res.status == 200) {
+    model.value.item_code = res.data.item_code;
+  }
+}
+
+onMounted(async () => {
   if (props.isEdit && props.selectedId) {
     model.value = productStore.products.find(
       (product) => product.id == props.selectedId
     );
+  }
+
+  if (!props.isEdit) {
+    await generateItemCode();
   }
 });
 

@@ -14,7 +14,7 @@
     </div>
 
     <!-- Navigations -->
-    <div class="mt-5">
+    <div class="mt-5 overflow-y-auto h-[calc(100vh-92px)]">
       <NavRow
         v-for="(nav, ndx) in navs"
         :key="ndx"

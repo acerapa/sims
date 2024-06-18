@@ -188,6 +188,11 @@ GET http://localhost:3000/api/products/all
 Accept: application/json
 Content-Type: application/json
 
+### = [GET all product item codes] success
+GET http://localhost:3000/api/products/item-code
+Accept: application/json
+Content-Type: application/json
+
 ### = [Register product] success
 POST http://localhost:3000/api/products/register
 Accept: application/json
