@@ -28,6 +28,7 @@
         v-for="(child, child_ndx) in props.nav.children"
         :key="child_ndx"
         class="px-5 py-2 flex gap-3 w-fit rounded-lg text-sm"
+        :class="isIncludedRoute(child) ? 'bg-dark-blue font-bold' : ''"
         :to="{ name: child.route }"
         active-class="bg-dark-blue font-bold"
         @click="emitRouteClick(child.route, child.children)"
@@ -39,7 +40,10 @@
   </div>
 </template>
 <script setup>
+import { useAppStore } from "@/stores/app";
 import { useRoute } from "vue-router";
+
+const appStore = useAppStore();
 
 const props = defineProps({
   nav: {
@@ -62,5 +66,13 @@ const emitRouteClick = (nav, hasChild) => {
   setTimeout(() => {
     emit("routeClick", nav, hasChild);
   }, 200);
+};
+
+const isIncludedRoute = (rt) => {
+  return (
+    appStore.currentNav.includes_active &&
+    appStore.currentNav.includes_active.includes(route.name) &&
+    rt.route == appStore.currentNav.route
+  );
 };
 </script>

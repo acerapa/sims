@@ -17,6 +17,11 @@ export default [
         name: "purchase-order",
         component: () => import("@/views/Inventory/PurchaseOrder.vue"),
       },
+      {
+        path: "/purchase-order-create",
+        name: "purchase-order-create",
+        component: () => import("@/views/Inventory/PurchaseOrderForm.vue"),
+      },
     ],
   },
 ];

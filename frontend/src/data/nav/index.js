@@ -23,6 +23,9 @@ export default [
         text: "Purchase Order",
         route: "purchase-order",
         icon: dot,
+        includes_active: [
+          'purchase-order-create'
+        ]
       },
       {
         text: "My Inventory",

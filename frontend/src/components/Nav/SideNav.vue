@@ -29,9 +29,11 @@ import { useAppStore } from "@/stores/app";
 import { useRoute } from "vue-router";
 import NavRow from "./NavRow.vue";
 import navs from "@/data/nav";
+import { onMounted, ref, watch } from "vue";
 
 const route = useRoute();
 const appStore = useAppStore();
+const targetRoutes = ref([]);
 
 const onRouteClick = (name = route.name, hasChild = false) => {
   if (hasChild) {
@@ -50,6 +52,34 @@ const onRouteClick = (name = route.name, hasChild = false) => {
   }
 };
 
+const getIncludeActiveRoutes = (rt) => {
+  if (rt.includes_active) {
+    rt.includes_active.forEach(iart => {
+      targetRoutes.value.push({
+        parent: rt,
+        route_name: iart
+      });
+    });
+  }
+
+  if (rt.children) {
+    rt.children.forEach((r) => getIncludeActiveRoutes(r));
+  }
+};
+
+const getActiveRouteBasedIncludes = (route) => {
+  const rt = targetRoutes.value.find(r => r.route_name == route.name);
+  if (rt) appStore.currentNav = rt.parent;
+}
+
+navs.forEach((rt) => getIncludeActiveRoutes(rt));
+
+watch(route, (val) => {
+  getActiveRouteBasedIncludes(val);
+});
+
+
 // run function upon loading
 onRouteClick();
+getActiveRouteBasedIncludes(route);
 </script>
