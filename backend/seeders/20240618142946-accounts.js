@@ -16,13 +16,38 @@ module.exports = {
     */
    const fields = [
     {
-      name: "Cost of Goods",
+      name: "Hardware",
+      type: "income",
+      createdAt: new Date()
+    },
+    {
+      name: "Software",
+      type: "income",
+      createdAt: new Date()
+    },
+    {
+      name: "Services",
+      type: "income",
+      createdAt: new Date()
+    },
+    {
+      name: "Others",
+      type: "income",
+      createdAt: new Date()
+    },
+    {
+      name: "Rentals",
       type: "expense",
       createdAt: new Date()
     },
     {
-      name: "Sales of Goods",
-      type: "income",
+      name: "Travel",
+      type: "expense",
+      createdAt: new Date()
+    },
+    {
+      name: "Mail Allowance",
+      type: "expense",
       createdAt: new Date()
     }
    ];

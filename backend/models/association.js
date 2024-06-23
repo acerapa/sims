@@ -3,13 +3,19 @@ const Product = require("./product");
 const Supplier = require("./supplier");
 const ProductSupplier = require("./product-supplier");
 const ProductCategory = require("./product-category");
+const ProductOrder = require("./product-order");
+const PurchaseOrder = require("./purchase-order");
 
 Supplier.hasOne(Address, {
-  foreignKey: "id",
+  foreignKey: "supplier_id",
   as: "address",
   onDelete: "CASCADE",
 });
-Address.belongsTo(Supplier, { as: "supplier", onDelete: "NO ACTION" });
+Address.belongsTo(Supplier, {
+  foreignKey: "supplier_id",
+  as: "supplier",
+  onDelete: "NO ACTION",
+});
 
 Product.hasOne(ProductSupplier, {
   foreignKey: "product_id",
@@ -29,4 +35,16 @@ ProductCategory.hasMany(Product, {
   foreignKey: "category_id",
   as: "products",
   onDelete: "NO ACTION",
+});
+
+Product.belongsToMany(PurchaseOrder, {
+  through: ProductOrder,
+  foreignKey: "product_id",
+  otherKey: "order_id",
+});
+
+PurchaseOrder.belongsToMany(Product, {
+  through: ProductOrder,
+  foreignKey: "order_id",
+  otherKey: "product_id",
 });

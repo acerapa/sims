@@ -25,7 +25,15 @@ Address.init(
     postal: {
       type: DataTypes.STRING,
       allowNull: true,
-    }
+    },
+    supplier_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "suppliers",
+        key: "id",
+      },
+      allowNull: false
+    },
   },
   {
     sequelize,
