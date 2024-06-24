@@ -27,64 +27,23 @@
             />
           </div>
           <div class="flex gap-3 items-start">
-            <div class="flex-1 flex flex-col">
-              <select
-                name=""
-                id=""
-                class="input"
-                v-model="model.supplier_id"
-                :disabled="!supplierStore.suppliers.length"
-              >
-                <option value="" hidden>*Select Preferred Supplier</option>
-                <option value="ADD NEW">&lt;&lt;Add New&gt;&gt;</option>
-                <option
-                  v-for="(sup, ndx) in supplierStore.suppliers"
-                  :value="sup.id"
-                  :key="ndx"
-                >
-                  {{ sup.company_name }}
-                </option>
-              </select>
-              <RouterLink
-                v-if="!supplierStore.suppliers.length"
-                :to="{ name: 'vendors' }"
-                class="text-center"
-              >
-                <small class="text-red-500"
-                  >***Please add suppliers first, just
-                  <small class="text-blue-500">click here</small>***</small
-                >
-              </RouterLink>
-            </div>
-            <div class="flex-1 flex flex-col">
-              <select
-                name=""
-                id=""
-                class="input"
-                v-model="model.category_id"
-                :disabled="!settingStore.productCategories.length"
-              >
-                <option value="" hidden>*Category</option>
-                <option value="ADD NEW">&lt;&lt;Add new&gt;&gt;</option>
-                <option
-                  v-for="(category, ndx) in settingStore.productCategories"
-                  :key="ndx"
-                  :value="category.id"
-                >
-                  {{ category.name }}
-                </option>
-              </select>
-              <RouterLink
-                v-if="!settingStore.productCategories.length"
-                :to="{ name: 'product-categories' }"
-                class="text-center"
-              >
-                <small class="text-red-500"
-                  >***Please add categories first, just
-                  <small class="text-blue-500">click here</small>***</small
-                >
-              </RouterLink>
-            </div>
+            <CustomSelectInput
+              placeholder="*Select Suppliers"
+              class="flex-1"
+              :has-add-new="true"
+              :select-multiple="true"
+              :options="supplierOptions"
+              @add-new="emit('newSupplier', true)"
+              v-model="model.supplier_ids"
+            />
+            <CustomSelectInput
+              placeholder="*Select Category"
+              class="flex-1"
+              :has-add-new="true"
+              :options="categoriesOptions"
+              @add-new="emit('newProductCategory')"
+              v-model="model.category_id"
+            />
           </div>
         </div>
       </div>
@@ -95,7 +54,7 @@
             <input
               type="number"
               class="input flex-1"
-              placeholder="Purchase Price"
+              placeholder="Cost Price"
               v-model="model.purchase_price"
             />
             <input
@@ -106,60 +65,22 @@
             />
           </div>
           <div class="flex gap-3 items-start">
-            <div class="flex-1 flex flex-col">
-              <select
-                name=""
-                id=""
-                class="input flex-1"
-                :disabled="!incomeAccounts.length"
-              >
-                <option value="" hidden>Income Account</option>
-                <option
-                  v-for="(acc, npx) in incomeAccounts"
-                  :key="npx"
-                  :value="acc.id"
-                >
-                  {{ acc.name }}
-                </option>
-              </select>
-              <RouterLink
-                v-if="!incomeAccounts.length"
-                :to="{ name: 'account-settings' }"
-                class="text-center"
-              >
-                <small class="text-red-500"
-                  >***Please add income accounts first, just
-                  <small class="text-blue-500">click here</small>***</small
-                >
-              </RouterLink>
-            </div>
-            <div class="flex-1 flex flex-col">
-              <select
-                name=""
-                id=""
-                class="input flex-1"
-                :disabled="!expenseAccounts.length"
-              >
-                <option value="" hidden>Expense Account</option>
-                <option
-                  v-for="(acc, npx) in expenseAccounts"
-                  :key="npx"
-                  :value="acc.id"
-                >
-                  {{ acc.name }}
-                </option>
-              </select>
-              <RouterLink
-                v-if="!expenseAccounts.length"
-                :to="{ name: 'account-settings' }"
-                class="text-center"
-              >
-                <small class="text-red-500"
-                  >***Please add expense accounts first, just
-                  <small class="text-blue-500">click here</small>***</small
-                >
-              </RouterLink>
-            </div>
+            <CustomSelectInput
+              placeholder="*Select Income Account"
+              class="flex-1"
+              :has-add-new="true"
+              :options="incomeAccounts"
+              @add-new="emit('newAccount')"
+              v-model="model.income_account"
+            />
+            <CustomSelectInput
+              placeholder="*Select Expense Account"
+              class="flex-1"
+              :has-add-new="true"
+              :options="expenseAccounts"
+              @add-new="emit('newAccount')"
+              v-model="model.expense_account"
+            />
           </div>
           <div class="flex gap-3">
             <input
@@ -189,7 +110,7 @@
               id=""
               rows="5"
               class="input flex-1"
-              placeholder="Seles Description"
+              placeholder="Sales Description"
               v-model="model.selling_description"
             ></textarea>
           </div>
@@ -202,6 +123,7 @@
 <script setup>
 import { Method, authenticatedApi } from "@/api";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
+import CustomSelectInput from "../shared/CustomSelectInput.vue";
 import { useProductStore } from "@/stores/product";
 import { useSettingsStore } from "@/stores/settings";
 import { useVendorStore } from "@/stores/supplier";
@@ -219,7 +141,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["newProductCategory", "newSupplier"]);
+const emit = defineEmits(["newProductCategory", "newSupplier", "newAccount"]);
 
 const showModal = defineModel();
 
@@ -236,7 +158,9 @@ const model = ref({
   status: "",
   type: "",
   category_id: "",
-  supplier_id: "",
+  supplier_ids: [],
+  income_account: "",
+  expense_account: "",
 });
 
 const title = ref(props.isEdit ? "Edit Product" : "New Product");
@@ -247,29 +171,59 @@ const supplierStore = useVendorStore();
 const settingStore = useSettingsStore();
 
 const incomeAccounts = computed(() => {
-  return settingStore.accounts.filter(
-    (acc) => acc.type == AccountType.income.value
-  );
+  return settingStore.accounts
+    .filter((acc) => acc.type == AccountType.income.value)
+    .map((acc) => {
+      return {
+        text: acc.name,
+        value: acc.id,
+      };
+    });
 });
 
 const expenseAccounts = computed(() => {
-  return settingStore.accounts.filter(
-    (acc) => acc.type == AccountType.expense.value
-  );
+  return settingStore.accounts
+    .filter((acc) => acc.type == AccountType.expense.value)
+    .map((acc) => {
+      return {
+        text: acc.name,
+        value: acc.id,
+      };
+    });
+});
+
+const supplierOptions = computed(() => {
+  return supplierStore.suppliers.map((supplier) => {
+    return {
+      value: supplier.id,
+      text: supplier.company_name,
+    };
+  });
+});
+
+const categoriesOptions = computed(() => {
+  return settingStore.productCategories.map((category) => {
+    return {
+      value: category.id,
+      text: category.name,
+    };
+  });
 });
 
 const generateItemCode = async () => {
-  const res = await authenticatedApi('products/item-code');
+  const res = await authenticatedApi("products/item-code");
   if (res.status == 200) {
     model.value.item_code = res.data.item_code;
   }
-}
+};
 
 onMounted(async () => {
   if (props.isEdit && props.selectedId) {
     model.value = productStore.products.find(
       (product) => product.id == props.selectedId
     );
+
+    model.value.supplier_ids = model.value.suppliers.map(sup => sup.id);
   }
 
   if (!props.isEdit) {
@@ -282,24 +236,4 @@ const onSubmit = async () => {
   await productStore.fetchAllProducts();
   showModal.value = false;
 };
-
-watch(
-  () => model.value.category_id,
-  (val) => {
-    if (val == "ADD NEW") {
-      emit("newProductCategory", true);
-      model.value.category_id = "";
-    }
-  }
-);
-
-watch(
-  () => model.value.supplier_id,
-  (val) => {
-    if (val == "ADD NEW") {
-      emit("newSupplier", true);
-      model.value.supplier_id = "";
-    }
-  }
-);
 </script>

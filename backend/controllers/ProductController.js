@@ -1,11 +1,20 @@
 const crypto = require("crypto");
 const Product = require("../models/product");
+const Supplier = require("../models/supplier");
 
 module.exports = {
   all: async (req, res) => {
     try {
       const products = await Product.findAll({
         order: [["updatedAt", "DESC"]],
+        include: [
+          {
+            model: Supplier,
+            as: "suppliers",
+            attributes: ["id"],
+            through: { attributes: [] },
+          },
+        ],
       });
       res.sendResponse({ products }, "Successfully fetched!");
     } catch (e) {
@@ -15,7 +24,8 @@ module.exports = {
 
   register: async (req, res) => {
     try {
-      await Product.create(req.body);
+      const product = await Product.create(req.body);
+      product.addSuppliers(req.body.supplier_ids);
       res.sendResponse({}, "Successfully Registered!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message);
@@ -51,7 +61,7 @@ module.exports = {
         attributes: ["item_code"],
       });
 
-      while (itemCodes.map(p => p.item_code).includes(itemCode)) {
+      while (itemCodes.map((p) => p.item_code).includes(itemCode)) {
         itemCode = crypto.randomBytes(4).toString("hex");
       }
 
