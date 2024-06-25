@@ -180,7 +180,6 @@ const onSubmit = async (isAddNew = false) => {
     Method.POST,
     model.value
   );
-  console.log(res);
 
   if (!isAddNew) {
     router.push({
