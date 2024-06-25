@@ -17,11 +17,15 @@ Address.belongsTo(Supplier, {
   onDelete: "NO ACTION",
 });
 
-Product.hasOne(ProductSupplier, {
+Product.belongsToMany(Supplier, {
+  through: ProductSupplier,
+  as: "suppliers",
   foreignKey: "product_id",
 });
 
-Supplier.hasMany(ProductSupplier, {
+Supplier.belongsToMany(Product, {
+  through: ProductSupplier,
+  as: "products",
   foreignKey: "supplier_id",
 });
 
