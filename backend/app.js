@@ -25,24 +25,8 @@ require("./models");
 const { responseFormatter } = require("./global/helper");
 app.use(responseFormatter);
 
-// start use routes
-const authRoutes = require("./routes/AuthRoutes");
-app.use("/api/auth", authRoutes);
-
-const userRoutes = require("./routes/UserRouters");
-app.use("/api/users", userRoutes);
-
-const productCategoryRoutes = require("./routes/ProuctCategoryRoutes");
-app.use("/api/product-category", productCategoryRoutes);
-
-const accountRoutes = require("./routes/AccountRoutes");
-app.use("/api/settings/accounts", accountRoutes);
-
-const supplierRoutes = require("./routes/SupplierRoutes");
-app.use("/api/suppliers", supplierRoutes);
-
-const productRoutes = require("./routes/ProductRoutes");
-app.use("/api/products", productRoutes);
-// end use routes
+// api routes
+const apiRoutes = require("./routes/apiRoutes");
+app.use("/api", apiRoutes);
 
 app.listen(port, console.log(`Server is running on port ${port}`));

@@ -11,6 +11,7 @@ Supplier.hasOne(Address, {
   as: "address",
   onDelete: "CASCADE",
 });
+
 Address.belongsTo(Supplier, {
   foreignKey: "supplier_id",
   as: "supplier",
@@ -51,4 +52,16 @@ PurchaseOrder.belongsToMany(Product, {
   through: ProductOrder,
   foreignKey: "order_id",
   otherKey: "product_id",
+});
+
+PurchaseOrder.belongsTo(Supplier, {
+  foreignKey: "supplier_id",
+  as: "supplier",
+  onDelete: "NO ACTION",
+});
+
+PurchaseOrder.hasOne(Address, {
+  foreignKey: "order_id",
+  as: "address",
+  onDelete: 'CASCADE'
 });

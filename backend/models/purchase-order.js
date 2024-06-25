@@ -29,6 +29,14 @@ PurchaseOrder.init(
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false
+    },
+    supplier_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'suppliers',
+        key: 'id'
+      }
     }
   },
   {

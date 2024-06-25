@@ -32,8 +32,15 @@ Address.init(
         model: "suppliers",
         key: "id",
       },
-      allowNull: false
+      allowNull: true
     },
+    order_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "purchaseorders",
+        key: "id"
+      }
+    }
   },
   {
     sequelize,

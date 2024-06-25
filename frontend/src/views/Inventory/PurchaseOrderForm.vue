@@ -1,5 +1,6 @@
 <template>
   <PurchaseOrderAddProductModal v-model="showModal" v-if="showModal" />
+  <VendorModal v-model="showVendorModal" v-if="showVendorModal" />
   <div class="flex flex-col gap-4">
     <div class="bg-white rounded-2xl p-4 shadow flex flex-col gap-3">
       <p class="text-base font-semibold">New Purchase Order</p>
@@ -8,36 +9,19 @@
           <div class="flex-1 flex flex-col gap-2">
             <p class="text-sm font-semibold">Order Info</p>
             <div class="flex flex-col gap-3">
-              <div class="flex-1 flex flex-col">
-                <select
-                  name=""
-                  id=""
-                  class="input"
-                  v-model="model.supplier_id"
-                  :disabled="!supplierStore.suppliers.length"
-                >
-                  <option value="" hidden>*Select Supplier</option>
-                  <option value="ADD NEW">&lt;&lt;Add New&gt;&gt;</option>
-                  <option
-                    v-for="(sup, ndx) in supplierStore.suppliers"
-                    :value="sup.id"
-                    :key="ndx"
-                  >
-                    {{ sup.company_name }}
-                  </option>
-                </select>
-                <RouterLink
-                  v-if="!supplierStore.suppliers.length"
-                  :to="{ name: 'vendors' }"
-                  class="text-center"
-                >
-                  <small class="text-red-500"
-                    >***Please add suppliers first, just
-                    <small class="text-blue-500">click here</small>***</small
-                  >
-                </RouterLink>
-              </div>
-              <input type="text" class="input" placeholder="Ref. No." />
+              <CustomSelectInput
+                :has-add-new="true"
+                :options="supplierOptions"
+                placeholder="*Select supplier"
+                v-model="model.order.supplier_id"
+                @add-new="showVendorModal = true"
+              />
+              <input
+                type="text"
+                class="input"
+                v-model="model.order.ref_no"
+                placeholder="Ref. No."
+              />
               <div class="flex gap-3">
                 <input
                   type="text"
@@ -45,6 +29,7 @@
                   placeholder="Date"
                   @focus="$event.target.type = 'date'"
                   @blur="$event.target.type = 'text'"
+                  v-model="model.order.date"
                 />
                 <input
                   type="text"
@@ -52,13 +37,14 @@
                   placeholder="Bill Due"
                   @focus="$event.target.type = 'date'"
                   @blur="$event.target.type = 'text'"
+                  v-model="model.order.bill_due"
                 />
               </div>
             </div>
           </div>
           <div class="flex-1 flex flex-col gap-2">
             <p class="text-sm font-semibold">Address Info</p>
-            <AddressForm />
+            <AddressForm v-model="model.order.address" />
           </div>
         </div>
         <textarea
@@ -66,6 +52,7 @@
           id=""
           class="input resize-none"
           placeholder="Memo"
+          v-model="model.order.memo"
         ></textarea>
       </div>
 
@@ -119,13 +106,17 @@
 </template>
 <script setup>
 import { useVendorStore } from "@/stores/supplier";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import AddressForm from "@/components/shared/AddressForm.vue";
 import PurchaseOrderFormRow from "../../components/Inventory/PurchaseOrderFormRow.vue";
 import { useRouter } from "vue-router";
 import PurchaseOrderAddProductModal from "@/components/Inventory/PurchaseOrderAddProductModal.vue";
+import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
+import VendorModal from "@/components/Vendor/VendorModal.vue";
+import { Method, authenticatedApi } from "@/api";
 
-const showModal = ref(true);
+const showVendorModal = ref(false);
+const showModal = ref(false);
 const isEdit = ref(false);
 const supplierStore = useVendorStore();
 const router = useRouter();
@@ -153,16 +144,48 @@ const orders = [
 ];
 
 const model = ref({
-  supplier_id: "",
+  order: {
+    supplier_id: "",
+    ref_no: "",
+    date: "",
+    bill_due: "",
+    memo: "",
+    amount: 0,
+    address: {
+      address1: "",
+      address2: "",
+      city: "",
+      postal: "",
+    },
+  },
+  products: [],
+});
+
+const supplierOptions = computed(() => {
+  return supplierStore.suppliers.map((supplier) => {
+    return {
+      value: supplier.id,
+      text: supplier.company_name,
+    };
+  });
 });
 
 onMounted(async () => {
   await supplierStore.fetchAllSuppliers();
 });
 
-const onSubmit = async () => {
-  router.push({
-    name: "purchase-order",
-  });
+const onSubmit = async (isAddNew = false) => {
+  const res = authenticatedApi(
+    "purchase-order/register",
+    Method.POST,
+    model.value
+  );
+  console.log(res);
+
+  if (!isAddNew) {
+    router.push({
+      name: "purchase-order",
+    });
+  }
 };
 </script>

@@ -39,8 +39,15 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { usePurchaseOrderStore } from "@/stores/purchase-order";
+import { onMounted, ref } from "vue";
 
 const showModal = ref(false);
 const isEdit = ref(false);
+
+const purchaseOrderStore = usePurchaseOrderStore();
+
+onMounted(async () => {
+  await purchaseOrderStore.fetchPurchaseOrders();
+});
 </script>
