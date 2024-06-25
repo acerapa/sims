@@ -6,6 +6,12 @@
     :selected-id="toEdit"
     @new-product-category="onNewProductCategory"
     @new-supplier="onNewSupplier"
+    @new-account="onNewAccount"
+  />
+  <AccountModal
+    :is-edit="false"
+    v-model="showAccountModal"
+    v-if="showAccountModal"
   />
   <ProductCategoryModal
     :is-edit="false"
@@ -75,11 +81,13 @@ import ProductRow from "@/components/Product/ProductRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import ProductCategoryModal from "@/components/Settings/ProductCategoryModal.vue";
 import VendorModal from "@/components/Vendor/VendorModal.vue";
+import AccountModal from "@/components/Settings/AccountModal.vue";
 
 import { useProductStore } from "@/stores/product";
 import { useVendorStore } from "@/stores/supplier";
 import { useSettingsStore } from "@/stores/settings";
 
+const showAccountModal = ref(false);
 const showVendorModal = ref(false);
 const showCategoryModal = ref(false);
 const showDeleteConfirmModal = ref(false);
@@ -110,13 +118,17 @@ const onAfterDelete = async () => {
 };
 
 const onNewProductCategory = () => {
-  showModal.value = false;
+  // showModal.value = false;
   showCategoryModal.value = true;
 };
 
 const onNewSupplier = () => {
-  showModal.value = false;
+  // showModal.value = false;
   showVendorModal.value = true;
+}
+
+const onNewAccount = () => {
+  showAccountModal.value = true;
 }
 
 onMounted(async () => {

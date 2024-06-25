@@ -66,7 +66,7 @@
 }
 
 .input {
-  @apply border rounded text-sm px-3 py-2 focus:!outline-0 focus:border-black;
+  @apply border rounded text-sm px-3 py-2 focus:!outline-0 focus:border-black group-focus:border-black group-focus:!outline-0 ;
 }
 
 .table-wrapper {
