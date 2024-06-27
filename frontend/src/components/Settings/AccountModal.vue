@@ -27,7 +27,7 @@ const model = ref({
 const props = defineProps({
 	isEdit: {
 		type: Boolean,
-		default: true
+		default: false
 	},
 	selectedId: {
 		type: Number,

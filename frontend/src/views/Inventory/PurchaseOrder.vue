@@ -33,6 +33,13 @@
           <p class="col-span-1 table-header">Status</p>
           <p class="col-span-1 table-header">Actions</p>
         </div>
+        <div class="flex flex-col gap-4">
+          <PurchaseOrderRow
+            v-for="(order,ndx) in purchaseOrderStore.purchaseOrders"
+            :key="ndx"
+            :order="order"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -41,6 +48,7 @@
 <script setup>
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
 import { onMounted, ref } from "vue";
+import PurchaseOrderRow from "@/components/Inventory/PurchaseOrderRow.vue";
 
 const showModal = ref(false);
 const isEdit = ref(false);

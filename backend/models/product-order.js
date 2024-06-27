@@ -17,6 +17,14 @@ ProductOrder.init(
     order_id: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    amount: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     }
   },
   {

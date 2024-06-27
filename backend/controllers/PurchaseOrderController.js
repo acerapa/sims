@@ -1,17 +1,22 @@
 const Address = require("../models/address");
 const PurchaseOrder = require("../models/purchase-order");
+const Supplier = require("../models/supplier");
 
 module.exports = {
   all: async (req, res) => {
     try {
       const orders = await PurchaseOrder.findAll({
-				include: [
-					{
-						model: Address,
-						as: 'address'
-					}
-				]
-			});
+        include: [
+          {
+            model: Address,
+            as: "address",
+          },
+          {
+            model: Supplier,
+            as: "supplier",
+          },
+        ],
+      });
       res.sendResponse({ orders }, "Successfully fetched!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.messge);

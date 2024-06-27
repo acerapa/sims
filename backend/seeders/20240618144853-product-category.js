@@ -17,7 +17,7 @@ module.exports = {
 
     const fields = [
       {
-        name: "Laptop",
+        name: "Laptops",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -38,6 +38,11 @@ module.exports = {
       },
       {
         name: "Services",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: "Mouses",
         createdAt: new Date(),
         updatedAt: new Date(),
       },

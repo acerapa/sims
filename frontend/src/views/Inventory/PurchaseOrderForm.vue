@@ -1,5 +1,4 @@
 <template>
-  <PurchaseOrderAddProductModal v-model="showModal" v-if="showModal" />
   <VendorModal v-model="showVendorModal" v-if="showVendorModal" />
   <div class="flex flex-col gap-4">
     <div class="bg-white rounded-2xl p-4 shadow flex flex-col gap-3">
@@ -43,7 +42,7 @@
             </div>
           </div>
           <div class="flex-1 flex flex-col gap-2">
-            <p class="text-sm font-semibold">Address Info</p>
+            <p class="text-sm font-semibold">Ship To Info</p>
             <AddressForm v-model="model.order.address" />
           </div>
         </div>
@@ -58,15 +57,6 @@
 
       <div class="flex justify-between items-center mt-6">
         <p class="text-base font-semibold">Select Products</p>
-        <button
-          class="bg-primary p-2 rounded"
-          @click="
-            showModal = true;
-            isEdit = false;
-          "
-        >
-          <img src="@/assets/icons/plus.svg" alt="Plus" />
-        </button>
       </div>
 
       <div class="flex flex-col gap-4">
@@ -84,10 +74,15 @@
         <hr class="bg-gray-50 -mx-4" />
         <div class="flex flex-col gap-4">
           <PurchaseOrderFormRow
-            v-for="(order, ndx) in orders"
-            :order="order"
+            v-for="(order, ndx) in model.products"
+            v-model="model.products[ndx]"
             :key="ndx"
+            @remove="removeProduct(ndx)"
           />
+        </div>
+        <div class="flex justify-between items-center">
+          <button class="btn w-fit" @click="addNewProduct">Add new item</button>
+          <p>Total: &#8369; {{ 56.12 }}</p>
         </div>
       </div>
 
@@ -116,32 +111,8 @@ import VendorModal from "@/components/Vendor/VendorModal.vue";
 import { Method, authenticatedApi } from "@/api";
 
 const showVendorModal = ref(false);
-const showModal = ref(false);
-const isEdit = ref(false);
 const supplierStore = useVendorStore();
 const router = useRouter();
-
-// fake data
-const orders = [
-  {
-    product: {
-      item_code: "sample-code",
-      purchase_description: "This is a sample description",
-      purchase_price: 500,
-    },
-    quantity: 5,
-    amount: 2500,
-  },
-  {
-    product: {
-      item_code: "sample-code",
-      purchase_description: "This is a sample description",
-      purchase_price: 500,
-    },
-    quantity: 5,
-    amount: 2500,
-  },
-];
 
 const model = ref({
   order: {
@@ -158,7 +129,16 @@ const model = ref({
       postal: "",
     },
   },
-  products: [],
+  products: [
+    {
+      id: "",
+      name: "",
+      description: "",
+      quantity: "",
+      cost: "",
+      amount: "",
+    },
+  ],
 });
 
 const supplierOptions = computed(() => {
@@ -173,6 +153,21 @@ const supplierOptions = computed(() => {
 onMounted(async () => {
   await supplierStore.fetchAllSuppliers();
 });
+
+const addNewProduct = () => {
+  model.value.products.push({
+    id: "",
+    name: "",
+    description: "",
+    quantity: "",
+    cost: "",
+    amount: "",
+  });
+};
+
+const removeProduct = (ndx) => {
+  model.value.products.splice(ndx, 1);
+}
 
 const onSubmit = async (isAddNew = false) => {
   const res = authenticatedApi(

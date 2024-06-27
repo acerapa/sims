@@ -6,7 +6,7 @@
     </div>
     <p class="col-span-3 text-sm">{{ props.productCategory.name }}</p>
     <p class="col-span-2 text-sm">
-      {{ new Date(props.productCategory.createdAt).toLocaleDateString() }}
+      {{ Helpers.formatDate(props.productCategory.createdAt, "M/D/YYYY") }}
     </p>
     <div class="col-span-1 text-sm">
       <img
@@ -18,8 +18,14 @@
     </div>
     <ProductCategoryRowMenu
       v-if="showActionMenu"
-      @delete="emit('delete', props.productCategory.id); action = false"
-      @view="emit('view', props.productCategory.id); action = false"
+      @delete="
+        emit('delete', props.productCategory.id);
+        action = false;
+      "
+      @view="
+        emit('view', props.productCategory.id);
+        action = false;
+      "
     />
   </div>
 </template>
@@ -27,6 +33,7 @@
 <script setup>
 import ProductCategoryRowMenu from "@/components/Settings/ProductCategoryRowMenu.vue";
 import { computed, ref } from "vue";
+import { Helpers } from "@/helpers";
 
 const props = defineProps({
   productCategory: {
