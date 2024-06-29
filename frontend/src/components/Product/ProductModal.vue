@@ -33,7 +33,7 @@
               :has-add-new="true"
               :select-multiple="true"
               :options="supplierOptions"
-              @add-new="emit('newSupplier', true)"
+              @add-new="showVendorModal = true"
               v-model="model.supplier_ids"
             />
             <CustomSelectInput
@@ -41,7 +41,7 @@
               class="flex-1"
               :has-add-new="true"
               :options="categoriesOptions"
-              @add-new="emit('newProductCategory')"
+              @add-new="showCategoryModal = true"
               v-model="model.category_id"
             />
           </div>
@@ -70,7 +70,7 @@
               class="flex-1"
               :has-add-new="true"
               :options="incomeAccounts"
-              @add-new="emit('newAccount')"
+              @add-new="showAccountModal = true"
               v-model="model.income_account"
             />
             <CustomSelectInput
@@ -78,7 +78,7 @@
               class="flex-1"
               :has-add-new="true"
               :options="expenseAccounts"
-              @add-new="emit('newAccount')"
+              @add-new="showAccountModal = true"
               v-model="model.expense_account"
             />
           </div>
@@ -118,17 +118,24 @@
       </div>
     </div>
   </ModalWrapper>
+  <VendorModal v-if="showVendorModal" v-model="showVendorModal" />
+  <AccountModal v-if="showAccountModal" v-model="showAccountModal" />
+  <ProductCategoryModal v-if="showCategoryModal" v-model="showCategoryModal" />
 </template>
 
 <script setup>
 import { Method, authenticatedApi } from "@/api";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import CustomSelectInput from "../shared/CustomSelectInput.vue";
-import { useProductStore } from "@/stores/product";
-import { useSettingsStore } from "@/stores/settings";
-import { useVendorStore } from "@/stores/supplier";
-import { computed, onMounted, ref, watch } from "vue";
+import ProductCategoryModal from "../Settings/ProductCategoryModal.vue";
+import AccountModal from "../Settings/AccountModal.vue";
+import VendorModal from "../Vendor/VendorModal.vue";
+import { computed, onMounted, ref } from "vue";
 import { AccountType } from "@/types/enums";
+
+import { useVendorStore } from "@/stores/supplier";
+import { useSettingsStore } from "@/stores/settings";
+import { useProductStore } from "@/stores/product";
 
 const props = defineProps({
   isEdit: {
@@ -141,9 +148,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["newProductCategory", "newSupplier", "newAccount"]);
+const emit = defineEmits(["newAccount"]);
 
 const showModal = defineModel();
+const showAccountModal = ref(false);
+const showCategoryModal = ref(false);
+const showVendorModal = ref(false);
 
 const model = ref({
   name: "",
@@ -166,9 +176,9 @@ const model = ref({
 const title = ref(props.isEdit ? "Edit Product" : "New Product");
 const apiPath = ref(props.isEdit ? "products/update" : "products/register");
 
-const productStore = useProductStore();
 const supplierStore = useVendorStore();
 const settingStore = useSettingsStore();
+const productStore = useProductStore();
 
 const incomeAccounts = computed(() => {
   return settingStore.accounts
@@ -223,12 +233,16 @@ onMounted(async () => {
       (product) => product.id == props.selectedId
     );
 
-    model.value.supplier_ids = model.value.suppliers.map(sup => sup.id);
+    model.value.supplier_ids = model.value.suppliers.map((sup) => sup.id);
   }
 
   if (!props.isEdit) {
     await generateItemCode();
   }
+
+  await supplierStore.fetchAllSuppliers();
+  await settingStore.fetchAllProductCategories();
+  await settingStore.fetchAllAccounts();
 });
 
 const onSubmit = async () => {

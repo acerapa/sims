@@ -8,9 +8,13 @@
       {{ props.product.name }}
     </p>
     <p class="col-span-1 text-sm">{{ props.product.item_code }}</p>
-    <p class="col-span-3 text-sm line-clamp-2">{{ props.product.purchase_description }}</p>
+    <p class="col-span-3 text-sm line-clamp-2">
+      {{ props.product.purchase_description }}
+    </p>
     <p class="col-span-1 text-sm">{{ props.product.quantityInStock }}</p>
-    <p class="col-span-1 text-sm">{{ new Date(props.product.createdAt).toLocaleDateString() }}</p>
+    <p class="col-span-1 text-sm">
+      {{ Helpers.formatDate(props.product.createdAt, "M/D/YYYY") }}
+    </p>
     <div class="col-span-1 text-sm">{{ props.product.status }}</div>
     <div class="col-span-1">
       <img
@@ -29,6 +33,7 @@
 
 <script setup>
 import ProductRowMenu from "@/components/Product/ProductRowMenu.vue";
+import { Helpers } from "@/helpers";
 const props = defineProps({
   product: {
     type: Object,

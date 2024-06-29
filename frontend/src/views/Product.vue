@@ -4,24 +4,6 @@
     v-model="showModal"
     v-if="showModal"
     :selected-id="toEdit"
-    @new-product-category="onNewProductCategory"
-    @new-supplier="onNewSupplier"
-    @new-account="onNewAccount"
-  />
-  <AccountModal
-    :is-edit="false"
-    v-model="showAccountModal"
-    v-if="showAccountModal"
-  />
-  <ProductCategoryModal
-    :is-edit="false"
-    v-model="showCategoryModal"
-    v-if="showCategoryModal"
-  />
-  <VendorModal
-    :is-edit="false"
-    v-model="showVendorModal"
-    v-if="showVendorModal"
   />
   <DeleteConfirmModal
     v-if="showDeleteConfirmModal"
@@ -79,26 +61,15 @@ import { onMounted, ref } from "vue";
 import ProductModal from "@/components/Product/ProductModal.vue";
 import ProductRow from "@/components/Product/ProductRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import ProductCategoryModal from "@/components/Settings/ProductCategoryModal.vue";
-import VendorModal from "@/components/Vendor/VendorModal.vue";
-import AccountModal from "@/components/Settings/AccountModal.vue";
 
 import { useProductStore } from "@/stores/product";
-import { useVendorStore } from "@/stores/supplier";
-import { useSettingsStore } from "@/stores/settings";
 
-const showAccountModal = ref(false);
-const showVendorModal = ref(false);
-const showCategoryModal = ref(false);
 const showDeleteConfirmModal = ref(false);
 const showModal = ref(false);
 const isEdit = ref(false);
 const productStore = useProductStore();
 const toDelete = ref({});
 const toEdit = ref(0);
-
-const supplierStore = useVendorStore();
-const settingStore = useSettingsStore();
 
 const onDeleteRow = (id) => {
   toDelete.value = { id };
@@ -117,24 +88,7 @@ const onAfterDelete = async () => {
   await productStore.fetchAllProducts();
 };
 
-const onNewProductCategory = () => {
-  // showModal.value = false;
-  showCategoryModal.value = true;
-};
-
-const onNewSupplier = () => {
-  // showModal.value = false;
-  showVendorModal.value = true;
-}
-
-const onNewAccount = () => {
-  showAccountModal.value = true;
-}
-
 onMounted(async () => {
   await productStore.fetchAllProducts();
-  await supplierStore.fetchAllSuppliers();
-  await settingStore.fetchAllProductCategories();
-  await settingStore.fetchAllAccounts();
 });
 </script>

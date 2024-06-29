@@ -1,6 +1,8 @@
 "use strict";
 
-const User = require("../models/user");
+const Address = require("../models/address");
+const Supplier = require("../models/supplier");
+const suppliersDummyData = require("./dummy/vendors");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -15,21 +17,14 @@ module.exports = {
      * }], {});
      */
 
-    const fields = [
-      {
-        username: "admin",
-        password: "admin123",
-        first_name: "Harlan",
-        last_name: "Doe",
-        middle_name: "",
-        date_started: new Date(),
-        position: "admin",
-        status: 1,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-    ];
-    await queryInterface.bulkInsert(User.getTableName(), fields, {});
+    await Supplier.bulkCreate(suppliersDummyData, {
+      include: [
+        {
+          model: Address,
+          as: "address",
+        },
+      ],
+    });
   },
 
   async down(queryInterface, Sequelize) {
@@ -39,7 +34,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    
-    await queryInterface.bulkDelete(User.getTableName(), null, {});
+    await queryInterface.bulkDelete(Supplier.getTableName(), null, {});
   },
 };
