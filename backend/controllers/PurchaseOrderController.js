@@ -26,12 +26,22 @@ module.exports = {
   register: async (req, res) => {
     try {
       const purchaseOrder = await PurchaseOrder.create(req.body.order, {
-        include: {
-          model: Address,
-          as: "address",
-        },
+        include: [
+          {
+            model: Address,
+            as: "address",
+          },
+        ],
       });
-      purchaseOrder.addProducts(req.body.products);
+
+      req.body.products.forEach(async (product) => {
+        await purchaseOrder.addProduct(product.id, {
+          through: {
+            quantity: product.quantity,
+            amount: product.amount,
+          },
+        });
+      });
       res.sendResponse({}, "Successfully created!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.messge);
