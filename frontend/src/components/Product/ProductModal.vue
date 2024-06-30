@@ -55,7 +55,7 @@
               type="number"
               class="input flex-1"
               placeholder="Cost Price"
-              v-model="model.purchase_price"
+              v-model="model.cost"
             />
             <input
               type="number"
@@ -87,7 +87,7 @@
               type="number"
               class="input flex-1"
               placeholder="Quantity in stock"
-              v-model="model.quantityInStock"
+              v-model="model.quantity_in_stock"
             />
             <input
               type="text"
@@ -111,7 +111,7 @@
               rows="5"
               class="input flex-1"
               placeholder="Sales Description"
-              v-model="model.selling_description"
+              v-model="model.sale_description"
             ></textarea>
           </div>
         </div>
@@ -158,13 +158,12 @@ const showVendorModal = ref(false);
 const model = ref({
   name: "",
   purchase_description: "",
-  selling_description: "",
-  purchase_price: "",
+  sale_description: "",
+  cost: "",
   selling_price: "",
   item_code: "",
   brand: "",
-  quantityInStock: "",
-  imageUrl: "",
+  quantity_in_stock: "",
   status: "",
   type: "",
   category_id: "",

@@ -25,7 +25,13 @@ module.exports = {
   register: async (req, res) => {
     try {
       const product = await Product.create(req.body);
-      product.addSuppliers(req.body.supplier_ids);
+      req.body.suppliers.forEach(async (supplier) => {
+        await product.addSupplier(supplier.id, {
+          through: {
+            cost: supplier.cost,
+          },
+        });
+      });
       res.sendResponse({}, "Successfully Registered!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message);

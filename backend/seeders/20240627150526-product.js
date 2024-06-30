@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 const path = require("path");
 
-const base_path = path.dirname(__dirname)
+const base_path = path.dirname(__dirname);
 
 const Product = require(base_path + "/models/product");
 const Supplier = require(base_path + "/models/supplier");
@@ -9,7 +9,7 @@ const { getProducts } = require(base_path + "/seeders/dummy/products");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     /**
      * Add seed commands here.
      *
@@ -18,20 +18,21 @@ module.exports = {
      *   name: 'John Doe',
      *   isBetaMember: false
      * }], {});
-    */
+     */
     const products = await getProducts();
-    await Product.bulkCreate(products, {
-      include: [
-        {
-          model: Supplier,
-          as: "suppliers"
-        }
-      ]
-    });
-    
+    for (let ndx = 0; ndx < products.length; ndx++) {
+      const product = await Product.create(products[ndx]);
+      for (let i = 0; i < products[ndx].suppliers.length; i++) {
+        await product.addSupplier(products[ndx].suppliers[i].id, {
+          through: {
+            cost: products[ndx].suppliers[i].cost,
+          },
+        });
+      }
+    }
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     /**
      * Add commands to revert seed here.
      *
@@ -40,5 +41,5 @@ module.exports = {
      */
 
     await queryInterface.bulkDelete(Product.getTableName(), null, {});
-  }
+  },
 };

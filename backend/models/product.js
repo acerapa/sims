@@ -23,15 +23,11 @@ Product.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    selling_description: {
+    sale_description: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    purchase_price: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    selling_price: {
+    price: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
@@ -44,14 +40,9 @@ Product.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    quantityInStock: {
+    quantity_in_stock: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    imageUrl: {
-      // to be discused
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     status: {
       type: DataTypes.STRING,

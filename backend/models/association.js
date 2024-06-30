@@ -23,6 +23,7 @@ Product.belongsToMany(Supplier, {
   through: ProductSupplier,
   as: "suppliers",
   foreignKey: "product_id",
+  otherKey: "supplier_id"
 });
 
 Product.belongsTo(Account, {
@@ -39,6 +40,7 @@ Supplier.belongsToMany(Product, {
   through: ProductSupplier,
   as: "products",
   foreignKey: "supplier_id",
+  otherKey: "product_id"
 });
 
 Product.belongsTo(ProductCategory, {
