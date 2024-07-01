@@ -1,10 +1,10 @@
 <template>
   <ProductModal v-model="showModal" v-if="showModal" />
-  <div class="grid grid-cols-9 gap-3 items-center">
+  <div class="grid grid-cols-9 gap-3 items-center min-w-[750px]">
     <div class="col-span-2 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <CustomSelectInput
-        class="w-full"
+        class="w-full [&>select]:w-full"
         placeholder="Select product"
         :options="productOptions"
         :has-add-new="true"
@@ -39,7 +39,7 @@ const emit = defineEmits(["remove"]);
 const productStore = useProductStore();
 
 const productOptions = computed(() => {
-  return productStore.products.map((product) => {
+  return productStore.supplierProducts.map((product) => {
     return {
       text: product.name,
       value: product.id,
@@ -59,7 +59,9 @@ watch(
       order.value.id = product.id;
       order.value.name = product.name;
       order.value.description = product.purchase_description;
-      order.value.cost = product.purchase_price;
+      if (product.suppliers.length) {
+        order.value.cost = product.suppliers[0].ProductSupplier.cost;
+      }
     }
   }
 );

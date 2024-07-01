@@ -6,6 +6,7 @@ module.exports = {
   all: async (req, res) => {
     try {
       const orders = await PurchaseOrder.findAll({
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: Address,
