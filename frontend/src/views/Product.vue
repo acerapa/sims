@@ -61,9 +61,8 @@ import { onMounted, ref } from "vue";
 import ProductModal from "@/components/Product/ProductModal.vue";
 import ProductRow from "@/components/Product/ProductRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+
 import { useProductStore } from "@/stores/product";
-import { useVendorStore } from "@/stores/supplier";
-import { useSettingsStore } from "@/stores/settings";
 
 const showDeleteConfirmModal = ref(false);
 const showModal = ref(false);
@@ -71,9 +70,6 @@ const isEdit = ref(false);
 const productStore = useProductStore();
 const toDelete = ref({});
 const toEdit = ref(0);
-
-const supplierStore = useVendorStore();
-const settingStore = useSettingsStore();
 
 const onDeleteRow = (id) => {
   toDelete.value = { id };
@@ -94,8 +90,5 @@ const onAfterDelete = async () => {
 
 onMounted(async () => {
   await productStore.fetchAllProducts();
-  await supplierStore.fetchAllSuppliers();
-  await settingStore.fetchAllProductCategories();
-  await settingStore.fetchAllAccounts();
 });
 </script>

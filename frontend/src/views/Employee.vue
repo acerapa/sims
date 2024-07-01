@@ -60,7 +60,7 @@ import EmployeeModal from "@/components/Employee/EmployeeModal.vue";
 import { onMounted, ref } from "vue";
 import EmployeeRow from "@/components/Employee/EmployeeRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import Pagination from "@/components/wrappers/Paginate.vue";
+import Pagination from "@/components/shared/Paginate.vue";
 import { useEmployeeStore } from "@/stores/employee";
 
 const showModal = ref(false);

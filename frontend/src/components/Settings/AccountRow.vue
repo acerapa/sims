@@ -2,12 +2,12 @@
   <div class="grid grid-cols-9 gap-3 relative" @click="clickOutSide">
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
-      <p class="table-header">{{ props.account.id }}</p>
+      <p class="text-sm">{{ props.account.id }}</p>
     </div>
     <p class="col-span-3 text-sm">{{ props.account.name }}</p>
     <p class="col-span-2 text-sm">{{ props.account.type }}</p>
     <p class="col-span-2 text-sm">
-      {{ new Date(props.account.createdAt).toLocaleDateString() }}
+      {{ Helpers.formatDate(props.account.createdAt, "M/D/YYYY") }}
     </p>
     <p class="col-span-1 text-sm">
       <img
@@ -34,6 +34,7 @@
 <script setup>
 import AccountRowMenu from "@/components/Settings/AccountRowMenu.vue";
 import { ref, computed } from "vue";
+import { Helpers } from "@/helpers";
 const emit = defineEmits(["delete", "view", "openMenu"]);
 const props = defineProps({
   account: {

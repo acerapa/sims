@@ -11,11 +11,11 @@
     <p class="col-span-2 text-sm">{{ user.last_name }}</p>
     <p class="col-span-2 text-sm">{{ user.position }}</p>
     <p class="col-span-2 text-sm">
-      {{ new Date(user.date_started).toLocaleDateString() }}
+      {{ Helpers.formatDate(user.date_started, "M/D/YYYY") }}
     </p>
     <p class="col-span-2 text-sm">
       {{
-        user.date_ended ? new Date(user.date_ended).toLocaleDateString() : "-"
+        user.date_ended ? Helpers.formatDate(user.date_ended, "M/D/YYYY") : "-"
       }}
     </p>
     <p class="col-span-1 text-sm">
@@ -53,6 +53,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import EmployeeRowMenu from "@/components/Employee/EmployeeRowMenu.vue";
+import { Helpers } from "@/helpers";
 
 const props = defineProps({
   user: {

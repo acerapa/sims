@@ -104,7 +104,7 @@
 
 <script setup>
 import { Method, authenticatedApi } from "@/api";
-import ModalWrapper from "@/components/wrappers/ModalWrapper.vue";
+import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { useVendorStore } from "@/stores/supplier";
 import { onMounted, ref } from "vue";
 
@@ -117,7 +117,7 @@ const props = defineProps({
   },
 	selectedId: {
 		type: Number,
-		required: true
+		required: false
 	}
 });
 

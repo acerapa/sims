@@ -1,68 +1,84 @@
-const { DataTypes, Model } = require('sequelize');
-const { sequelize } = require('.');
+const { DataTypes, Model } = require("sequelize");
+const { sequelize } = require(".");
 
-class Product extends Model { }
+class Product extends Model {}
 
-const fields = {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
+Product.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      values: ["inventory", "non-inventory"],
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    purchase_description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    sale_description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    price: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    item_code: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    brand: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    quantity_in_stock: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "active",
+    },
+    category_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "productcategories",
+        key: "id",
+      },
+    },
+    income_account: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "accounts",
+        key: "id",
+      },
+    },
+    expense_account: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "accounts",
+        key: "id",
+      },
+    },
   },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  purchase_description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  salling_description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  purchase_price: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  selling_price: {
-    type: DataTypes.FLOAT,
-    allowNull: false
-  },
-  item_code: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  brand: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  quantityInStock: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  imageUrl: { // to be discused
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'active',
+  {
+    sequelize,
+    timestamps: true,
+    paranoid: false,
   }
-};
-
-const options = {
-  sequelize,
-  timestamps: true,
-  paranoid: false
-};
-
-Product.init(fields, options);
+);
 
 module.exports = Product;
