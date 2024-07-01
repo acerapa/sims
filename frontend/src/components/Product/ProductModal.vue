@@ -34,7 +34,7 @@
               :select-multiple="true"
               :options="supplierOptions"
               @add-new="showVendorModal = true"
-              v-model="model.supplier_ids"
+              v-model="model.suppliers"
             />
             <CustomSelectInput
               placeholder="*Select Category"
@@ -61,7 +61,7 @@
               type="number"
               class="input flex-1"
               placeholder="Sale Price"
-              v-model="model.selling_price"
+              v-model="model.price"
             />
           </div>
           <div class="flex gap-3 items-start">
@@ -160,14 +160,14 @@ const model = ref({
   purchase_description: "",
   sale_description: "",
   cost: "",
-  selling_price: "",
+  price: "",
   item_code: "",
   brand: "",
   quantity_in_stock: "",
   status: "",
   type: "",
   category_id: "",
-  supplier_ids: [],
+  suppliers: [],
   income_account: "",
   expense_account: "",
 });
@@ -232,7 +232,15 @@ onMounted(async () => {
       (product) => product.id == props.selectedId
     );
 
-    model.value.supplier_ids = model.value.suppliers.map((sup) => sup.id);
+    // get the first supplier to show the cost
+    if (model.value.suppliers.length) {
+      model.value.cost = model.value.suppliers[0].ProductSupplier.cost;
+      model.value.suppliers = model.value.suppliers.map((sup) => sup.id);
+    }
+
+    // setting the accounts
+    model.value.expense_account = model.value.expense.id;
+    model.value.income_account = model.value.income.id;
   }
 
   if (!props.isEdit) {

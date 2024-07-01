@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const Product = require("../models/product");
 const Supplier = require("../models/supplier");
+const Account = require("../models/account");
 
 module.exports = {
   all: async (req, res) => {
@@ -12,7 +13,17 @@ module.exports = {
             model: Supplier,
             as: "suppliers",
             attributes: ["id"],
-            through: { attributes: [] },
+            through: { attributes: ["cost"] },
+          },
+          {
+            model: Account,
+            as: "income",
+            attributes: ["id"],
+          },
+          {
+            model: Account,
+            as: "expense",
+            attributes: ["id"],
           },
         ],
       });

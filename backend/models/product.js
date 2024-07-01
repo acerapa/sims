@@ -42,7 +42,7 @@ Product.init(
     },
     quantity_in_stock: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     status: {
       type: DataTypes.STRING,
