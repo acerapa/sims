@@ -1,7 +1,7 @@
 "use strict";
 
 const Address = require("../models/address");
-const Supplier = require("../models/supplier");
+const { Supplier } = require("../models/association");
 const suppliersDummyData = require("./dummy/vendors");
 
 /** @type {import('sequelize-cli').Migration} */
@@ -18,12 +18,10 @@ module.exports = {
      */
 
     await Supplier.bulkCreate(suppliersDummyData, {
-      include: [
-        {
-          model: Address,
-          as: "address",
-        },
-      ],
+      include: {
+        model: Address,
+        as: "address"
+      }
     });
   },
 

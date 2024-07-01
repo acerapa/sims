@@ -1,5 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
+const ProductCategories = require("./product-category");
+const Account = require("./account");
 
 class Product extends Model {}
 
@@ -53,15 +55,19 @@ Product.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "productcategories",
+        model: ProductCategories,
         key: "id",
       },
+    },
+    cost: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
     income_account: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "accounts",
+        model: Account,
         key: "id",
       },
     },
@@ -69,7 +75,7 @@ Product.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "accounts",
+        model: Account,
         key: "id",
       },
     },

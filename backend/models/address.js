@@ -1,5 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
+const Supplier = require("./supplier");
+const PurchaseOrder = require("./purchase-order");
 
 class Address extends Model {}
 
@@ -29,7 +31,7 @@ Address.init(
     supplier_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: "suppliers",
+        model: Supplier,
         key: "id",
       },
       allowNull: true
@@ -37,7 +39,7 @@ Address.init(
     order_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: "purchaseorders",
+        model: PurchaseOrder,
         key: "id"
       }
     }

@@ -82,3 +82,8 @@ PurchaseOrder.hasOne(Address, {
   as: "address",
   onDelete: "CASCADE",
 });
+
+
+module.exports = {
+  Supplier
+};

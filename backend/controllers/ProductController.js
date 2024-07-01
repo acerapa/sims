@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const Product = require("../models/product");
 const Supplier = require("../models/supplier");
 const Account = require("../models/account");
+const { Op } = require("sequelize");
 
 module.exports = {
   all: async (req, res) => {
@@ -36,13 +37,14 @@ module.exports = {
   register: async (req, res) => {
     try {
       const product = await Product.create(req.body);
-      req.body.suppliers.forEach(async (supplier) => {
-        await product.addSupplier(supplier.id, {
+      for (let ndx = 0; ndx < req.body.suppliers.length; ndx++) {
+        await product.addSupplier(req.body.suppliers[ndx], {
           through: {
-            cost: supplier.cost,
+            cost: req.body.cost,
           },
         });
-      });
+      }
+
       res.sendResponse({}, "Successfully Registered!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message);
@@ -56,6 +58,28 @@ module.exports = {
           id: req.body.id,
         },
       });
+
+      const product = await Product.findByPk(req.body.id);
+      const suppliers = await Supplier.findAll({
+        where: {
+          id: {
+            [Op.in]: req.body.suppliers,
+          },
+        },
+      });
+
+      // remove all the suppliers
+      await product.removeSuppliers(await product.getSuppliers());
+
+      // add the associations again
+      for (let ndx = 0; ndx < suppliers.length; ndx++) {
+        await product.addSupplier(suppliers[ndx], {
+          through: {
+            cost: req.body.cost,
+          },
+        });
+      }
+
       res.sendResponse({}, "Successfully updated!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message);
