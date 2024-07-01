@@ -9,8 +9,8 @@ module.exports = {
     };
 
     const categories = await ProductCategory.findAll();
-		const laptops = categories.find(cat => cat.name == "Laptops").id;
-		const mouses = categories.find(cat => cat.name == "Mouses").id;
+    const laptops = categories.find((cat) => cat.name == "Laptops").id;
+    const mouses = categories.find((cat) => cat.name == "Mouses").id;
 
     const suppliers = await Supplier.findAll({
       attributes: ["id"],
@@ -32,33 +32,43 @@ module.exports = {
         name: "Dell Latitude 5320",
         brand: "Dell",
         type: types[getRandomDigitBetween(0, 1)],
-        supplier_ids: suppliers.map((sup) => sup.id),
-        purchase_price: 20000,
-        selling_price: 25000,
-        quantityInStock: 60,
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 20000,
+          };
+        }),
+        // purchase_price: 20000,
+        price: 25000,
+        quantity_in_stock: 60,
         status: "",
         category_id: laptops,
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
         item_code: "qwertyui",
         purchase_description: "This is a sample description",
-        selling_description: "This is a sample description",
+        sale_description: "This is a sample description",
       },
       {
         name: "Logi Mouse",
         brand: "Logi",
         type: types[getRandomDigitBetween(0, 1)],
-        supplier_ids: suppliers.map((sup) => sup.id),
-        purchase_price: 20000,
-        selling_price: 25000,
-        quantityInStock: 60,
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 20000,
+          };
+        }),
+        // purchase_price: 20000,
+        price: 25000,
+        quantity_in_stock: 60,
         status: "",
         category_id: mouses,
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
         item_code: "qwertyui12",
         purchase_description: "This is a sample description",
-        selling_description: "This is a sample description",
+        sale_description: "This is a sample description",
       },
     ];
   },
