@@ -77,6 +77,7 @@
             v-model="model.products[ndx]"
             :key="ndx"
             @remove="removeProduct(ndx)"
+            :selected-products="model.products"
           />
         </div>
         <div class="flex justify-between items-center pb-3">
@@ -120,11 +121,11 @@ const showVendorModal = ref(false);
 const supplierStore = useVendorStore();
 const router = useRouter();
 
-const model = ref({
+const modelDefualtValue = {
   order: {
     supplier_id: "",
     ref_no: "",
-    date: "",
+    date: Helpers.formatDate(new Date(), "YYYY-MM-DD"),
     bill_due: "",
     memo: "",
     amount: 0,
@@ -145,7 +146,9 @@ const model = ref({
       amount: "",
     },
   ],
-});
+};
+
+const model = ref({ ...modelDefualtValue });
 
 const supplierOptions = computed(() => {
   return supplierStore.suppliers.map((supplier) => {
@@ -183,7 +186,7 @@ const onSubmit = async (isAddNew = false) => {
   );
 
   // reset model
-  model.value = Helpers.objectReset(model.value);
+  model.value = { ...modelDefualtValue };
 
   if (!isAddNew) {
     router.push({
@@ -191,12 +194,6 @@ const onSubmit = async (isAddNew = false) => {
     });
   }
 };
-
-const totalAmount = computed(() => {
-  return model.value.products
-    .map((prod) => prod.amount)
-    .reduce((a, b) => a + b, 0);
-});
 
 watch(
   () => model.value.order.supplier_id,
@@ -210,9 +207,11 @@ watch(
 watch(
   () => model.value.products,
   () => {
-    model.value.order.amount = model.value.products
-      .map((prod) => prod.amount)
-      .reduce((a, b) => a + b, 0);
+    if (model.value.products.length) {
+      model.value.order.amount = model.value.products
+        .map((prod) => prod.amount)
+        .reduce((a, b) => a + b, 0);
+    }
   },
   {
     deep: true,

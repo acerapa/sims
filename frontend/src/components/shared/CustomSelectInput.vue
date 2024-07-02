@@ -81,8 +81,9 @@ const props = defineProps({
   selectMultiple: {
     type: Boolean,
     default: false,
-  },
+  }
 });
+
 
 const selected = defineModel();
 const select = ref();

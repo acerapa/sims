@@ -33,18 +33,30 @@ import CustomSelectInput from "../shared/CustomSelectInput.vue";
 import { useProductStore } from "@/stores/product";
 import ProductModal from "../Product/ProductModal.vue";
 
+const props = defineProps({
+  selectedProducts: {
+    type: Array,
+    defualt: [],
+  },
+});
+
 const order = defineModel();
 const showModal = ref(false);
 const emit = defineEmits(["remove"]);
 const productStore = useProductStore();
 
 const productOptions = computed(() => {
-  return productStore.supplierProducts.map((product) => {
-    return {
-      text: product.name,
-      value: product.id,
-    };
-  });
+  return productStore.supplierProducts
+    .map((product) => {
+      return {
+        text: product.name,
+        value: product.id,
+      };
+    })
+    .filter((prod) => {
+      if (order.value.id == prod.value) return true;
+      return !props.selectedProducts.map((p) => p.id).includes(prod.value);
+    });
 });
 
 onMounted(async () => {
@@ -59,6 +71,7 @@ watch(
       order.value.id = product.id;
       order.value.name = product.name;
       order.value.description = product.purchase_description;
+      order.value.quantity = 1; // will always set quantity upon create
       if (product.suppliers.length) {
         order.value.cost = product.suppliers[0].ProductSupplier.cost;
       }
@@ -67,10 +80,10 @@ watch(
 );
 
 watch(
-  () => order.value.quantity,
+  () => [order.value.quantity, order.value.cost],
   (val) => {
     if (val) {
-      order.value.amount = order.value.cost * val;
+      order.value.amount = order.value.cost * order.value.quantity;
     }
   }
 );

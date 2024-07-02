@@ -1,8 +1,26 @@
 export const Helpers = {
+  /**
+   * Reset object to it's default form
+   * @param {*} obj
+   * @returns
+   */
   objectReset: (obj) => {
     const keys = Object.keys(obj);
     const newObj = {};
     keys.forEach((key) => {
+      switch (typeof obj[key]) {
+        case "string":
+          obj[key] = "";
+          break;
+        case "number":
+          obj[key] = 0;
+        case "object":
+          if (Array.isArray(obj[key])) {
+            obj[key] = [];
+          } else {
+            obj[key] = {};
+          }
+      }
       newObj[key] = "";
     });
 
