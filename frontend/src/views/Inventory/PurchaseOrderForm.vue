@@ -116,10 +116,12 @@ import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import VendorModal from "@/components/Vendor/VendorModal.vue";
 import { Method, authenticatedApi } from "@/api";
 import { Helpers } from "@/helpers";
+import { useProductStore } from "@/stores/product";
 
 const showVendorModal = ref(false);
 const supplierStore = useVendorStore();
 const router = useRouter();
+const productStore = useProductStore();
 
 const modelDefualtValue = {
   order: {
@@ -201,6 +203,15 @@ watch(
     supplierStore.selectedSupplier = supplierStore.suppliers.find(
       (sup) => sup.id == val
     );
+
+    // remove the products in the order which are not related to the supplier
+    model.value.products = model.value.products.filter((prod) => {
+      if (!prod.id) return true;
+      const p = productStore.products.find((prd) => prd.id == prod.id);
+      if (p) {
+        return p.suppliers.map((sup) => sup.id).includes(val);
+      }
+    });
   }
 );
 
