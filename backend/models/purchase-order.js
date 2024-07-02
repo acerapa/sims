@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const { sequelize } = require('.');
+const Supplier = require("./supplier");
 
 class PurchaseOrder extends Model { }
 
@@ -34,7 +35,7 @@ PurchaseOrder.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'suppliers',
+        model: Supplier,
         key: 'id'
       }
     }

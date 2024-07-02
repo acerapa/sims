@@ -4,7 +4,7 @@
     <div class="bg-white rounded-2xl p-4 shadow flex flex-col gap-3">
       <p class="text-base font-semibold">New Purchase Order</p>
       <div class="flex flex-col gap-3">
-        <div class="flex gap-3">
+        <div class="flex gap-3 max-[1180px]:flex-col">
           <div class="flex-1 flex flex-col gap-2">
             <p class="text-sm font-semibold">Order Info</p>
             <div class="flex flex-col gap-3">
@@ -59,8 +59,8 @@
         <p class="text-base font-semibold">Select Products</p>
       </div>
 
-      <div class="flex flex-col gap-4">
-        <div class="grid grid-cols-9 gap-3">
+      <div class="flex flex-col gap-4 overflow-x-auto">
+        <div class="grid grid-cols-9 gap-3 min-w-[750px] pb-2 border-b">
           <div class="col-span-2 flex gap-3 items-center">
             <input type="checkbox" class="input" />
             <p class="table-header">Item</p>
@@ -71,18 +71,25 @@
           <p class="col-span-1 table-header">Amount</p>
           <p class="col-span-1 table-header">Action</p>
         </div>
-        <hr class="bg-gray-50 -mx-4" />
         <div class="flex flex-col gap-4">
           <PurchaseOrderFormRow
             v-for="(order, ndx) in model.products"
             v-model="model.products[ndx]"
             :key="ndx"
             @remove="removeProduct(ndx)"
+            :selected-products="model.products"
           />
         </div>
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center pb-3">
           <button class="btn w-fit" @click="addNewProduct">Add new item</button>
-          <p>Total: &#8369; {{ 56.12 }}</p>
+          <p>
+            Total: &#8369;
+            {{
+              model.order.amount.toLocaleString("en", {
+                minimumFractionDigits: 2,
+              })
+            }}
+          </p>
         </div>
       </div>
 
@@ -94,31 +101,33 @@
           >Cancel</RouterLink
         >
         <button type="button" class="btn-outline">Save and New</button>
-        <button type="button" class="btn" @click="onSubmit">Save</button>
+        <button type="button" class="btn" @click="onSubmit()">Save</button>
       </div>
     </div>
   </div>
 </template>
 <script setup>
 import { useVendorStore } from "@/stores/supplier";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import AddressForm from "@/components/shared/AddressForm.vue";
 import PurchaseOrderFormRow from "../../components/Inventory/PurchaseOrderFormRow.vue";
 import { useRouter } from "vue-router";
-import PurchaseOrderAddProductModal from "@/components/Inventory/PurchaseOrderAddProductModal.vue";
 import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import VendorModal from "@/components/Vendor/VendorModal.vue";
 import { Method, authenticatedApi } from "@/api";
+import { Helpers } from "@/helpers";
+import { useProductStore } from "@/stores/product";
 
 const showVendorModal = ref(false);
 const supplierStore = useVendorStore();
 const router = useRouter();
+const productStore = useProductStore();
 
-const model = ref({
+const modelDefualtValue = {
   order: {
     supplier_id: "",
     ref_no: "",
-    date: "",
+    date: Helpers.formatDate(new Date(), "YYYY-MM-DD"),
     bill_due: "",
     memo: "",
     amount: 0,
@@ -139,7 +148,9 @@ const model = ref({
       amount: "",
     },
   ],
-});
+};
+
+const model = ref({ ...modelDefualtValue });
 
 const supplierOptions = computed(() => {
   return supplierStore.suppliers.map((supplier) => {
@@ -167,7 +178,7 @@ const addNewProduct = () => {
 
 const removeProduct = (ndx) => {
   model.value.products.splice(ndx, 1);
-}
+};
 
 const onSubmit = async (isAddNew = false) => {
   const res = authenticatedApi(
@@ -176,10 +187,45 @@ const onSubmit = async (isAddNew = false) => {
     model.value
   );
 
+  // reset model
+  model.value = { ...modelDefualtValue };
+
   if (!isAddNew) {
     router.push({
       name: "purchase-order",
     });
   }
 };
+
+watch(
+  () => model.value.order.supplier_id,
+  (val) => {
+    supplierStore.selectedSupplier = supplierStore.suppliers.find(
+      (sup) => sup.id == val
+    );
+
+    // remove the products in the order which are not related to the supplier
+    model.value.products = model.value.products.filter((prod) => {
+      if (!prod.id) return true;
+      const p = productStore.products.find((prd) => prd.id == prod.id);
+      if (p) {
+        return p.suppliers.map((sup) => sup.id).includes(val);
+      }
+    });
+  }
+);
+
+watch(
+  () => model.value.products,
+  () => {
+    if (model.value.products.length) {
+      model.value.order.amount = model.value.products
+        .map((prod) => prod.amount)
+        .reduce((a, b) => a + b, 0);
+    }
+  },
+  {
+    deep: true,
+  }
+);
 </script>
