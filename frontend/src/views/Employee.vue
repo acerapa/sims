@@ -2,7 +2,7 @@
   <EmployeeModal
     v-model="showModal"
     :is-edit="isEdit"
-    :selected-id="idToEdit"
+    :selected-id="selectedId"
     v-if="showModal"
   />
   <DeleteConfirmModal
@@ -17,6 +17,8 @@
     v-model:is-edit="isEdit"
     :has-add-btn="true"
     :has-pagination="true"
+    class="relative"
+    @click=""
   >
     <template v-slot:table_header>
       <div class="grid grid-cols-13 gap-3 items-center min-w-[792px]">
@@ -40,12 +42,13 @@
           :user="user"
           :key="user.id"
           @open-menu="onSelectRow"
-          :current-open-menu="selectedMenuRow"
+          :current-open-menu="selectedId"
           @view="viewRow"
           @delete="deleteRow"
         />
       </div>
     </template>
+    <RowMenu :top="top" v-if="showRowMenu" @view="viewRow" @delete="deleteRow" />
   </CustomTable>
 </template>
 <script setup>
@@ -55,31 +58,40 @@ import EmployeeRow from "@/components/Employee/EmployeeRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import { useEmployeeStore } from "@/stores/employee";
 import CustomTable from "@/components/shared/CustomTable.vue";
+import RowMenu from "@/components/shared/RowMenu.vue";
+import Event from "@/event";
 
+const top = ref(0);
+const showRowMenu = ref(false);
 const showModal = ref(false);
 const showDeleteConfirmModal = ref(false);
 const toDelete = ref();
-const idToEdit = ref();
 const isEdit = ref(false);
-const selectedMenuRow = ref(-1);
+const selectedId = ref(-1);
 const employeeStore = useEmployeeStore();
+
+// custom event
+Event.on("global-click", function () {
+  showRowMenu.value = false;
+});
 
 onMounted(async () => {
   await employeeStore.fetchAllEmployees();
 });
 
-const onSelectRow = (data) => {
-  selectedMenuRow.value = data;
+const onSelectRow = (id) => {
+  selectedId.value = id;
+  top.value = event.target.offsetTop;
+  showRowMenu.value = true;
 };
 
-const viewRow = (user_id) => {
+const viewRow = () => {
   isEdit.value = true;
   showModal.value = true;
-  idToEdit.value = user_id;
 };
 
-const deleteRow = (user_id) => {
-  toDelete.value = { user_id };
+const deleteRow = () => {
+  toDelete.value = { user_id: selectedId.value };
   showDeleteConfirmModal.value = true;
 };
 
