@@ -12,21 +12,13 @@
     :data="toDelete"
     @after-delete="afterDelete"
   />
-  <div class="table-wrapper w-full relative">
-    <div class="flex justify-between items-center">
-      <input type="search" class="input w-full max-w-72" placeholder="Search" />
-      <button
-        class="bg-primary p-2 rounded"
-        @click="
-          showModal = true;
-          isEdit = false;
-        "
-      >
-        <img src="../assets//icons/plus.svg" alt="Plus" />
-      </button>
-    </div>
-    <hr class="bg-gray-50 -mx-4" />
-    <div class="flex flex-col gap-7 overflow-x-auto pb-5">
+  <CustomTable
+    v-model:show-modal="showModal"
+    v-model:is-edit="isEdit"
+    :has-add-btn="true"
+    :has-pagination="true"
+  >
+    <template v-slot:table_header>
       <div class="grid grid-cols-13 gap-3 items-center min-w-[792px]">
         <div class="col-span-1 flex gap-3 items-center">
           <input type="checkbox" class="input" />
@@ -40,6 +32,8 @@
         <p class="col-span-1 table-header">Status</p>
         <p class="col-span-1 table-header">Action</p>
       </div>
+    </template>
+    <template v-slot:table_body>
       <div class="flex flex-col gap-4">
         <EmployeeRow
           v-for="user in employeeStore.employees"
@@ -51,17 +45,16 @@
           @delete="deleteRow"
         />
       </div>
-    </div>
-    <Pagination />
-  </div>
+    </template>
+  </CustomTable>
 </template>
 <script setup>
 import EmployeeModal from "@/components/Employee/EmployeeModal.vue";
 import { onMounted, ref } from "vue";
 import EmployeeRow from "@/components/Employee/EmployeeRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import Pagination from "@/components/shared/Paginate.vue";
 import { useEmployeeStore } from "@/stores/employee";
+import CustomTable from "@/components/shared/CustomTable.vue";
 
 const showModal = ref(false);
 const showDeleteConfirmModal = ref(false);
