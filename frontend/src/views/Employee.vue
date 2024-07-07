@@ -18,7 +18,6 @@
     :has-add-btn="true"
     :has-pagination="true"
     class="relative"
-    @click=""
   >
     <template v-slot:table_header>
       <div class="grid grid-cols-13 gap-3 items-center min-w-[792px]">

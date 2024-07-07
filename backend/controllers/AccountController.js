@@ -47,12 +47,6 @@ module.exports = {
   },
 
   delete: async (req, res) => {
-    const response = {
-      message: "Something wen't wrong",
-      status: 400,
-      data: {},
-    };
-
     try {
       await Account.destroy({
         where: {

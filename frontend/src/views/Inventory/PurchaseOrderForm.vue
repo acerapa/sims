@@ -43,7 +43,11 @@
           </div>
           <div class="flex-1 flex flex-col gap-2">
             <p class="text-sm font-semibold">Ship To Info</p>
-            <AddressForm v-model="model.order.address" />
+            <AddressForm
+              v-model="model.order.address"
+              :address="model.order.address"
+              :key="model.order"
+            />
           </div>
         </div>
         <textarea
@@ -100,8 +104,15 @@
           class="btn-outline !border-danger !text-danger"
           >Cancel</RouterLink
         >
-        <button type="button" class="btn-outline">Save and New</button>
-        <button type="button" class="btn" @click="onSubmit()">Save</button>
+        <button type="button" class="btn-outline" v-if="!isEdit">
+          Save and New
+        </button>
+        <button type="button" class="btn" @click="onSubmit()" v-if="!isEdit">
+          Save
+        </button>
+
+        <!-- edit page save button -->
+        <button type="button" class="btn" v-if="isEdit">Update</button>
       </div>
     </div>
   </div>
@@ -111,16 +122,21 @@ import { useVendorStore } from "@/stores/supplier";
 import { computed, onMounted, ref, watch } from "vue";
 import AddressForm from "@/components/shared/AddressForm.vue";
 import PurchaseOrderFormRow from "../../components/Inventory/PurchaseOrderFormRow.vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import VendorModal from "@/components/Vendor/VendorModal.vue";
 import { Method, authenticatedApi } from "@/api";
 import { Helpers } from "@/helpers";
 import { useProductStore } from "@/stores/product";
+import { usePurchaseOrderStore } from "@/stores/purchase-order";
 
-const showVendorModal = ref(false);
-const supplierStore = useVendorStore();
+const route = useRoute();
+const isEdit = ref(false);
 const router = useRouter();
+const showVendorModal = ref(false);
+
+const supplierStore = useVendorStore();
+const purchaseOrderStore = usePurchaseOrderStore();
 const productStore = useProductStore();
 
 const modelDefualtValue = {
@@ -162,6 +178,35 @@ const supplierOptions = computed(() => {
 });
 
 onMounted(async () => {
+  if (route.query.id) {
+    isEdit.value = true;
+    await purchaseOrderStore.fetchPurchaseOrderById(route.query.id);
+
+    const order = purchaseOrderStore.purchaseOrder;
+    model.value = {
+      order: {
+        address: order.address,
+        supplier_id: order.supplier.id,
+        amount: order.amount,
+        bill_due: Helpers.formatDate(order.bill_due, "YYYY-MM-DD"),
+        date: Helpers.formatDate(order.date, "YYYY-MM-DD"),
+        memo: "",
+        ref_no: order.ref_no,
+      },
+      products: [
+        ...order.products.map((product) => {
+          return {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            quantity: product.ProductOrder.quantity,
+            cost: product.cost,
+            amount: product.ProductOrder.amount,
+          };
+        }),
+      ],
+    };
+  }
   await supplierStore.fetchAllSuppliers();
 });
 

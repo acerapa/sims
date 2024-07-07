@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-10 gap-3 min-w-[907px] relative">
+  <div class="grid grid-cols-10 gap-3 min-w-[907px]">
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.product.id }}</p>
@@ -21,18 +21,13 @@
         src="@/assets/icons/vertical-menu.svg"
         alt=""
         class="cursor-pointer menu-btn-trigger"
-        @click="openMenu(props.product.id)"
+        @click.stop="openMenu(props.product.id)"
       />
     </div>
-    <ProductRowMenu
-      @delete="emit('delete', props.product.id)"
-      @view="emit('view', props.product.id)"
-    />
   </div>
 </template>
 
 <script setup>
-import ProductRowMenu from "@/components/Product/ProductRowMenu.vue";
 import { Helpers } from "@/helpers";
 const props = defineProps({
   product: {
@@ -41,7 +36,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["delete", "view", "openMenu"]);
+const emit = defineEmits(["openMenu"]);
 
 const openMenu = () => {
   emit("openMenu", props.product.id);

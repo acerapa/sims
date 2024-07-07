@@ -33,11 +33,18 @@
 <script setup>
 import { ref, watch } from "vue";
 
+const props = defineProps({
+  address: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+
 const model = ref({
-  address1: "",
-  address2: "",
-  city: "",
-  postal: "",
+  address1: props.address.address1,
+  address2: props.address.address2,
+  city: props.address.city,
+  postal: props.address.postal,
 });
 
 const formModel = defineModel();

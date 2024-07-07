@@ -2,10 +2,15 @@ class Event {
   static events = [];
 
   static on(event, callback) {
-    this.events.push({
-      event,
-      callback,
-    });
+    const evt = this.events.find((v) => v.event == event);
+    if (evt) {
+      evt.callback = callback;
+    } else {
+      this.events.push({
+        event,
+        callback,
+      });
+    }
   }
 
   static emit(event, data = null) {

@@ -46,10 +46,6 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
-  currentOpenMenu: {
-    type: Number,
-    required: true,
-  },
 });
 
 const emit = defineEmits(["openMenu", "view", "delete"]);

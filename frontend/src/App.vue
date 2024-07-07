@@ -1,10 +1,10 @@
 <script setup>
-import { RouterView } from 'vue-router';
-import { onMounted } from 'vue';
-import Event from './event';
+import { RouterView } from "vue-router";
+import { onMounted } from "vue";
+import Event from "./event";
 
 onMounted(() => {
-  window.addEventListener('click', () => {
+  window.addEventListener("click", () => {
     Event.emit("global-click");
   });
 });
@@ -13,4 +13,3 @@ onMounted(() => {
 <template>
   <RouterView />
 </template>
-
