@@ -1,19 +1,29 @@
-import { authenticatedApi } from '@/api';
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { authenticatedApi } from "@/api";
+import { defineStore } from "pinia";
+import { ref } from "vue";
 
-export const usePurchaseOrderStore = defineStore('purchase-order', () => {
-	const purchaseOrders = ref([]);
+export const usePurchaseOrderStore = defineStore("purchase-order", () => {
+  const purchaseOrders = ref([]);
+	const purchaseOrder = ref(null);
 
-	const fetchPurchaseOrders = async () => {
-		const res = await authenticatedApi('/purchase-order/all');
+  const fetchPurchaseOrders = async () => {
+    const res = await authenticatedApi("/purchase-order/all");
+    if (res.status == 200) {
+      purchaseOrders.value = res.data.orders;
+    }
+  };
+
+  const fetchPurchaseOrderById = async (id) => {
+		const res = await authenticatedApi("/purchase-order/"+id);
 		if (res.status == 200) {
-			purchaseOrders.value = res.data.orders;
+			purchaseOrder.value = res.data.order;
 		}
-	} 
+  };
 
-	return {
-		purchaseOrders,
-		fetchPurchaseOrders
-	}
+  return {
+		purchaseOrder,
+    purchaseOrders,
+    fetchPurchaseOrders,
+		fetchPurchaseOrderById
+  };
 });

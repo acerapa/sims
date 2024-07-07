@@ -28,6 +28,11 @@ export default [
         ]
       },
       {
+        text: "Receive Order",
+        route: "purchase-receive-order",
+        icon: dot,
+      },
+      {
         text: "My Inventory",
         route: "my-inventory",
         icon: dot,

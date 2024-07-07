@@ -1,5 +1,5 @@
 <template>
   <!-- TODO: Needs to create pagination -->
-  <div>Pagination</div>
+  <code>Pagination is currently in progress</code>
 </template>
 <script setup></script>

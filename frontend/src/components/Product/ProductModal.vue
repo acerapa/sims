@@ -227,29 +227,36 @@ const generateItemCode = async () => {
 };
 
 onMounted(async () => {
+  await supplierStore.fetchAllSuppliers();
+  await settingStore.fetchAllProductCategories();
+  await settingStore.fetchAllAccounts();
+
   if (props.isEdit && props.selectedId) {
-    model.value = productStore.products.find(
-      (product) => product.id == props.selectedId
-    );
+    model.value = (() => {
+      let product = productStore.products.find(
+        (product) => product.id == props.selectedId
+      );
 
-    // get the first supplier to show the cost
-    if (model.value.suppliers.length) {
-      model.value.cost = model.value.suppliers[0].ProductSupplier.cost;
-      model.value.suppliers = model.value.suppliers.map((sup) => sup.id);
-    }
+      // remove pass by reference
+      product = { ...product };
 
-    // setting the accounts
-    model.value.expense_account = model.value.expense.id;
-    model.value.income_account = model.value.income.id;
+      if (product) {
+        if (product.suppliers.length) {
+          product.cost = product.suppliers[0].ProductSupplier.cost;
+          product.suppliers = product.suppliers.map((supplier) => supplier.id);
+        }
+
+        product.expense_account = product.expense.id;
+        product.income_account = product.income.id;
+      }
+
+      return product ? product : model.value;
+    })();
   }
 
   if (!props.isEdit) {
     await generateItemCode();
   }
-
-  await supplierStore.fetchAllSuppliers();
-  await settingStore.fetchAllProductCategories();
-  await settingStore.fetchAllAccounts();
 });
 
 const onSubmit = async () => {

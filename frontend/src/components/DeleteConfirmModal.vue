@@ -5,9 +5,12 @@
     @submit="submit"
     v-model="showModal"
   >
-    <p class="font-semibold text-lg mx-auto my-7 text-center">
-      This action is irreversible do you want to continue?
-    </p>
+    <div class="mx-auto text-center mt-7 mb-4 flex flex-col gap-4">
+      <img src="@/assets/icons/exclamation.svg" alt="notice" class="block mx-auto w-15 h-15" />
+      <p class="font-semibold text-lg">
+        This action is irreversible do you want to continue?
+      </p>
+    </div>
   </ModalWrapper>
 </template>
 <script setup>

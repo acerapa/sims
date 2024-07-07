@@ -3,7 +3,7 @@
     <AccountModal
       v-model="showModal"
       :is-edit="isEdit"
-      :selected-id="idToEdit"
+      :selected-id="selectedId"
       v-if="showModal"
     />
     <DeleteConfirmModal
@@ -16,26 +16,13 @@
         showDeleteConfirmationModal = false;
       "
     />
-    <div class="table-wrapper">
-      <div class="flex justify-between items-center">
-        <input
-          type="search"
-          class="input w-full max-w-72"
-          placeholder="Search"
-        />
-        <button
-          class="bg-primary p-2 rounded"
-          @click="
-            showModal = true;
-            isEdit = false;
-          "
-        >
-          <img src="@/assets/icons/plus.svg" alt="Plus" />
-        </button>
-      </div>
-      <hr class="bg-gray-50 -mx-4" />
-      <div class="flex flex-col gap-7 overflow-x-auto pb-5">
-        <!-- table heades -->
+    <CustomTable
+      :has-add-btn="true"
+      :has-pagination="true"
+      v-model:show-modal="showModal"
+      v-model:is-edit="isEdit"
+    >
+      <template v-slot:table_header>
         <div class="grid grid-cols-9 gap-3">
           <div class="col-span-1 flex gap-3 items-center">
             <input type="checkbox" class="input" />
@@ -46,21 +33,25 @@
           <p class="col-span-2 table-header">Date Added</p>
           <p class="col-span-1 table-header">Action</p>
         </div>
-
-        <!-- Datas -->
+      </template>
+      <template v-slot:table_body>
         <div class="flex flex-col gap-4">
           <AccountRow
             v-for="(account, ndx) in settingsStore.accounts"
             :key="ndx"
             :account="account"
             @open-menu="onSelectRow"
-            :current-open-menu="selectedMenuRow"
-            @view="onViewRow"
-            @delete="onDeleteRow"
           />
         </div>
-      </div>
-    </div>
+      </template>
+      <RowMenu
+        :top="top"
+        class="right-15"
+        v-if="showRowMenu"
+        @view="onViewRow"
+        @delete="onDeleteRow"
+      />
+    </CustomTable>
   </div>
 </template>
 
@@ -70,31 +61,42 @@ import { ref, onMounted } from "vue";
 import AccountModal from "@/components/Settings/AccountModal.vue";
 import AccountRow from "@/components/Settings/AccountRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import CustomTable from "@/components/shared/CustomTable.vue";
+import RowMenu from "@/components/shared/RowMenu.vue";
+import Event from "@/event";
+
+const top = ref(0);
+const toDelete = ref();
+const selectedId = ref(0);
+const isEdit = ref(false);
+const showModal = ref(false);
+const showRowMenu = ref(false);
+const showDeleteConfirmationModal = ref(false);
 
 const settingsStore = useSettingsStore();
-const showModal = ref(false);
-const isEdit = ref(false);
-const idToEdit = ref();
-const toDelete = ref();
-const selectedMenuRow = ref(-1);
-const showDeleteConfirmationModal = ref(false);
+
+// custom event
+Event.on("global-click", function () {
+  showRowMenu.value = false;
+});
 
 onMounted(async () => {
   await settingsStore.fetchAllAccounts();
 });
 
-const onSelectRow = (data) => {
-  selectedMenuRow.value = data;
+const onSelectRow = (id) => {
+  selectedId.value = id;
+  top.value = event.target.offsetTop;
+  showRowMenu.value = true;
 };
 
-const onViewRow = (account_id) => {
+const onViewRow = () => {
   isEdit.value = true;
   showModal.value = true;
-  idToEdit.value = account_id;
 };
 
 const onDeleteRow = (id) => {
-  toDelete.value = { id };
+  toDelete.value = { id: selectedId.value };
   showDeleteConfirmationModal.value = true;
 };
 </script>
