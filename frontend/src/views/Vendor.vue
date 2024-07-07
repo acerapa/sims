@@ -4,7 +4,7 @@
       v-if="showModal"
       v-model="showModal"
       :is-edit="isEdit"
-      :selected-id="toEdit"
+      :selected-id="selectedId"
     />
     <DeleteConfirmModal
       v-model="showDeleteConfirmModal"
@@ -13,25 +13,13 @@
       :data="toDelete"
       @after-delete="afterDelete"
     />
-    <div class="table-wrapper w-full">
-      <div class="flex justify-between items-center">
-        <input
-          type="search"
-          class="input w-full max-w-72"
-          placeholder="Search"
-        />
-        <button
-          class="bg-primary p-2 rounded"
-          @click="
-            showModal = true;
-            isEdit = false;
-          "
-        >
-          <img src="../assets//icons/plus.svg" alt="Plus" />
-        </button>
-      </div>
-      <hr class="bg-gray-50 -mx-4" />
-      <div class="flex flex-col gap-7 overflow-x-auto pb-5">
+    <CustomTable
+      :has-add-btn="true"
+      :has-pagination="true"
+      v-model:show-modal="showModal"
+      v-model:is-edit="isEdit"
+    >
+      <template v-slot:table_header>
         <div class="grid grid-cols-7 gap-3 items-center min-w-[564px]">
           <div class="col-span-1 flex gap-3 items-center">
             <input type="checkbox" class="input" />
@@ -41,19 +29,25 @@
           <p class="col-span-2 table-header">Rep. Name</p>
           <p class="col-span-1 table-header">Action</p>
         </div>
+      </template>
+      <template v-slot:table_body>
         <div class="flex flex-col gap-4 min-w-[564px]">
           <VendorRow
             v-for="(supplier, ndx) in vendorStore.suppliers"
             :supplier="supplier"
             :key="ndx"
-            :current-open-menu="selectedMenuRow"
             @open-menu="onSelectRow"
-            @view="onViewRow"
-            @delete="onDeleteRow"
           />
         </div>
-      </div>
-    </div>
+      </template>
+      <RowMenu
+        :top="top"
+        v-if="showRowMenu"
+        @view="onViewRow"
+        @delete="onDeleteRow"
+        class="right-24"
+      />
+    </CustomTable>
   </div>
 </template>
 
@@ -63,35 +57,45 @@ import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import VendorModal from "@/components/Vendor/VendorModal.vue";
 import VendorRow from "@/components/Vendor/VendorRow.vue";
 import { useVendorStore } from "@/stores/supplier";
+import CustomTable from "@/components/shared/CustomTable.vue";
+import RowMenu from "@/components/shared/RowMenu.vue";
+import Event from "@/event";
 
 const vendorStore = useVendorStore();
 
+const top = ref(0);
 const showModal = ref(false);
 const isEdit = ref(false);
-const toEdit = ref(-1);
 const toDelete = ref();
-const selectedMenuRow = ref(-1);
+const selectedId = ref(-1);
+const showRowMenu = ref(false);
 const showDeleteConfirmModal = ref(false);
 
+// custom event
+Event.on("global-click", function () {
+  showRowMenu.value = false;
+});
+
 const onSelectRow = (id) => {
-  selectedMenuRow.value = id;
+  selectedId.value = id;
+  top.value = event.target.offsetTop;
+  showRowMenu.value = true;
 };
 
-const onViewRow = (id) => {
-  toEdit.value = id;
+const onViewRow = () => {
   isEdit.value = true;
   showModal.value = true;
 };
 
-const onDeleteRow = async (id) => {
-  toDelete.value = { id };
+const onDeleteRow = async () => {
+  toDelete.value = { id: selectedId.value };
   showDeleteConfirmModal.value = true;
 };
 
 const afterDelete = async () => {
   await vendorStore.fetchAllSuppliers();
   showDeleteConfirmModal.value = false;
-}
+};
 
 onMounted(async () => {
   await vendorStore.fetchAllSuppliers();

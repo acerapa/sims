@@ -16,5 +16,6 @@
     "**/dist": true
   },
   "javascript.referencesCodeLens.enabled": true,
-  "javascript.updateImportsOnFileMove.enabled": "always"
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "editor.fontFamily": "JetBrains Mono"
 }

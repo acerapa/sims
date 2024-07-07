@@ -3,7 +3,7 @@
     :is-edit="isEdit"
     v-model="showModal"
     v-if="showModal"
-    :selected-id="toEdit"
+    :selected-id="selectedId"
   />
   <DeleteConfirmModal
     v-if="showDeleteConfirmModal"
@@ -12,22 +12,13 @@
     :data="toDelete"
     @after-delete="onAfterDelete"
   />
-  <div class="table-wrapper w-full">
-    <div class="flex justify-between items-center">
-      <input type="search" class="input w-full max-w-72" placeholder="Search" />
-      <button
-        class="bg-primary p-2 rounded"
-        @click="
-          showModal = true;
-          isEdit = false;
-        "
-      >
-        <img src="../assets//icons/plus.svg" alt="Plus" />
-      </button>
-    </div>
-    <hr class="bg-gray-50 -mx-4" />
-    <div class="flex flex-col gap-7 overflow-x-auto pb-5">
-      <!-- table header -->
+  <CustomTable
+    :has-add-btn="true"
+    :has-pagination="true"
+    v-model:show-modal="showModal"
+    v-model:is-edit="isEdit"
+  >
+    <template v-slot:table_header>
       <div class="grid grid-cols-10 gap-3 min-w-[907px]">
         <div class="col-span-1 flex gap-3 items-center">
           <input type="checkbox" class="input" />
@@ -41,19 +32,24 @@
         <p class="col-span-1 table-header">Status</p>
         <p class="col-span-1 table-header">Actions</p>
       </div>
-
-      <!-- table body -->
+    </template>
+    <template v-slot:table_body>
       <div class="flex flex-col gap-4">
         <ProductRow
           v-for="(product, ndx) in productStore.products"
           :key="ndx"
           :product="product"
-          @delete="onDeleteRow"
-          @view="onViewRow"
+          @open-menu="onSelectRow"
         />
       </div>
-    </div>
-  </div>
+    </template>
+    <RowMenu
+      :top="top"
+      v-if="showRowMenu"
+      @view="onViewRow"
+      @delete="onDeleteRow"
+    />
+  </CustomTable>
 </template>
 
 <script setup>
@@ -61,23 +57,37 @@ import { onMounted, ref } from "vue";
 import ProductModal from "@/components/Product/ProductModal.vue";
 import ProductRow from "@/components/Product/ProductRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-
+import CustomTable from "@/components/shared/CustomTable.vue";
+import RowMenu from "@/components/shared/RowMenu.vue";
 import { useProductStore } from "@/stores/product";
+import Event from "@/event";
 
+const top = ref(0);
+const showRowMenu = ref(false);
 const showDeleteConfirmModal = ref(false);
 const showModal = ref(false);
 const isEdit = ref(false);
 const productStore = useProductStore();
 const toDelete = ref({});
-const toEdit = ref(0);
+const selectedId = ref(0);
 
-const onDeleteRow = (id) => {
-  toDelete.value = { id };
+// custom event
+Event.on("global-click", function () {
+  showRowMenu.value = false;
+});
+
+const onSelectRow = (id) => {
+  top.value = event.target.offsetTop;
+  showRowMenu.value = true;
+  selectedId.value = id;
+};
+
+const onDeleteRow = () => {
+  toDelete.value = { id: selectedId.value };
   showDeleteConfirmModal.value = true;
 };
 
-const onViewRow = (id) => {
-  toEdit.value = id;
+const onViewRow = () => {
   isEdit.value = true;
   showModal.value = true;
 };

@@ -15,6 +15,8 @@
     </div>
     <hr class="bg-gray-50 -mx-4" />
     <div class="flex flex-col gap-7 overflow-x-auto pb-5">
+      <!-- Default slot -->
+      <slot></slot>
       <!-- Table Header -->
       <slot name="table_header"></slot>
       <!-- Table Body -->
