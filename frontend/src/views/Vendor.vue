@@ -14,32 +14,17 @@
       @after-delete="afterDelete"
     />
     <CustomTable
+      v-if="vendorStore.suppliers.length"
       :has-add-btn="true"
       :has-pagination="true"
-      v-model:show-modal="showModal"
       v-model:is-edit="isEdit"
+      :data="vendorStore.suppliers"
+      v-model:show-modal="showModal"
+      :row-prop-init="vendorRowEvent"
+      :table-row-component="VendorRow"
+      :table-header-component="VendorTableHeader"
+      @open-menu="onSelectRow"
     >
-      <template v-slot:table_header>
-        <div class="grid grid-cols-7 gap-3 items-center min-w-[564px]">
-          <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
-            <p class="table-header">#</p>
-          </div>
-          <p class="col-span-3 table-header">Company Name</p>
-          <p class="col-span-2 table-header">Rep. Name</p>
-          <p class="col-span-1 table-header">Action</p>
-        </div>
-      </template>
-      <template v-slot:table_body>
-        <div class="flex flex-col gap-4 min-w-[564px]">
-          <VendorRow
-            v-for="(supplier, ndx) in vendorStore.suppliers"
-            :supplier="supplier"
-            :key="ndx"
-            @open-menu="onSelectRow"
-          />
-        </div>
-      </template>
       <RowMenu
         :top="top"
         v-if="showRowMenu"
@@ -60,6 +45,7 @@ import { useVendorStore } from "@/stores/supplier";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
+import VendorTableHeader from "@/components/Vendor/VendorTableHeader.vue";
 
 const vendorStore = useVendorStore();
 
@@ -74,6 +60,14 @@ const showDeleteConfirmModal = ref(false);
 // custom event
 Event.on("global-click", function () {
   showRowMenu.value = false;
+});
+
+// define vendor row init props
+const vendorRowEvent = "vendor-row-props-init";
+Event.on(vendorRowEvent, function (data) {
+  return {
+    supplier: data,
+  };
 });
 
 const onSelectRow = (id) => {

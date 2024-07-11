@@ -11,6 +11,8 @@ export const useSettingsStore = defineStore("settings", () => {
     if (res.status == 200) {
       productCategories.value = res.data.categories;
     }
+
+    return res.data.categories;
   };
 
   const fetchAllAccounts = async () => {

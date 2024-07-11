@@ -14,32 +14,17 @@
       @after-delete="afterDelete"
     />
     <CustomTable
+      v-if="productCategories.length /* temporary for now need to add loaders */"
       :has-add-btn="true"
       :has-pagination="true"
-      v-model:show-modal="showModal"
       v-model:is-edit="isEdit"
+      @open-menu="onSelectRow"
+      :data="productCategories"
+      v-model:show-modal="showModal"
+      :row-prop-init="productCategoryRowEvent"
+      :table-row-component="ProductCategoryRow"
+      :table-header-component="ProductCategoryTableHeader"
     >
-      <template v-slot:table_header>
-        <div class="grid gap-3 grid-cols-7">
-          <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
-            <p class="table-header">#</p>
-          </div>
-          <p class="col-span-3 table-header">Name</p>
-          <p class="col-span-2 table-header">Date Added</p>
-          <p class="col-span-1 table-header">Action</p>
-        </div>
-      </template>
-      <template v-slot:table_body>
-        <div class="flex flex-col gap-4">
-          <ProductCategoryRow
-            v-for="(productCategory, ndx) in settingsStore.productCategories"
-            :product-category="productCategory"
-            :key="ndx"
-            @open-menu="onSelectRow"
-          />
-        </div>
-      </template>
       <RowMenu
         :top="top"
         v-if="showRowMenu"
@@ -57,12 +42,14 @@ import ProductCategoryRow from "@/components/Settings/ProductCategoryRow.vue";
 import { useSettingsStore } from "@/stores/settings";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
+import ProductCategoryTableHeader from "@/components/Settings/ProductCategoryTableHeader.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
 
 const top = ref(0);
 const showModal = ref(false);
 const showRowMenu = ref(false);
+const productCategories = ref([]);
 const showDeleteConfirmationModal = ref(false);
 const isEdit = ref(false);
 const toDelete = ref({});
@@ -75,8 +62,14 @@ Event.on("global-click", function () {
   showRowMenu.value = false;
 });
 
+// define Product categories row props
+const productCategoryRowEvent = "product-category-row-props-init";
+Event.on(productCategoryRowEvent, function (item) {
+  return { productCategory: item };
+});
+
 onMounted(async () => {
-  await settingsStore.fetchAllProductCategories();
+  productCategories.value = await settingsStore.fetchAllProductCategories();
 });
 
 const onSelectRow = (id) => {
