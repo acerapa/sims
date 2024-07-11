@@ -17,33 +17,17 @@
       "
     />
     <CustomTable
+      v-if="accounts.length /* temporary for now need to add loaders */"
       :has-add-btn="true"
       :has-pagination="true"
       v-model:show-modal="showModal"
       v-model:is-edit="isEdit"
+      :table-header-component="AccountTableHeader"
+      :table-row-component="AccountRow"
+      :data="accounts"
+      :row-prop-init="accountRowEvent"
+      @open-menu="onSelectRow"
     >
-      <template v-slot:table_header>
-        <div class="grid grid-cols-9 gap-3">
-          <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
-            <p class="table-header">#</p>
-          </div>
-          <p class="col-span-3 table-header">Account Name</p>
-          <p class="col-span-2 table-header">Type</p>
-          <p class="col-span-2 table-header">Date Added</p>
-          <p class="col-span-1 table-header">Action</p>
-        </div>
-      </template>
-      <template v-slot:table_body>
-        <div class="flex flex-col gap-4">
-          <AccountRow
-            v-for="(account, ndx) in settingsStore.accounts"
-            :key="ndx"
-            :account="account"
-            @open-menu="onSelectRow"
-          />
-        </div>
-      </template>
       <RowMenu
         :top="top"
         class="right-15"
@@ -63,10 +47,12 @@ import AccountRow from "@/components/Settings/AccountRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
+import AccountTableHeader from "@/components/Settings/AccountTableHeader.vue";
 import Event from "@/event";
 
 const top = ref(0);
 const toDelete = ref();
+const accounts = ref([]);
 const selectedId = ref(0);
 const isEdit = ref(false);
 const showModal = ref(false);
@@ -80,8 +66,15 @@ Event.on("global-click", function () {
   showRowMenu.value = false;
 });
 
+// define account row props
+const accountRowEvent = "account-row-init-props";
+Event.on(accountRowEvent, function (data) {
+  // initize the value of props here
+  return { account: data };
+});
+
 onMounted(async () => {
-  await settingsStore.fetchAllAccounts();
+  accounts.value = await settingsStore.fetchAllAccounts();
 });
 
 const onSelectRow = (id) => {
@@ -95,7 +88,7 @@ const onViewRow = () => {
   showModal.value = true;
 };
 
-const onDeleteRow = (id) => {
+const onDeleteRow = () => {
   toDelete.value = { id: selectedId.value };
   showDeleteConfirmationModal.value = true;
 };

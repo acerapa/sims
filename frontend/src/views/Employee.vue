@@ -41,9 +41,6 @@
           :user="user"
           :key="user.id"
           @open-menu="onSelectRow"
-          :current-open-menu="selectedId"
-          @view="viewRow"
-          @delete="deleteRow"
         />
       </div>
     </template>
