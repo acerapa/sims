@@ -16,7 +16,7 @@ class Event {
   static emit(event, data = null) {
     const evt = this.events.find((v) => v.event == event);
     if (evt) {
-      evt.callback.length ? evt.callback(data) : evt.callback();
+      return evt.callback.length ? evt.callback(data) : evt.callback();
     }
   }
 }

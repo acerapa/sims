@@ -11,7 +11,7 @@
     <p class="col-span-3 text-sm line-clamp-2">
       {{ props.product.purchase_description }}
     </p>
-    <p class="col-span-1 text-sm">{{ props.product.quantityInStock }}</p>
+    <p class="col-span-1 text-sm">{{ props.product.quantity_in_stock }}</p>
     <p class="col-span-1 text-sm">
       {{ Helpers.formatDate(props.product.createdAt, "M/D/YYYY") }}
     </p>
