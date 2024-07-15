@@ -1,10 +1,18 @@
 class Event {
   static events = [];
 
-  static on(event, callback) {
+  static on(event, callback, append = false) {
     const evt = this.events.find((v) => v.event == event);
     if (evt) {
-      evt.callback = callback;
+      if (append) {
+        let callbacks = [];
+        callbacks.push(evt.callback);
+        callbacks.push(callback);
+
+        evt.callback = callbacks;
+      } else {
+        evt.callback = callback;
+      }
     } else {
       this.events.push({
         event,
@@ -16,7 +24,11 @@ class Event {
   static emit(event, data = null) {
     const evt = this.events.find((v) => v.event == event);
     if (evt) {
-      return evt.callback.length ? evt.callback(data) : evt.callback();
+      if (Array.isArray(evt.callback)) {
+        evt.callback.map(fn => fn.length ? fn(data) : fn());
+      } else {
+        return evt.callback.length ? evt.callback(data) : evt.callback();
+      }
     }
   }
 }

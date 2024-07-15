@@ -1,7 +1,29 @@
 <template>
   <div class="table-wrapper w-full relative">
+    <!-- filter -->
+    <div class="filter" v-if="showFilter && props.hasFilter" ref="filter">
+      <div class="flex justify-between items-center">
+        <p>Filters</p>
+        <img
+          src="@/assets/icons/close.svg"
+          alt="close"
+          class="cursor-pointer"
+          @click="showFilter = false"
+        />
+      </div>
+      <div>
+        <slot name="filters"></slot>
+      </div>
+    </div>
     <div class="flex justify-between items-center">
-      <div class="flex gap-3">
+      <div class="flex gap-3 items-center">
+        <div
+          class="rounded border p-3 cursor-pointer"
+          @click.stop="showFilter = true"
+          v-if="props.hasFilter"
+        >
+          <img src="@/assets/icons/funnel.svg" class="w-6 h-3" alt="funnel" />
+        </div>
         <input
           type="search"
           class="input w-full max-w-72"
@@ -85,6 +107,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  hasFilter: {
+    type: Boolean,
+    default: false,
+  },
   tableHeaderComponent: {
     type: Object,
     required: false,
@@ -109,13 +135,35 @@ const props = defineProps({
   },
 });
 
+const filter = ref();
+Event.on("global-click", function () {
+  if (filter.value) {
+    if (!filter.value.contains(event.target)) {
+      showFilter.value = false;
+    }
+  }
+}, true);
+
+console.log(Event.events);
+
 const items = ref([]);
 const showItemSelected = ref(5);
 
+const showFilter = ref(false);
+
 onMounted(() => {
   items.value = props.data;
-})
+});
 
 const showModal = defineModel("showModal");
 const isEdit = defineModel("isEdit");
 </script>
+
+<style scoped>
+.filter {
+  position: absolute;
+  top: 60px;
+  left: 12px;
+  @apply p-4 shadow bg-white rounded-xl border-2;
+}
+</style>
