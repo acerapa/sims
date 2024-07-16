@@ -13,26 +13,37 @@
       :data="toDelete"
       @after-delete="afterDelete"
     />
-    <CustomTable
-      v-if="productCategories.length /* temporary for now need to add loaders */"
-      :has-add-btn="true"
-      :has-pagination="true"
-      v-model:is-edit="isEdit"
-      @open-menu="onSelectRow"
-      :data="productCategories"
-      v-model:show-modal="showModal"
-      :row-prop-init="productCategoryRowEvent"
-      :table-row-component="ProductCategoryRow"
-      :table-header-component="ProductCategoryTableHeader"
-    >
-      <RowMenu
-        :top="top"
-        v-if="showRowMenu"
-        class="right-[100px]"
-        @view="onView"
-        @delete="onDelete"
-      />
-    </CustomTable>
+    <div class="flex flex-col gap-6">
+      <CustomTable
+        title="Product Reordering Point"
+        :has-pagination="true"
+        :table-row-component="ProductReorderingPointRow"
+        :table-header-component="ProductReorderingPointTableHeader"
+      ></CustomTable>
+      <CustomTable
+        v-if="
+          productCategories.length /* temporary for now need to add loaders */
+        "
+        :has-add-btn="true"
+        :has-pagination="true"
+        v-model:is-edit="isEdit"
+        @open-menu="onSelectRow"
+        :data="productCategories"
+        title="Product Categories"
+        v-model:show-modal="showModal"
+        :row-prop-init="productCategoryRowEvent"
+        :table-row-component="ProductCategoryRow"
+        :table-header-component="ProductCategoryTableHeader"
+      >
+        <RowMenu
+          :top="top"
+          v-if="showRowMenu"
+          class="right-[100px]"
+          @view="onView"
+          @delete="onDelete"
+        />
+      </CustomTable>
+    </div>
   </div>
 </template>
 <script setup>
@@ -42,7 +53,9 @@ import ProductCategoryRow from "@/components/Settings/ProductCategoryRow.vue";
 import { useSettingsStore } from "@/stores/settings";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
+import ProductReorderingPointRow from "@/components/Settings/ProductReorderingPointRow.vue";
 import ProductCategoryTableHeader from "@/components/Settings/ProductCategoryTableHeader.vue";
+import ProductReorderingPointTableHeader from "@/components/Settings/ProductReorderingPointTableHeader.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
 

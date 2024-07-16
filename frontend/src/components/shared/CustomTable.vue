@@ -1,5 +1,6 @@
 <template>
   <div class="table-wrapper w-full relative">
+    <p v-if="props.title" class="font-bold text-sm">{{ props.title }}</p>
     <div class="flex justify-between items-center">
       <div class="flex gap-3">
         <input
@@ -77,6 +78,9 @@ import Event from "@/event";
 
 const emit = defineEmits(["update:showModal", "update:isEdit", "open-menu"]);
 const props = defineProps({
+  title: {
+    type: String
+  },
   hasPagination: {
     type: Boolean,
     default: false,
