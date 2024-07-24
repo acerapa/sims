@@ -20,6 +20,9 @@ router.use("/products", productRoutes);
 
 const purchaseOrderRoutes = require('./PurchaseOrderRoutes');
 router.use("/purchase-order", purchaseOrderRoutes);
+
+const productSettingRoutes = require('./ProductSettingRoutes');
+router.use("/product-setting", productSettingRoutes);
 // end use routes
 
 module.exports = router;

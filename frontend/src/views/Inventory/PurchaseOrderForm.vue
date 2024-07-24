@@ -63,29 +63,38 @@
         <p class="text-base font-semibold">Select Products</p>
       </div>
 
-      <div class="flex flex-col gap-4 overflow-x-auto">
-        <div class="grid grid-cols-9 gap-3 min-w-[750px] pb-2 border-b">
-          <div class="col-span-2 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
-            <p class="table-header">Item</p>
+      <div class="max-[750px]:w-[calc(100vw-328px)]">
+        <div class="flex flex-col gap-4 max-w-full overflow-x-auto mb-4 pb-4">
+          <div
+            class="grid grid-cols-9 gap-3 min-w-[750px] pb-2 border-b"
+          >
+            <div class="col-span-2 flex gap-3 items-center">
+              <input type="checkbox" class="input" />
+              <p class="table-header">Item</p>
+            </div>
+            <p class="col-span-3 table-header">Description</p>
+            <p class="col-span-1 table-header">Qty</p>
+            <p class="col-span-1 table-header">Cost</p>
+            <p class="col-span-1 table-header">Amount</p>
+            <p class="col-span-1 table-header">Action</p>
           </div>
-          <p class="col-span-3 table-header">Description</p>
-          <p class="col-span-1 table-header">Qty</p>
-          <p class="col-span-1 table-header">Cost</p>
-          <p class="col-span-1 table-header">Amount</p>
-          <p class="col-span-1 table-header">Action</p>
-        </div>
-        <div class="flex flex-col gap-4">
-          <PurchaseOrderFormRow
-            v-for="(order, ndx) in model.products"
-            v-model="model.products[ndx]"
-            :key="ndx"
-            @remove="removeProduct(ndx)"
-            :selected-products="model.products"
-          />
+          <div class="flex flex-col gap-4">
+            <PurchaseOrderFormRow
+              v-for="(order, ndx) in model.products"
+              v-model="model.products[ndx]"
+              :key="ndx"
+              @remove="removeProduct(ndx)"
+              :selected-products="model.products"
+            />
+          </div>
+          <div class="flex flex-col gap-4" v-if="!model.products.length">
+            <p class="text-center text-sm">Table has no data!</p>
+          </div>
         </div>
         <div class="flex justify-between items-center pb-3">
-          <button class="btn w-fit" @click="addNewProduct">Add new item</button>
+          <button class="btn w-fit" @click="addNewProduct">
+            Add new item
+          </button>
           <p>
             Total: &#8369;
             {{
@@ -129,6 +138,7 @@ import { Method, authenticatedApi } from "@/api";
 import { Helpers } from "@/helpers";
 import { useProductStore } from "@/stores/product";
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
+import Event from "@/event";
 
 const route = useRoute();
 const isEdit = ref(false);
@@ -175,6 +185,12 @@ const supplierOptions = computed(() => {
       text: supplier.company_name,
     };
   });
+});
+
+const isCustomSelectFocused = ref(false);
+// Custom global event
+Event.on("custom-select-focus", function (data) {
+  isCustomSelectFocused.value = data;
 });
 
 onMounted(async () => {

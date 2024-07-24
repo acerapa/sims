@@ -91,7 +91,7 @@
 }
 
 .status {
-  @apply px-2 py-1 text-xs font-semibold rounded-md;
+  @apply px-2 py-1 text-xs font-semibold rounded-md h-fit;
 }
 
 .row-menu-item {

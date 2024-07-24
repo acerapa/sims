@@ -2,6 +2,7 @@
   <div class="overlay"></div>
   <div
     class="fixed w-full max-h-[calc(100vh-80px)] max-w-[614px] rounded-xl top-10 left-1/2 -translate-x-1/2 p-4 z-40 bg-white"
+    :class="props.modalClass"
   >
     <div class="flex justify-between items-center">
       <p class="font-semibold text-xl">{{ props.title }}</p>
@@ -40,6 +41,10 @@ const props = defineProps({
     type: String,
     default: "Save",
   },
+  modalClass: {
+    type: String,
+    default: ""
+  }
 });
 
 const showModal = defineModel();
