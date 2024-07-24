@@ -18,6 +18,7 @@
     />
     <CustomTable
       v-if="accounts.length /* temporary for now need to add loaders */"
+      :has-filter="true"
       :has-add-btn="true"
       :has-pagination="true"
       v-model:show-modal="showModal"

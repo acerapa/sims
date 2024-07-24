@@ -15,6 +15,7 @@
         <slot name="filters"></slot>
       </div>
     </div>
+    <p v-if="props.title" class="font-bold text-sm">{{ props.title }}</p>
     <div class="flex justify-between items-center">
       <div class="flex gap-3 items-center">
         <div
@@ -65,7 +66,7 @@
       <slot v-if="!props.tableHeaderComponent" name="table_header"></slot>
 
       <!-- Table Body -->
-      <div class="flex flex-col gap-4" v-if="props.tableRowComponent">
+      <div class="flex flex-col gap-4" v-if="props.tableRowComponent && items.length">
         <component
           :is="props.tableRowComponent"
           v-for="(item, ndx) in items"
@@ -77,6 +78,9 @@
             }
           "
         />
+      </div>
+      <div class="flex items-center justify-center" v-if="!items.length">
+        <p class="text-sm">Table has no data!</p>
       </div>
       <slot v-if="!props.tableRowComponent" name="table_body"></slot>
     </div>
@@ -99,6 +103,9 @@ import Event from "@/event";
 
 const emit = defineEmits(["update:showModal", "update:isEdit", "open-menu"]);
 const props = defineProps({
+  title: {
+    type: String
+  },
   hasPagination: {
     type: Boolean,
     default: false,

@@ -13,11 +13,10 @@
     @after-delete="onAfterDelete"
   />
   <CustomTable
-    v-if="productStore.products.length"
-    :has-filter="true"
     :has-add-btn="true"
     :has-pagination="true"
     v-model:is-edit="isEdit"
+    :key="productStore.products"
     :data="productStore.products"
     v-model:show-modal="showModal"
     :row-prop-init="productRowEvent"
