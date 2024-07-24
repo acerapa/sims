@@ -17,17 +17,36 @@
       New Purchase Order
     </RouterLink>
     <CustomTable
-      class="relative"
-      :has-add-btn="false"
-      :has-pagination="true"
-      v-model:is-edit="isEdit"
       v-model:show-modal="showModal"
-      :row-prop-init="purchaseOrderRowEvent"
-      :table-row-component="PurchaseOrderRow"
-      :data="purchaseOrderStore.purchaseOrders"
-      :table-header-component="PurchaseOrderTableHeader"
-      @open-menu="onSelectRow"
+      v-model:is-edit="isEdit"
+      :has-add-btn="false"
+      class="relative"
     >
+      <template v-slot:table_header>
+        <div class="grid grid-cols-12 gap-3">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-2 table-header">Ref. No.</p>
+          <p class="col-span-2 table-header">Supplier</p>
+          <p class="col-span-1 table-header">Total</p>
+          <p class="col-span-2 table-header">Date</p>
+          <p class="col-span-2 table-header">Bill Due</p>
+          <p class="col-span-1 table-header">Status</p>
+          <p class="col-span-1 table-header">Actions</p>
+        </div>
+      </template>
+      <template v-slot:table_body>
+        <div class="flex flex-col gap-4">
+          <PurchaseOrderRow
+            @open-menu="onSelectRow"
+            v-for="(order, ndx) in purchaseOrderStore.purchaseOrders"
+            :key="ndx"
+            :order="order"
+          />
+        </div>
+      </template>
       <RowMenu
         :top="top"
         v-if="showRowMenu"
@@ -47,7 +66,6 @@ import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
 import { useRouter } from "vue-router";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrderTableHeader.vue";
 
 const top = ref(0);
 const toDelete = ref();
@@ -62,12 +80,6 @@ const router = useRouter();
 // custom event
 Event.on("global-click", function () {
   showRowMenu.value = false;
-});
-
-// define purchase order props init
-const purchaseOrderRowEvent = "purchase-order-row-props-init";
-Event.on(purchaseOrderRowEvent, function (data) {
-  return { order: data };
 });
 
 const onSelectRow = (id) => {

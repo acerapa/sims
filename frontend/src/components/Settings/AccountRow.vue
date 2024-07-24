@@ -27,7 +27,7 @@ const props = defineProps({
   account: {
     type: Object,
     default: () => ({}),
-  },
+  }
 });
 
 const openMenu = (id) => {

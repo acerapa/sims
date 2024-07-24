@@ -199,21 +199,12 @@ Accept: application/json
 Content-Type: application/json
 
 {
-	"brand": "Testing",
-	"category_id": 39,
-	"cost": 567,
-	"expense_account": 43,
-	"income_account": 39,
-	"item_code": "a027420f",
-	"name": "Testing 3",
-	"price": 567,
-	"product_setting_id": 2,
-	"purchase_description": "This is a test",
-	"quantity_in_stock": 4,
-	"sale_description": "This is a test",
-	"status": "",
-	"suppliers": [11, 12],
-	"type": "inventory"
+	"name": "Printer",
+	"purchase_price": 5000,
+	"selling_price": 5000,
+	"sku": "PRTN-567-788",
+	"category": 45,
+	"quantityInStock": 8
 }
 
 ### = [Update product] success
@@ -235,37 +226,3 @@ Content-Type: application/json
 	"id": 1
 }
 
-### - [All Product Setting] success
-GET http://localhost:3000/api/product-setting/all
-Accept: application/json
-Content-Type: application/json
-
-### - [Register Product Setting] Error
-POST http://localhost:3000/api/product-setting/register
-Accept: application/json
-Content-Type: application/json
-
-{
-	"point": 3,
-	"products": []
-}
-
-### - [Update Product Setting] success
-POST http://localhost:3000/api/product-setting/update
-Accept: application/json
-Content-Type: application/json
-
-{
-	"point": 5,
-	"id": 1,
-	"products": [12,13]
-}
-
-### - [Delete Product Setting] success
-DELETE http://localhost:3000/api/product-setting/delete
-Accept: application/json
-Content-Type: application/json
-
-{
-	"id": 4
-}

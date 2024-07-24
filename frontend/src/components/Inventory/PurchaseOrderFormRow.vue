@@ -1,8 +1,8 @@
 <template>
   <ProductModal v-model="showModal" v-if="showModal" />
-  <div class="grid grid-cols-9 gap-3 items-start min-w-[750px]">
-    <div class="col-span-2 flex gap-3">
-      <input type="checkbox" class="input flex-shrink-0 mt-[10px]" />
+  <div class="grid grid-cols-9 gap-3 items-center min-w-[750px]">
+    <div class="col-span-2 flex gap-3 items-center">
+      <input type="checkbox" class="input" />
       <CustomSelectInput
         class="w-full [&>select]:w-full"
         placeholder="Select product"
@@ -10,14 +10,13 @@
         :has-add-new="true"
         @add-new="showModal = true"
         v-model="order.id"
-        :can-search="true"
       />
     </div>
     <input class="col-span-3 input" v-model="order.description" />
     <input class="col-span-1 input" type="number" v-model="order.quantity" />
     <input class="col-span-1 input" type="number" v-model="order.cost" />
     <input class="col-span-1 input" v-model="order.amount" />
-    <p class="col-span-1 text-sm pl-3 mt-[10px]">
+    <p class="col-span-1 text-sm pl-3">
       <img
         @click="emit('remove')"
         src="@/assets/icons/remove.svg"

@@ -1,23 +1,13 @@
 <template>
   <ModalWrapper :title="title" v-model="showModal" @submit="onSubmit">
     <div class="flex flex-col gap-6 my-7">
-      <div class="flex flex-col gap-3">
-        <p class="text-base font-semibold">Product Type & Reordering Point</p>
-        <div class="flex gap-3">
-          <select class="input flex-1" v-model="model.type">
-            <option value="" hidden>Select type</option>
-            <option value="inventory">Inventory</option>
-            <option value="non-inventory">Non Inventory</option>
-          </select>
-          <CustomSelectInput
-            class="flex-1"
-            :has-add-new="true"
-            v-model="model.product_setting_id"
-            :options="reorderingPointOptions"
-            placeholder="*Select Reordering Point"
-            @add-new="showProductPointModal = true"
-          />
-        </div>
+      <div class="flex flex-col gap-3 w-[calc(50%-6px)]">
+        <p class="text-base font-semibold">Product Type</p>
+        <select class="input" v-model="model.type">
+          <option value="" hidden>Select type</option>
+          <option value="inventory">Inventory</option>
+          <option value="non-inventory">Non Inventory</option>
+        </select>
       </div>
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Basic Info</p>
@@ -131,10 +121,6 @@
   <VendorModal v-if="showVendorModal" v-model="showVendorModal" />
   <AccountModal v-if="showAccountModal" v-model="showAccountModal" />
   <ProductCategoryModal v-if="showCategoryModal" v-model="showCategoryModal" />
-  <ProductPointModal
-    v-if="showProductPointModal"
-    v-model="showProductPointModal"
-  />
 </template>
 
 <script setup>
@@ -144,7 +130,6 @@ import CustomSelectInput from "../shared/CustomSelectInput.vue";
 import ProductCategoryModal from "../Settings/ProductCategoryModal.vue";
 import AccountModal from "../Settings/AccountModal.vue";
 import VendorModal from "../Vendor/VendorModal.vue";
-import ProductPointModal from "../Settings/ProductPointModal.vue";
 import { computed, onMounted, ref } from "vue";
 import { AccountType } from "@/types/enums";
 
@@ -169,7 +154,6 @@ const showModal = defineModel();
 const showAccountModal = ref(false);
 const showCategoryModal = ref(false);
 const showVendorModal = ref(false);
-const showProductPointModal = ref(false);
 
 const model = ref({
   name: "",
@@ -186,7 +170,6 @@ const model = ref({
   suppliers: [],
   income_account: "",
   expense_account: "",
-  product_setting_id: "",
 });
 
 const title = ref(props.isEdit ? "Edit Product" : "New Product");
@@ -236,15 +219,6 @@ const categoriesOptions = computed(() => {
   });
 });
 
-const reorderingPointOptions = computed(() => {
-  return settingStore.productReorderingPoints.map((point) => {
-    return {
-      value: point.id,
-      text: point.point,
-    };
-  });
-});
-
 const generateItemCode = async () => {
   const res = await authenticatedApi("products/item-code");
   if (res.status == 200) {
@@ -256,7 +230,6 @@ onMounted(async () => {
   await supplierStore.fetchAllSuppliers();
   await settingStore.fetchAllProductCategories();
   await settingStore.fetchAllAccounts();
-  await settingStore.fetchAllProductReorderingPoints();
 
   if (props.isEdit && props.selectedId) {
     model.value = (() => {

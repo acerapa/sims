@@ -3,7 +3,6 @@ const Product = require("../models/product");
 const Supplier = require("../models/supplier");
 const Account = require("../models/account");
 const { Op } = require("sequelize");
-const ProductSettings = require("../models/product-setting");
 
 module.exports = {
   all: async (req, res) => {
@@ -26,11 +25,6 @@ module.exports = {
             model: Account,
             as: "expense",
             attributes: ["id"],
-          },
-          {
-            model: ProductSettings,
-            as: "product_setting",
-            attributes: ["id", "point"],
           },
         ],
       });

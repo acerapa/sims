@@ -75,8 +75,8 @@ export default [
         icon: dot,
       },
       {
-        text: "Product Settings",
-        route: "product-settings",
+        text: "Product Categories",
+        route: "product-categories",
         icon: dot,
       },
     ],
