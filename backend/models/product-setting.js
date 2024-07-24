@@ -1,6 +1,5 @@
 const { sequelize, Sequelize } = require("./");
 const { DataTypes, Model } = Sequelize;
-const Product = require("./product");
 
 class ProductSettings extends Model {}
 
@@ -14,15 +13,7 @@ ProductSettings.init(
     point: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    product_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: Product,
-        key: "id",
-      },
-      allowNull: false,
-    },
+    }
   },
   {
     sequelize,

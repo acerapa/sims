@@ -45,7 +45,6 @@ sequelize
   })
   .catch((e) => {
     console.error("Unable to connect to the database \n", e);
-    console.log(e.parent);
   });
 
 db.sequelize = sequelize;
@@ -59,9 +58,26 @@ const isColumnExistInTable = async (table, column) => {
     `
   );
 
-  return results.map(res => res.COLUMN_NAME).includes(column);
+  return results.map((res) => res.COLUMN_NAME).includes(column);
+};
+
+const areColumnsExistInTable = async (table, columns) => {
+  const [results] = await sequelize.query(
+    `
+    SELECT column_name FROM information_schema.columns
+    WHERE table_schema='${config.database}' AND table_name='${table}';
+    `
+  );
+
+  const data = {};
+  columns.forEach((column) => {
+    data[column] = results.map((res) => res.COLUMN_NAME).includes(column);
+  });
+
+  return data;
 };
 
 db.isColumnExistInTable = isColumnExistInTable;
+db.areColumnsExistInTable = areColumnsExistInTable;
 
 module.exports = db;

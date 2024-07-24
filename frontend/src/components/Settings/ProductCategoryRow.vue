@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-7 gap-3">
+  <div class="grid grid-cols-7 gap-3 min-w-[550px]">
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.productCategory.id }}</p>

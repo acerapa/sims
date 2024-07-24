@@ -84,17 +84,17 @@ PurchaseOrder.hasOne(Address, {
   onDelete: "CASCADE",
 });
 
-Product.hasOne(ProductSettings, {
-  foreignKey: "product_id",
-  as: "setting",
-  onDelete: "CASCADE",
+ProductSettings.hasMany(Product, {
+  foreignKey: "product_setting_id",
+  as: "products",
+  onDelete: "SET NULL"
 });
 
-ProductSettings.belongsTo(Product, {
-  foreignKey: "product_id",
-  as: "setting",
-  onDelete: "NO ACTION",
-});
+Product.belongsTo(ProductSettings, {
+  foreignKey: "product_setting_id",
+  as: "product_setting",
+  onDelete: "NO ACTION"
+})
 
 module.exports = {
   Supplier,

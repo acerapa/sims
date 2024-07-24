@@ -44,7 +44,7 @@
       <slot v-if="!props.tableHeaderComponent" name="table_header"></slot>
 
       <!-- Table Body -->
-      <div class="flex flex-col gap-4" v-if="props.tableRowComponent">
+      <div class="flex flex-col gap-4" v-if="props.tableRowComponent && items.length">
         <component
           :is="props.tableRowComponent"
           v-for="(item, ndx) in items"
@@ -56,6 +56,9 @@
             }
           "
         />
+      </div>
+      <div class="flex items-center justify-center" v-if="!items.length">
+        <p class="text-sm">Table has no data!</p>
       </div>
       <slot v-if="!props.tableRowComponent" name="table_body"></slot>
     </div>

@@ -5,6 +5,7 @@ import { ref } from "vue";
 export const useSettingsStore = defineStore("settings", () => {
   const productCategories = ref([]);
   const accounts = ref([]);
+  const productReorderingPoints = ref([]);
 
   const fetchAllProductCategories = async () => {
     const res = await authenticatedApi("product-category/all");
@@ -23,10 +24,21 @@ export const useSettingsStore = defineStore("settings", () => {
     return res.data.accounts;
   };
 
+  const fetchAllProductReorderingPoints = async () => {
+    const res = await authenticatedApi("product-setting/all");
+    if (res.status == 200) {
+      productReorderingPoints.value = res.data.productReorderingPoints;
+    }
+
+    return res.data.productReorderingPoints;
+  };
+
   return {
     accounts,
     productCategories,
+    productReorderingPoints,
     fetchAllAccounts,
     fetchAllProductCategories,
+    fetchAllProductReorderingPoints,
   };
 });

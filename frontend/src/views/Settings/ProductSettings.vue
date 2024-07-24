@@ -6,6 +6,12 @@
       v-if="showModal"
       :selected-id="selectedId"
     />
+    <ProductPointModal
+      v-model="reorderingModalShow"
+      v-if="reorderingModalShow"
+      :is-edit="isEdit"
+      :selected-id="selectedReorderingId"
+    />
     <DeleteConfirmModal
       v-if="showDeleteConfirmationModal"
       v-model="showDeleteConfirmationModal"
@@ -15,22 +21,33 @@
     />
     <div class="flex flex-col gap-6">
       <CustomTable
-        title="Product Reordering Point"
         :has-pagination="true"
+        :key="settingsStore.productReorderingPoints"
+        :data="settingsStore.productReorderingPoints"
+        title="Product Reordering Point"
+        @open-menu="onSelectReorderingRow"
+        v-model:show-modal="reorderingModalShow"
+        :row-prop-init="productReorderingRowEvent"
         :table-row-component="ProductReorderingPointRow"
         :table-header-component="ProductReorderingPointTableHeader"
-      ></CustomTable>
+      >
+        <RowMenu
+          :top="top"
+          v-if="showReorderingRowMenu"
+          class="right-[100px]"
+          @view="onViewReordering"
+          @delete="onDelete"
+        />
+      </CustomTable>
       <CustomTable
-        v-if="
-          productCategories.length /* temporary for now need to add loaders */
-        "
         :has-add-btn="true"
         :has-pagination="true"
         v-model:is-edit="isEdit"
         @open-menu="onSelectRow"
-        :data="productCategories"
         title="Product Categories"
         v-model:show-modal="showModal"
+        :key="settingsStore.productCategories"
+        :data="settingsStore.productCategories"
         :row-prop-init="productCategoryRowEvent"
         :table-row-component="ProductCategoryRow"
         :table-header-component="ProductCategoryTableHeader"
@@ -48,6 +65,7 @@
 </template>
 <script setup>
 import { onMounted, ref } from "vue";
+import ProductPointModal from "@/components/Settings/ProductPointModal.vue";
 import ProductCategoryModal from "@/components/Settings/ProductCategoryModal.vue";
 import ProductCategoryRow from "@/components/Settings/ProductCategoryRow.vue";
 import { useSettingsStore } from "@/stores/settings";
@@ -60,19 +78,21 @@ import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
 
 const top = ref(0);
+const toDelete = ref({});
+const isEdit = ref(false);
+const selectedId = ref(-1);
 const showModal = ref(false);
 const showRowMenu = ref(false);
-const productCategories = ref([]);
-const showDeleteConfirmationModal = ref(false);
-const isEdit = ref(false);
-const toDelete = ref({});
-const toEdit = ref();
-const selectedId = ref(-1);
+const selectedReorderingId = ref(-1);
+const reorderingModalShow = ref(false);
+const showReorderingRowMenu = ref(false);
 const settingsStore = useSettingsStore();
+const showDeleteConfirmationModal = ref(false);
 
 // custom event
 Event.on("global-click", function () {
   showRowMenu.value = false;
+  showReorderingRowMenu.value = false;
 });
 
 // define Product categories row props
@@ -81,14 +101,27 @@ Event.on(productCategoryRowEvent, function (item) {
   return { productCategory: item };
 });
 
+// define Product reordering point row props
+const productReorderingRowEvent = "product-reordering-row-props-init";
+Event.on(productReorderingRowEvent, function (item) {
+  return { productReordering: item };
+});
+
 onMounted(async () => {
-  productCategories.value = await settingsStore.fetchAllProductCategories();
+  await settingsStore.fetchAllProductCategories();
+  await settingsStore.fetchAllProductReorderingPoints();
 });
 
 const onSelectRow = (id) => {
   selectedId.value = id;
   top.value = event.target.offsetTop;
   showRowMenu.value = true;
+};
+
+const onSelectReorderingRow = (id) => {
+  selectedReorderingId.value = id;
+  top.value = event.target.offsetTop;
+  showReorderingRowMenu.value = true;
 };
 
 const onDelete = () => {
@@ -99,6 +132,11 @@ const onDelete = () => {
 const onView = () => {
   isEdit.value = true;
   showModal.value = true;
+};
+
+const onViewReordering = () => {
+  isEdit.value = true;
+  reorderingModalShow.value = true;
 };
 
 const afterDelete = async () => {
