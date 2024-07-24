@@ -15,7 +15,31 @@
     <p class="col-span-1 text-sm">
       {{ Helpers.formatDate(props.product.createdAt, "M/D/YYYY") }}
     </p>
-    <div class="col-span-1 text-sm">{{ props.product.status }}</div>
+    <div class="col-span-1 text-sm flex">
+      <button
+        v-if="
+          props.product.quantity_in_stock > props.product.product_setting.point
+        "
+        class="status text-sm bg-opacity-20 text-success bg-success flex-shrink-0"
+      >
+        In Stock
+      </button>
+      <button
+        v-if="
+          props.product.quantity_in_stock &&
+          props.product.quantity_in_stock < props.product.product_setting.point
+        "
+        class="status text-sm bg-opacity-20 text-yellow-500 bg-yellow-500 flex-shrink-0"
+      >
+        Low Stock
+      </button>
+      <button
+        v-if="props.product.quantity_in_stock <= 0"
+        class="status text-sm bg-opacity-20 text-red-500 bg-red-500 flex-shrink-0"
+      >
+        Out of Stock
+      </button>
+    </div>
     <div class="col-span-1">
       <img
         src="@/assets/icons/vertical-menu.svg"

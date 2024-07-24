@@ -17,7 +17,6 @@
       New Purchase Order
     </RouterLink>
     <CustomTable
-      v-if="purchaseOrderStore.purchaseOrders.length"
       class="relative"
       :has-add-btn="false"
       :has-pagination="true"

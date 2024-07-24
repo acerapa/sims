@@ -43,6 +43,17 @@ PurchaseOrder.init(
         key: "id",
       },
     },
+    type: {
+      type: DataTypes.ENUM,
+      values: ["term", "cod"],
+      allowNull: true,
+      defaultValue: "cod",
+    },
+    term_start: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: new Date(),
+    },
   },
   {
     sequelize,
