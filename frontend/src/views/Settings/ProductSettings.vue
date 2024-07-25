@@ -15,7 +15,7 @@
     <DeleteConfirmModal
       v-if="showDeleteConfirmationModal"
       v-model="showDeleteConfirmationModal"
-      href="product-category/delete"
+      :href="deleteHref"
       :data="toDelete"
       @after-delete="afterDelete"
     />
@@ -35,7 +35,7 @@
           v-if="showReorderingRowMenu"
           class="right-[100px]"
           @view="onViewReordering"
-          @delete="onDelete"
+          @delete="onDeleteReordering"
         />
       </CustomTable>
       <CustomTable
@@ -79,6 +79,7 @@ const top = ref(0);
 const toDelete = ref({});
 const isEdit = ref(false);
 const selectedId = ref(-1);
+const deleteHref = ref("");
 const showModal = ref(false);
 const showRowMenu = ref(false);
 const selectedReorderingId = ref(-1);
@@ -124,6 +125,13 @@ const onSelectReorderingRow = (id) => {
 
 const onDelete = () => {
   toDelete.value = { id: selectedId.value };
+  deleteHref.value = "product-category/delete";
+  showDeleteConfirmationModal.value = true;
+};
+
+const onDeleteReordering = () => {
+  toDelete.value = { id: selectedReorderingId.value };
+  deleteHref.value = "product-setting/delete";
   showDeleteConfirmationModal.value = true;
 };
 
@@ -139,6 +147,7 @@ const onViewReordering = () => {
 
 const afterDelete = async () => {
   await settingsStore.fetchAllProductCategories();
+  await settingsStore.fetchAllProductReorderingPoints();
   showDeleteConfirmationModal.value = false;
 };
 </script>

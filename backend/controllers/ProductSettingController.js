@@ -5,6 +5,7 @@ module.exports = {
   all: async (req, res) => {
     try {
       const productReorderingPoints = await ProductSettings.findAll({
+        order: [["updatedAt", "DESC"]],
         include: [
           {
             model: Product,
@@ -56,5 +57,5 @@ module.exports = {
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message);
     }
-  }
+  },
 };
