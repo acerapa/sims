@@ -35,7 +35,7 @@
           type="search"
           class="input w-full max-w-72"
           placeholder="Search"
-          v-model="searchText"          
+          v-model="searchText"
         />
         <select
           name="show-item"
@@ -98,6 +98,7 @@
       class="ml-auto mr-0"
       v-if="props.hasPagination && items.length"
       :data="props.data"
+      :key="props.data"
       :items-show="props.pgOptions.showItems"
       :item-selected="showItemSelected"
       v-model:show-item-selected="showItemSelected"
@@ -112,7 +113,12 @@ import Paginate from "./Paginate.vue";
 import FilterComponent from "./FilterComponent.vue";
 import Event from "@/event";
 
-const emit = defineEmits(["update:showModal", "update:isEdit", "open-menu", "update:searchText"]);
+const emit = defineEmits([
+  "update:showModal",
+  "update:isEdit",
+  "open-menu",
+  "update:searchText",
+]);
 const props = defineProps({
   title: {
     type: String,
