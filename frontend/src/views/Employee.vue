@@ -13,17 +13,17 @@
     @after-delete="afterDelete"
   />
   <CustomTable
-  v-if="employeeStore.employees.length"
-  class="relative"
-  :has-add-btn="true"
-  :has-pagination="true"
-  v-model:is-edit="isEdit"
-  v-model:show-modal="showModal"
-  :data="employeeStore.employees"
-  :row-prop-init="employeeRowEvent"
-  :table-row-component="EmployeeRow"
-  :table-header-component="EmployeeTableHeader"
-  @open-menu="onSelectRow"
+    v-if="employeeStore.employees.length"
+    class="relative"
+    :has-add-btn="true"
+    :has-pagination="true"
+    v-model:is-edit="isEdit"
+    v-model:show-modal="showModal"
+    :data="employeeStore.employees"
+    :row-prop-init="employeeRowEvent"
+    :table-row-component="EmployeeRow"
+    :table-header-component="EmployeeTableHeader"
+    @open-menu="onSelectRow"
   >
     <RowMenu
       :top="top"

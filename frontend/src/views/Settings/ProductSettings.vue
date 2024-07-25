@@ -22,12 +22,11 @@
     <div class="flex flex-col gap-6">
       <CustomTable
         :has-pagination="true"
-        :key="settingsStore.productReorderingPoints"
-        :data="settingsStore.productReorderingPoints"
         title="Product Reordering Point"
         @open-menu="onSelectReorderingRow"
         v-model:show-modal="reorderingModalShow"
         :row-prop-init="productReorderingRowEvent"
+        :data="settingsStore.productReorderingPoints"
         :table-row-component="ProductReorderingPointRow"
         :table-header-component="ProductReorderingPointTableHeader"
       >
@@ -46,7 +45,6 @@
         @open-menu="onSelectRow"
         title="Product Categories"
         v-model:show-modal="showModal"
-        :key="settingsStore.productCategories"
         :data="settingsStore.productCategories"
         :row-prop-init="productCategoryRowEvent"
         :table-row-component="ProductCategoryRow"

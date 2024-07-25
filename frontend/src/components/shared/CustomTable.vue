@@ -1,12 +1,41 @@
 <template>
   <div class="table-wrapper w-full relative">
+    <!-- filter -->
+    <div ref="filter">
+      <FilterComponent
+        v-model="showFilter"
+        v-if="showFilter"
+        v-model:is-filter-used="filterUsed"
+      >
+        <template v-slot:filters>
+          <slot name="filters"></slot>
+        </template>
+      </FilterComponent>
+    </div>
     <p v-if="props.title" class="font-bold text-sm">{{ props.title }}</p>
     <div class="flex justify-between items-center">
-      <div class="flex gap-3">
+      <div class="flex gap-3 items-center">
+        <div
+          class="rounded border cursor-pointer w-[64px] h-[38px] p-1 flex items-center justify-center"
+          :class="
+            filterUsed
+              ? '[&>img]:brightness-0 [&>img]:invert bg-primary border-primary '
+              : ''
+          "
+          @click.stop="showFilter = true"
+          v-if="props.hasFilter"
+        >
+          <img
+            src="@/assets/icons/funnel.png"
+            class="max-w-[30px] max-h-[26px] w-full h-full object-fill"
+            alt="funnel"
+          />
+        </div>
         <input
           type="search"
           class="input w-full max-w-72"
           placeholder="Search"
+          v-model="searchText"          
         />
         <select
           name="show-item"
@@ -44,7 +73,10 @@
       <slot v-if="!props.tableHeaderComponent" name="table_header"></slot>
 
       <!-- Table Body -->
-      <div class="flex flex-col gap-4" v-if="props.tableRowComponent && items.length">
+      <div
+        class="flex flex-col gap-4"
+        v-if="props.tableRowComponent && items.length"
+      >
         <component
           :is="props.tableRowComponent"
           v-for="(item, ndx) in items"
@@ -75,14 +107,15 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref, watch } from "vue";
 import Paginate from "./Paginate.vue";
+import FilterComponent from "./FilterComponent.vue";
 import Event from "@/event";
 
-const emit = defineEmits(["update:showModal", "update:isEdit", "open-menu"]);
+const emit = defineEmits(["update:showModal", "update:isEdit", "open-menu", "update:searchText"]);
 const props = defineProps({
   title: {
-    type: String
+    type: String,
   },
   hasPagination: {
     type: Boolean,
@@ -91,6 +124,10 @@ const props = defineProps({
   hasAddBtn: {
     type: Boolean,
     default: true,
+  },
+  hasFilter: {
+    type: Boolean,
+    default: false,
   },
   tableHeaderComponent: {
     type: Object,
@@ -116,13 +153,37 @@ const props = defineProps({
   },
 });
 
-const items = ref([]);
+const filter = ref();
+Event.on(
+  "global-click",
+  function () {
+    if (filter.value) {
+      if (!filter.value.contains(event.target)) {
+        showFilter.value = false;
+      }
+    }
+  },
+  true
+);
+
+// vars
+const items = ref(props.data);
 const showItemSelected = ref(5);
 
-onMounted(() => {
-  items.value = props.data;
-})
+// flags
+const showFilter = ref(false);
+const filterUsed = ref(false);
 
+// watchers
+watch(
+  () => props.data,
+  (value) => (items.value = value)
+);
+
+// models
 const showModal = defineModel("showModal");
 const isEdit = defineModel("isEdit");
+const searchText = defineModel("searchText");
 </script>
+
+<style scoped></style>

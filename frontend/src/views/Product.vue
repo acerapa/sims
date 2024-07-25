@@ -24,6 +24,41 @@
     :table-header-component="ProductTableHeader"
     @open-menu="onSelectRow"
   >
+    <!-- filter contents -->
+    <template v-slot:filters>
+      <div class="flex flex-col gap-3 mt-3">
+        <div>
+          <small>Dates</small>
+          <div class="flex gap-3">
+            <input
+              type="text"
+              class="input date min-w-[200px] max-h-[38px]"
+              placeholder="From"
+              @focus="$event.target.type = 'date'"
+              @blur="$event.target.type = 'text'"
+            />
+            <input
+              type="text"
+              class="input date min-w-[200px] max-h-[38px]"
+              placeholder="To"
+              @focus="$event.target.type = 'date'"
+              @blur="$event.target.type = 'text'"
+            />
+          </div>
+        </div>
+        <div>
+          <small>Stocks</small>
+          <div class="flex gap-3">
+            <select name="operations" id="operations" class="input w-full">
+              <option value="1">Equals (=)</option>
+              <option value="1">Less than (&lt;)</option>
+              <option value="1">Greater than (&gt;)</option>
+            </select>
+            <input type="number" class="input" placeholder="Stocks" />
+          </div>
+        </div>
+      </div>
+    </template>
     <RowMenu
       :top="top"
       v-if="showRowMenu"
