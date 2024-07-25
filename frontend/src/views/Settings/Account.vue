@@ -17,33 +17,18 @@
       "
     />
     <CustomTable
+      :has-filter="true"
       :has-add-btn="true"
+      :data="filteredData"
       :has-pagination="true"
-      v-model:show-modal="showModal"
       v-model:is-edit="isEdit"
+      v-model:show-modal="showModal"
+      :row-prop-init="accountRowEvent"
+      v-model:search-text="searchText"
+      :table-row-component="AccountRow"
+      :table-header-component="AccountTableHeader"
+      @open-menu="onSelectRow"
     >
-      <template v-slot:table_header>
-        <div class="grid grid-cols-9 gap-3">
-          <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
-            <p class="table-header">#</p>
-          </div>
-          <p class="col-span-3 table-header">Account Name</p>
-          <p class="col-span-2 table-header">Type</p>
-          <p class="col-span-2 table-header">Date Added</p>
-          <p class="col-span-1 table-header">Action</p>
-        </div>
-      </template>
-      <template v-slot:table_body>
-        <div class="flex flex-col gap-4">
-          <AccountRow
-            v-for="(account, ndx) in settingsStore.accounts"
-            :key="ndx"
-            :account="account"
-            @open-menu="onSelectRow"
-          />
-        </div>
-      </template>
       <RowMenu
         :top="top"
         class="right-15"
@@ -51,18 +36,36 @@
         @view="onViewRow"
         @delete="onDeleteRow"
       />
+      <template v-slot:filters>
+        <CustomSelectInput
+          placeholder="Account type"
+          v-model="filter.type"
+          :options="[
+            {
+              value: 'income',
+              text: 'Income',
+            },
+            {
+              value: 'expense',
+              text: 'Expense',
+            },
+          ]"
+        />
+      </template>
     </CustomTable>
   </div>
 </template>
 
 <script setup>
 import { useSettingsStore } from "@/stores/settings";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import AccountModal from "@/components/Settings/AccountModal.vue";
 import AccountRow from "@/components/Settings/AccountRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
+import AccountTableHeader from "@/components/Settings/AccountTableHeader.vue";
+import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import Event from "@/event";
 
 const top = ref(0);
@@ -75,9 +78,35 @@ const showDeleteConfirmationModal = ref(false);
 
 const settingsStore = useSettingsStore();
 
+const filter = ref({
+  type: "",
+});
+
+const searchText = ref();
+
+const filteredData = computed(() => {
+  return settingsStore.accounts
+    .filter((account) =>
+      filter.value.type ? account.type == filter.value.type : account
+    )
+    .filter((account) => {
+      const searchCondition = `${account.type} ${account.name}`.toLowerCase();
+      return searchText.value
+        ? searchCondition.includes(searchText.value.toLowerCase())
+        : account;
+    });
+});
+
 // custom event
 Event.on("global-click", function () {
   showRowMenu.value = false;
+});
+
+// define account row props
+const accountRowEvent = "account-row-init-props";
+Event.on(accountRowEvent, function (data) {
+  // initize the value of props here
+  return { account: data };
 });
 
 onMounted(async () => {
@@ -95,7 +124,7 @@ const onViewRow = () => {
   showModal.value = true;
 };
 
-const onDeleteRow = (id) => {
+const onDeleteRow = () => {
   toDelete.value = { id: selectedId.value };
   showDeleteConfirmationModal.value = true;
 };

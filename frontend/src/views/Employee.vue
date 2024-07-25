@@ -13,41 +13,24 @@
     @after-delete="afterDelete"
   />
   <CustomTable
-    v-model:show-modal="showModal"
-    v-model:is-edit="isEdit"
+    v-if="employeeStore.employees.length"
+    class="relative"
     :has-add-btn="true"
     :has-pagination="true"
-    class="relative"
+    v-model:is-edit="isEdit"
+    v-model:show-modal="showModal"
+    :data="employeeStore.employees"
+    :row-prop-init="employeeRowEvent"
+    :table-row-component="EmployeeRow"
+    :table-header-component="EmployeeTableHeader"
+    @open-menu="onSelectRow"
   >
-    <template v-slot:table_header>
-      <div class="grid grid-cols-13 gap-3 items-center min-w-[792px]">
-        <div class="col-span-1 flex gap-3 items-center">
-          <input type="checkbox" class="input" />
-          <p class="table-header">#</p>
-        </div>
-        <p class="col-span-2 table-header">First Name</p>
-        <p class="col-span-2 table-header">Last Name</p>
-        <p class="col-span-2 table-header">Position</p>
-        <p class="col-span-2 table-header">Date Started</p>
-        <p class="col-span-2 table-header">Date Ended</p>
-        <p class="col-span-1 table-header">Status</p>
-        <p class="col-span-1 table-header">Action</p>
-      </div>
-    </template>
-    <template v-slot:table_body>
-      <div class="flex flex-col gap-4">
-        <EmployeeRow
-          v-for="user in employeeStore.employees"
-          :user="user"
-          :key="user.id"
-          @open-menu="onSelectRow"
-          :current-open-menu="selectedId"
-          @view="viewRow"
-          @delete="deleteRow"
-        />
-      </div>
-    </template>
-    <RowMenu :top="top" v-if="showRowMenu" @view="viewRow" @delete="deleteRow" />
+    <RowMenu
+      :top="top"
+      v-if="showRowMenu"
+      @view="viewRow"
+      @delete="deleteRow"
+    />
   </CustomTable>
 </template>
 <script setup>
@@ -57,6 +40,7 @@ import EmployeeRow from "@/components/Employee/EmployeeRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import { useEmployeeStore } from "@/stores/employee";
 import CustomTable from "@/components/shared/CustomTable.vue";
+import EmployeeTableHeader from "@/components/Employee/EmployeeTableHeader.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
 
@@ -72,6 +56,12 @@ const employeeStore = useEmployeeStore();
 // custom event
 Event.on("global-click", function () {
   showRowMenu.value = false;
+});
+
+// define employee row props
+const employeeRowEvent = "employee-row-init-props";
+Event.on(employeeRowEvent, function (data) {
+  return { user: data };
 });
 
 onMounted(async () => {
