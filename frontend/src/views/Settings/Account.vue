@@ -17,16 +17,16 @@
       "
     />
     <CustomTable
-      v-if="accounts.length /* temporary for now need to add loaders */"
       :has-filter="true"
       :has-add-btn="true"
+      :data="filteredData"
       :has-pagination="true"
-      v-model:show-modal="showModal"
       v-model:is-edit="isEdit"
-      :table-header-component="AccountTableHeader"
-      :table-row-component="AccountRow"
-      :data="accounts"
+      v-model:show-modal="showModal"
       :row-prop-init="accountRowEvent"
+      v-model:search-text="searchText"
+      :table-row-component="AccountRow"
+      :table-header-component="AccountTableHeader"
       @open-menu="onSelectRow"
     >
       <RowMenu
@@ -36,24 +36,40 @@
         @view="onViewRow"
         @delete="onDeleteRow"
       />
+      <template v-slot:filters>
+        <CustomSelectInput
+          placeholder="Account type"
+          v-model="filter.type"
+          :options="[
+            {
+              value: 'income',
+              text: 'Income',
+            },
+            {
+              value: 'expense',
+              text: 'Expense',
+            },
+          ]"
+        />
+      </template>
     </CustomTable>
   </div>
 </template>
 
 <script setup>
 import { useSettingsStore } from "@/stores/settings";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import AccountModal from "@/components/Settings/AccountModal.vue";
 import AccountRow from "@/components/Settings/AccountRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import AccountTableHeader from "@/components/Settings/AccountTableHeader.vue";
+import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import Event from "@/event";
 
 const top = ref(0);
 const toDelete = ref();
-const accounts = ref([]);
 const selectedId = ref(0);
 const isEdit = ref(false);
 const showModal = ref(false);
@@ -61,6 +77,25 @@ const showRowMenu = ref(false);
 const showDeleteConfirmationModal = ref(false);
 
 const settingsStore = useSettingsStore();
+
+const filter = ref({
+  type: "",
+});
+
+const searchText = ref();
+
+const filteredData = computed(() => {
+  return settingsStore.accounts
+    .filter((account) =>
+      filter.value.type ? account.type == filter.value.type : account
+    )
+    .filter((account) => {
+      const searchCondition = `${account.type} ${account.name}`.toLowerCase();
+      return searchText.value
+        ? searchCondition.includes(searchText.value.toLowerCase())
+        : account;
+    });
+});
 
 // custom event
 Event.on("global-click", function () {
@@ -75,7 +110,7 @@ Event.on(accountRowEvent, function (data) {
 });
 
 onMounted(async () => {
-  accounts.value = await settingsStore.fetchAllAccounts();
+  await settingsStore.fetchAllAccounts();
 });
 
 const onSelectRow = (id) => {
