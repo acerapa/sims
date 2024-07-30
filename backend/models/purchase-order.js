@@ -54,6 +54,17 @@ PurchaseOrder.init(
       allowNull: true,
       defaultValue: new Date(),
     },
+    status: {
+      type: DataTypes.ENUM,
+      allowNull: false,
+      values: [
+        "open",
+        "confirmed",
+        "completed",
+        "cancelled"
+      ],
+      defaultValue: "open"
+    }
   },
   {
     sequelize,

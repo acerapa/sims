@@ -28,12 +28,10 @@
       :table-header-component="PurchaseOrderTableHeader"
       @open-menu="onSelectRow"
     >
-      <RowMenu
-        :top="top"
-        v-if="showRowMenu"
-        @view="onView"
-        @delete="onDelete"
-      />
+      <RowMenu :top="top" v-if="showRowMenu" @view="onView" @delete="onDelete">
+        <button class="row-menu-item" @click="onCancelPO">Cancel PO</button>
+        <button class="row-menu-item" @click="onReceivePO">Receive PO</button>
+      </RowMenu>
     </CustomTable>
   </div>
 </template>
@@ -92,6 +90,18 @@ const onDelete = () => {
   showDeleteConfirmation.value = true;
 };
 
+const onCancelPO = () => {
+  console.log("Cancel this PO #" + selectedId.value);
+};
+
+const onReceivePO = () => {
+  router.push({
+    name: 'purchase-receive-order',
+    params: {
+      id: selectedId.value
+    }
+  })
+};
 const purchaseOrderStore = usePurchaseOrderStore();
 
 onMounted(async () => {

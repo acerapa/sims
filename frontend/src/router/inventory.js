@@ -23,7 +23,7 @@ export default [
         component: () => import("@/views/Inventory/PurchaseOrderForm.vue"),
       },
       {
-        path: "/purchase-receive-order",
+        path: "/:id/purchase-receive-order",
         name: "purchase-receive-order",
         component: () => import("@/views/Inventory/ReceiveOrder.vue"),
       },
