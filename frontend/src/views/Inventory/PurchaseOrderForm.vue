@@ -65,9 +65,7 @@
 
       <div class="max-[750px]:w-[calc(100vw-328px)]">
         <div class="flex flex-col gap-4 max-w-full overflow-x-auto mb-4 pb-4">
-          <div
-            class="grid grid-cols-9 gap-3 min-w-[750px] pb-2 border-b"
-          >
+          <div class="grid grid-cols-9 gap-3 min-w-[750px] pb-2 border-b">
             <div class="col-span-2 flex gap-3 items-center">
               <input type="checkbox" class="input" />
               <p class="table-header">Item</p>
@@ -81,20 +79,20 @@
           <div class="flex flex-col gap-4">
             <PurchaseOrderFormRow
               v-for="(order, ndx) in model.products"
+              :order="order"
               v-model="model.products[ndx]"
               :key="ndx"
               @remove="removeProduct(ndx)"
               :selected-products="model.products"
-            />
+            >
+            </PurchaseOrderFormRow>
           </div>
           <div class="flex flex-col gap-4" v-if="!model.products.length">
             <p class="text-center text-sm">Table has no data!</p>
           </div>
         </div>
         <div class="flex justify-between items-center pb-3">
-          <button class="btn w-fit" @click="addNewProduct">
-            Add new item
-          </button>
+          <button class="btn w-fit" @click="addNewProduct">Add new item</button>
           <p>
             Total: &#8369;
             {{
@@ -187,17 +185,18 @@ const supplierOptions = computed(() => {
   });
 });
 
-const isCustomSelectFocused = ref(false);
 // Custom global event
+const isCustomSelectFocused = ref(false);
 Event.on("custom-select-focus", function (data) {
   isCustomSelectFocused.value = data;
 });
 
 onMounted(async () => {
+  await supplierStore.fetchAllSuppliers();
+  await productStore.fetchAllProducts();
   if (route.query.id) {
     isEdit.value = true;
     await purchaseOrderStore.fetchPurchaseOrderById(route.query.id);
-
     const order = purchaseOrderStore.purchaseOrder;
     model.value = {
       order: {
@@ -206,7 +205,7 @@ onMounted(async () => {
         amount: order.amount,
         bill_due: Helpers.formatDate(order.bill_due, "YYYY-MM-DD"),
         date: Helpers.formatDate(order.date, "YYYY-MM-DD"),
-        memo: "",
+        memo: order.memo,
         ref_no: order.ref_no,
       },
       products: [
@@ -214,7 +213,7 @@ onMounted(async () => {
           return {
             id: product.id,
             name: product.name,
-            description: product.description,
+            description: product.purchase_description,
             quantity: product.ProductOrder.quantity,
             cost: product.cost,
             amount: product.ProductOrder.amount,
@@ -223,7 +222,6 @@ onMounted(async () => {
       ],
     };
   }
-  await supplierStore.fetchAllSuppliers();
 });
 
 const addNewProduct = () => {

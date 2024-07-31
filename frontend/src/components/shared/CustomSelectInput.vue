@@ -117,7 +117,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
 const emit = defineEmits(["addNew"]);
 
@@ -151,6 +151,12 @@ const singleDropdownGroup = ref();
 
 const selected = defineModel();
 const select = ref();
+
+onMounted(() => {
+  if (props.canSearch && selected.value && !props.selectMultiple) {
+    search.value = getName(selected.value);
+  }
+});
 
 const filteredOptions = computed(() => {
   return props.options.filter((option) =>

@@ -50,6 +50,20 @@ module.exports = {
     }
   },
 
+  update: async (req, res) => {
+    try {
+      // TODO: Later on we may add the updates for relations here
+      await PurchaseOrder.update(req.body.po, {
+        where: {
+          id: req.params.id,
+        },
+      });
+      res.sendResponse({}, "Successfully updated!", 200);
+    } catch (e) {
+      res.sendError({}, "Something wen't wrong!", 400);
+    }
+  },
+
   byId: async (req, res) => {
     try {
       const order = await PurchaseOrder.findByPk(req.params.id, {

@@ -8,6 +8,7 @@
     <button class="row-menu-item" v-if="props.hasView" @click="emit('view')">
       View
     </button>
+    <slot></slot>
     <button
       class="row-menu-item"
       v-if="props.hasDelete"
@@ -15,7 +16,6 @@
     >
       Delete
     </button>
-    <slot></slot>
   </div>
 </template>
 
