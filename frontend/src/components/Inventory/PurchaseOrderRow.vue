@@ -13,7 +13,12 @@
     <p class="col-span-2 text-sm">
       {{ Helpers.formatDate(props.order.bill_due, "M/D/YYYY") }}
     </p>
-    <p class="col-span-1 text-sm">{{ props.order.status }}</p>
+    <div class="col-span-1">
+      <BadgeComponent
+        :custom-class="selectedStatus.class"
+        :text="selectedStatus.text"
+      />
+    </div>
     <div class="col-span-1 text-sm">
       <img
         @click.stop="emit('openMenu', props.order.id)"
@@ -27,6 +32,8 @@
 
 <script setup>
 import { Helpers } from "@/helpers/index";
+import { PurchaseStatusMap } from "@/helpers/purchase-order";
+import BadgeComponent from "../shared/BadgeComponent.vue";
 
 const emit = defineEmits(["openMenu"]);
 
@@ -36,4 +43,6 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const selectedStatus = PurchaseStatusMap[props.order.status];
 </script>

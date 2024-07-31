@@ -5,6 +5,13 @@
     :data="toDelete"
     :href="'purchase-order/delete'"
   />
+  <CancelConfirmation
+    v-model="showCancelModal"
+    v-if="showCancelModal"
+    :href="`purchase-order/${selectedId}/update`"
+    :data="toUpdate"
+    @after-update="purchaseOrderStore.fetchPurchaseOrders()"
+  />
   <div class="flex flex-col gap-6">
     <RouterLink
       :to="{ name: 'purchase-order-create' }"
@@ -38,21 +45,25 @@
 
 <script setup>
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import PurchaseOrderRow from "@/components/Inventory/PurchaseOrderRow.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
 import { useRouter } from "vue-router";
+import CancelConfirmation from "@/components/Inventory/CancelConfirmation.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrderTableHeader.vue";
+import { PurchaseOrderStatus } from "@/helpers/purchase-order";
 
 const top = ref(0);
 const toDelete = ref();
+const toUpdate = ref();
 const selectedId = ref(0);
 const isEdit = ref(false);
 const showModal = ref(false);
 const showRowMenu = ref(false);
+const showCancelModal = ref(false);
 const showDeleteConfirmation = ref(false);
 
 const router = useRouter();
@@ -91,16 +102,17 @@ const onDelete = () => {
 };
 
 const onCancelPO = () => {
-  console.log("Cancel this PO #" + selectedId.value);
+  toUpdate.value = { po: { status: PurchaseOrderStatus.CANCELLED } };
+  showCancelModal.value = true;
 };
 
 const onReceivePO = () => {
   router.push({
-    name: 'purchase-receive-order',
+    name: "purchase-receive-order",
     params: {
-      id: selectedId.value
-    }
-  })
+      id: selectedId.value,
+    },
+  });
 };
 const purchaseOrderStore = usePurchaseOrderStore();
 
