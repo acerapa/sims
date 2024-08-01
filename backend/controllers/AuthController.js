@@ -3,7 +3,7 @@ const bcryptJS = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 // Validation Schema
-const { AuthSchema, VerifyTokenSchema } = require("../validator/Auth");
+const { AuthSchema, VerifyTokenSchema } = require("shared");
 
 module.exports = {
   login: async (req, res) => {

@@ -4,7 +4,7 @@
       <p><b>PO #:</b> {{ purchaseOrderStore.purchaseOrder.id }}</p>
       <p>
         <b>Date Ordered #:</b>
-        {{ Helpers.formatDate(purchaseOrderStore.purchaseOrder.date) }}
+        {{ DateHelpers.formatDate(purchaseOrderStore.purchaseOrder.date) }}
       </p>
       <p>
         <b>Supplier:</b>
@@ -26,8 +26,12 @@
           v-for="(product, ndx) in purchaseOrderStore.purchaseOrder.products"
           :key="ndx"
         >
-          <p class="text-sm col-span-2 h-[38px] table-cell align-middle">{{ product.name }}</p>
-          <p class="text-sm col-span-2 h-[38px] table-cell align-middle">{{ product.cost }}</p>
+          <p class="text-sm col-span-2 h-[38px] table-cell align-middle">
+            {{ product.name }}
+          </p>
+          <p class="text-sm col-span-2 h-[38px] table-cell align-middle">
+            {{ product.cost }}
+          </p>
           <input
             type="number"
             class="input col-span-1"
@@ -39,7 +43,10 @@
       </div>
     </div>
     <div class="flex gap-3 mt-5 w-fit ml-auto mr-0">
-      <button class="btn-outline !border-danger !text-danger w-fit mx-auto" @click="onCancel">
+      <button
+        class="btn-outline !border-danger !text-danger w-fit mx-auto"
+        @click="onCancel"
+      >
         Cancel
       </button>
       <button class="btn w-fit mx-auto">Receive Order</button>
@@ -50,8 +57,8 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
-import { Helpers } from "../../helpers/index";
-import { useRoute,useRouter } from "vue-router";
+import { DateHelpers } from "shared";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -65,9 +72,9 @@ onMounted(async () => {
 
 const onCancel = () => {
   router.push({
-    name: 'purchase-order'
-  })
-}
+    name: "purchase-order",
+  });
+};
 
 const showModal = ref(false);
 </script>

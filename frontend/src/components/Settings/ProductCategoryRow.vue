@@ -6,7 +6,7 @@
     </div>
     <p class="col-span-3 text-sm">{{ props.productCategory.name }}</p>
     <p class="col-span-2 text-sm">
-      {{ Helpers.formatDate(props.productCategory.createdAt, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.productCategory.createdAt, "M/D/YYYY") }}
     </p>
     <div class="col-span-1 text-sm">
       <img
@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { Helpers } from "@/helpers";
+import { DateHelpers } from "shared/helpers/date";
 
 const props = defineProps({
   productCategory: {

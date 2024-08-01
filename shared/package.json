@@ -1,0 +1,11 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "description": "This is intended for all the objects, types, package etc that are shared between frontend and backend",
+  "main": "index.js",
+  "author": "acerapa",
+  "license": "MIT",
+  "dependencies": {
+    "joi": "^17.13.3"
+  }
+}

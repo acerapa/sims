@@ -1,32 +1,4 @@
-export const Helpers = {
-  /**
-   * Reset object to it's default form
-   * @param {*} obj
-   * @returns
-   */
-  objectReset: (obj) => {
-    const keys = Object.keys(obj);
-    const newObj = {};
-    keys.forEach((key) => {
-      switch (typeof obj[key]) {
-        case "string":
-          obj[key] = "";
-          break;
-        case "number":
-          obj[key] = 0;
-        case "object":
-          if (Array.isArray(obj[key])) {
-            obj[key] = [];
-          } else {
-            obj[key] = {};
-          }
-      }
-      newObj[key] = "";
-    });
-
-    return newObj;
-  },
-
+class DateHelpers {
   /**
    * Date formatter
    * Please refer to this formats
@@ -45,7 +17,8 @@ export const Helpers = {
    * @param { String } format
    * @returns { String }
    */
-  formatDate: (date, format = "MM/DD/YYYY") => {
+
+  static formatDate = (date, format = "MM/DD/YYYY") => {
     if (!date || isNaN(new Date(date))) {
       console.error("Helpers => formatDate(): Invalid date");
       return;
@@ -91,5 +64,7 @@ export const Helpers = {
     // formatting year end
 
     return format;
-  },
-};
+  };
+}
+
+module.exports = { DateHelpers };

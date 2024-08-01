@@ -2,6 +2,7 @@ const Address = require("../models/address");
 const PurchaseOrder = require("../models/purchase-order");
 const Supplier = require("../models/supplier");
 const Product = require("../models/product");
+const ProductOrder = require("../models/product-order");
 
 module.exports = {
   all: async (req, res) => {
@@ -27,14 +28,7 @@ module.exports = {
 
   register: async (req, res) => {
     try {
-      const purchaseOrder = await PurchaseOrder.create(req.body.order, {
-        include: [
-          {
-            model: Address,
-            as: "address",
-          },
-        ],
-      });
+      const purchaseOrder = await PurchaseOrder.create(req.body.order);
 
       req.body.products.forEach(async (product) => {
         await purchaseOrder.addProduct(product.id, {
@@ -53,11 +47,19 @@ module.exports = {
   update: async (req, res) => {
     try {
       // TODO: Later on we may add the updates for relations here
-      await PurchaseOrder.update(req.body.po, {
+      await PurchaseOrder.update(req.body.order, {
         where: {
           id: req.params.id,
-        },
+        }
       });
+      if (req.body.products) {
+        const productOrders = await ProductOrder.findAll({
+          where: {
+            id: [...req.body.products.map((productOrder) => product.id)],
+          },
+        });
+      }
+
       res.sendResponse({}, "Successfully updated!", 200);
     } catch (e) {
       res.sendError({}, "Something wen't wrong!", 400);

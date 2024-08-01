@@ -13,7 +13,7 @@
     </p>
     <p class="col-span-1 text-sm">{{ props.product.quantity_in_stock }}</p>
     <p class="col-span-1 text-sm">
-      {{ Helpers.formatDate(props.product.createdAt, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.product.createdAt, "M/D/YYYY") }}
     </p>
     <div class="col-span-1 text-sm flex">
       <button
@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { Helpers } from "@/helpers";
+import { DateHelpers } from "shared/helpers/date";
 const props = defineProps({
   product: {
     type: Object,

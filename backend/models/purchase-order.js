@@ -23,10 +23,6 @@ PurchaseOrder.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    is_completed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false,

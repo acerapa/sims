@@ -8,10 +8,10 @@
     <p class="col-span-2 text-sm">{{ props.order.supplier.company_name }}</p>
     <p class="col-span-1 text-sm">{{ props.order.amount }}</p>
     <p class="col-span-2 text-sm">
-      {{ Helpers.formatDate(props.order.date, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.order.date, "M/D/YYYY") }}
     </p>
     <p class="col-span-2 text-sm">
-      {{ Helpers.formatDate(props.order.bill_due, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.order.bill_due, "M/D/YYYY") }}
     </p>
     <div class="col-span-1">
       <BadgeComponent
@@ -31,8 +31,8 @@
 </template>
 
 <script setup>
-import { Helpers } from "@/helpers/index";
-import { PurchaseStatusMap } from "@/helpers/purchase-order";
+import { DateHelpers } from "shared/helpers/date";
+import { PurchaseOrderStatus } from "shared";
 import BadgeComponent from "../shared/BadgeComponent.vue";
 
 const emit = defineEmits(["openMenu"]);
@@ -41,6 +41,25 @@ const props = defineProps({
   order: {
     type: Object,
     default: () => ({}),
+  },
+});
+
+const PurchaseStatusMap = Object.freeze({
+  [PurchaseOrderStatus.OPEN]: {
+    text: "Open",
+    class: "bg-blue-500 text-blue-500",
+  },
+  [PurchaseOrderStatus.CONFIRMED]: {
+    text: "Confirmed",
+    class: "bg-yellow-500 text-yellow-500",
+  },
+  [PurchaseOrderStatus.COMPLETED]: {
+    text: "Completed",
+    class: "bg-success text-success",
+  },
+  [PurchaseOrderStatus.CANCELLED]: {
+    text: "Cancelled",
+    class: "bg-gray-500 text-gray-500",
   },
 });
 
