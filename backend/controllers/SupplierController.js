@@ -2,7 +2,7 @@ const Address = require("../models/address");
 const Supplier = require("../models/supplier");
 
 // validators
-const { VendorSchema } = require("../validator/Vendor");
+const { VendorSchema } = require("shared");
 
 module.exports = {
   all: async (req, res) => {

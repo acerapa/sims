@@ -1,5 +1,5 @@
 const Account = require("../models/account");
-const AccountSchema = require("../validator/Settings");
+const { AccountSchema } = require("shared")
 
 module.exports = {
   all: async (req, res) => {

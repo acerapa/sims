@@ -9,7 +9,7 @@ Content-Type: application/json
 	"last_name": "Tech",
 	"password": "bluelock",
 	"position": "admin",
-	"start_date": "2024-06-09",
+	"date_started": "2024-06-09",
 	"status": 1
 }
 
@@ -84,14 +84,13 @@ Accept: application/json
 
 
 ### = [UPDATE a user] success
-POST http://localhost:3000/api/users/update
+POST http://localhost:3000/api/users/10/update
 Accept: application/json
 Content-Type: application/json
 
 {
-	"username": "blue-master",
-	"first_name": "Master",
-	"id": 4
+	"username": "administrator",
+	"first_name": "Master"
 }
 
 ### = [UPDATE a user] failed

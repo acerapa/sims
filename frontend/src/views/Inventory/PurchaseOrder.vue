@@ -54,7 +54,7 @@ import { useRouter } from "vue-router";
 import CancelConfirmation from "@/components/Inventory/CancelConfirmation.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrderTableHeader.vue";
-import { PurchaseOrderStatus } from "@/helpers/purchase-order";
+import { PurchaseOrderStatus } from "shared";
 
 const top = ref(0);
 const toDelete = ref();
@@ -102,7 +102,7 @@ const onDelete = () => {
 };
 
 const onCancelPO = () => {
-  toUpdate.value = { po: { status: PurchaseOrderStatus.CANCELLED } };
+  toUpdate.value = { order: { status: PurchaseOrderStatus.CANCELLED } };
   showCancelModal.value = true;
 };
 

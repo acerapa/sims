@@ -25,6 +25,10 @@ ProductOrder.init(
     amount: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   },
   {

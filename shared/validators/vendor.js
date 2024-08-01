@@ -21,6 +21,6 @@ const VendorSchema = Joi.object({
 	address: AddressSchema
 }).options({
 	allowUnknown: true
-});;
+});
 
 module.exports = { VendorSchema, AddressSchema };

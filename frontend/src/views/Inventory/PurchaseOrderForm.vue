@@ -119,7 +119,9 @@
         </button>
 
         <!-- edit page save button -->
-        <button type="button" class="btn" v-if="isEdit">Update</button>
+        <button type="button" class="btn" v-if="isEdit" @click="onUpdate">
+          Update
+        </button>
       </div>
     </div>
   </div>
@@ -133,7 +135,7 @@ import { useRoute, useRouter } from "vue-router";
 import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import VendorModal from "@/components/Vendor/VendorModal.vue";
 import { Method, authenticatedApi } from "@/api";
-import { Helpers } from "@/helpers";
+import { DateHelpers } from 'shared';
 import { useProductStore } from "@/stores/product";
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
 import Event from "@/event";
@@ -151,7 +153,7 @@ const modelDefualtValue = {
   order: {
     supplier_id: "",
     ref_no: "",
-    date: Helpers.formatDate(new Date(), "YYYY-MM-DD"),
+    date: DateHelpers.formatDate(new Date(), "YYYY-MM-DD"),
     bill_due: "",
     memo: "",
     amount: 0,
@@ -203,8 +205,8 @@ onMounted(async () => {
         address: order.address,
         supplier_id: order.supplier.id,
         amount: order.amount,
-        bill_due: Helpers.formatDate(order.bill_due, "YYYY-MM-DD"),
-        date: Helpers.formatDate(order.date, "YYYY-MM-DD"),
+        bill_due: DateHelpers.formatDate(order.bill_due, "YYYY-MM-DD"),
+        date: DateHelpers.formatDate(order.date, "YYYY-MM-DD"),
         memo: order.memo,
         ref_no: order.ref_no,
       },
@@ -254,6 +256,10 @@ const onSubmit = async (isAddNew = false) => {
       name: "purchase-order",
     });
   }
+};
+
+const onUpdate = async () => {
+  console.log(model.value);
 };
 
 watch(

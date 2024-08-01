@@ -146,7 +146,7 @@ import AccountModal from "../Settings/AccountModal.vue";
 import VendorModal from "../Vendor/VendorModal.vue";
 import ProductPointModal from "../Settings/ProductPointModal.vue";
 import { computed, onMounted, ref } from "vue";
-import { AccountType } from "@/types/enums";
+import { AccountTypes } from "shared";
 
 import { useVendorStore } from "@/stores/supplier";
 import { useSettingsStore } from "@/stores/settings";
@@ -198,7 +198,7 @@ const productStore = useProductStore();
 
 const incomeAccounts = computed(() => {
   return settingStore.accounts
-    .filter((acc) => acc.type == AccountType.income.value)
+    .filter((acc) => acc.type == AccountTypes.INCOME)
     .map((acc) => {
       return {
         text: acc.name,
@@ -209,7 +209,7 @@ const incomeAccounts = computed(() => {
 
 const expenseAccounts = computed(() => {
   return settingStore.accounts
-    .filter((acc) => acc.type == AccountType.expense.value)
+    .filter((acc) => acc.type == AccountTypes.EXPENSE)
     .map((acc) => {
       return {
         text: acc.name,
