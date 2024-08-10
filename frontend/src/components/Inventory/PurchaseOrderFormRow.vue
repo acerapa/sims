@@ -10,15 +10,15 @@
         :options="productOptions"
         :has-add-new="true"
         @add-new="showModal = true"
-        v-model="props.order.id"
-        :key="props.order.id"
+        v-model="product.product_id"
+        :key="product.product_id"
         :can-search="true"
       />
     </div>
-    <input class="col-span-3 input" v-model="order.description" />
-    <input class="col-span-1 input" type="number" v-model="order.quantity" />
-    <input class="col-span-1 input" type="number" v-model="order.cost" />
-    <input class="col-span-1 input" v-model="order.amount" />
+    <input class="col-span-3 input" v-model="product.description" />
+    <input class="col-span-1 input" type="number" v-model="product.quantity" />
+    <input class="col-span-1 input" type="number" v-model="product.cost" />
+    <input class="col-span-1 input" v-model="product.amount" />
     <p class="col-span-1 text-sm pl-3 mt-[10px]">
       <img
         @click="emit('remove')"
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import CustomSelectInput from "../shared/CustomSelectInput.vue";
 import { useProductStore } from "@/stores/product";
 import ProductModal from "../Product/ProductModal.vue";
@@ -41,13 +41,9 @@ const props = defineProps({
     type: Array,
     defualt: [],
   },
-  order: {
-    type: Object,
-    defualt: () => ({}),
-  },
 });
 
-const orderModel = defineModel();
+const product = defineModel();
 const showModal = ref(false);
 const emit = defineEmits(["remove"]);
 const productStore = useProductStore();
@@ -60,33 +56,32 @@ const productOptions = computed(() => {
       };
     })
     .filter((prod) => {
-      if (orderModel.value.id == prod.value) return true;
-      return !props.selectedProducts.map((p) => p.id).includes(prod.value);
+      if (product.value.product_id == prod.value) return true;
+      return !props.selectedProducts.map((p) => p.product_id).includes(prod.value);
     });
 });
 
 watch(
-  () => orderModel.value.id,
+  () => product.value.product_id,
   (val) => {
-    const product = productStore.products.find((product) => product.id == val);
+    const prd = productStore.products.find((product) => product.id == val);
     if (product) {
-      orderModel.value.id = product.id;
-      orderModel.value.name = product.name;
-      orderModel.value.description = product.purchase_description;
-      orderModel.value.quantity = 1; // will always set quantity upon create
-      if (product.suppliers.length) {
-        orderModel.value.cost = product.suppliers[0].ProductSupplier.cost;
+      product.value.product_id = prd.id;
+      product.value.name = prd.name;
+      product.value.description = prd.purchase_description;
+      product.value.quantity = 1; // will always set quantity upon create
+      if (prd.suppliers.length) {
+        product.value.cost = prd.suppliers[0].ProductSupplier.cost;
       }
     }
   }
 );
 
 watch(
-  () => [orderModel.value.quantity, orderModel.value.cost],
+  () => [product.value.quantity, product.value.cost],
   (val) => {
     if (val) {
-      orderModel.value.amount =
-        orderModel.value.cost * orderModel.value.quantity;
+      product.value.amount = product.value.cost * product.value.quantity;
     }
   }
 );

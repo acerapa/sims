@@ -268,3 +268,58 @@ Content-Type: application/json
 {
 	"id": 4
 }
+
+### - [Purchase Order Register] success
+POST http://localhost:3000/api/purchase-order/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"order": {
+		"ref_no": "12345678",
+		"date": "2024-02-01",
+		"bill_due": "2024-02-01",
+		"amount": 5000,
+		"supplier_id": "13",
+		"type": "cod"
+	},
+	"address": {
+		"address1": "Test",
+		"address2": "Trest",
+		"city": "Test",
+		"postal": "Testd"
+	},
+	"products": [
+		{
+			"product_id": 12,
+			"name": "Dell Latitude 5320",
+			"quantity": 1,
+			"cost": 20000,
+			"amount": 20000
+		}
+	]
+}
+
+### [Get all purchase Orders]
+GET HTTP://localhost:3000/api/purchase-order/all
+
+
+### [Update Purchase order]
+POST HTTP://localhost:3000/api/purchase-order/11/update
+Accept: application/json
+Content-Type: application/json
+
+{
+	"order": {
+		"ref_no": "1234567"
+	},
+	"products": [
+		{
+			"product_id": 12,
+			"name": "Dell Latitude 5320",
+			"quantity": 1,
+			"cost": 20000,
+			"amount": 20000
+		}
+	]
+}

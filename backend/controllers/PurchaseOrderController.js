@@ -28,10 +28,14 @@ module.exports = {
 
   register: async (req, res) => {
     try {
-      const purchaseOrder = await PurchaseOrder.create(req.body.order);
+      const data = req.body.validated;
+      const purchaseOrder = await PurchaseOrder.create(data.order);
 
-      req.body.products.forEach(async (product) => {
-        await purchaseOrder.addProduct(product.id, {
+      const address = { ...data.address, order_id: purchaseOrder.id };
+      await Address.create(address);
+
+      data.products.forEach(async (product) => {
+        await purchaseOrder.addProduct(product.product_id, {
           through: {
             quantity: product.quantity,
             amount: product.amount,
@@ -46,18 +50,25 @@ module.exports = {
 
   update: async (req, res) => {
     try {
-      // TODO: Later on we may add the updates for relations here
-      await PurchaseOrder.update(req.body.order, {
-        where: {
-          id: req.params.id,
-        }
-      });
-      if (req.body.products) {
-        const productOrders = await ProductOrder.findAll({
+      const data = req.body.validated;
+      if (data.order) {
+        await PurchaseOrder.update(data.order, {
           where: {
-            id: [...req.body.products.map((productOrder) => product.id)],
+            id: req.params.id,
           },
         });
+      }
+
+      if (data.products) {
+        await ProductOrder.destroy({
+          where: {
+            product_id: req.params.id,
+          },
+        });
+
+        for (let product in data.products) {
+          console.log(product);
+        }
       }
 
       res.sendResponse({}, "Successfully updated!", 200);
@@ -81,8 +92,24 @@ module.exports = {
           {
             model: Product,
             as: "products",
+            include: [
+              {
+                model: Supplier,
+                as: "suppliers",
+                attributes: ["id"],
+              },
+            ],
           },
         ],
+      });
+
+      // map products to get the cost from the supplier
+      order.products = order.products.map((product) => {
+        let supplier = product.suppliers.find(
+          (sup) => sup.id == order.supplier_id
+        );
+        product.cost = supplier ? supplier.ProductSupplier.cost : product.cost;
+        return product;
       });
 
       res.sendResponse({ order }, "Successfully fetched!");

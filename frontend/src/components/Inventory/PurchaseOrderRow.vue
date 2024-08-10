@@ -32,7 +32,7 @@
 
 <script setup>
 import { DateHelpers } from "shared/helpers/date";
-import { PurchaseOrderStatus } from "shared";
+import { PurchaseStatusMap } from "shared";
 import BadgeComponent from "../shared/BadgeComponent.vue";
 
 const emit = defineEmits(["openMenu"]);
@@ -41,25 +41,6 @@ const props = defineProps({
   order: {
     type: Object,
     default: () => ({}),
-  },
-});
-
-const PurchaseStatusMap = Object.freeze({
-  [PurchaseOrderStatus.OPEN]: {
-    text: "Open",
-    class: "bg-blue-500 text-blue-500",
-  },
-  [PurchaseOrderStatus.CONFIRMED]: {
-    text: "Confirmed",
-    class: "bg-yellow-500 text-yellow-500",
-  },
-  [PurchaseOrderStatus.COMPLETED]: {
-    text: "Completed",
-    class: "bg-success text-success",
-  },
-  [PurchaseOrderStatus.CANCELLED]: {
-    text: "Cancelled",
-    class: "bg-gray-500 text-gray-500",
   },
 });
 
