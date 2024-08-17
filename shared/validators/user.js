@@ -16,6 +16,13 @@ const UserSchema = Joi.object({
   date_ended: Joi.date().allow(null),
 });
 
+const AddressSchema = Joi.object({
+  address1: Joi.string().required(),
+  address2: Joi.string().optional(),
+  city: Joi.string().required(),
+  postal: Joi.string().required()
+})
+
 const UserUpdateSchema = ValidatorHelpers.makeSchemaFieldOptional(UserSchema);
 
-module.exports = { UserSchema, UserUpdateSchema };
+module.exports = { UserSchema, UserUpdateSchema, AddressSchema };

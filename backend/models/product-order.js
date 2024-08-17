@@ -1,39 +1,53 @@
-const { DataTypes, Model } = require('sequelize');
-const { sequelize } = require('.');
+const { DataTypes, Model } = require("sequelize");
+const { sequelize } = require(".");
+const { ProductOrderedStatus } = require("shared/enums/purchase-order");
 
-class ProductOrder extends Model { }
+class ProductOrder extends Model {}
 
 ProductOrder.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     product_id: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     order_id: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     quantity: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+    },
+    quantity_received: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.ENUM,
+      values: Object.values(ProductOrderedStatus),
+      allowNull: true,
     },
     amount: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+    },
+    cost: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   },
   {
     sequelize,
-    timestamps: true
+    timestamps: true,
   }
 );
 

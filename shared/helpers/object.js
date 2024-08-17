@@ -1,8 +1,27 @@
 class ObjectHelpers {
+  // TODO: Need to create a function that will identify if the object is change depending on the
+  // TODO: values form before and after.
+  // TODO: The function is already created but the logic is not yet add (name: isObjectDifferent)
+
+  static isObjectDifferent = () => true;
+
   static assignSameFields = (target, source) => {
-    Object.keys(target).forEach((key) => {
-      target[key] = source[key];
-    });
+    // parameter check
+    if (typeof target != "object" && Array.isArray(target)) {
+      console.error("target must be object");
+      return;
+    }
+
+    if (typeof source != "object" && Array.isArray(source)) {
+      console.error("source must be object");
+      return;
+    }
+
+    for (const key in source) {
+      if (target.hasOwnProperty(key)) {
+        target[key] = source[key];
+      }
+    }
 
     return target;
   };

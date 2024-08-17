@@ -2,19 +2,46 @@
   <VendorModal v-model="showVendorModal" v-if="showVendorModal" />
   <div class="flex flex-col gap-4">
     <div class="bg-white rounded-2xl p-4 shadow flex flex-col gap-3">
-      <p class="text-base font-semibold">New Purchase Order</p>
+      <div class="flex justify-between items-center">
+        <p class="text-base font-semibold">
+          {{ isEdit ? "Edit" : "New" }} Purchase Order
+        </p>
+        <BadgeComponent
+          v-if="isEdit && selectedStatus"
+          :custom-class="selectedStatus.class"
+          :text="selectedStatus.text"
+        />
+      </div>
       <div class="flex flex-col gap-3">
         <div class="flex gap-3 max-[1180px]:flex-col">
           <div class="flex-1 flex flex-col gap-2">
             <p class="text-sm font-semibold">Order Info</p>
             <div class="flex flex-col gap-3">
-              <CustomSelectInput
-                :has-add-new="true"
-                :options="supplierOptions"
-                placeholder="*Select supplier"
-                v-model="model.order.supplier_id"
-                @add-new="showVendorModal = true"
-              />
+              <div class="flex gap-3">
+                <CustomSelectInput
+                  :has-add-new="true"
+                  :options="supplierOptions"
+                  placeholder="*Select supplier"
+                  v-model="model.order.supplier_id"
+                  @add-new="showVendorModal = true"
+                  class="flex-1"
+                />
+                <CustomSelectInput
+                  class="flex-1"
+                  placeholder="*Select Order Type"
+                  v-model="model.order.type"
+                  :options="[
+                    {
+                      text: 'Term',
+                      value: PurchaseOrderType.TERM,
+                    },
+                    {
+                      text: 'COD',
+                      value: PurchaseOrderType.COD,
+                    },
+                  ]"
+                />
+              </div>
               <input
                 type="text"
                 class="input"
@@ -44,8 +71,8 @@
           <div class="flex-1 flex flex-col gap-2">
             <p class="text-sm font-semibold">Ship To Info</p>
             <AddressForm
-              v-model="model.order.address"
-              :address="model.order.address"
+              v-model="model.address"
+              :address="model.address"
               :key="model.order"
             />
           </div>
@@ -78,8 +105,7 @@
           </div>
           <div class="flex flex-col gap-4">
             <PurchaseOrderFormRow
-              v-for="(order, ndx) in model.products"
-              :order="order"
+              v-for="(product, ndx) in model.products"
               v-model="model.products[ndx]"
               :key="ndx"
               @remove="removeProduct(ndx)"
@@ -135,14 +161,19 @@ import { useRoute, useRouter } from "vue-router";
 import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import VendorModal from "@/components/Vendor/VendorModal.vue";
 import { Method, authenticatedApi } from "@/api";
-import { DateHelpers } from 'shared';
+import { DateHelpers } from "shared";
 import { useProductStore } from "@/stores/product";
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
+import BadgeComponent from "@/components/shared/BadgeComponent.vue";
+import { PurchaseStatusMap } from "shared/enums/purchase-order";
+import { ObjectHelpers } from "shared/helpers/object";
 import Event from "@/event";
+import { PurchaseOrderType } from "shared/enums/purchase-order";
 
 const route = useRoute();
 const isEdit = ref(false);
 const router = useRouter();
+const selectedStatus = ref();
 const showVendorModal = ref(false);
 
 const supplierStore = useVendorStore();
@@ -155,18 +186,19 @@ const modelDefualtValue = {
     ref_no: "",
     date: DateHelpers.formatDate(new Date(), "YYYY-MM-DD"),
     bill_due: "",
+    type: PurchaseOrderType.COD,
     memo: "",
     amount: 0,
-    address: {
-      address1: "",
-      address2: "",
-      city: "",
-      postal: "",
-    },
+  },
+  address: {
+    address1: "",
+    address2: "",
+    city: "",
+    postal: "",
   },
   products: [
     {
-      id: "",
+      product_id: "",
       name: "",
       description: "",
       quantity: "",
@@ -200,35 +232,38 @@ onMounted(async () => {
     isEdit.value = true;
     await purchaseOrderStore.fetchPurchaseOrderById(route.query.id);
     const order = purchaseOrderStore.purchaseOrder;
-    model.value = {
-      order: {
-        address: order.address,
-        supplier_id: order.supplier.id,
-        amount: order.amount,
-        bill_due: DateHelpers.formatDate(order.bill_due, "YYYY-MM-DD"),
-        date: DateHelpers.formatDate(order.date, "YYYY-MM-DD"),
-        memo: order.memo,
-        ref_no: order.ref_no,
-      },
-      products: [
-        ...order.products.map((product) => {
-          return {
-            id: product.id,
-            name: product.name,
-            description: product.purchase_description,
-            quantity: product.ProductOrder.quantity,
-            cost: product.cost,
-            amount: product.ProductOrder.amount,
-          };
-        }),
-      ],
+    selectedStatus.value = PurchaseStatusMap[order.status];
+    model.value.address = ObjectHelpers.assignSameFields(
+      model.value.address,
+      order.address
+    );
+    model.value.order = {
+      supplier_id: order.supplier.id,
+      amount: order.amount,
+      bill_due: DateHelpers.formatDate(order.bill_due, "YYYY-MM-DD"),
+      date: DateHelpers.formatDate(order.date, "YYYY-MM-DD"),
+      memo: order.memo,
+      ref_no: order.ref_no,
+      type: order.type,
     };
+    model.value.products = [
+      ...order.products.map((product) => {
+        return {
+          product_id: product.id,
+          name: product.name,
+          description: product.purchase_description,
+          quantity: product.ProductOrder.quantity,
+          cost: product.ProductOrder.cost,
+          amount: product.ProductOrder.amount,
+        };
+      }),
+    ];
   }
 });
 
 const addNewProduct = () => {
   model.value.products.push({
-    id: "",
+    product_id: "",
     name: "",
     description: "",
     quantity: "",
@@ -242,7 +277,7 @@ const removeProduct = (ndx) => {
 };
 
 const onSubmit = async (isAddNew = false) => {
-  const res = authenticatedApi(
+  const res = await authenticatedApi(
     "purchase-order/register",
     Method.POST,
     model.value
@@ -251,15 +286,27 @@ const onSubmit = async (isAddNew = false) => {
   // reset model
   model.value = { ...modelDefualtValue };
 
-  if (!isAddNew) {
-    router.push({
-      name: "purchase-order",
-    });
+  if (res.status == 200) {
+    if (!isAddNew) {
+      router.push({
+        name: "purchase-order",
+      });
+    }
   }
 };
 
 const onUpdate = async () => {
-  console.log(model.value);
+  if (route.query.id) {
+    const res = await authenticatedApi(
+      `purchase-order/${route.query.id}/update`,
+      Method.POST,
+      model.value
+    );
+
+    if (res.status == 200) {
+      console.log("Api is working and need to check the result in db");
+    }
+  }
 };
 
 watch(

@@ -51,3 +51,24 @@
 .row-menu-item  {
   @apply border-b text-sm last:border-none px-3 py-1 hover:bg-blue-100 first:rounded-t-lg last:rounded-b-lg;
 }
+
+/* Dev defined classes for special used */
+.purchase-status-open {
+  color: #3F83F8;
+  background-color: rgba(63, 131, 248, 0.2);
+}
+
+.purchase-status-confirmed {
+  color: #C27803;
+  background-color: rgb(194, 120, 3, 0.2);
+}
+
+.purchase-status-completed {
+  color: #19BE34;
+  background-color: rgb(25, 190, 52, 0.2);
+}
+
+.purchase-status-cancelled {
+  color: #F05252;
+  background-color: rgb(240, 82, 82, 0.2);
+}
