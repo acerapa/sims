@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const { AddressSchema } = require("./user");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
+const { ProductOrderedStatus } = require("./../enums/purchase-order")
 
 const PurchaseOrderSchema = Joi.object({
   ref_no: Joi.string().required(),
@@ -26,7 +27,9 @@ const PurchaseProductSchema = Joi.object({
   description: Joi.string().optional(),
   quantity: Joi.number().required(),
   cost: Joi.number().required(),
-  amount: Joi.number().required()
+  amount: Joi.number().required(),
+  quantity_received: Joi.number().optional(),
+  status: Joi.string().valid(...Object.values(ProductOrderedStatus))
 });
 
 const PurchaseOrderCreationSchema = Joi.object({

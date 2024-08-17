@@ -30,9 +30,13 @@ ProductOrder.init(
     status: {
       type: DataTypes.ENUM,
       values: Object.values(ProductOrderedStatus),
-      allowNull: true
+      allowNull: true,
     },
     amount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    cost: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },

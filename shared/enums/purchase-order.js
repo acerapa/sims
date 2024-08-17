@@ -6,6 +6,7 @@ const PurchaseOrderStatus = Object.freeze({
 });
 
 const ProductOrderedStatus = Object.freeze({
+  OPEN: "open",
   COMPLETE: "complete",
   INCOMPLETE: "incomplete",
   NOT_RECEIVED: "not-received",

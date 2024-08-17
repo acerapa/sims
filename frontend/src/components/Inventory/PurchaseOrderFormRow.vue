@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import CustomSelectInput from "../shared/CustomSelectInput.vue";
 import { useProductStore } from "@/stores/product";
 import ProductModal from "../Product/ProductModal.vue";
@@ -57,7 +57,9 @@ const productOptions = computed(() => {
     })
     .filter((prod) => {
       if (product.value.product_id == prod.value) return true;
-      return !props.selectedProducts.map((p) => p.product_id).includes(prod.value);
+      return !props.selectedProducts
+        .map((p) => p.product_id)
+        .includes(prod.value);
     });
 });
 
@@ -68,10 +70,16 @@ watch(
     if (product) {
       product.value.product_id = prd.id;
       product.value.name = prd.name;
-      product.value.description = prd.purchase_description;
-      product.value.quantity = 1; // will always set quantity upon create
+      product.value.description = product.value.description
+        ? product.value.description
+        : prd.purchase_description;
+      product.value.quantity = product.value.quantity
+        ? product.value.quantity
+        : 1; // will always set quantity upon create
       if (prd.suppliers.length) {
-        product.value.cost = prd.suppliers[0].ProductSupplier.cost;
+        product.value.cost = product.value.cost
+          ? product.value.cost
+          : prd.suppliers[0].ProductSupplier.cost;
       }
     }
   }

@@ -165,7 +165,8 @@ import { DateHelpers } from "shared";
 import { useProductStore } from "@/stores/product";
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
 import BadgeComponent from "@/components/shared/BadgeComponent.vue";
-import { PurchaseStatusMap } from "shared";
+import { PurchaseStatusMap } from "shared/enums/purchase-order";
+import { ObjectHelpers } from "shared/helpers/object";
 import Event from "@/event";
 import { PurchaseOrderType } from "shared/enums/purchase-order";
 
@@ -232,29 +233,31 @@ onMounted(async () => {
     await purchaseOrderStore.fetchPurchaseOrderById(route.query.id);
     const order = purchaseOrderStore.purchaseOrder;
     selectedStatus.value = PurchaseStatusMap[order.status];
-    model.value = {
-      address: order.address,
-      order: {
-        supplier_id: order.supplier.id,
-        amount: order.amount,
-        bill_due: DateHelpers.formatDate(order.bill_due, "YYYY-MM-DD"),
-        date: DateHelpers.formatDate(order.date, "YYYY-MM-DD"),
-        memo: order.memo,
-        ref_no: order.ref_no,
-      },
-      products: [
-        ...order.products.map((product) => {
-          return {
-            product_id: product.id,
-            name: product.name,
-            description: product.purchase_description,
-            quantity: product.ProductOrder.quantity,
-            cost: product.cost,
-            amount: product.ProductOrder.amount,
-          };
-        }),
-      ],
+    model.value.address = ObjectHelpers.assignSameFields(
+      model.value.address,
+      order.address
+    );
+    model.value.order = {
+      supplier_id: order.supplier.id,
+      amount: order.amount,
+      bill_due: DateHelpers.formatDate(order.bill_due, "YYYY-MM-DD"),
+      date: DateHelpers.formatDate(order.date, "YYYY-MM-DD"),
+      memo: order.memo,
+      ref_no: order.ref_no,
+      type: order.type,
     };
+    model.value.products = [
+      ...order.products.map((product) => {
+        return {
+          product_id: product.id,
+          name: product.name,
+          description: product.purchase_description,
+          quantity: product.ProductOrder.quantity,
+          cost: product.ProductOrder.cost,
+          amount: product.ProductOrder.amount,
+        };
+      }),
+    ];
   }
 });
 
@@ -293,7 +296,17 @@ const onSubmit = async (isAddNew = false) => {
 };
 
 const onUpdate = async () => {
-  console.log(model.value);
+  if (route.query.id) {
+    const res = await authenticatedApi(
+      `purchase-order/${route.query.id}/update`,
+      Method.POST,
+      model.value
+    );
+
+    if (res.status == 200) {
+      console.log("Api is working and need to check the result in db");
+    }
+  }
 };
 
 watch(

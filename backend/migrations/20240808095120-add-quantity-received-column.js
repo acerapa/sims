@@ -15,7 +15,7 @@ module.exports = {
 
     const areColumnsExist = await areColumnsExistInTable(
       ProductOrder.getTableName(),
-      ["status", "quantity_received"]
+      ["status", "quantity_received", "cost"]
     );
 
     if (!areColumnsExist["status"]) {
@@ -33,6 +33,14 @@ module.exports = {
         ProductOrder.getAttributes()["quantity_received"]
       );
     }
+
+    if (!areColumnsExist["cost"]) {
+      await queryInterface.addColumn(
+        ProductOrder.getTableName(),
+        "cost",
+        ProductOrder.getAttributes()["cost"]
+      );
+    }
   },
 
   async down(queryInterface, Sequelize) {
@@ -45,7 +53,7 @@ module.exports = {
 
     const areColumnsExist = await areColumnsExistInTable(
       ProductOrder.getTableName(),
-      ["status", "quantity_received"]
+      ["status", "quantity_received", "cost"]
     );
 
     if (areColumnsExist["status"]) {
@@ -57,6 +65,10 @@ module.exports = {
         ProductOrder.getTableName(),
         "quantity_received"
       );
+    }
+
+    if (areColumnsExist["cost"]) {
+      await queryInterface.removeColumn(ProductOrder.getTableName(), "cost");
     }
   },
 };
