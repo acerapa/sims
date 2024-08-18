@@ -9,7 +9,7 @@ export default [
         name: "dashboard",
         component: () => import("@/views/Dashboard.vue"),
         meta: {
-          requireAuth: true,
+          requiresAuth: true,
         },
       },
       {
@@ -17,7 +17,7 @@ export default [
         name: "vendors",
         component: () => import("@/views/Vendor.vue"),
         meta: {
-          requireAuth: true,
+          requiresAuth: true,
         },
       },
       {
@@ -25,7 +25,7 @@ export default [
         name: "customers",
         component: () => import("@/views/Customer.vue"),
         meta: {
-          requireAuth: true,
+          requiresAuth: true,
         },
       },
       {
@@ -33,7 +33,7 @@ export default [
         name: "products",
         component: () => import("@/views/Product.vue"),
         meta: {
-          requireAuth: true,
+          requiresAuth: true,
         },
       },
       {
@@ -41,7 +41,7 @@ export default [
         name: "reports",
         component: () => import("@/views/Report.vue"),
         meta: {
-          requireAuth: true,
+          requiresAuth: true,
         },
       },
       {
@@ -49,7 +49,7 @@ export default [
         name: "employees",
         component: () => import("@/views/Employee.vue"),
         meta: {
-          requireAuth: true,
+          requiresAuth: true,
         },
       },
     ],

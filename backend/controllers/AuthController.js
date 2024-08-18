@@ -70,6 +70,16 @@ module.exports = {
     try {
       const data = jwt.verify(req.body.refresh, process.env.REFRESH_TOKEN_KEY);
 
+      const user = await User.findOne({
+        where: {
+          id: data.user_id,
+        },
+      });
+
+      if (!user) {
+        throw new Error("User in token is not valid!");
+      }
+
       if (data && data.refresh) {
         // generate new access and refresh token
         const accessToken = jwt.sign(
@@ -84,10 +94,12 @@ module.exports = {
         );
 
         res.sendResponse(
-          { access: accessToken, refresh: refressToken },
+          { access: accessToken, refresh: refressToken, user: user },
           "Successfully refresh tokens",
           200
         );
+      } else {
+        throw new Error("Invalid token data");
       }
     } catch (e) {
       res.sendError(e, "Invalid refresh token =>" + e.message, 401);

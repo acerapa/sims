@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { isAuthenticated } from "@/stores/auth";
 
 import commonRoutes from "./common";
 import inventoryRoutes from "./inventory";
@@ -10,8 +11,23 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  console.log(to);
-  next();
+  const isAuth = await isAuthenticated();
+
+  if (to.meta.requiresAuth) {
+    if (isAuth) {
+      next();
+    } else {
+      if (to.name == "login") {
+        next();
+        return;
+      } else {
+        next({ name: "login" });
+        return;
+      }
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;
