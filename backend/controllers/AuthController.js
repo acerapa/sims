@@ -3,39 +3,46 @@ const bcryptJS = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 // Validation Schema
-const { AuthSchema, VerifyTokenSchema } = require("shared");
+const { VerifyTokenSchema } = require("shared");
 
 module.exports = {
   login: async (req, res) => {
-    const { value, error } = AuthSchema.validate(req.body);
-    if (!error) {
-      const user = await User.findOne({ where: { username: value.username } });
-      if (user) {
-        if (await bcryptJS.compare(value.password, user.password)) {
-          // generate access token and refresh token
-          const accessToken = jwt.sign(
-            { user_id: user.id, refresh: false },
-            process.env.SECRET_KEY,
-            { expiresIn: process.env.TOKEN_EXP }
-          );
-          const refressToken = jwt.sign(
-            { user_id: user.id, refresh: true },
-            process.env.REFRESH_TOKEN_KEY,
-            { expiresIn: process.env.REFRESH_TOKEN_EXP }
-          );
+    const validated = req.body.validated;
 
-          res.sendResponse(
-            {
-              access: accessToken,
-              refresh: refressToken,
-            },
-            "Successfully login!",
-            200
-          );
-        }
+    const user = await User.findOne({
+      where: { username: validated.username },
+      raw: true,
+    });
+    if (user) {
+      if (await bcryptJS.compare(validated.password, user.password)) {
+        // generate access token and refresh token
+        const accessToken = jwt.sign(
+          { user_id: user.id, refresh: false },
+          process.env.SECRET_KEY,
+          { expiresIn: process.env.TOKEN_EXP }
+        );
+        const refressToken = jwt.sign(
+          { user_id: user.id, refresh: true },
+          process.env.REFRESH_TOKEN_KEY,
+          { expiresIn: process.env.REFRESH_TOKEN_EXP }
+        );
+
+        // remove password
+        delete user.password;
+        res.sendResponse(
+          {
+            access: accessToken,
+            refresh: refressToken,
+            user: user,
+          },
+          "Successfully login!",
+          200
+        );
+      } else {
+        res.sendError({}, "Incorrect Credentials!", 401);
       }
     } else {
-      res.sendError(error, "Incorrect Credentials!", 401);
+      res.sendError({}, "No user found!", 404);
     }
   },
 
