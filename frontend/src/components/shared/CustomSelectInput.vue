@@ -33,7 +33,7 @@
     >
       <input
         type="search"
-        class="input w-full"
+        class="input w-full disabled:bg-white"
         :placeholder="props.placeholder"
         tabindex="0"
         ref="singleDropdown"
@@ -72,7 +72,10 @@
     <div class="relative group z-10" tabindex="0">
       <div
         class="min-h-[38px] relative z-10"
-        :class="props.canSearch ? 'border px-3 py-2 rounded' : 'input'"
+        :class="[
+          props.canSearch ? 'border px-3 py-2 rounded' : 'input',
+          props.disabled ? 'border-none pointer-events-none' : '',
+        ]"
         v-if="props.selectMultiple"
       >
         <p
@@ -86,6 +89,7 @@
           class="input !border-none !p-0 mb-2 hidden group-focus:block group-focus-within:block w-full"
           v-model="search"
           :placeholder="props.placeholder"
+          :disabled="props.disabled"
         />
         <div id="selected" class="flex gap-2 flex-wrap" v-if="selected.length">
           <div

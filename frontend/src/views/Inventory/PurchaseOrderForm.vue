@@ -111,6 +111,7 @@
               :key="ndx"
               @remove="removeProduct(ndx)"
               :selected-products="model.products"
+              :is-disabled="true"
             >
             </PurchaseOrderFormRow>
           </div>

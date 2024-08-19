@@ -13,6 +13,7 @@
         v-model="product.product_id"
         :key="product.product_id"
         :can-search="true"
+        :disabled="props.isDisabled"
       />
     </div>
     <input class="col-span-3 input" v-model="product.description" />
@@ -40,6 +41,10 @@ const props = defineProps({
   selectedProducts: {
     type: Array,
     defualt: [],
+  },
+  isDisabled: {
+    type: Boolean,
+    default: false,
   },
 });
 
