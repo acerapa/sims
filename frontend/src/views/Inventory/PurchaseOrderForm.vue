@@ -25,6 +25,7 @@
                   v-model="model.order.supplier_id"
                   @add-new="showVendorModal = true"
                   class="flex-1"
+                  :disabled="isEdit"
                 />
                 <CustomSelectInput
                   class="flex-1"

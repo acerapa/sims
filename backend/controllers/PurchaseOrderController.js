@@ -73,7 +73,6 @@ module.exports = {
           });
 
           const currentProductIds = products.map((p) => p.product_id);
-          console.log(currentProductIds, data.products);
 
           await Promise.all([
             // determine the products in data.products needs to be created

@@ -1,10 +1,14 @@
 <template>
-  <div class="flex flex-col relative">
+  <div
+    class="flex flex-col relative"
+    :class="props.disabled ? 'pointer-events-none' : ''"
+  >
     <select
       class="input flex-1"
       v-model="selected"
       ref="select"
       v-if="!props.selectMultiple && !props.canSearch"
+      :disabled="props.disabled"
     >
       <option value="" v-if="props.placeholder" selected disabled>
         {{ props.placeholder }}
@@ -34,6 +38,7 @@
         tabindex="0"
         ref="singleDropdown"
         v-model="search"
+        :disabled="props.disabled"
       />
       <div
         class="hidden bg-white group-focus-within:block rounded shadow w-full max-h-40 overflow-y-auto"
@@ -139,6 +144,10 @@ const props = defineProps({
     default: false,
   },
   canSearch: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
     type: Boolean,
     default: false,
   },

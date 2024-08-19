@@ -80,15 +80,13 @@ export const isAuthenticated = async () => {
     const res = await getRefreshToken();
     if (res.status == 200) {
       isAuth = true;
+    } else {
+      // discard the current tokens and user in local storage
+      // if auth is still false
+      localStorage.removeItem(LocalStorageKeys.ACCESS);
+      localStorage.removeItem(LocalStorageKeys.REFRESH);
+      localStorage.removeItem(LocalStorageKeys.CURRENT_USER);
     }
-  }
-
-  // discard the current tokens and user in local storage
-  // if auth is still false
-  if (!isAuth) {
-    localStorage.removeItem(LocalStorageKeys.ACCESS);
-    localStorage.removeItem(LocalStorageKeys.REFRESH);
-    localStorage.removeItem(LocalStorageKeys.CURRENT_USER);
   }
 
   return isAuth;

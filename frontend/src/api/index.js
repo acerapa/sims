@@ -85,7 +85,7 @@ export const verifyAccessToken = async () => {
   let isValid = false;
 
   const manager = new FunctionCooldownManager("verifyAccessToken", 10000);
-  isValid = manager.execute(async () => {
+  isValid = await manager.executeAsync(async () => {
     let iV = false;
     const tokens = getPersistedTokens();
     if (Object.keys(tokens).length) {
@@ -94,7 +94,6 @@ export const verifyAccessToken = async () => {
       });
       if (res.status == 200 && res.data) iV = res.data.isValid;
     }
-
     return iV;
   });
 
@@ -105,6 +104,9 @@ export const getRefreshToken = async () => {
   const res = await api("auth/token/refresh", Method.POST, {
     refresh: getPersistedTokens().refresh,
   });
+
+  const resCopy = { ...res };
+
   if ((res.status = 200 && res.data)) {
     // manually set tokens to localstorage
     localStorage.setItem(LocalStorageKeys.ACCESS, res.data.access);
@@ -115,7 +117,7 @@ export const getRefreshToken = async () => {
     );
   }
 
-  return res;
+  return resCopy;
 };
 
 export const getPersistedTokens = () => {
