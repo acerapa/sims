@@ -1,44 +1,62 @@
 export default [
-    {
-        path: '/',
-        component: () => import('@/layout/NavLayout.vue'),
-        redirect: '/dashboard',
-        children: [
-            {
-                path: '/dashboard',
-                name: 'dashboard',
-                component: () => import('@/views/Dashboard.vue')
-            },
-            {
-                path: '/vendors',
-                name: 'vendors',
-                component: () => import('@/views/Vendor.vue')
-            },
-            {
-                path: '/customers',
-                name: 'customers',
-                component: () => import('@/views/Customer.vue')
-            },
-            {
-                path: '/products',
-                name: 'products',
-                component: () => import('@/views/Product.vue')
-            },
-            {
-                path: '/reports',
-                name: 'reports',
-                component: () => import('@/views/Report.vue')
-            },
-            {
-                path: '/employees',
-                name: 'employees',
-                component: () => import('@/views/Employee.vue')
-            }
-        ]
-    },
-    {
-        path: '/login',
-        name: 'login',
-        component: () => import('@/views/Sign-in.vue')
-    }
-]
+  {
+    path: "/",
+    component: () => import("@/layout/NavLayout.vue"),
+    redirect: "/dashboard",
+    children: [
+      {
+        path: "/dashboard",
+        name: "dashboard",
+        component: () => import("@/views/Dashboard.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "/vendors",
+        name: "vendors",
+        component: () => import("@/views/Vendor.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "/customers",
+        name: "customers",
+        component: () => import("@/views/Customer.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "/products",
+        name: "products",
+        component: () => import("@/views/Product.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "/reports",
+        name: "reports",
+        component: () => import("@/views/Report.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "/employees",
+        name: "employees",
+        component: () => import("@/views/Employee.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+    ],
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: () => import("@/views/Sign-in.vue"),
+  },
+];

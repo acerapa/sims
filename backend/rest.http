@@ -37,8 +37,8 @@ Accept: application/json
 Content-Type: application/json
 
 {
-	"username": "Master",
-	"password": "nbgfsdfsd"
+	"username": "administrator",
+	"password": "password"
 }
 
 #### - [Authenticating Users] success response

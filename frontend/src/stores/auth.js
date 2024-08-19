@@ -1,50 +1,95 @@
-import { Method, api } from "@/api";
+import {
+  Method,
+  api,
+  getPersistedTokens,
+  getRefreshToken,
+  verifyAccessToken,
+} from "@/api";
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { LocalStorageKeys } from "shared/enums/local-storage";
 
-export const useAuthStore = defineStore('auth', () => {
-	const accessToken = ref('');
-	const refreshToken = ref('');
+export const useAuthStore = defineStore("auth", () => {
+  const accessToken = ref("");
+  const refreshToken = ref("");
+  const authUser = ref(null);
 
-	const persistTokens = () => {
-		localStorage.setItem('tokens', JSON.stringify({
-			access: accessToken.value,
-			refresh: refreshToken.value
-		}));
-	}
+  const setAuthAndTokens = (access, refresh, auth, isPersist = false) => {
+    accessToken.value = access;
+    refreshToken.value = refresh;
+    authUser.value = auth;
 
-	const setTokens = (access, refresh, isPersist = false) => {
-		accessToken.value = access;
-		refreshToken.value = refresh;
+    if (isPersist) {
+      localStorage.setItem(LocalStorageKeys.ACCESS, accessToken.value);
+      localStorage.setItem(LocalStorageKeys.REFRESH, refreshToken.value);
+      localStorage.setItem(
+        LocalStorageKeys.CURRENT_USER,
+        JSON.stringify(authUser.value)
+      );
+    }
+  };
 
-		if (isPersist) persistTokens();
-	}
+  const getTokens = () => {
+    if (!accessToken.value && refreshToken.value) {
+      const tokens = getPersistedTokens();
+      if (access && refresh) {
+        accessToken.value = tokens.access;
+        refreshToken.value = tokens.refresh;
+      }
+    }
 
-	const getTokens = () => {
-		if (!accessToken.value && refreshToken.value) {
-			if (localStorage.getItem('tokens')) {
-				const tokens = JSON.parse(localStorage.getItem('tokens'));
-				accessToken.value = tokens.access;
-				refreshToken.value = tokens.refresh;
-			}
-		}
+    return { access: accessToken.value, refresh: refreshToken.value };
+  };
 
-		return { access: accessToken.value, refresh: refreshToken.value };
-	}
+  const getAuthUser = () => {
+    if (!authUser.value) {
+      let user = localStorage.getItem(LocalStorageKeys.CURRENT_USER);
+      if (user) {
+        authUser.value = JSON.parse(user);
+      }
+    }
 
-	const authenticate = async (credentials) => {
-		const res = await api('auth/login', Method.POST, credentials);
-		if (res.status == 200 && res.data) {
-			setTokens(res.data.access, res.data.refresh, true);
-		}
-		return res;
-	}
+    return authUser.value;
+  };
 
-	return {
-		accessToken,
-		refreshToken,
-		setTokens,
-		getTokens,
-		authenticate
-	}
+  const authenticate = async (credentials) => {
+    const res = await api("auth/login", Method.POST, credentials);
+    if (res.status == 200 && res.data) {
+      setAuthAndTokens(res.data.access, res.data.refresh, res.data.user, true);
+    }
+    return res;
+  };
+
+  return {
+    getTokens,
+    getAuthUser,
+    authenticate,
+  };
 });
+
+export const isAuthenticated = async () => {
+  let isAuth = false;
+  const access = localStorage.getItem(LocalStorageKeys.ACCESS);
+  const refresh = localStorage.getItem(LocalStorageKeys.REFRESH);
+
+  if (access) {
+    isAuth = await verifyAccessToken();
+  }
+
+  if (refresh && !isAuth) {
+    const res = await getRefreshToken();
+    if (res.status == 200) {
+      isAuth = true;
+    }
+  }
+
+  // discard the current tokens and user in local storage
+  // if auth is still false
+  if (!isAuth) {
+    localStorage.removeItem(LocalStorageKeys.ACCESS);
+    localStorage.removeItem(LocalStorageKeys.REFRESH);
+    localStorage.removeItem(LocalStorageKeys.CURRENT_USER);
+  }
+
+  return isAuth;
+};
