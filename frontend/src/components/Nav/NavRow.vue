@@ -70,6 +70,7 @@ const emitRouteClick = (nav, hasChild) => {
 
 const isIncludedRoute = (rt) => {
   return (
+    appStore.currentNav &&
     appStore.currentNav.includes_active &&
     appStore.currentNav.includes_active.includes(route.name) &&
     rt.route == appStore.currentNav.route

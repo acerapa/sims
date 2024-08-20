@@ -9,7 +9,7 @@ Content-Type: application/json
 	"last_name": "Tech",
 	"password": "bluelock",
 	"position": "admin",
-	"start_date": "2024-06-09",
+	"date_started": "2024-06-09",
 	"status": 1
 }
 
@@ -37,8 +37,8 @@ Accept: application/json
 Content-Type: application/json
 
 {
-	"username": "Master",
-	"password": "nbgfsdfsd"
+	"username": "administrator",
+	"password": "password"
 }
 
 #### - [Authenticating Users] success response
@@ -84,14 +84,13 @@ Accept: application/json
 
 
 ### = [UPDATE a user] success
-POST http://localhost:3000/api/users/update
+POST http://localhost:3000/api/users/10/update
 Accept: application/json
 Content-Type: application/json
 
 {
-	"username": "blue-master",
-	"first_name": "Master",
-	"id": 4
+	"username": "administrator",
+	"first_name": "Master"
 }
 
 ### = [UPDATE a user] failed
@@ -268,4 +267,59 @@ Content-Type: application/json
 
 {
 	"id": 4
+}
+
+### - [Purchase Order Register] success
+POST http://localhost:3000/api/purchase-order/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"order": {
+		"ref_no": "12345678",
+		"date": "2024-02-01",
+		"bill_due": "2024-02-01",
+		"amount": 5000,
+		"supplier_id": "13",
+		"type": "cod"
+	},
+	"address": {
+		"address1": "Test",
+		"address2": "Trest",
+		"city": "Test",
+		"postal": "Testd"
+	},
+	"products": [
+		{
+			"product_id": 12,
+			"name": "Dell Latitude 5320",
+			"quantity": 1,
+			"cost": 20000,
+			"amount": 20000
+		}
+	]
+}
+
+### [Get all purchase Orders]
+GET HTTP://localhost:3000/api/purchase-order/all
+
+
+### [Update Purchase order]
+POST HTTP://localhost:3000/api/purchase-order/11/update
+Accept: application/json
+Content-Type: application/json
+
+{
+	"order": {
+		"ref_no": "1234567"
+	},
+	"products": [
+		{
+			"product_id": 12,
+			"name": "Dell Latitude 5320",
+			"quantity": 1,
+			"cost": 20000,
+			"amount": 20000
+		}
+	]
 }

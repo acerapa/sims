@@ -55,8 +55,8 @@
 <script setup>
 import { Method, authenticatedApi } from "@/api";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import { Helpers } from "@/helpers";
 import { useEmployeeStore } from "@/stores/employee";
+import { ObjectHelpers } from "shared";
 import { onMounted, ref } from "vue";
 
 const props = defineProps({
@@ -71,7 +71,9 @@ const props = defineProps({
   },
 });
 
-const apiPath = props.isEdit ? "users/update" : "users/register";
+const apiPath = props.isEdit
+  ? `users/${props.selectedId}/update`
+  : "users/register";
 const employeeStore = useEmployeeStore();
 
 const model = ref({
@@ -93,13 +95,13 @@ onMounted(() => {
       (emp) => emp.id == props.selectedId
     );
     if (employee) {
-      model.value = employee;
+      model.value = ObjectHelpers.assignSameFields(model.value, employee);
 
       // update date
       model.value.date_started = model.value.date_started.split("T")[0];
     }
   } else {
-    model.value = Helpers.objectReset(model.value);
+    model.value = ObjectHelpers.objectReset(model.value);
   }
 });
 
@@ -109,7 +111,6 @@ const onSubmit = async () => {
       model.value.username
     }-${new Date().getFullYear()}`;
   }
-  
   const res = await authenticatedApi(apiPath, Method.POST, model.value);
   // TODO: Show alert. Currently we have no alert component so go ahead and create it first
   showModal.value = false;

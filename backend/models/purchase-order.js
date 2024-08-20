@@ -1,6 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
 const Supplier = require("./supplier");
+const { PurchaseOrderType } = require('shared/enums/purchase-order')
 
 class PurchaseOrder extends Model {}
 
@@ -23,10 +24,6 @@ PurchaseOrder.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    is_completed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
@@ -45,15 +42,26 @@ PurchaseOrder.init(
     },
     type: {
       type: DataTypes.ENUM,
-      values: ["term", "cod"],
+      values: Object.values(PurchaseOrderType),
       allowNull: true,
-      defaultValue: "cod",
+      defaultValue: PurchaseOrderType.COD,
     },
     term_start: {
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: new Date(),
     },
+    status: {
+      type: DataTypes.ENUM,
+      allowNull: false,
+      values: [
+        "open",
+        "confirmed",
+        "completed",
+        "cancelled"
+      ],
+      defaultValue: "open"
+    }
   },
   {
     sequelize,

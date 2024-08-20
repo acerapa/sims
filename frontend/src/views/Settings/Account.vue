@@ -58,7 +58,7 @@
 
 <script setup>
 import { useSettingsStore } from "@/stores/settings";
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AccountModal from "@/components/Settings/AccountModal.vue";
 import AccountRow from "@/components/Settings/AccountRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";

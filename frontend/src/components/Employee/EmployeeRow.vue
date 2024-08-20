@@ -10,11 +10,11 @@
     <p class="col-span-2 text-sm">{{ user.last_name }}</p>
     <p class="col-span-2 text-sm">{{ user.position }}</p>
     <p class="col-span-2 text-sm">
-      {{ Helpers.formatDate(user.date_started, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(user.date_started, "M/D/YYYY") }}
     </p>
     <p class="col-span-2 text-sm">
       {{
-        user.date_ended ? Helpers.formatDate(user.date_ended, "M/D/YYYY") : "-"
+        user.date_ended ? DateHelpers.formatDate(user.date_ended, "M/D/YYYY") : "-"
       }}
     </p>
     <p class="col-span-1 text-sm">
@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { Helpers } from "@/helpers";
+import { DateHelpers } from "shared";
 
 const props = defineProps({
   user: {

@@ -1,66 +1,62 @@
-const { DataTypes, Model } = require('sequelize');
-const { sequelize } = require('.');
+const { DataTypes, Model } = require("sequelize");
+const { sequelize } = require(".");
+const { UserType } = require("shared");
 
-class User extends Model { }
+class User extends Model {}
 
 User.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
     },
     first_name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     last_name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     middle_name: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
     },
     date_started: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
     },
     date_ended: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        min: 8
-      }
+        min: 8,
+      },
     },
     position: {
       type: DataTypes.ENUM,
       allowNull: false,
-      values: [
-        'admin',
-        'manager',
-        'cashier',
-        'inventory'
-      ]
+      values: Object.values(UserType),
     },
     status: {
       type: DataTypes.TINYINT,
-      defaultValue: 1
-    }
+      defaultValue: 1,
+    },
   },
   {
     sequelize,
     timestamps: true,
-    paranoid: true
+    paranoid: true,
   }
 );
 

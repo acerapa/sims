@@ -76,6 +76,7 @@
       <div
         class="flex flex-col gap-4"
         v-if="props.tableRowComponent && items.length"
+        :key="props.data"
       >
         <component
           :is="props.tableRowComponent"

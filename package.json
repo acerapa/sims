@@ -4,6 +4,9 @@
   "scripts": {
     "backend": "yarn workspace backend dev",
     "frontend": "yarn workspace frontend dev",
+    "shared": "yarn workspace shared",
+    "rm-nm-vite": "rm -r frontend/node_modules/.vite",
+    "re-install-shared": "yarn workspace backend add file:../shared && yarn workspace frontend add file:../shared",
     "migrate": "yarn workspace backend sequelize db:migrate",
     "migrate-undo": "yarn workspace backend sequelize db:migrate:undo",
     "migrate-undo-all": "yarn workspace backend sequelize db:migrate:undo:all",
@@ -11,9 +14,10 @@
     "seed-undo-all": "yarn workspace backend sequelize db:seed:undo:all",
     "sequelize": "yarn workspace backend sequelize"
   },
-  "workspaces":[
+  "workspaces": [
     "./frontend",
-    "./backend"
+    "./backend",
+    "./shared"
   ],
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }

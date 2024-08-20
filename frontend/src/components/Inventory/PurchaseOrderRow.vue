@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-12 gap-3">
+  <div class="grid grid-cols-12 gap-3 min-w-[935px]">
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.order.id }}</p>
@@ -8,12 +8,17 @@
     <p class="col-span-2 text-sm">{{ props.order.supplier.company_name }}</p>
     <p class="col-span-1 text-sm">{{ props.order.amount }}</p>
     <p class="col-span-2 text-sm">
-      {{ Helpers.formatDate(props.order.date, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.order.date, "M/D/YYYY") }}
     </p>
     <p class="col-span-2 text-sm">
-      {{ Helpers.formatDate(props.order.bill_due, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.order.bill_due, "M/D/YYYY") }}
     </p>
-    <p class="col-span-1 text-sm">{{ props.order.status }}</p>
+    <div class="col-span-1">
+      <BadgeComponent
+        :custom-class="selectedStatus.class"
+        :text="selectedStatus.text"
+      />
+    </div>
     <div class="col-span-1 text-sm">
       <img
         @click.stop="emit('openMenu', props.order.id)"
@@ -26,7 +31,9 @@
 </template>
 
 <script setup>
-import { Helpers } from "@/helpers/index";
+import { DateHelpers } from "shared/helpers/date";
+import { PurchaseStatusMap } from "shared";
+import BadgeComponent from "../shared/BadgeComponent.vue";
 
 const emit = defineEmits(["openMenu"]);
 
@@ -36,4 +43,6 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const selectedStatus = PurchaseStatusMap[props.order.status];
 </script>
