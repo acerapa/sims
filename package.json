@@ -5,6 +5,7 @@
     "backend": "yarn workspace backend dev",
     "frontend": "yarn workspace frontend dev",
     "shared": "yarn workspace shared",
+    "rm-nm-vite": "rm -r frontend/node_modules/.vite",
     "re-install-shared": "yarn workspace backend add file:../shared && yarn workspace frontend add file:../shared",
     "migrate": "yarn workspace backend sequelize db:migrate",
     "migrate-undo": "yarn workspace backend sequelize db:migrate:undo",

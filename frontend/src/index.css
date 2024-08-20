@@ -15,12 +15,12 @@
   font-style: normal;
 }
 
+/*=====================================================
+ * Input Related Styling
+ ======================================================*/
 .input {
   @apply border rounded text-sm px-3 py-2 focus:!outline-0 focus:border-black group-focus:border-black group-focus:!outline-0 ;
-}
-
-.table-wrapper {
-  @apply rounded-2xl shadow bg-white p-4 flex flex-col gap-4;
+  @apply disabled:border-none disabled:opacity-100 disabled:bg-white;
 }
 
 /* TODO: Update the styling for checkbox later on */
@@ -28,10 +28,25 @@
   @apply w-4 h-4 !rounded-sm !border-gray-100;
 }
 
+select.input {
+  @apply disabled:appearance-none;
+}
+
+/*=====================================================
+ * Table Related Styling
+ ======================================================*/
+.table-wrapper {
+  @apply rounded-2xl shadow bg-white p-4 flex flex-col gap-4;
+}
+
 .table-header {
   @apply font-semibold text-base whitespace-nowrap;
 }
 
+
+/*=====================================================
+ * Button Related Styling
+ ======================================================*/
 .btn {
   @apply px-4 py-2 rounded bg-primary text-white font-semibold text-sm;
 }
