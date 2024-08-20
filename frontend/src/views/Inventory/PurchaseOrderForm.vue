@@ -25,7 +25,7 @@
                   v-model="model.order.supplier_id"
                   @add-new="showVendorModal = true"
                   class="flex-1"
-                  :disabled="isEdit"
+                  :disabled="isEdit || isDisabled"
                 />
                 <CustomSelectInput
                   class="flex-1"
@@ -41,6 +41,7 @@
                       value: PurchaseOrderType.COD,
                     },
                   ]"
+                  :disabled="isDisabled"
                 />
               </div>
               <input
@@ -48,6 +49,7 @@
                 class="input"
                 v-model="model.order.ref_no"
                 placeholder="Ref. No."
+                :disabled="isDisabled"
               />
               <div class="flex gap-3">
                 <input
@@ -57,6 +59,7 @@
                   @focus="$event.target.type = 'date'"
                   @blur="$event.target.type = 'text'"
                   v-model="model.order.date"
+                  :disabled="isDisabled"
                 />
                 <input
                   type="text"
@@ -65,6 +68,7 @@
                   @focus="$event.target.type = 'date'"
                   @blur="$event.target.type = 'text'"
                   v-model="model.order.bill_due"
+                  :disabled="isDisabled"
                 />
               </div>
             </div>
@@ -75,6 +79,7 @@
               v-model="model.address"
               :address="model.address"
               :key="model.order"
+              :disabled="isDisabled"
             />
           </div>
         </div>
@@ -84,6 +89,7 @@
           class="input resize-none"
           placeholder="Memo"
           v-model="model.order.memo"
+          :disabled="isDisabled"
         ></textarea>
       </div>
 
@@ -93,16 +99,21 @@
 
       <div class="max-[750px]:w-[calc(100vw-328px)]">
         <div class="flex flex-col gap-4 max-w-full overflow-x-auto mb-4 pb-4">
-          <div class="grid grid-cols-9 gap-3 min-w-[750px] pb-2 border-b">
+          <div
+            class="grid gap-3 min-w-[750px] pb-2 border-b"
+            :class="[isDisabled ? 'grid-cols-8' : 'grid-cols-9']"
+          >
             <div class="col-span-2 flex gap-3 items-center">
-              <input type="checkbox" class="input" />
-              <p class="table-header">Item</p>
+              <input type="checkbox" class="input" v-if="!isDisabled" />
+              <p class="table-header pl-3">Item</p>
             </div>
-            <p class="col-span-3 table-header">Description</p>
-            <p class="col-span-1 table-header">Qty</p>
-            <p class="col-span-1 table-header">Cost</p>
-            <p class="col-span-1 table-header">Amount</p>
-            <p class="col-span-1 table-header">Action</p>
+            <p class="col-span-3 table-header pl-3">Description</p>
+            <p class="col-span-1 table-header pl-3">Qty</p>
+            <p class="col-span-1 table-header pl-3">Cost</p>
+            <p class="col-span-1 table-header pl-3">Amount</p>
+            <p class="col-span-1 table-header pl-3" v-if="!isDisabled">
+              Action
+            </p>
           </div>
           <div class="flex flex-col gap-4">
             <PurchaseOrderFormRow
@@ -111,7 +122,7 @@
               :key="ndx"
               @remove="removeProduct(ndx)"
               :selected-products="model.products"
-              :is-disabled="true"
+              :is-disabled="isDisabled"
             >
             </PurchaseOrderFormRow>
           </div>
@@ -120,7 +131,13 @@
           </div>
         </div>
         <div class="flex justify-between items-center pb-3">
-          <button class="btn w-fit" @click="addNewProduct">Add new item</button>
+          <button
+            class="btn w-fit"
+            :class="[isDisabled ? 'pointer-events-none opacity-0' : '']"
+            @click="addNewProduct"
+          >
+            Add new item
+          </button>
           <p>
             Total: &#8369;
             {{
@@ -137,8 +154,9 @@
         <RouterLink
           :to="{ name: 'purchase-order' }"
           class="btn-outline !border-danger !text-danger"
-          >Cancel</RouterLink
         >
+          {{ isDisabled ? "Back" : "Cancel" }}
+        </RouterLink>
         <button type="button" class="btn-outline" v-if="!isEdit">
           Save and New
         </button>
@@ -147,7 +165,12 @@
         </button>
 
         <!-- edit page save button -->
-        <button type="button" class="btn" v-if="isEdit" @click="onUpdate">
+        <button
+          type="button"
+          class="btn"
+          v-if="isEdit && !isDisabled"
+          @click="onUpdate"
+        >
           Update
         </button>
       </div>
@@ -171,6 +194,7 @@ import { PurchaseStatusMap } from "shared/enums/purchase-order";
 import { ObjectHelpers } from "shared/helpers/object";
 import Event from "@/event";
 import { PurchaseOrderType } from "shared/enums/purchase-order";
+import { PurchaseOrderStatus } from "shared/enums/purchase-order";
 
 const route = useRoute();
 const isEdit = ref(false);
@@ -221,11 +245,30 @@ const supplierOptions = computed(() => {
   });
 });
 
+const orderStatus = ref();
+const isDisabled = computed(() => {
+  return orderStatus.value
+    ? orderStatus.value == PurchaseOrderStatus.CANCELLED ||
+        orderStatus.value == PurchaseOrderStatus.COMPLETED ||
+        orderStatus.value == PurchaseOrderStatus.CONFIRMED
+    : false;
+});
+
 // Custom global event
 const isCustomSelectFocused = ref(false);
 Event.on("custom-select-focus", function (data) {
   isCustomSelectFocused.value = data;
 });
+
+const getCost = (cost, prd, sup_id) => {
+  const sup = prd.suppliers.find((sp) => sp.id == sup_id);
+
+  return cost
+    ? cost
+    : sup && sup.ProductSupplier && sup.ProductSupplier.cost
+      ? sup.ProductSupplier.cost
+      : prd.cost;
+};
 
 onMounted(async () => {
   await supplierStore.fetchAllSuppliers();
@@ -234,6 +277,7 @@ onMounted(async () => {
     isEdit.value = true;
     await purchaseOrderStore.fetchPurchaseOrderById(route.query.id);
     const order = purchaseOrderStore.purchaseOrder;
+    orderStatus.value = order.status;
     selectedStatus.value = PurchaseStatusMap[order.status];
     model.value.address = ObjectHelpers.assignSameFields(
       model.value.address,
@@ -255,7 +299,7 @@ onMounted(async () => {
           name: product.name,
           description: product.purchase_description,
           quantity: product.ProductOrder.quantity,
-          cost: product.ProductOrder.cost,
+          cost: getCost(product.ProductOrder.cost, product, order.supplier_id),
           amount: product.ProductOrder.amount,
         };
       }),
@@ -264,14 +308,16 @@ onMounted(async () => {
 });
 
 const addNewProduct = () => {
-  model.value.products.push({
-    product_id: "",
-    name: "",
-    description: "",
-    quantity: "",
-    cost: "",
-    amount: "",
-  });
+  if (!isDisabled.value) {
+    model.value.products.push({
+      product_id: "",
+      name: "",
+      description: "",
+      quantity: "",
+      cost: "",
+      amount: "",
+    });
+  }
 };
 
 const removeProduct = (ndx) => {

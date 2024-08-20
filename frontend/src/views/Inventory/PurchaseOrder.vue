@@ -35,9 +35,26 @@
       :table-header-component="PurchaseOrderTableHeader"
       @open-menu="onSelectRow"
     >
-      <RowMenu :top="top" v-if="showRowMenu" @view="onView" @delete="onDelete">
-        <button class="row-menu-item" @click="onCancelPO">Cancel PO</button>
-        <button class="row-menu-item" @click="onReceivePO">Receive PO</button>
+      <RowMenu
+        :top="top"
+        v-if="showRowMenu"
+        :has-delete="showDeleteAndConfirmPO"
+        @view="onView"
+        @delete="onDelete"
+      >
+        <button class="row-menu-item" @click="onCancelPO" v-if="showCancelPO">
+          Cancel PO
+        </button>
+        <button
+          class="row-menu-item"
+          @click="onConfirmPO"
+          v-if="showDeleteAndConfirmPO"
+        >
+          Confirm PO
+        </button>
+        <button class="row-menu-item" @click="onReceivePO" v-if="showReceivePO">
+          Receive PO
+        </button>
       </RowMenu>
     </CustomTable>
   </div>
@@ -45,7 +62,7 @@
 
 <script setup>
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import PurchaseOrderRow from "@/components/Inventory/PurchaseOrderRow.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
@@ -54,12 +71,15 @@ import { useRouter } from "vue-router";
 import CancelConfirmation from "@/components/Inventory/CancelConfirmation.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrderTableHeader.vue";
-import { PurchaseOrderStatus } from "shared";
+import { PurchaseOrderStatus } from "shared/enums/purchase-order";
+import { computed } from "vue";
+import { authenticatedApi, Method } from "@/api";
 
 const top = ref(0);
 const toDelete = ref();
 const toUpdate = ref();
 const selectedId = ref(0);
+const selectedRow = ref();
 const isEdit = ref(false);
 const showModal = ref(false);
 const showRowMenu = ref(false);
@@ -73,6 +93,29 @@ Event.on("global-click", function () {
   showRowMenu.value = false;
 });
 
+// computed
+const showCancelPO = computed(() => {
+  return (
+    selectedRow.value.status != PurchaseOrderStatus.CANCELLED &&
+    selectedRow.value.status != PurchaseOrderStatus.COMPLETED &&
+    selectedRow.value.status != PurchaseOrderStatus.CONFIRMED &&
+    selectedRow.value.status == PurchaseOrderStatus.OPEN
+  );
+});
+
+const showReceivePO = computed(() => {
+  return (
+    selectedRow.value.status != PurchaseOrderStatus.CANCELLED &&
+    selectedRow.value.status != PurchaseOrderStatus.COMPLETED &&
+    selectedRow.value.status != PurchaseOrderStatus.OPEN &&
+    selectedRow.value.status == PurchaseOrderStatus.CONFIRMED
+  );
+});
+
+const showDeleteAndConfirmPO = computed(() => {
+  return selectedRow.value.status == PurchaseOrderStatus.OPEN;
+});
+
 // define purchase order props init
 const purchaseOrderRowEvent = "purchase-order-row-props-init";
 Event.on(purchaseOrderRowEvent, function (data) {
@@ -81,6 +124,10 @@ Event.on(purchaseOrderRowEvent, function (data) {
 
 const onSelectRow = (id) => {
   selectedId.value = id;
+  selectedRow.value = purchaseOrderStore.purchaseOrders.find(
+    (order) => order.id == id
+  );
+
   top.value = event.target.offsetTop;
   showRowMenu.value = true;
 };
@@ -104,6 +151,22 @@ const onDelete = () => {
 const onCancelPO = () => {
   toUpdate.value = { order: { status: PurchaseOrderStatus.CANCELLED } };
   showCancelModal.value = true;
+};
+
+const onConfirmPO = async () => {
+  const res = await authenticatedApi(
+    `purchase-order/${selectedId.value}/update`,
+    Method.POST,
+    {
+      order: {
+        status: PurchaseOrderStatus.CONFIRMED,
+      },
+    }
+  );
+
+  if (res.status == 200) {
+    await purchaseOrderStore.fetchPurchaseOrders();
+  }
 };
 
 const onReceivePO = () => {

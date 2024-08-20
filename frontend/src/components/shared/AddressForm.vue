@@ -6,12 +6,14 @@
         class="input w-full"
         placeholder="Address 1"
         v-model="model.address1"
+        :disabled="props.disabled"
       />
       <input
         type="text"
         class="input w-full"
         placeholder="Address 2"
         v-model="model.address2"
+        :disabled="props.disabled"
       />
     </div>
     <div class="flex gap-6 max-lg:flex-col max-lg:gap-3">
@@ -20,12 +22,14 @@
         class="input flex-1"
         placeholder="City"
         v-model="model.city"
+        :disabled="props.disabled"
       />
       <input
         type="text"
         class="input flex-1"
         placeholder="Zip Code"
         v-model="model.postal"
+        :disabled="props.disabled"
       />
     </div>
   </div>
@@ -37,6 +41,10 @@ const props = defineProps({
   address: {
     type: Object,
     default: () => ({}),
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
 });
 
