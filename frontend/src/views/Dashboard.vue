@@ -1,7 +1,14 @@
 <template>
-    <div>
-        <h1>Your all set 🎉!</h1>
-    </div>
+  <div>
+    <h1>Your all set 🎉!</h1>
+  </div>
 </template>
 
-<script setup></script>
+<script setup>
+import Event from "@/event";
+import { EventEnum } from "@/data/event";
+
+// sample implemetation
+
+setTimeout(() => Event.emit(EventEnum.IS_PAGE_LOADING, false), 1000);
+</script>

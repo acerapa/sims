@@ -87,3 +87,17 @@ select.input {
   color: #F05252;
   background-color: rgb(240, 82, 82, 0.2);
 }
+
+
+/*=====================================================
+ * KEYFRAMES, ANIMATIONS, TRANSISTIONS
+ ======================================================*/
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(180deg);
+  }
+}

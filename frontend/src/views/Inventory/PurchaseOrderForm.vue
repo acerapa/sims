@@ -195,6 +195,7 @@ import { ObjectHelpers } from "shared/helpers/object";
 import Event from "@/event";
 import { PurchaseOrderType } from "shared/enums/purchase-order";
 import { PurchaseOrderStatus } from "shared/enums/purchase-order";
+import { EventEnum } from "@/data/event";
 
 const route = useRoute();
 const isEdit = ref(false);
@@ -236,6 +237,19 @@ const modelDefualtValue = {
 
 const model = ref({ ...modelDefualtValue });
 
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+
+// Custom global event
+const isCustomSelectFocused = ref(false);
+Event.on("custom-select-focus", function (data) {
+  isCustomSelectFocused.value = data;
+});
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
 const supplierOptions = computed(() => {
   return supplierStore.suppliers.map((supplier) => {
     return {
@@ -254,12 +268,9 @@ const isDisabled = computed(() => {
     : false;
 });
 
-// Custom global event
-const isCustomSelectFocused = ref(false);
-Event.on("custom-select-focus", function (data) {
-  isCustomSelectFocused.value = data;
-});
-
+/** ================================================
+ * METHODS
+ ** ================================================*/
 const getCost = (cost, prd, sup_id) => {
   const sup = prd.suppliers.find((sp) => sp.id == sup_id);
 
@@ -269,43 +280,6 @@ const getCost = (cost, prd, sup_id) => {
       ? sup.ProductSupplier.cost
       : prd.cost;
 };
-
-onMounted(async () => {
-  await supplierStore.fetchAllSuppliers();
-  await productStore.fetchAllProducts();
-  if (route.query.id) {
-    isEdit.value = true;
-    await purchaseOrderStore.fetchPurchaseOrderById(route.query.id);
-    const order = purchaseOrderStore.purchaseOrder;
-    orderStatus.value = order.status;
-    selectedStatus.value = PurchaseStatusMap[order.status];
-    model.value.address = ObjectHelpers.assignSameFields(
-      model.value.address,
-      order.address
-    );
-    model.value.order = {
-      supplier_id: order.supplier.id,
-      amount: order.amount,
-      bill_due: DateHelpers.formatDate(order.bill_due, "YYYY-MM-DD"),
-      date: DateHelpers.formatDate(order.date, "YYYY-MM-DD"),
-      memo: order.memo,
-      ref_no: order.ref_no,
-      type: order.type,
-    };
-    model.value.products = [
-      ...order.products.map((product) => {
-        return {
-          product_id: product.id,
-          name: product.name,
-          description: product.purchase_description,
-          quantity: product.ProductOrder.quantity,
-          cost: getCost(product.ProductOrder.cost, product, order.supplier_id),
-          amount: product.ProductOrder.amount,
-        };
-      }),
-    ];
-  }
-});
 
 const addNewProduct = () => {
   if (!isDisabled.value) {
@@ -356,6 +330,48 @@ const onUpdate = async () => {
     }
   }
 };
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+onMounted(async () => {
+  await supplierStore.fetchAllSuppliers();
+  await productStore.fetchAllProducts();
+  if (route.query.id) {
+    isEdit.value = true;
+    await purchaseOrderStore.fetchPurchaseOrderById(route.query.id);
+    const order = purchaseOrderStore.purchaseOrder;
+    orderStatus.value = order.status;
+    selectedStatus.value = PurchaseStatusMap[order.status];
+    model.value.address = ObjectHelpers.assignSameFields(
+      model.value.address,
+      order.address
+    );
+    model.value.order = {
+      supplier_id: order.supplier.id,
+      amount: order.amount,
+      bill_due: DateHelpers.formatDate(order.bill_due, "YYYY-MM-DD"),
+      date: DateHelpers.formatDate(order.date, "YYYY-MM-DD"),
+      memo: order.memo,
+      ref_no: order.ref_no,
+      type: order.type,
+    };
+    model.value.products = [
+      ...order.products.map((product) => {
+        return {
+          product_id: product.id,
+          name: product.name,
+          description: product.purchase_description,
+          quantity: product.ProductOrder.quantity,
+          cost: getCost(product.ProductOrder.cost, product, order.supplier_id),
+          amount: product.ProductOrder.amount,
+        };
+      }),
+    ];
+  }
+
+  Event.emit(EventEnum.IS_PAGE_LOADING, false);
+});
 
 watch(
   () => model.value.order.supplier_id,
