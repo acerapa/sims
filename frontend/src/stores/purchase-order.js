@@ -19,6 +19,8 @@ export const usePurchaseOrderStore = defineStore("purchase-order", () => {
     const res = await authenticatedApi("/purchase-order/" + id);
     if (res.status == 200) {
       purchaseOrder.value = res.data.order;
+
+      return res.data.order;
     }
   };
 

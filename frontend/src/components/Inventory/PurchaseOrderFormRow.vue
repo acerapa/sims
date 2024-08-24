@@ -6,7 +6,11 @@
     :class="[props.isDisabled ? 'grid grid-cols-8' : 'grid-cols-9']"
   >
     <div class="col-span-2 flex gap-3">
-      <input type="checkbox" v-if="!props.isDisabled" class="input flex-shrink-0 mt-[10px]" />
+      <input
+        type="checkbox"
+        v-if="!props.isDisabled"
+        class="input flex-shrink-0 mt-[10px]"
+      />
       <CustomSelectInput
         class="w-full [&>select]:w-full"
         placeholder="Select product"
@@ -60,6 +64,7 @@ import { computed, ref, watch } from "vue";
 import CustomSelectInput from "../shared/CustomSelectInput.vue";
 import { useProductStore } from "@/stores/product";
 import ProductModal from "../Product/ProductModal.vue";
+import { getCost } from "@/helper";
 
 const props = defineProps({
   selectedProducts: {
@@ -69,6 +74,9 @@ const props = defineProps({
   isDisabled: {
     type: Boolean,
     default: false,
+  },
+  sup_id: {
+    type: String,
   },
 });
 
@@ -105,7 +113,7 @@ watch(
       product.value.quantity = product.value.quantity
         ? product.value.quantity
         : 1; // will always set quantity upon create
-      product.value.cost = product.value.cost;
+      product.value.cost = getCost(product.value.cost, prd, props.sup_id);
     }
   }
 );

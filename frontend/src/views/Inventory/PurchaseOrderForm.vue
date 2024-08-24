@@ -123,6 +123,7 @@
               @remove="removeProduct(ndx)"
               :selected-products="model.products"
               :is-disabled="isDisabled"
+              :sup_id="model.order.supplier_id.toString()"
             >
             </PurchaseOrderFormRow>
           </div>
@@ -196,6 +197,7 @@ import Event from "@/event";
 import { PurchaseOrderType } from "shared/enums/purchase-order";
 import { PurchaseOrderStatus } from "shared/enums/purchase-order";
 import { EventEnum } from "@/data/event";
+import { getCost } from "@/helper";
 
 const route = useRoute();
 const isEdit = ref(false);
@@ -271,16 +273,6 @@ const isDisabled = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
-const getCost = (cost, prd, sup_id) => {
-  const sup = prd.suppliers.find((sp) => sp.id == sup_id);
-
-  return cost
-    ? cost
-    : sup && sup.ProductSupplier && sup.ProductSupplier.cost
-      ? sup.ProductSupplier.cost
-      : prd.cost;
-};
-
 const addNewProduct = () => {
   if (!isDisabled.value) {
     model.value.products.push({
@@ -361,7 +353,9 @@ onMounted(async () => {
         return {
           product_id: product.id,
           name: product.name,
-          description: product.purchase_description,
+          description: product.ProductOrder.description
+            ? product.ProductOrder.description
+            : product.purchase_description,
           quantity: product.ProductOrder.quantity,
           cost: getCost(product.ProductOrder.cost, product, order.supplier_id),
           amount: product.ProductOrder.amount,
