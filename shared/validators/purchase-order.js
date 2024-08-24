@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const { AddressSchema } = require("./user");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
-const { ProductOrderedStatus } = require("./../enums/purchase-order")
+const { ProductOrderedStatus } = require("./../enums/purchase-order");
 
 const PurchaseOrderSchema = Joi.object({
   ref_no: Joi.string().required(),
@@ -29,20 +29,23 @@ const PurchaseProductSchema = Joi.object({
   cost: Joi.number().required(),
   amount: Joi.number().required(),
   quantity_received: Joi.number().optional(),
-  status: Joi.string().valid(...Object.values(ProductOrderedStatus))
+  remarks: Joi.string().optional(),
+  status: Joi.string().valid(...Object.values(ProductOrderedStatus)),
 });
 
 const PurchaseOrderCreationSchema = Joi.object({
   order: PurchaseOrderSchema.required(),
   address: AddressSchema.required(),
-  products: Joi.array().items(PurchaseProductSchema).min(1).required()
-})
+  products: Joi.array().items(PurchaseProductSchema).min(1).required(),
+});
 
 const PurchaseOrderUpdateSchema = Joi.object({
   order: ValidatorHelpers.makeSchemaFieldOptional(PurchaseOrderSchema),
   address: ValidatorHelpers.makeSchemaFieldOptional(AddressSchema),
-  products: ValidatorHelpers.makeSchemaFieldOptional(Joi.array().items(PurchaseProductSchema).min(1))
-})
+  products: ValidatorHelpers.makeSchemaFieldOptional(
+    Joi.array().items(PurchaseProductSchema).min(1)
+  ),
+});
 
 module.exports = {
   PurchaseOrderSchema,

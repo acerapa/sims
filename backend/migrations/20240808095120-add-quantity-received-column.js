@@ -15,7 +15,7 @@ module.exports = {
 
     const areColumnsExist = await areColumnsExistInTable(
       ProductOrder.getTableName(),
-      ["status", "quantity_received", "cost"]
+      ["status", "quantity_received", "cost", "remarks"]
     );
 
     if (!areColumnsExist["status"]) {
@@ -39,6 +39,14 @@ module.exports = {
         ProductOrder.getTableName(),
         "cost",
         ProductOrder.getAttributes()["cost"]
+      );
+    }
+
+    if (!areColumnsExist["remarks"]) {
+      await queryInterface.addColumn(
+        ProductOrder.getTableName(),
+        "remarks",
+        ProductOrder.getAttributes()["remarks"]
       );
     }
   },
@@ -69,6 +77,10 @@ module.exports = {
 
     if (areColumnsExist["cost"]) {
       await queryInterface.removeColumn(ProductOrder.getTableName(), "cost");
+    }
+
+    if (areColumnsExist["remarks"]) {
+      await queryInterface.removeColumn(ProductOrder.getTableName(), "remarks");
     }
   },
 };

@@ -4,6 +4,7 @@ const Supplier = require("../models/supplier");
 const Product = require("../models/product");
 const ProductOrder = require("../models/product-order");
 const { ProductOrderedStatus } = require("shared/enums/purchase-order");
+const { sequelize } = require("../models");
 
 module.exports = {
   all: async (req, res) => {
@@ -29,40 +30,44 @@ module.exports = {
 
   register: async (req, res) => {
     try {
+      const transaction = await sequelize.transaction();
       const data = req.body.validated;
-      const purchaseOrder = await PurchaseOrder.create(data.order);
+      const purchaseOrder = await PurchaseOrder.create(data.order, {
+        transaction: transaction,
+      });
 
       const address = { ...data.address, order_id: purchaseOrder.id };
-      await Address.create(address);
+      await Address.create(address, { transaction: transaction });
 
-      data.products.forEach(async (product) => {
-        await purchaseOrder.addProduct(product.product_id, {
-          through: {
-            cost: product.cost,
-            amount: product.amount,
-            quantity: product.quantity,
-            description: product.description,
-            status: product.status ? product.status : ProductOrderedStatus.OPEN,
-            quantity_received: product.quantity_received
-              ? product.quantity_received
-              : 0,
-          },
-        });
-      });
+      await Promise.all([
+        ...data.products.map(async (product) => {
+          return await ProductOrder.create(
+            {
+              ...product,
+              order_id: purchaseOrder.id,
+            },
+            { transaction: transaction }
+          );
+        }),
+      ]);
+      transaction.commit();
       res.sendResponse({}, "Successfully created!");
     } catch (e) {
+      transaction.rollback();
       res.sendError({ ...e }, "Something wen't wrong! => " + e.messge);
     }
   },
 
   update: async (req, res) => {
     try {
+      const transaction = await sequelize.transaction();
       const data = req.body.validated;
       if (data.order) {
         await PurchaseOrder.update(data.order, {
           where: {
             id: req.params.id,
           },
+          transaction: transaction,
         });
 
         // update related products
@@ -79,7 +84,10 @@ module.exports = {
             ...data.products
               .filter((p) => !currentProductIds.includes(p.product_id))
               .map((p) =>
-                ProductOrder.create({ ...p, order_id: req.params.id })
+                ProductOrder.create(
+                  { ...p, order_id: req.params.id },
+                  { transaction: transaction }
+                )
               ),
 
             // determine the products weither they it will be updated or deleted
@@ -96,12 +104,14 @@ module.exports = {
                   where: {
                     id: product.id,
                   },
+                  transaction: transaction,
                 });
               } else {
                 return ProductOrder.destroy({
                   where: {
                     id: product.id,
                   },
+                  transaction: transaction,
                 });
               }
             }),
@@ -114,12 +124,14 @@ module.exports = {
             where: {
               order_id: req.params.id,
             },
+            transaction: transaction,
           });
         }
       }
-
+      transaction.commit();
       res.sendResponse({}, "Successfully updated!", 200);
     } catch (e) {
+      transaction.rollback();
       res.sendError({ ...e }, "Something wen't wrong! => " + e.message, 400);
     }
   },
