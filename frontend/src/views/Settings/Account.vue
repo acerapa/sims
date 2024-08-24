@@ -67,6 +67,7 @@ import RowMenu from "@/components/shared/RowMenu.vue";
 import AccountTableHeader from "@/components/Settings/AccountTableHeader.vue";
 import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import Event from "@/event";
+import { EventEnum } from "@/data/event";
 
 const top = ref(0);
 const toDelete = ref();
@@ -84,18 +85,9 @@ const filter = ref({
 
 const searchText = ref();
 
-const filteredData = computed(() => {
-  return settingsStore.accounts
-    .filter((account) =>
-      filter.value.type ? account.type == filter.value.type : account
-    )
-    .filter((account) => {
-      const searchCondition = `${account.type} ${account.name}`.toLowerCase();
-      return searchText.value
-        ? searchCondition.includes(searchText.value.toLowerCase())
-        : account;
-    });
-});
+/** ================================================
+ * EVENTS
+ ** ================================================*/
 
 // custom event
 Event.on("global-click", function () {
@@ -109,9 +101,27 @@ Event.on(accountRowEvent, function (data) {
   return { account: data };
 });
 
-onMounted(async () => {
-  await settingsStore.fetchAllAccounts();
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+
+const filteredData = computed(() => {
+  return settingsStore.accounts
+    .filter((account) =>
+      filter.value.type ? account.type == filter.value.type : account
+    )
+    .filter((account) => {
+      const searchCondition =
+        `${account.id} ${account.type} ${account.name}`.toLowerCase();
+      return searchText.value
+        ? searchCondition.includes(searchText.value.toLowerCase())
+        : account;
+    });
 });
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
 
 const onSelectRow = (id) => {
   selectedId.value = id;
@@ -128,4 +138,13 @@ const onDeleteRow = () => {
   toDelete.value = { id: selectedId.value };
   showDeleteConfirmationModal.value = true;
 };
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+
+onMounted(async () => {
+  await settingsStore.fetchAllAccounts();
+  Event.emit(EventEnum.IS_PAGE_LOADING, false);
+});
 </script>

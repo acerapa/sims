@@ -14,13 +14,13 @@
       @after-delete="afterDelete"
     />
     <CustomTable
-      v-if="vendorStore.suppliers.length"
       :has-add-btn="true"
+      :data="filteredData"
       :has-pagination="true"
       v-model:is-edit="isEdit"
-      :data="vendorStore.suppliers"
       v-model:show-modal="showModal"
       :row-prop-init="vendorRowEvent"
+      v-model:search-text="searchText"
       :table-row-component="VendorRow"
       :table-header-component="VendorTableHeader"
       @open-menu="onSelectRow"
@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import VendorModal from "@/components/Vendor/VendorModal.vue";
 import VendorRow from "@/components/Vendor/VendorRow.vue";
@@ -46,19 +46,24 @@ import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
 import VendorTableHeader from "@/components/Vendor/VendorTableHeader.vue";
+import { EventEnum } from "@/data/event";
 
 const vendorStore = useVendorStore();
-
 const top = ref(0);
 const showModal = ref(false);
 const isEdit = ref(false);
 const toDelete = ref();
+const searchText = ref();
 const selectedId = ref(-1);
 const showRowMenu = ref(false);
 const showDeleteConfirmModal = ref(false);
 
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+
 // custom event
-Event.on("global-click", function () {
+Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });
 
@@ -69,6 +74,23 @@ Event.on(vendorRowEvent, function (data) {
     supplier: data,
   };
 });
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const filteredData = computed(() => {
+  return vendorStore.suppliers.filter((supplier) => {
+    const searchCondition =
+      `${supplier.id} ${supplier.company_name} ${supplier.first_name} ${supplier.last_name} ${supplier.annotation ? supplier.annotation : ""}`.toLowerCase();
+    return searchText.value
+      ? searchCondition.includes(searchText.value.toLowerCase())
+      : supplier;
+  });
+});
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
 
 const onSelectRow = (id) => {
   selectedId.value = id;
@@ -91,7 +113,12 @@ const afterDelete = async () => {
   showDeleteConfirmModal.value = false;
 };
 
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+
 onMounted(async () => {
   await vendorStore.fetchAllSuppliers();
+  Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });
 </script>

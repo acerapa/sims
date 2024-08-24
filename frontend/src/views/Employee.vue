@@ -13,13 +13,13 @@
     @after-delete="afterDelete"
   />
   <CustomTable
-    v-if="employeeStore.employees.length"
     class="relative"
     :has-add-btn="true"
+    :data="filteredData"
     :has-pagination="true"
     v-model:is-edit="isEdit"
     v-model:show-modal="showModal"
-    :data="employeeStore.employees"
+    v-model:search-text="searchText"
     :row-prop-init="employeeRowEvent"
     :table-row-component="EmployeeRow"
     :table-header-component="EmployeeTableHeader"
@@ -35,7 +35,7 @@
 </template>
 <script setup>
 import EmployeeModal from "@/components/Employee/EmployeeModal.vue";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import EmployeeRow from "@/components/Employee/EmployeeRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import { useEmployeeStore } from "@/stores/employee";
@@ -43,6 +43,8 @@ import CustomTable from "@/components/shared/CustomTable.vue";
 import EmployeeTableHeader from "@/components/Employee/EmployeeTableHeader.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
+import { EventEnum } from "@/data/event";
+import { DateHelpers } from "shared/helpers/date";
 
 const top = ref(0);
 const showRowMenu = ref(false);
@@ -52,9 +54,14 @@ const toDelete = ref();
 const isEdit = ref(false);
 const selectedId = ref(-1);
 const employeeStore = useEmployeeStore();
+const searchText = ref();
 
-// custom event
-Event.on("global-click", function () {
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+
+ // custom event
+Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });
 
@@ -64,9 +71,23 @@ Event.on(employeeRowEvent, function (data) {
   return { user: data };
 });
 
-onMounted(async () => {
-  await employeeStore.fetchAllEmployees();
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+
+const filteredData = computed(() => {
+  return employeeStore.employees.filter((employee) => {
+    const searchCondition =
+      `${employee.id} ${employee.first_name} ${employee.last_name} ${employee.username} ${DateHelpers.formatDate(employee.date_started, "M/D/YYYY")} ${employee.position} ${DateHelpers.formatDate(employee.date_ended, "M/D/YYYY")}`.toLowerCase();
+    return searchText.value
+      ? searchCondition.includes(searchText.value.toLowerCase())
+      : employee;
+  });
 });
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
 
 const onSelectRow = (id) => {
   selectedId.value = id;
@@ -88,4 +109,13 @@ const afterDelete = async () => {
   await employeeStore.fetchAllEmployees();
   showDeleteConfirmModal.value = false;
 };
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+
+onMounted(async () => {
+  await employeeStore.fetchAllEmployees();
+  Event.emit(EventEnum.IS_PAGE_LOADING, false);
+});
 </script>

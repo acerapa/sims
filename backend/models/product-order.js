@@ -44,6 +44,10 @@ ProductOrder.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    remarks: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     sequelize,

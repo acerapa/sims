@@ -1,15 +1,25 @@
+<template>
+  <PageLoader v-if="isPageLoading" />
+  <RouterView />
+</template>
+
 <script setup>
-import { RouterView } from "vue-router";
-import { onMounted } from "vue";
 import Event from "./event";
+import { onMounted, ref } from "vue";
+import { RouterView } from "vue-router";
+import { EventEnum } from "./data/event";
+import PageLoader from "./components/shared/PageLoader.vue";
 
 onMounted(() => {
   window.addEventListener("click", () => {
-    Event.emit("global-click");
+    Event.emit(EventEnum.GLOBAL_CLICK);
   });
 });
-</script>
 
-<template>
-  <RouterView />
-</template>
+const isPageLoading = ref(true);
+
+// TODO: Lets create a const or enum to store this event names
+Event.on(EventEnum.IS_PAGE_LOADING, function (isLoading) {
+  isPageLoading.value = isLoading;
+});
+</script>

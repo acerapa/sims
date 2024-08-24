@@ -77,6 +77,7 @@ import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import { useProductStore } from "@/stores/product";
 import Event from "@/event";
+import { EventEnum } from "@/data/event";
 import ProductTableHeader from "@/components/Product/ProductTableHeader.vue";
 
 const top = ref(0);
@@ -89,7 +90,7 @@ const toDelete = ref({});
 const selectedId = ref(0);
 
 // custom event
-Event.on("global-click", function () {
+Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });
 
@@ -123,5 +124,6 @@ const onAfterDelete = async () => {
 
 onMounted(async () => {
   await productStore.fetchAllProducts();
+  Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });
 </script>

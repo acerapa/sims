@@ -74,6 +74,7 @@ import ProductCategoryTableHeader from "@/components/Settings/ProductCategoryTab
 import ProductReorderingPointTableHeader from "@/components/Settings/ProductReorderingPointTableHeader.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";
+import { EventEnum } from "@/data/event";
 
 const top = ref(0);
 const toDelete = ref({});
@@ -87,6 +88,10 @@ const reorderingModalShow = ref(false);
 const showReorderingRowMenu = ref(false);
 const settingsStore = useSettingsStore();
 const showDeleteConfirmationModal = ref(false);
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
 
 // custom event
 Event.on("global-click", function () {
@@ -106,10 +111,9 @@ Event.on(productReorderingRowEvent, function (item) {
   return { productReordering: item };
 });
 
-onMounted(async () => {
-  await settingsStore.fetchAllProductCategories();
-  await settingsStore.fetchAllProductReorderingPoints();
-});
+/** ================================================
+ * METHODS
+ ** ================================================*/
 
 const onSelectRow = (id) => {
   selectedId.value = id;
@@ -150,4 +154,14 @@ const afterDelete = async () => {
   await settingsStore.fetchAllProductReorderingPoints();
   showDeleteConfirmationModal.value = false;
 };
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+
+onMounted(async () => {
+  await settingsStore.fetchAllProductCategories();
+  await settingsStore.fetchAllProductReorderingPoints();
+  Event.emit(EventEnum.IS_PAGE_LOADING, false);
+});
 </script>

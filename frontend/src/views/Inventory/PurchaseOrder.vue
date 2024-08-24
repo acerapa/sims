@@ -74,6 +74,7 @@ import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrderTableH
 import { PurchaseOrderStatus } from "shared/enums/purchase-order";
 import { computed } from "vue";
 import { authenticatedApi, Method } from "@/api";
+import { EventEnum } from "@/data/event";
 
 const top = ref(0);
 const toDelete = ref();
@@ -88,10 +89,24 @@ const showDeleteConfirmation = ref(false);
 
 const router = useRouter();
 
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+
 // custom event
 Event.on("global-click", function () {
   showRowMenu.value = false;
 });
+
+// define purchase order props init
+const purchaseOrderRowEvent = "purchase-order-row-props-init";
+Event.on(purchaseOrderRowEvent, function (data) {
+  return { order: data };
+});
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
 
 // computed
 const showCancelPO = computed(() => {
@@ -116,11 +131,9 @@ const showDeleteAndConfirmPO = computed(() => {
   return selectedRow.value.status == PurchaseOrderStatus.OPEN;
 });
 
-// define purchase order props init
-const purchaseOrderRowEvent = "purchase-order-row-props-init";
-Event.on(purchaseOrderRowEvent, function (data) {
-  return { order: data };
-});
+/** ================================================
+ * METHODS
+ ** ================================================*/
 
 const onSelectRow = (id) => {
   selectedId.value = id;
@@ -179,7 +192,12 @@ const onReceivePO = () => {
 };
 const purchaseOrderStore = usePurchaseOrderStore();
 
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+
 onMounted(async () => {
   await purchaseOrderStore.fetchPurchaseOrders();
+  Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });
 </script>

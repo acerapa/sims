@@ -32,7 +32,7 @@ export default [
         },
       },
       {
-        path: "/:id/purchase-receive-order",
+        path: "/purchase-receive-order/:id",
         name: "purchase-receive-order",
         component: () => import("@/views/Inventory/ReceiveOrder.vue"),
         meta: {
