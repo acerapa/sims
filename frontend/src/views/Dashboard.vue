@@ -9,6 +9,7 @@ import Event from "@/event";
 import { EventEnum } from "@/data/event";
 
 // sample implemetation
+Event.emit(EventEnum.IS_PAGE_LOADING, true);
 
 setTimeout(() => Event.emit(EventEnum.IS_PAGE_LOADING, false), 1000);
 </script>

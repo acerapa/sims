@@ -39,6 +39,8 @@
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { ref } from "vue";
+import Event from "@/event";
+import { EventEnum } from "@/data/event";
 
 const router = useRouter();
 
@@ -50,8 +52,10 @@ const credentials = ref({
 });
 
 const onSubmit = async () => {
+  Event.emit(EventEnum.IS_PAGE_LOADING, true);
   const res = await authStore.authenticate(credentials.value);
   if (res.status == 200 && res.data) {
+    Event.emit(EventEnum.IS_PAGE_LOADING, false);
     router.push({ name: "dashboard" });
   }
 };
