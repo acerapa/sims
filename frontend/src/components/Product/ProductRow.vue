@@ -18,6 +18,7 @@
     <div class="col-span-1 text-sm flex">
       <button
         v-if="
+          props.product.product_setting &&
           props.product.quantity_in_stock > props.product.product_setting.point
         "
         class="status text-sm bg-opacity-20 text-success bg-success flex-shrink-0"
@@ -27,6 +28,7 @@
       <button
         v-if="
           props.product.quantity_in_stock &&
+          props.product.product_setting &&
           props.product.quantity_in_stock < props.product.product_setting.point
         "
         class="status text-sm bg-opacity-20 text-yellow-500 bg-yellow-500 flex-shrink-0"
