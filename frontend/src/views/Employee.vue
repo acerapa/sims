@@ -60,7 +60,9 @@ const searchText = ref();
  * EVENTS
  ** ================================================*/
 
- // custom event
+Event.emit(EventEnum.IS_PAGE_LOADING, true);
+
+// custom event
 Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });

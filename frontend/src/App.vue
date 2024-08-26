@@ -16,7 +16,7 @@ onMounted(() => {
   });
 });
 
-const isPageLoading = ref(true);
+const isPageLoading = ref(false);
 
 // TODO: Lets create a const or enum to store this event names
 Event.on(EventEnum.IS_PAGE_LOADING, function (isLoading) {

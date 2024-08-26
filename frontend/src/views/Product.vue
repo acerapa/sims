@@ -89,6 +89,12 @@ const productStore = useProductStore();
 const toDelete = ref({});
 const selectedId = ref(0);
 
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+
+Event.emit(EventEnum.IS_PAGE_LOADING, true);
+
 // custom event
 Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
@@ -99,6 +105,10 @@ const productRowEvent = "product-row-init-props";
 Event.on(productRowEvent, function (data) {
   return { product: data };
 });
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
 
 const onSelectRow = (id) => {
   top.value = event.target.offsetTop;
@@ -121,6 +131,10 @@ const onAfterDelete = async () => {
   toDelete.value = {};
   await productStore.fetchAllProducts();
 };
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
 
 onMounted(async () => {
   await productStore.fetchAllProducts();
