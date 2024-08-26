@@ -92,9 +92,10 @@ const router = useRouter();
 /** ================================================
  * EVENTS
  ** ================================================*/
+Event.emit(EventEnum.IS_PAGE_LOADING, true);
 
 // custom event
-Event.on("global-click", function () {
+Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });
 

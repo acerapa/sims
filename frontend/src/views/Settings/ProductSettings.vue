@@ -93,8 +93,10 @@ const showDeleteConfirmationModal = ref(false);
  * EVENTS
  ** ================================================*/
 
+Event.emit(EventEnum.IS_PAGE_LOADING, true);
+
 // custom event
-Event.on("global-click", function () {
+Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
   showReorderingRowMenu.value = false;
 });

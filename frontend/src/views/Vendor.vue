@@ -62,6 +62,9 @@ const showDeleteConfirmModal = ref(false);
  * EVENTS
  ** ================================================*/
 
+// is page is loading
+Event.emit(EventEnum.IS_PAGE_LOADING, true);
+
 // custom event
 Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;

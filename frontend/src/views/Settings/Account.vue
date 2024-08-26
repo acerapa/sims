@@ -89,8 +89,11 @@ const searchText = ref();
  * EVENTS
  ** ================================================*/
 
+// Is page loading
+Event.emit(EventEnum.IS_PAGE_LOADING, true);
+
 // custom event
-Event.on("global-click", function () {
+Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });
 

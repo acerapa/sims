@@ -243,6 +243,9 @@ const model = ref({ ...modelDefualtValue });
  * EVENTS
  ** ================================================*/
 
+// is page loading event
+Event.emit(EventEnum.IS_PAGE_LOADING, true);
+
 // Custom global event
 const isCustomSelectFocused = ref(false);
 Event.on("custom-select-focus", function (data) {
