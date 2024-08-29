@@ -37,20 +37,48 @@
         @delete="onDeleteRow"
       />
       <template v-slot:filters>
-        <CustomSelectInput
-          placeholder="Account type"
-          v-model="filter.type"
-          :options="[
-            {
-              value: 'income',
-              text: 'Income',
-            },
-            {
-              value: 'expense',
-              text: 'Expense',
-            },
-          ]"
-        />
+        <div class="flex flex-col gap-3">
+          <div class="flex flex-col">
+            <small>Account Type</small>
+            <CustomSelectInput
+              placeholder="Account type"
+              v-model="filter.type"
+              :options="[
+                {
+                  value: 'income',
+                  text: 'Income',
+                },
+                {
+                  value: 'expense',
+                  text: 'Expense',
+                },
+              ]"
+            />
+          </div>
+          <div class="flex flex-col">
+            <small><b>Date Added</b></small>
+            <div class="flex gap-3">
+              <div class="flex flex-col">
+                <small>From</small>
+                <input
+                  type="date"
+                  class="input"
+                  v-model="dateAdded.from"
+                  @reset="dateAdded.from = ''"
+                />
+              </div>
+              <div class="flex flex-col">
+                <small>To</small>
+                <input
+                  type="date"
+                  class="input"
+                  v-model="dateAdded.to"
+                  @reset="dateAdded.to = ''"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </template>
     </CustomTable>
   </div>
@@ -68,6 +96,7 @@ import AccountTableHeader from "@/components/Settings/AccountTableHeader.vue";
 import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import Event from "@/event";
 import { EventEnum } from "@/data/event";
+import { DateHelpers } from "shared/helpers";
 
 const top = ref(0);
 const toDelete = ref();
@@ -84,6 +113,10 @@ const filter = ref({
 });
 
 const searchText = ref();
+const dateAdded = ref({
+  from: "",
+  to: "",
+});
 
 /** ================================================
  * EVENTS
@@ -112,6 +145,13 @@ const filteredData = computed(() => {
   return settingsStore.accounts
     .filter((account) =>
       filter.value.type ? account.type == filter.value.type : account
+    )
+    .filter((account) =>
+      DateHelpers.getRangeDates(
+        dateAdded.value.from,
+        dateAdded.value.to,
+        account.createdAt
+      )
     )
     .filter((account) => {
       const searchCondition =

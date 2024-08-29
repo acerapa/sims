@@ -80,7 +80,7 @@ Event.on(employeeRowEvent, function (data) {
 const filteredData = computed(() => {
   return employeeStore.employees.filter((employee) => {
     const searchCondition =
-      `${employee.id} ${employee.first_name} ${employee.last_name} ${employee.username} ${DateHelpers.formatDate(employee.date_started, "M/D/YYYY")} ${employee.position} ${DateHelpers.formatDate(employee.date_ended, "M/D/YYYY")}`.toLowerCase();
+      `${employee.id} ${employee.first_name} ${employee.last_name} ${employee.username} ${DateHelpers.formatDate(employee.date_started, "M/D/YYYY")} ${employee.position} ${employee.date_ended ? DateHelpers.formatDate(employee.date_ended, "M/D/YYYY") : ""}`.toLowerCase();
     return searchText.value
       ? searchCondition.includes(searchText.value.toLowerCase())
       : employee;
