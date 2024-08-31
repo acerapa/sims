@@ -60,7 +60,18 @@ export const useAuthStore = defineStore("auth", () => {
     return res;
   };
 
+  const logout = async () => {
+    localStorage.removeItem(LocalStorageKeys.ACCESS);
+    localStorage.removeItem(LocalStorageKeys.REFRESH);
+    localStorage.removeItem(LocalStorageKeys.CURRENT_USER);
+
+    accessToken.value = "";
+    refreshToken.value = "";
+    authUser.value = null;
+  };
+
   return {
+    logout,
     getTokens,
     getAuthUser,
     authenticate,
