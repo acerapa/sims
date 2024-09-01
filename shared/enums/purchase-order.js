@@ -17,6 +17,11 @@ const PurchaseOrderType = Object.freeze({
   COD: "cod",
 });
 
+const PhysicalInventoryStatus = Object.freeze({
+  DRAFT: "draft",
+  DONE: "done",
+});
+
 const PurchaseStatusMap = Object.freeze({
   [PurchaseOrderStatus.OPEN]: {
     text: "Open",
@@ -41,4 +46,5 @@ module.exports = {
   PurchaseStatusMap,
   PurchaseOrderStatus,
   ProductOrderedStatus,
+  PhysicalInventoryStatus,
 };

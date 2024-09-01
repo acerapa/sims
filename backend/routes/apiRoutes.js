@@ -18,11 +18,14 @@ router.use("/suppliers", supplierRoutes);
 const productRoutes = require("./ProductRoutes");
 router.use("/products", productRoutes);
 
-const purchaseOrderRoutes = require('./PurchaseOrderRoutes');
+const purchaseOrderRoutes = require("./PurchaseOrderRoutes");
 router.use("/purchase-order", purchaseOrderRoutes);
 
-const productSettingRoutes = require('./ProductSettingRoutes');
+const productSettingRoutes = require("./ProductSettingRoutes");
 router.use("/product-setting", productSettingRoutes);
+
+const physicalInventoryRoutes = require("./PhysicalInventoryRoutes");
+router.use("/physical-inventory", physicalInventoryRoutes);
 // end use routes
 
 module.exports = router;

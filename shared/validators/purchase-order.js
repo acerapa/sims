@@ -1,7 +1,10 @@
 const Joi = require("joi");
 const { AddressSchema } = require("./user");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
-const { ProductOrderedStatus } = require("./../enums/purchase-order");
+const {
+  ProductOrderedStatus,
+  PhysicalInventoryStatus,
+} = require("./../enums/purchase-order");
 
 const PurchaseOrderSchema = Joi.object({
   ref_no: Joi.string().required(),
@@ -47,9 +50,39 @@ const PurchaseOrderUpdateSchema = Joi.object({
   ),
 });
 
+// Physical Inventory
+const PhysicalInventorySchema = Joi.object({
+  date: Joi.date().required(),
+  status: Joi.string().valid(...Object.values(PhysicalInventoryStatus)),
+  remarks: Joi.string().optional(),
+});
+
+// Physical Inventory Item
+const PhysicalInventoryItemSchema = Joi.object({
+  id: Joi.number().optional(),
+  remarks: Joi.string().optional(),
+  quantity: Joi.number().required(),
+  product_id: Joi.number().required(),
+  item_description: Joi.string().optional(),
+  physical_inventory_id: Joi.number().required(),
+  physical_quantity: Joi.number().min(0).required(),
+});
+
+const PhysicalInventoryUpdateSchema = Joi.object({
+  physical_inventory: ValidatorHelpers.makeSchemaFieldOptional(
+    PhysicalInventorySchema
+  ),
+  items: ValidatorHelpers.makeSchemaFieldOptional(
+    Joi.array().items(PhysicalInventoryItemSchema).min(1)
+  ),
+});
+
 module.exports = {
   PurchaseOrderSchema,
   PurchaseProductSchema,
+  PhysicalInventorySchema,
   PurchaseOrderUpdateSchema,
   PurchaseOrderCreationSchema,
+  PhysicalInventoryItemSchema,
+  PhysicalInventoryUpdateSchema,
 };
