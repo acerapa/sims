@@ -11,7 +11,7 @@
     <p class="col-span-1 text-sm">{{ props.inventory.status }}</p>
     <div class="col-span-1 text-sm">
       <img
-        @click.stop=""
+        @click.stop="openMenu(props.inventory.id)"
         class="cursor-pointer menu-btn-trigger"
         src="@/assets/icons/vertical-menu.svg"
         alt=""
@@ -29,4 +29,10 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const emit = defineEmits(["openMenu"]);
+
+const openMenu = () => {
+  emit("openMenu", props.inventory.id);
+};
 </script>

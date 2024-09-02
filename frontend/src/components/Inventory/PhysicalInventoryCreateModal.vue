@@ -23,7 +23,9 @@ import CustomInput from "../shared/CustomInput.vue";
 import { authenticatedApi, Method } from "@/api";
 import { ref } from "vue";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const showModal = defineModel();
 const model = ref({
   date: "",
@@ -32,7 +34,6 @@ const model = ref({
 const physicalInventoryStore = usePhysicalInventoryStore();
 
 const onSubmit = async () => {
-  console.log("here");
   const res = await authenticatedApi(
     `physical-inventory/register`,
     Method.POST,
@@ -44,6 +45,12 @@ const onSubmit = async () => {
     await physicalInventoryStore.fetchAllPhysicalInventories();
 
     // TODO: Redirect to the details the form for the product items
+    router.push({
+      name: "physical-inventory-details",
+      params: {
+        id: res.data.physical_inventory.id,
+      },
+    });
   }
 
   // show errors here

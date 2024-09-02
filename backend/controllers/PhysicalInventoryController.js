@@ -14,11 +14,33 @@ module.exports = {
   register: async (req, res) => {
     try {
       const data = req.body.validated;
-      await PhysicalInventory.create(data);
+      const physicalInventory = await PhysicalInventory.create(data);
 
-      res.sendResponse({}, "Successfully created!", 200);
+      res.sendResponse(
+        { physical_inventory: physicalInventory },
+        "Successfully created!",
+        200
+      );
     } catch (e) {
       res.sendError(e, "Something wen't wrong", 400);
+    }
+  },
+
+  getOne: async (req, res) => {
+    try {
+      const physicalInventory = await PhysicalInventory.findOne({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      res.sendResponse(
+        { physical_inventory: physicalInventory },
+        "Successfully fetched!",
+        200
+      );
+    } catch (e) {
+      res.sendError(e, "Something wen't wrong!", 400);
     }
   },
 };
