@@ -55,7 +55,7 @@ export default [
         component: () =>
           import("@/views/Inventory/PhysicalInventoryDetails.vue"),
         meta: {
-          title: "Physical Inventory Details",
+          title: "Physical Inventory",
           requiresAuth: true,
         },
       },

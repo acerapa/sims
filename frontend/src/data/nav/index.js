@@ -34,6 +34,7 @@ export default [
         text: "Physical Inventory",
         route: "physical-inventory",
         icon: dot,
+        includes_active: ["physical-inventory-details"],
       },
     ],
   },

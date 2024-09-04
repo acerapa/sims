@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "backend": "yarn workspace backend dev",
-    "frontend": "yarn workspace frontend dev",
+    "frontend": "yarn rm-nm-vite && yarn re-install-shared && yarn workspace frontend dev",
     "shared": "yarn workspace shared",
     "rm-nm-vite": "rm -r frontend/node_modules/.vite",
     "re-install-shared": "yarn workspace backend add file:../shared && yarn workspace frontend add file:../shared",

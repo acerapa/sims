@@ -36,7 +36,7 @@
     </div>
 
     <!-- Navigations -->
-    <div class="mt-5 overflow-y-auto h-[calc(100vh-92px)]">
+    <div class="navigations py-5 overflow-y-auto h-[calc(100vh-72px)]">
       <NavRow
         v-for="(nav, ndx) in navs"
         :key="ndx"
@@ -134,5 +134,19 @@ getActiveRouteBasedIncludes(route);
 
 .dropdown-item {
   @apply hover:bg-blue-200 px-3 first:rounded-t last:rounded-b text-sm py-1;
+}
+
+.navigations::-webkit-scrollbar {
+  width: 10px;
+  background-color: rgb(21, 22, 91);
+}
+
+.navigations::-webkit-scrollbar-track {
+  background-color: #c3c1c1;
+}
+
+.navigations::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background-color: #787878;
 }
 </style>
