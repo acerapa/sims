@@ -1,4 +1,11 @@
 <template>
+  <DeleteConfirmModal
+    v-model="showDeleteConfirmModal"
+    v-if="showDeleteConfirmModal"
+    href="physical-inventory/delete"
+    :data="toDelete"
+    @after-delete="afterDelete"
+  />
   <PhysicalInventoryCreateModal
     v-model="showCreationModal"
     v-if="showCreationModal"
@@ -15,7 +22,12 @@
       :table-header-component="PhysicalInventoryTableHeader"
       @open-menu="onSelectRow"
     >
-      <RowMenu v-if="showRowMenu" :top="top" @view="onView" />
+      <RowMenu
+        v-if="showRowMenu"
+        :top="top"
+        @view="onView"
+        @delete="onDelete"
+      />
     </CustomTable>
   </div>
 </template>
@@ -31,12 +43,15 @@ import PhysicalInventoryCreateModal from "@/components/Inventory/PhysicalInvento
 import PhysicalInventoryTableHeader from "@/components/Inventory/PhysicalInventoryTableHeader.vue";
 import { EventEnum } from "@/data/event";
 import { useRouter } from "vue-router";
+import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 
 const top = ref(0);
+const toDelete = ref();
 const selectedId = ref(0);
 const router = useRouter();
 const showRowMenu = ref(false);
 const showCreationModal = ref(false);
+const showDeleteConfirmModal = ref(false);
 const physicalInventoryStore = usePhysicalInventoryStore();
 
 /** ================================================
@@ -78,6 +93,17 @@ const onView = () => {
   });
 };
 
+const onDelete = () => {
+  toDelete.value = {
+    id: selectedId.value,
+  };
+  showDeleteConfirmModal.value = true;
+};
+
+const afterDelete = async () => {
+  showDeleteConfirmModal.value = false;
+  await physicalInventoryStore.fetchAllPhysicalInventories();
+};
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/

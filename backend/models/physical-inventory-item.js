@@ -13,6 +13,10 @@ PhysicalInventoryItem.init(
       autoIncrement: true,
       primaryKey: true,
     },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     item_description: {
       type: DataTypes.STRING,
       allowNull: true,

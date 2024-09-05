@@ -335,5 +335,16 @@ POST http://localhost:3000/api/physical-inventory/register
 Content-Type: application/json
 Accept: application/json
 
-{}
+{
+	"physical_inventory": {},
+	"items": []
+}
 
+### [Physical Inventory Routes delete]
+DELETE http://localhost:3000/api/physical-inventory/delete
+Content-Type: application/json
+Accept: application/json
+
+{
+	"id": 1
+}

@@ -47,6 +47,15 @@ select.input {
   @apply font-semibold text-base whitespace-nowrap;
 }
 
+.gen-table-row {
+  padding: 4px 0px;
+}
+
+.gen-table-row:hover {
+  border-radius: 2px;
+  background-color: #eff6ff;
+}
+
 
 /*=====================================================
  * Button Related Styling

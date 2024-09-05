@@ -60,12 +60,18 @@ const PhysicalInventorySchema = Joi.object({
 // Physical Inventory Item
 const PhysicalInventoryItemSchema = Joi.object({
   id: Joi.number().optional(),
-  remarks: Joi.string().optional(),
+  name: Joi.string().required(),
   quantity: Joi.number().required(),
   product_id: Joi.number().required(),
-  item_description: Joi.string().optional(),
+  remarks: Joi.string().min(0).optional(),
   physical_inventory_id: Joi.number().required(),
+  item_description: Joi.string().min(0).optional(),
   physical_quantity: Joi.number().min(0).required(),
+});
+
+const PhysicalInventoryCreateSchema = Joi.object({
+  physical_inventory: PhysicalInventorySchema.required(),
+  items: Joi.array().items(PhysicalInventoryItemSchema).min(1),
 });
 
 const PhysicalInventoryUpdateSchema = Joi.object({
@@ -85,4 +91,5 @@ module.exports = {
   PurchaseOrderCreationSchema,
   PhysicalInventoryItemSchema,
   PhysicalInventoryUpdateSchema,
+  PhysicalInventoryCreateSchema,
 };

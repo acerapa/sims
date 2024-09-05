@@ -41,10 +41,22 @@ const PurchaseStatusMap = Object.freeze({
   },
 });
 
+const PhysicalInventoryStatusMap = {
+  [PhysicalInventoryStatus.DRAFT]: {
+    text: "Draft",
+    class: "draft",
+  },
+  [PhysicalInventoryStatus.DONE]: {
+    text: "Done",
+    class: "done",
+  },
+};
+
 module.exports = {
   PurchaseOrderType,
   PurchaseStatusMap,
   PurchaseOrderStatus,
   ProductOrderedStatus,
   PhysicalInventoryStatus,
+  PhysicalInventoryStatusMap,
 };

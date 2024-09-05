@@ -10,7 +10,7 @@
         placeholder="Date"
         type="date"
         :has-label="true"
-        v-model="model.date"
+        v-model="model.physical_inventory.date"
         label="Physical Inventory for date?"
       />
     </div>
@@ -24,16 +24,35 @@ import { authenticatedApi, Method } from "@/api";
 import { ref } from "vue";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
 import { useRouter } from "vue-router";
+import { useProductStore } from "@/stores/product";
 
+const items = ref([]);
 const router = useRouter();
 const showModal = defineModel();
 const model = ref({
-  date: "",
+  physical_inventory: {
+    date: "",
+  },
+  items: [],
 });
 
+const productStore = useProductStore();
 const physicalInventoryStore = usePhysicalInventoryStore();
 
 const onSubmit = async () => {
+  await productStore.fetchAllProducts();
+  model.value.items = productStore.products.map((product) => {
+    return {
+      product_id: product.id,
+      name: product.name,
+      item_description: product.purchase_description || "",
+      quantity: product.quantity_in_stock,
+      physical_quantity: 0,
+      remarks: "",
+      physical_inventory_id: 0,
+    };
+  });
+
   const res = await authenticatedApi(
     `physical-inventory/register`,
     Method.POST,

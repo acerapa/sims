@@ -10,7 +10,9 @@
         </div>
         <BadgeComponent
           :text="PhysicalInventoryStatusMap[physicalInventory.status].text"
-          :class="PhysicalInventoryStatusMap[physicalInventory.status].class"
+          :custom-class="
+            PhysicalInventoryStatusMap[physicalInventory.status].class
+          "
         />
       </div>
     </div>
@@ -19,27 +21,40 @@
       :has-add-btn="false"
       :data="filteredData"
       :has-pagination="true"
-      :table-row-component="PhysicalInventoryRow"
+      v-model:search-text="seachText"
+      :row-prop-init="physicalItemInitRow"
+      :table-row-component="PhysicalInventoryItemRow"
       :table-header-component="PhysicalInventoryItemHeader"
-    ></CustomTable>
+      @open-menu="onSelectRow"
+    >
+      <RowMenu v-if="showRowMenu" :top="top" />
+    </CustomTable>
   </div>
 </template>
 
 <script setup>
 import Event from "@/event";
-import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { EventEnum } from "@/data/event";
 import { DateHelpers } from "shared/helpers";
+import { computed, onMounted, ref } from "vue";
+import { useProductStore } from "@/stores/product";
+import RowMenu from "@/components/shared/RowMenu.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import BadgeComponent from "@/components/shared/BadgeComponent.vue";
 import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
-import PhysicalInventoryRow from "@/components/Inventory/PhysicalInventoryRow.vue";
+import PhysicalInventoryItemRow from "@/components/Inventory/PhysicalInventoryItemRow.vue";
 import PhysicalInventoryItemHeader from "@/components/Inventory/PhysicalInventoryItemHeader.vue";
 
+const top = ref(0);
+const items = ref([]);
 const route = useRoute();
+const selectedId = ref();
+const searchText = ref("");
+const showRowMenu = ref(false);
 const physicalInventory = ref();
+const productStore = useProductStore();
 const physicalInventoryStore = usePhysicalInventoryStore();
 
 const PhysicalInventoryStatusMap = {
@@ -58,12 +73,37 @@ const PhysicalInventoryStatusMap = {
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true);
 
+Event.on(EventEnum.GLOBAL_CLICK, function () {
+  showRowMenu.value = false;
+});
+
+const physicalItemInitRow = "physical-item-init-row";
+Event.on(physicalItemInitRow, function (data) {
+  return { item: data };
+});
+
 /** ================================================
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return [];
+  return items.value.filter((item) => {
+    return productStore.products
+      .filter((product) => {
+        return product;
+      })
+      .map((product) => product.id)
+      .includes(item.product_id);
+  });
 });
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const onSelectRow = (id) => {
+  top.value = event.target.offsetTop;
+  selectedId.value = id;
+  showRowMenu.value = true;
+};
 
 /** ================================================
  * LIFE CYCLE HOOKS
@@ -72,7 +112,10 @@ onMounted(async () => {
   if (route.params.id) {
     await physicalInventoryStore.fetchOne(route.params.id);
     physicalInventory.value = physicalInventoryStore.physicalInventory;
+    items.value = physicalInventory.value.items;
   }
+
+  await productStore.fetchAllProducts();
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });

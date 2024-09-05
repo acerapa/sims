@@ -1,4 +1,6 @@
+const { sequelize } = require("../models");
 const PhysicalInventory = require("../models/physical-inventory");
+const PhysicalInventoryItem = require("../models/physical-inventory-item");
 
 module.exports = {
   all: async (req, res) => {
@@ -12,9 +14,31 @@ module.exports = {
   },
 
   register: async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      const physicalInventory = await PhysicalInventory.create(data);
+      let physicalInventory = null;
+      if (data.physical_inventory) {
+        physicalInventory = await PhysicalInventory.create(
+          data.physical_inventory,
+          {
+            transaction: transaction,
+          }
+        );
+      }
+
+      if (physicalInventory && data.items) {
+        await Promise.all(
+          data.items.map((item) => {
+            item.physical_inventory_id = physicalInventory.id;
+            return PhysicalInventoryItem.create(item, {
+              transaction: transaction,
+            });
+          })
+        );
+      }
+
+      await transaction.commit();
 
       res.sendResponse(
         { physical_inventory: physicalInventory },
@@ -22,6 +46,7 @@ module.exports = {
         200
       );
     } catch (e) {
+      await transaction.rollback();
       res.sendError(e, "Something wen't wrong", 400);
     }
   },
@@ -32,6 +57,12 @@ module.exports = {
         where: {
           id: req.params.id,
         },
+        include: [
+          {
+            model: PhysicalInventoryItem,
+            as: "items",
+          },
+        ],
       });
 
       res.sendResponse(
@@ -41,6 +72,19 @@ module.exports = {
       );
     } catch (e) {
       res.sendError(e, "Something wen't wrong!", 400);
+    }
+  },
+
+  destroy: async (req, res) => {
+    try {
+      await PhysicalInventory.destroy({
+        where: {
+          id: req.body.id,
+        },
+      });
+      res.sendResponse({}, "Successfully deleted!", 200);
+    } catch (e) {
+      res.sendError(e, "Something wen't wrong! => " + e.message);
     }
   },
 };
