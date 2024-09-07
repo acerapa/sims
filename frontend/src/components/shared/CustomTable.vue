@@ -69,7 +69,10 @@
       <slot></slot>
 
       <!-- Table Header -->
-      <component :is="props.tableHeaderComponent" />
+      <component
+        :is="props.tableHeaderComponent"
+        :has-check-box="props.hasCheckBox"
+      />
       <slot v-if="!props.tableHeaderComponent" name="table_header"></slot>
 
       <!-- Table Body -->
@@ -83,6 +86,7 @@
           v-for="(item, ndx) in items"
           :key="ndx"
           v-bind="Event.emit(props.rowPropInit, item)"
+          :has-check-box="props.hasCheckBox"
           @open-menu="
             (data) => {
               emit('open-menu', data);
@@ -135,6 +139,10 @@ const props = defineProps({
   hasFilter: {
     type: Boolean,
     default: false,
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: true,
   },
   tableHeaderComponent: {
     type: Object,

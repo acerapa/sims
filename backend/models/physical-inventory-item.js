@@ -1,4 +1,4 @@
-const { DataTypes, Model } = require("sequelize");
+const { DataTypes, Model, BOOLEAN } = require("sequelize");
 const { sequelize } = require(".");
 const {} = require("./physical-inventory");
 const PhysicalInventory = require("./physical-inventory");
@@ -40,6 +40,10 @@ PhysicalInventoryItem.init(
         model: Product,
         key: "id",
       },
+    },
+    is_done: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     physical_inventory_id: {
       type: DataTypes.INTEGER,

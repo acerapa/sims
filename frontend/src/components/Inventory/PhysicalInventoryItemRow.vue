@@ -1,12 +1,12 @@
 <template>
-  <div class="grid grid-cols-9 gap-3 min-w-[760px] gen-table-row">
+  <div class="grid grid-cols-11 gap-3 min-w-[760px] gen-table-row">
     <div class="col-span-1 flex gap-3 items-center">
-      <input type="checkbox" class="input" />
+      <input type="checkbox" class="input" v-if="hasCheckBox" />
       <p class="text-sm">{{ props.item.id }}</p>
     </div>
-    <p class="col-span-1 text-sm">{{ props.item.name }}</p>
-    <p class="col-span-2 text-sm">{{ props.item.item_description }}</p>
-    <p class="col-span-1 text-sm">{{ props.item.quantity }}</p>
+    <p class="col-span-2 text-sm py-2">{{ props.item.name }}</p>
+    <p class="col-span-3 text-sm py-2">{{ props.item.item_description }}</p>
+    <p class="col-span-1 text-sm py-2">{{ props.item.quantity }}</p>
     <div class="col-span-1">
       <input class="text-sm input w-full min-w-0" placeholder="Quantity" />
     </div>
@@ -16,12 +16,11 @@
         placeholder="Remarks"
       ></textarea>
     </div>
-    <div class="col-span-1 text-sm">
-      <img
-        @click.stop="openMenu(props.item.id)"
-        class="cursor-pointer menu-btn-trigger"
-        src="@/assets/icons/vertical-menu.svg"
-        alt=""
+    <div class="col-span-1 flex items-center">
+      <input
+        type="checkbox"
+        class="w-4 h-4"
+        @change="onCheckItem(props.item.id)"
       />
     </div>
   </div>
@@ -33,11 +32,15 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  hasCheckBox: {
+    type: Boolean,
+  },
 });
 
-const emit = defineEmits(["openMenu"]);
+const onCheckItem = async (id) => {
+  // TODO: Call api to update the "is_done" status
+  // of the item
 
-const openMenu = (id) => {
-  emit("openMenu", id);
+  console.log("Inprogress => " + id);
 };
 </script>
