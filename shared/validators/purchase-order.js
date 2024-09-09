@@ -76,9 +76,7 @@ const PhysicalInventoryCreateSchema = Joi.object({
 });
 
 const PhysicalInventoryItemUpdateSchema =
-  ValidatorHelpers.makeSchemaFieldOptional(
-    Joi.array().items(PhysicalInventoryItemSchema).min(1)
-  );
+  ValidatorHelpers.makeSchemaFieldOptional(PhysicalInventoryItemSchema);
 
 const PhysicalInventoryUpdateSchema = Joi.object({
   physical_inventory: ValidatorHelpers.makeSchemaFieldOptional(

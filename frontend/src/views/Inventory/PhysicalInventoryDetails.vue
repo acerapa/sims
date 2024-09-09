@@ -28,7 +28,35 @@
       :table-header-component="PhysicalInventoryItemHeader"
       @open-menu="onSelectRow"
     >
-      <RowMenu v-if="showRowMenu" :top="top" />
+      <template v-slot:filters>
+        <CustomInput
+          type="select"
+          label="Status"
+          :has-label="true"
+          name="status-filter"
+          placeholder="Status"
+          :options="[
+            { text: 'Checked', value: true },
+            { text: 'Unchecked', value: false },
+          ]"
+          v-model="filters.status"
+        />
+      </template>
+      <RowMenu
+        :has-delete="false"
+        :has-view="false"
+        v-if="showRowMenu"
+        :top="top"
+      >
+        <button
+          class="row-menu-item"
+          v-if="!isItemChecked"
+          @click="onItemUpdate"
+        >
+          Mark as Done
+        </button>
+        <button class="row-menu-item" v-else @click="onEditItem">Edit</button>
+      </RowMenu>
     </CustomTable>
   </div>
 </template>
@@ -42,6 +70,7 @@ import { computed, onMounted, ref } from "vue";
 import { useProductStore } from "@/stores/product";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import BadgeComponent from "@/components/shared/BadgeComponent.vue";
 import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
@@ -55,9 +84,13 @@ const selectedId = ref();
 const searchText = ref("");
 const showRowMenu = ref(false);
 const physicalInventory = ref();
+const isItemChecked = ref(false);
 const productStore = useProductStore();
 const physicalInventoryStore = usePhysicalInventoryStore();
 
+const filters = ref({
+  status: "",
+});
 const PhysicalInventoryStatusMap = {
   [PhysicalInventoryStatus.DRAFT]: {
     text: "Draft",
@@ -87,23 +120,42 @@ Event.on(physicalItemInitRow, function (data) {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return items.value.filter((item) => {
-    return productStore.products
-      .filter((product) => {
-        return product;
-      })
-      .map((product) => product.id)
-      .includes(item.product_id);
-  });
+  return items.value
+    .filter((item) => {
+      const status = filters.value.status;
+      return status !== "" ? item.is_done == status : item;
+    })
+    .filter((item) => {
+      return productStore.products
+        .filter((product) => {
+          const searchCondition =
+            `${product.id} ${product.name} ${product.quantity_in_stock} ${product.purchase_description}`.toLowerCase();
+
+          return searchText.value
+            ? searchCondition.includes(searchText.value.toLowerCase())
+            : product;
+        })
+        .map((product) => product.id)
+        .includes(item.product_id);
+    });
 });
 
 /** ================================================
  * METHODS
  ** ================================================*/
-const onSelectRow = (id) => {
+const onSelectRow = (data) => {
   top.value = event.target.offsetTop;
-  selectedId.value = id;
+  selectedId.value = data.id;
   showRowMenu.value = true;
+  isItemChecked.value = data.is_done;
+};
+
+const onEditItem = async () => {
+  Event.emit(`${EventEnum.PI_ITEM_EDIT}-${selectedId.value}`);
+};
+
+const onItemUpdate = async () => {
+  Event.emit(`${EventEnum.PI_ITEM_UPDATE}-${selectedId.value}`);
 };
 
 /** ================================================

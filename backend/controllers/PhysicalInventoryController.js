@@ -87,4 +87,19 @@ module.exports = {
       res.sendError(e, "Something wen't wrong! => " + e.message);
     }
   },
+  updateItem: async (req, res) => {
+    try {
+      // TODO: Need to create a script to update the PhysicalInventoryItem by id
+      const data = req.body.validated;
+      await PhysicalInventoryItem.update(data, {
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      res.sendResponse({}, "Successfully updated!", 200);
+    } catch (e) {
+      res.sendError(e, "Something wen't wrong! => " + e.message);
+    }
+  },
 };

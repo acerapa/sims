@@ -1,4 +1,4 @@
-import { authenticatedApi } from "@/api";
+import { authenticatedApi, Method } from "@/api";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -27,10 +27,21 @@ export const usePhysicalInventoryStore = defineStore(
       return physicalInventory.value;
     };
 
+    const updateItem = async (id, model) => {
+      const res = await authenticatedApi(
+        `physical-inventory/item/${id}`,
+        Method.POST,
+        model
+      );
+
+      return res;
+    };
+
     return {
       physicalInventory,
       physicalInventories,
       fetchOne,
+      updateItem,
       fetchAllPhysicalInventories,
     };
   }

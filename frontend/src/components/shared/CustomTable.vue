@@ -83,8 +83,8 @@
       >
         <component
           :is="props.tableRowComponent"
-          v-for="(item, ndx) in items"
-          :key="ndx"
+          v-for="item in items"
+          :key="item.hasOwnProperty('id') ? item.id : item"
           v-bind="Event.emit(props.rowPropInit, item)"
           :has-check-box="props.hasCheckBox"
           @open-menu="
