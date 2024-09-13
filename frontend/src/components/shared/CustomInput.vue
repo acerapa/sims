@@ -15,6 +15,7 @@
       @input="emit('input')"
       @focus="emit('focus')"
       @change="emit('change')"
+      @reset="emit('reset')"
     />
     <small class="error" v-if="props.error">{{ props.error }}</small>
   </div>
@@ -30,6 +31,7 @@
       @input="emit('input')"
       @focus="emit('focus')"
       @change="emit('change')"
+      @reset="emit('reset')"
     ></textarea>
     <small class="error" v-if="props.error">{{ props.error }}</small>
   </div>
@@ -48,6 +50,7 @@
       @input="emit('input')"
       @focus="emit('focus')"
       @change="emit('change')"
+      @reset="emit('reset')"
     />
   </div>
 </template>
@@ -114,7 +117,7 @@ if (props.type == "select" && !props.options) {
 }
 
 const value = defineModel();
-const emit = defineEmits(["focus", "change", "input"]);
+const emit = defineEmits(["focus", "change", "input", "reset"]);
 </script>
 
 <style scoped>

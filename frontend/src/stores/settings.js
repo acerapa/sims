@@ -33,10 +33,24 @@ export const useSettingsStore = defineStore("settings", () => {
     return res.data.productReorderingPoints;
   };
 
+  const categoryOption = async () => {
+    const cats = productCategories.value.length
+      ? productCategories.value
+      : await fetchAllProductCategories();
+
+    return cats.map((category) => {
+      return {
+        text: category.name,
+        value: category.id,
+      };
+    });
+  };
+
   return {
     accounts,
     productCategories,
     productReorderingPoints,
+    categoryOption,
     fetchAllAccounts,
     fetchAllProductCategories,
     fetchAllProductReorderingPoints,
