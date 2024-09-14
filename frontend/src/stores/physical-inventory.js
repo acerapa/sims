@@ -37,11 +37,27 @@ export const usePhysicalInventoryStore = defineStore(
       return res;
     };
 
+    const getGroupedItems = async (id) => {
+      if (!physicalInventory.value || physicalInventory.value.id == id) {
+        await fetchOne(id);
+      }
+
+      const physicalInventoryCopy = { ...physicalInventory.value };
+
+      physicalInventoryCopy.grouped_items = Object.groupBy(
+        physicalInventory.value.items,
+        ({ product }) => product.category_id
+      );
+
+      return physicalInventoryCopy;
+    };
+
     return {
       physicalInventory,
       physicalInventories,
       fetchOne,
       updateItem,
+      getGroupedItems,
       fetchAllPhysicalInventories,
     };
   }

@@ -163,8 +163,9 @@ const onItemUpdate = async () => {
  ** ================================================*/
 onMounted(async () => {
   if (route.params.id) {
-    await physicalInventoryStore.fetchOne(route.params.id);
-    physicalInventory.value = physicalInventoryStore.physicalInventory;
+    physicalInventory.value = await physicalInventoryStore.getGroupedItems(
+      route.params.id
+    );
     items.value = physicalInventory.value.items;
   }
 

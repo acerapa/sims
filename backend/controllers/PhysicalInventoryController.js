@@ -1,6 +1,7 @@
 const { sequelize } = require("../models");
 const PhysicalInventory = require("../models/physical-inventory");
 const PhysicalInventoryItem = require("../models/physical-inventory-item");
+const Product = require("../models/product");
 
 module.exports = {
   all: async (req, res) => {
@@ -57,12 +58,14 @@ module.exports = {
         where: {
           id: req.params.id,
         },
-        include: [
-          {
-            model: PhysicalInventoryItem,
-            as: "items",
+        include: {
+          model: PhysicalInventoryItem,
+          as: "items",
+          include: {
+            model: Product,
+            as: "product",
           },
-        ],
+        },
       });
 
       res.sendResponse(

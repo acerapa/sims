@@ -44,11 +44,7 @@ const onSubmit = async () => {
   model.value.items = productStore.products.map((product) => {
     return {
       product_id: product.id,
-      name: product.name,
-      item_description: product.purchase_description || "",
-      quantity: product.quantity_in_stock,
       physical_quantity: 0,
-      remarks: "",
       physical_inventory_id: 0,
     };
   });

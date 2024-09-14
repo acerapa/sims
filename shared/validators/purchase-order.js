@@ -60,13 +60,8 @@ const PhysicalInventorySchema = Joi.object({
 // Physical Inventory Item
 const PhysicalInventoryItemSchema = Joi.object({
   id: Joi.number().optional(),
-  name: Joi.string().required(),
-  is_done: Joi.bool().optional(),
-  quantity: Joi.number().required(),
   product_id: Joi.number().required(),
-  remarks: Joi.string().min(0).optional(),
   physical_inventory_id: Joi.number().required(),
-  item_description: Joi.string().min(0).optional(),
   physical_quantity: Joi.number().min(0).required(),
 });
 
