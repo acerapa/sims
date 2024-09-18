@@ -52,6 +52,50 @@ module.exports = {
     }
   },
 
+  update: async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+      const data = req.body.validated;
+
+      const physicalInventory = await PhysicalInventory.findOne({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      if (physicalInventory) {
+        if (data.physical_inventory) {
+          await physicalInventory.update(data.physical_inventory, {
+            transaction: transaction,
+          });
+        }
+
+        if (data.items) {
+          await Promise.all([
+            data.items.map((item) => {
+              const item_copy = { ...item };
+              delete item_copy;
+              return PhysicalInventoryItem.update(item_copy, {
+                where: {
+                  id: item.id,
+                },
+                transaction: transaction,
+              });
+            }),
+          ]);
+        }
+      } else {
+        throw "Not found!";
+      }
+
+      await transaction.commit();
+      res.sendResponse({}, "Successfully Updated", 200);
+    } catch (e) {
+      await transaction.rollback();
+      res.sendError(e, "Something went wrong!", 400);
+    }
+  },
+
   getOne: async (req, res) => {
     try {
       const physicalInventory = await PhysicalInventory.findOne({
@@ -90,6 +134,7 @@ module.exports = {
       res.sendError(e, "Something wen't wrong! => " + e.message);
     }
   },
+
   updateItem: async (req, res) => {
     try {
       // TODO: Need to create a script to update the PhysicalInventoryItem by id

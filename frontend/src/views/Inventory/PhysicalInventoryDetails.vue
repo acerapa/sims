@@ -17,17 +17,22 @@
       </div>
     </div>
     <CustomTable
+      :is-nested="true"
       :has-filter="true"
       :has-add-btn="false"
       :data="filteredData"
       :has-check-box="false"
-      :has-pagination="true"
+      :has-pagination="false"
+      class="[&>.table-wrapper]:sticky [&>.table-wrapper]:top-[84px] [&>.table-wrapper]:z-10 [&>.table-wrapper]:py-0"
       v-model:search-text="searchText"
       :row-prop-init="physicalItemInitRow"
       :table-row-component="PhysicalInventoryItemRow"
       :table-header-component="PhysicalInventoryItemHeader"
       @open-menu="onSelectRow"
     >
+      <template v-slot:buttons>
+        <button class="btn !bg-success" @click="onSubmit">Submit</button>
+      </template>
       <template v-slot:filters>
         <CustomInput
           type="select"
@@ -42,21 +47,22 @@
           v-model="filters.status"
         />
       </template>
-      <RowMenu
-        :has-delete="false"
-        :has-view="false"
-        v-if="showRowMenu"
-        :top="top"
-      >
-        <button
-          class="row-menu-item"
-          v-if="!isItemChecked"
-          @click="onItemUpdate"
-        >
-          Mark as Done
-        </button>
-        <button class="row-menu-item" v-else @click="onEditItem">Edit</button>
-      </RowMenu>
+      <template v-slot:tables>
+        <div class="flex flex-col gap-3 relative z-0" v-if="physicalInventory">
+          <CustomTable
+            v-for="(items, ndx) in physicalInventory.grouped_items"
+            :key="ndx"
+            :data="items"
+            :has-tools="false"
+            :has-add-btn="false"
+            :has-filter="true"
+            :has-check-box="false"
+            :row-prop-init="physicalItemInitRow"
+            :table-row-component="PhysicalInventoryItemRow"
+            :title="settingStore.getProductCategoryByIdSync(ndx).name"
+          ></CustomTable>
+        </div>
+      </template>
     </CustomTable>
   </div>
 </template>
@@ -68,7 +74,6 @@ import { EventEnum } from "@/data/event";
 import { DateHelpers } from "shared/helpers";
 import { computed, onMounted, ref } from "vue";
 import { useProductStore } from "@/stores/product";
-import RowMenu from "@/components/shared/RowMenu.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import CustomInput from "@/components/shared/CustomInput.vue";
 import BadgeComponent from "@/components/shared/BadgeComponent.vue";
@@ -76,6 +81,7 @@ import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
 import PhysicalInventoryItemRow from "@/components/Inventory/PhysicalInventoryItemRow.vue";
 import PhysicalInventoryItemHeader from "@/components/Inventory/PhysicalInventoryItemHeader.vue";
+import { useSettingsStore } from "@/stores/settings";
 
 const top = ref(0);
 const items = ref([]);
@@ -86,11 +92,9 @@ const showRowMenu = ref(false);
 const physicalInventory = ref();
 const isItemChecked = ref(false);
 const productStore = useProductStore();
+const settingStore = useSettingsStore();
 const physicalInventoryStore = usePhysicalInventoryStore();
 
-const filters = ref({
-  status: "",
-});
 const PhysicalInventoryStatusMap = {
   [PhysicalInventoryStatus.DRAFT]: {
     text: "Draft",
@@ -120,24 +124,19 @@ Event.on(physicalItemInitRow, function (data) {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return items.value
-    .filter((item) => {
-      const status = filters.value.status;
-      return status !== "" ? item.is_done == status : item;
-    })
-    .filter((item) => {
-      return productStore.products
-        .filter((product) => {
-          const searchCondition =
-            `${product.id} ${product.name} ${product.quantity_in_stock} ${product.purchase_description}`.toLowerCase();
+  return items.value.filter((item) => {
+    return productStore.products
+      .filter((product) => {
+        const searchCondition =
+          `${product.id} ${product.name} ${product.quantity_in_stock} ${product.purchase_description}`.toLowerCase();
 
-          return searchText.value
-            ? searchCondition.includes(searchText.value.toLowerCase())
-            : product;
-        })
-        .map((product) => product.id)
-        .includes(item.product_id);
-    });
+        return searchText.value
+          ? searchCondition.includes(searchText.value.toLowerCase())
+          : product;
+      })
+      .map((product) => product.id)
+      .includes(item.product_id);
+  });
 });
 
 /** ================================================
@@ -150,26 +149,27 @@ const onSelectRow = (data) => {
   isItemChecked.value = data.is_done;
 };
 
-const onEditItem = async () => {
-  Event.emit(`${EventEnum.PI_ITEM_EDIT}-${selectedId.value}`);
-};
-
-const onItemUpdate = async () => {
-  Event.emit(`${EventEnum.PI_ITEM_UPDATE}-${selectedId.value}`);
+const onSubmit = async () => {
+  await physicalInventoryStore.update(physicalInventory.value.id, {
+    physical_inventory: {
+      status: PhysicalInventoryStatus.DONE,
+    },
+  });
 };
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
+  await productStore.fetchAllProducts();
+  await settingStore.fetchAllProductCategories();
+
   if (route.params.id) {
     physicalInventory.value = await physicalInventoryStore.getGroupedItems(
       route.params.id
     );
     items.value = physicalInventory.value.items;
   }
-
-  await productStore.fetchAllProducts();
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });

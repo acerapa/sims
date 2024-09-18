@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-10 gap-3 min-w-[1032px]">
+  <div class="grid grid-cols-10 gap-3 pl-10">
     <div class="col-span-2 flex gap-3 items-center">
       <input type="checkbox" class="input" v-if="props.hasCheckBox" />
       <p class="table-header">#</p>

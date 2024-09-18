@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-10 gap-3 min-w-[1032px] gen-table-row !py-0">
+  <div class="grid grid-cols-10 gap-3 gen-table-row !py-0 !pl-10">
     <div class="col-span-2 flex gap-3 items-center">
       <input type="checkbox" class="input" v-if="hasCheckBox" />
       <p class="text-sm">{{ props.item.id }}</p>
@@ -16,6 +16,7 @@
         v-model="model.physical_quantity"
         placeholder="Quantity"
         input-class="bg-transparent"
+        @change="onQuantityChange"
       />
     </div>
   </div>
@@ -23,9 +24,7 @@
 
 <script setup>
 import { ref } from "vue";
-import Event from "@/event";
 import CustomInput from "../shared/CustomInput.vue";
-import { EventEnum } from "@/data/event";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
 
 const props = defineProps({
@@ -38,8 +37,6 @@ const props = defineProps({
   },
 });
 
-const isEdit = ref(false);
-
 const model = ref({
   physical_quantity: props.item.physical_quantity,
 });
@@ -50,27 +47,15 @@ const physicalInventoryStore = usePhysicalInventoryStore();
  * EVENTS
  ** ================================================*/
 
-// On edit item
-Event.on(`${EventEnum.PI_ITEM_EDIT}-${props.item.id}`, function () {
-  isEdit.value = true;
-});
-
-// On update item
-Event.on(`${EventEnum.PI_ITEM_UPDATE}-${props.item.id}`, async function () {
-  model.value.is_done = true;
-  const res = await physicalInventoryStore.updateItem(
-    props.item.id,
-    model.value
-  );
-
-  if (res.status == 200) {
-    const physical_inventory_id = physicalInventoryStore.physicalInventory.id;
-    await physicalInventoryStore.fetchOne(physical_inventory_id);
-    isEdit.value = false;
-  }
-});
-
 /** ================================================
  * METHODS
  ** ================================================*/
+const onQuantityChange = async () => {
+  if (model.value.physical_quantity != props.item.physical_quantity) {
+    await physicalInventoryStore.updateItem(props.item.id, model.value);
+    await physicalInventoryStore.getGroupedItems(
+      physicalInventoryStore.physicalInventory.id
+    );
+  }
+};
 </script>

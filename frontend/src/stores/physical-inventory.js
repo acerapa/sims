@@ -27,6 +27,16 @@ export const usePhysicalInventoryStore = defineStore(
       return physicalInventory.value;
     };
 
+    const update = async (id, model) => {
+      const res = await authenticatedApi(
+        `physical-inventory/update/${id}`,
+        Method.POST,
+        model
+      );
+
+      return res;
+    };
+
     const updateItem = async (id, model) => {
       const res = await authenticatedApi(
         `physical-inventory/item/${id}`,
@@ -55,6 +65,7 @@ export const usePhysicalInventoryStore = defineStore(
     return {
       physicalInventory,
       physicalInventories,
+      update,
       fetchOne,
       updateItem,
       getGroupedItems,

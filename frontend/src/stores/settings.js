@@ -46,6 +46,21 @@ export const useSettingsStore = defineStore("settings", () => {
     });
   };
 
+  const getProductCategoryByIdSync = (id) => {
+    return productCategories.value.find((cat) => cat.id == id);
+  };
+
+  const getProductCategoryByIdAsync = async (id) => {
+    let category = getProductCategoryByIdSync(id);
+
+    if (!category) {
+      await fetchAllProductCategories();
+      category = getProductCategoryByIdSync(id);
+    }
+
+    return category;
+  };
+
   return {
     accounts,
     productCategories,
@@ -53,6 +68,8 @@ export const useSettingsStore = defineStore("settings", () => {
     categoryOption,
     fetchAllAccounts,
     fetchAllProductCategories,
+    getProductCategoryByIdSync,
+    getProductCategoryByIdAsync,
     fetchAllProductReorderingPoints,
   };
 });
