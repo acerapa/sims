@@ -6,7 +6,8 @@
   "module": "module",
   "scripts": {
     "dev": "nodemon app.js",
-    "sequlize": "npx sequelize-cli"
+    "sequlize": "npx sequelize-cli",
+    "install-shared": "yarn add file:../shared"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
