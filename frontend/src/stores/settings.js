@@ -33,12 +33,43 @@ export const useSettingsStore = defineStore("settings", () => {
     return res.data.productReorderingPoints;
   };
 
+  const categoryOption = async () => {
+    const cats = productCategories.value.length
+      ? productCategories.value
+      : await fetchAllProductCategories();
+
+    return cats.map((category) => {
+      return {
+        text: category.name,
+        value: category.id,
+      };
+    });
+  };
+
+  const getProductCategoryByIdSync = (id) => {
+    return productCategories.value.find((cat) => cat.id == id);
+  };
+
+  const getProductCategoryByIdAsync = async (id) => {
+    let category = getProductCategoryByIdSync(id);
+
+    if (!category) {
+      await fetchAllProductCategories();
+      category = getProductCategoryByIdSync(id);
+    }
+
+    return category;
+  };
+
   return {
     accounts,
     productCategories,
     productReorderingPoints,
+    categoryOption,
     fetchAllAccounts,
     fetchAllProductCategories,
+    getProductCategoryByIdSync,
+    getProductCategoryByIdAsync,
     fetchAllProductReorderingPoints,
   };
 });

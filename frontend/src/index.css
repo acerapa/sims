@@ -32,15 +32,28 @@ select.input {
   @apply disabled:appearance-none;
 }
 
+.cont {
+  @apply bg-white p-4 shadow rounded-2xl;
+}
+
 /*=====================================================
  * Table Related Styling
  ======================================================*/
 .table-wrapper {
-  @apply rounded-2xl shadow bg-white p-4 flex flex-col gap-4;
+  @apply cont flex flex-col gap-4;
 }
 
 .table-header {
   @apply font-semibold text-base whitespace-nowrap;
+}
+
+.gen-table-row {
+  padding: 4px 0px;
+}
+
+.gen-table-row:hover {
+  border-radius: 2px;
+  background-color: #eff6ff;
 }
 
 
@@ -78,14 +91,19 @@ select.input {
   background-color: rgb(194, 120, 3, 0.2);
 }
 
-.purchase-status-completed {
+.purchase-status-completed, .done {
   color: #19BE34;
-  background-color: rgb(25, 190, 52, 0.2);
+  background-color: rgb(25, 190, 52, 0.2); 
 }
 
 .purchase-status-cancelled {
   color: #F05252;
   background-color: rgb(240, 82, 82, 0.2);
+}
+
+.draft {
+  color:#6b7280;
+  background-color: rgb(107, 114, 128, 0.2);
 }
 
 

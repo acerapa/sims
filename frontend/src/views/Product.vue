@@ -28,54 +28,58 @@
     <!-- filter contents -->
     <template v-slot:filters>
       <div class="flex flex-col gap-3 mt-3">
+        <CustomInput
+          type="select"
+          name="Category"
+          :has-label="true"
+          label="Select Category"
+          v-model="filters.category"
+          :options="categoryOptions"
+          placeholder="Select Category"
+          @reset="filters.category = null"
+        />
         <div>
           <small>Added on</small>
           <div class="flex gap-3">
-            <div class="flex flex-col">
-              <small>From</small>
-              <input
-                type="date"
-                class="input date min-w-[200px] max-h-[38px]"
-                placeholder="From"
-                v-model="filters.added_on_from"
-                @reset="filters.added_on_from = ''"
-              />
-            </div>
-            <div class="flex flex-col">
-              <small>To</small>
-              <input
-                type="date"
-                class="input date min-w-[200px] max-h-[38px]"
-                placeholder="To"
-                v-model="filters.added_on_to"
-                @reset="filters.added_on_to = ''"
-              />
-            </div>
+            <CustomInput
+              type="date"
+              name="date_from"
+              placeholder="From"
+              v-model="filters.added_on_from"
+              @reset="filters.added_on_from = ''"
+              input-class="min-w-[200px] max-h-[38px]"
+            />
+            <CustomInput
+              type="date"
+              name="date_to"
+              placeholder="To"
+              v-model="filters.added_on_to"
+              @reset="filters.added_on_to = ''"
+              input-class="min-w-[200px] max-h-[38px]"
+            />
           </div>
         </div>
         <div>
           <small>Stocks</small>
           <div class="flex gap-3">
-            <div class="flex flex-col">
-              <small>From</small>
-              <input
-                type="number"
-                class="input"
-                placeholder="From"
-                v-model="filters.stock_from"
-                @reset="filters.stock_from = null"
-              />
-            </div>
-            <div class="flex flex-col">
-              <small>To</small>
-              <input
-                type="number"
-                class="input"
-                placeholder="To"
-                v-model="filters.stock_to"
-                @reset="filters.stock_to = null"
-              />
-            </div>
+            <CustomInput
+              name="from"
+              label="From"
+              type="number"
+              :has-label="true"
+              placeholder="From"
+              v-model="filters.stock_from"
+              @reset="filters.stock_from = null"
+            />
+            <CustomInput
+              name="to"
+              label="From"
+              type="number"
+              :has-label="true"
+              placeholder="To"
+              v-model="filters.stock_to"
+              @reset="filters.stock_to = null"
+            />
           </div>
         </div>
       </div>
@@ -95,27 +99,32 @@ import ProductModal from "@/components/Product/ProductModal.vue";
 import ProductRow from "@/components/Product/ProductRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import { useProductStore } from "@/stores/product";
 import Event from "@/event";
 import { EventEnum } from "@/data/event";
 import ProductTableHeader from "@/components/Product/ProductTableHeader.vue";
 import { DateHelpers } from "shared/helpers";
+import { useSettingsStore } from "@/stores/settings";
 
 const top = ref(0);
-const showRowMenu = ref(false);
-const showDeleteConfirmModal = ref(false);
-const showModal = ref(false);
-const isEdit = ref(false);
-const productStore = useProductStore();
 const toDelete = ref({});
+const isEdit = ref(false);
 const selectedId = ref(0);
 const searchText = ref("");
+const showModal = ref(false);
+const showRowMenu = ref(false);
+const categoryOptions = ref([]);
+const productStore = useProductStore();
+const settingStore = useSettingsStore();
+const showDeleteConfirmModal = ref(false);
 const filters = ref({
   added_on_from: "",
   added_on_to: "",
   stock_from: null,
   stock_to: null,
+  category: "",
 });
 
 /** ================================================
@@ -140,6 +149,12 @@ Event.on(productRowEvent, function (data) {
  ** ================================================*/
 const filteredData = computed(() => {
   return productStore.products
+    .filter((product) => {
+      const catId =
+        filters.value.category === "" ? null : filters.value.category;
+
+      return catId ? product.category_id == catId : product;
+    })
     .filter((product) => {
       filters.value.stock_from =
         filters.value.stock_from === "" ? null : filters.value.stock_from;
@@ -217,6 +232,7 @@ const onAfterDelete = async () => {
 
 onMounted(async () => {
   await productStore.fetchAllProducts();
+  categoryOptions.value = await settingStore.categoryOption();
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });
 </script>
