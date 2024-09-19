@@ -23,14 +23,18 @@ export default [
         text: "Purchase Order",
         route: "purchase-order",
         icon: dot,
-        includes_active: [
-          'purchase-order-create'
-        ]
+        includes_active: ["purchase-order-create"],
       },
       {
         text: "My Inventory",
         route: "my-inventory",
         icon: dot,
+      },
+      {
+        text: "Physical Inventory",
+        route: "physical-inventory",
+        icon: dot,
+        includes_active: ["physical-inventory-details"],
       },
     ],
   },

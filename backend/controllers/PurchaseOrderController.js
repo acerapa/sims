@@ -50,10 +50,10 @@ module.exports = {
           );
         }),
       ]);
-      transaction.commit();
+      await transaction.commit();
       res.sendResponse({}, "Successfully created!");
     } catch (e) {
-      transaction.rollback();
+      await transaction.rollback();
       res.sendError({ ...e }, "Something wen't wrong! => " + e.messge);
     }
   },
@@ -128,10 +128,10 @@ module.exports = {
           });
         }
       }
-      transaction.commit();
+      await transaction.commit();
       res.sendResponse({}, "Successfully updated!", 200);
     } catch (e) {
-      transaction.rollback();
+      await transaction.rollback();
       res.sendError({ ...e }, "Something wen't wrong! => " + e.message, 400);
     }
   },

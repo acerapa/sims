@@ -5,7 +5,7 @@
       <p class="text-sm">{{ props.productReordering.id }}</p>
     </div>
     <p class="col-span-1 text-sm">{{ props.productReordering.point }}</p>
-    <div class="col-span-3 text-sm flex gap-3">
+    <div class="col-span-3 text-sm flex flex-wrap gap-3">
       <p
         class="text-xs bg-blue-200 px-2 py-1 rounded"
         v-for="(product, ndx) in props.productReordering.products"

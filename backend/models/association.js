@@ -2,11 +2,13 @@ const Address = require("./address");
 const Account = require("./account");
 const Product = require("./product");
 const Supplier = require("./supplier");
-const ProductSupplier = require("./product-supplier");
-const ProductCategory = require("./product-category");
 const ProductOrder = require("./product-order");
 const PurchaseOrder = require("./purchase-order");
 const ProductSettings = require("./product-setting");
+const ProductSupplier = require("./product-supplier");
+const ProductCategory = require("./product-category");
+const PhysicalInventory = require("./physical-inventory");
+const PhysicalInventoryItem = require("./physical-inventory-item");
 
 Supplier.hasOne(Address, {
   foreignKey: "supplier_id",
@@ -87,14 +89,37 @@ PurchaseOrder.hasOne(Address, {
 ProductSettings.hasMany(Product, {
   foreignKey: "product_setting_id",
   as: "products",
-  onDelete: "SET NULL"
+  onDelete: "SET NULL",
 });
 
 Product.belongsTo(ProductSettings, {
   foreignKey: "product_setting_id",
   as: "product_setting",
-  onDelete: "NO ACTION"
-})
+  onDelete: "NO ACTION",
+});
+
+// Product and PhysicalInventory Relations
+Product.hasMany(PhysicalInventoryItem, {
+  foreignKey: "product_id",
+  as: "physical_inventories",
+});
+
+PhysicalInventoryItem.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+// PhysicalInventory and PhysicalInventoryItem Relations
+PhysicalInventory.hasMany(PhysicalInventoryItem, {
+  foreignKey: "physical_inventory_id",
+  as: "items",
+  onDelete: "CASCADE",
+});
+
+PhysicalInventoryItem.belongsTo(PhysicalInventory, {
+  foreignKey: "physical_inventory_id",
+  as: "physical_inventory",
+});
 
 module.exports = {
   Supplier,

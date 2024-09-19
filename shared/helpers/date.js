@@ -65,6 +65,24 @@ class DateHelpers {
 
     return format;
   };
+
+  static getRangeDates = (from, to, compareTo) => {
+    let poDate = new Date(compareTo);
+    if (from && to) {
+      let f = new Date(from);
+      let t = new Date(to);
+
+      return poDate >= f && poDate <= t;
+    } else if (from && !to) {
+      let f = new Date(from);
+      return poDate >= f;
+    } else if (!from && to) {
+      let t = new Date(to);
+      return poDate <= t;
+    } else {
+      return true;
+    }
+  };
 }
 
 module.exports = { DateHelpers };

@@ -42,7 +42,7 @@ module.exports = {
         res.sendError({}, "Incorrect Credentials!", 401);
       }
     } else {
-      res.sendError({}, "No user found!", 404);
+      res.sendError({}, "Incorrect Credentials!", 404);
     }
   },
 

@@ -13,12 +13,13 @@
     @after-delete="onAfterDelete"
   />
   <CustomTable
+    :has-filter="true"
     :has-add-btn="true"
+    :data="filteredData"
     :has-pagination="true"
     v-model:is-edit="isEdit"
-    :key="productStore.products"
-    :data="productStore.products"
     v-model:show-modal="showModal"
+    v-model:search-text="searchText"
     :row-prop-init="productRowEvent"
     :table-row-component="ProductRow"
     :table-header-component="ProductTableHeader"
@@ -27,34 +28,58 @@
     <!-- filter contents -->
     <template v-slot:filters>
       <div class="flex flex-col gap-3 mt-3">
+        <CustomInput
+          type="select"
+          name="Category"
+          :has-label="true"
+          label="Select Category"
+          v-model="filters.category"
+          :options="categoryOptions"
+          placeholder="Select Category"
+          @reset="filters.category = null"
+        />
         <div>
-          <small>Dates</small>
+          <small>Added on</small>
           <div class="flex gap-3">
-            <input
-              type="text"
-              class="input date min-w-[200px] max-h-[38px]"
+            <CustomInput
+              type="date"
+              name="date_from"
               placeholder="From"
-              @focus="$event.target.type = 'date'"
-              @blur="$event.target.type = 'text'"
+              v-model="filters.added_on_from"
+              @reset="filters.added_on_from = ''"
+              input-class="min-w-[200px] max-h-[38px]"
             />
-            <input
-              type="text"
-              class="input date min-w-[200px] max-h-[38px]"
+            <CustomInput
+              type="date"
+              name="date_to"
               placeholder="To"
-              @focus="$event.target.type = 'date'"
-              @blur="$event.target.type = 'text'"
+              v-model="filters.added_on_to"
+              @reset="filters.added_on_to = ''"
+              input-class="min-w-[200px] max-h-[38px]"
             />
           </div>
         </div>
         <div>
           <small>Stocks</small>
           <div class="flex gap-3">
-            <select name="operations" id="operations" class="input w-full">
-              <option value="1">Equals (=)</option>
-              <option value="1">Less than (&lt;)</option>
-              <option value="1">Greater than (&gt;)</option>
-            </select>
-            <input type="number" class="input" placeholder="Stocks" />
+            <CustomInput
+              name="from"
+              label="From"
+              type="number"
+              :has-label="true"
+              placeholder="From"
+              v-model="filters.stock_from"
+              @reset="filters.stock_from = null"
+            />
+            <CustomInput
+              name="to"
+              label="From"
+              type="number"
+              :has-label="true"
+              placeholder="To"
+              v-model="filters.stock_to"
+              @reset="filters.stock_to = null"
+            />
           </div>
         </div>
       </div>
@@ -69,25 +94,38 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import ProductModal from "@/components/Product/ProductModal.vue";
 import ProductRow from "@/components/Product/ProductRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import { useProductStore } from "@/stores/product";
 import Event from "@/event";
 import { EventEnum } from "@/data/event";
 import ProductTableHeader from "@/components/Product/ProductTableHeader.vue";
+import { DateHelpers } from "shared/helpers";
+import { useSettingsStore } from "@/stores/settings";
 
 const top = ref(0);
-const showRowMenu = ref(false);
-const showDeleteConfirmModal = ref(false);
-const showModal = ref(false);
-const isEdit = ref(false);
-const productStore = useProductStore();
 const toDelete = ref({});
+const isEdit = ref(false);
 const selectedId = ref(0);
+const searchText = ref("");
+const showModal = ref(false);
+const showRowMenu = ref(false);
+const categoryOptions = ref([]);
+const productStore = useProductStore();
+const settingStore = useSettingsStore();
+const showDeleteConfirmModal = ref(false);
+const filters = ref({
+  added_on_from: "",
+  added_on_to: "",
+  stock_from: null,
+  stock_to: null,
+  category: "",
+});
 
 /** ================================================
  * EVENTS
@@ -104,6 +142,62 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
 const productRowEvent = "product-row-init-props";
 Event.on(productRowEvent, function (data) {
   return { product: data };
+});
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const filteredData = computed(() => {
+  return productStore.products
+    .filter((product) => {
+      const catId =
+        filters.value.category === "" ? null : filters.value.category;
+
+      return catId ? product.category_id == catId : product;
+    })
+    .filter((product) => {
+      filters.value.stock_from =
+        filters.value.stock_from === "" ? null : filters.value.stock_from;
+
+      filters.value.stock_to =
+        filters.value.stock_to === "" ? null : filters.value.stock_to;
+
+      if (
+        filters.value.stock_from !== null &&
+        filters.value.stock_to !== null
+      ) {
+        return (
+          product.quantity_in_stock >= filters.value.stock_from &&
+          product.quantity_in_stock <= filters.value.stock_to
+        );
+      } else if (
+        filters.value.stock_from !== null &&
+        filters.value.stock_to == null
+      ) {
+        return product.quantity_in_stock >= filters.value.stock_from;
+      } else if (
+        filters.value.stock_from == null &&
+        filters.value.stock_to !== null
+      ) {
+        return product.quantity_in_stock <= filters.value.stock_to;
+      } else {
+        return product;
+      }
+    })
+    .filter((product) =>
+      DateHelpers.getRangeDates(
+        filters.value.added_on_from,
+        filters.value.added_on_to,
+        product.createdAt
+      )
+    )
+    .filter((product) => {
+      const searchCondition =
+        `${product.id} ${product.name} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, "M/D/YYYY")}`.toLowerCase();
+      return searchText.value
+        ? searchCondition.includes(searchText.value.toLowerCase())
+        : product;
+    });
 });
 
 /** ================================================
@@ -138,6 +232,7 @@ const onAfterDelete = async () => {
 
 onMounted(async () => {
   await productStore.fetchAllProducts();
+  categoryOptions.value = await settingStore.categoryOption();
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });
 </script>

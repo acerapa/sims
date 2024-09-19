@@ -323,3 +323,28 @@ Content-Type: application/json
 		}
 	]
 }
+
+### [Physical Inventory Routes all]
+GET http://localhost:3000/api/physical-inventory/all
+
+### [Physical Inventory Routes get one]
+GET http://localhost:3000/api/physical-inventory/1
+
+### [Physical Inventory Routes register]
+POST http://localhost:3000/api/physical-inventory/register
+Content-Type: application/json
+Accept: application/json
+
+{
+	"physical_inventory": {},
+	"items": []
+}
+
+### [Physical Inventory Routes delete]
+DELETE http://localhost:3000/api/physical-inventory/delete
+Content-Type: application/json
+Accept: application/json
+
+{
+	"id": 1
+}

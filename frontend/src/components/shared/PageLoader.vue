@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed top-0 left-0 w-full h-full flex justify-center items-center z-[60] bg-white bg-opacity-70"
+    class="backdrop-blur-sm fixed top-0 left-0 w-full h-full flex justify-center items-center z-[60]"
   >
     <div class="loader-image"></div>
   </div>

@@ -45,8 +45,10 @@ onMounted(() => {
 const onClear = () => {
   filter_form.value.reset();
   const change = new Event("change");
+  const reset = new Event("reset");
   for (let el of filter_form.value.elements) {
     el.dispatchEvent(change);
+    el.dispatchEvent(reset);
   }
   isFilterUsed.value = false;
 };
