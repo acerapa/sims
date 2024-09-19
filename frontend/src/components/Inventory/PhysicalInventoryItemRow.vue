@@ -17,6 +17,7 @@
         placeholder="Quantity"
         input-class="bg-transparent"
         @change="onQuantityChange"
+        :disabled="physicalInventory.status == PhysicalInventoryStatus.DONE"
       />
     </div>
   </div>
@@ -26,6 +27,7 @@
 import { ref } from "vue";
 import CustomInput from "../shared/CustomInput.vue";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
+import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
 
 const props = defineProps({
   item: {
@@ -42,6 +44,7 @@ const model = ref({
 });
 
 const physicalInventoryStore = usePhysicalInventoryStore();
+const physicalInventory = physicalInventoryStore.physicalInventory;
 
 /** ================================================
  * EVENTS
@@ -53,9 +56,7 @@ const physicalInventoryStore = usePhysicalInventoryStore();
 const onQuantityChange = async () => {
   if (model.value.physical_quantity != props.item.physical_quantity) {
     await physicalInventoryStore.updateItem(props.item.id, model.value);
-    await physicalInventoryStore.getGroupedItems(
-      physicalInventoryStore.physicalInventory.id
-    );
+    await physicalInventoryStore.getGroupedItems(physicalInventory.id);
   }
 };
 </script>
