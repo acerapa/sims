@@ -314,6 +314,7 @@ const onSubmit = async (isAddNew = false) => {
 
 const onUpdate = async () => {
   if (route.query.id) {
+    Event.emit(EventEnum.IS_PAGE_LOADING, true);
     const res = await authenticatedApi(
       `purchase-order/${route.query.id}/update`,
       Method.POST,
@@ -323,6 +324,7 @@ const onUpdate = async () => {
     if (res.status == 200) {
       console.log("Api is working and need to check the result in db");
     }
+    Event.emit(EventEnum.IS_PAGE_LOADING, false);
   }
 };
 

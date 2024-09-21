@@ -2,12 +2,18 @@ import { createRouter, createWebHistory } from "vue-router";
 import { isAuthenticated } from "@/stores/auth";
 
 import commonRoutes from "./common";
+import reportRoutes from "./report";
 import inventoryRoutes from "./inventory";
 import settingsRoutes from "./settings";
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [...commonRoutes, ...inventoryRoutes, ...settingsRoutes],
+  routes: [
+    ...commonRoutes,
+    ...inventoryRoutes,
+    ...settingsRoutes,
+    ...reportRoutes,
+  ],
 });
 
 router.beforeEach(async (to, from, next) => {

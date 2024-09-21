@@ -30,12 +30,6 @@ export default [
         route: "my-inventory",
         icon: dot,
       },
-      {
-        text: "Physical Inventory",
-        route: "physical-inventory",
-        icon: dot,
-        includes_active: ["physical-inventory-details"],
-      },
     ],
   },
   {
@@ -57,6 +51,13 @@ export default [
     text: "Reports",
     route: "reports",
     icon: reports,
+    children: [
+      {
+        text: "Physical Inventories",
+        route: "physical-inventory",
+        icon: dot,
+      },
+    ],
   },
   {
     text: "Employees",
