@@ -1,3 +1,4 @@
+const User = require("./user");
 const Address = require("./address");
 const Account = require("./account");
 const Product = require("./product");
@@ -124,3 +125,24 @@ PhysicalInventoryItem.belongsTo(PhysicalInventory, {
 module.exports = {
   Supplier,
 };
+
+// PhysicalInventory to User
+User.hasMany(PhysicalInventory, {
+  foreignKey: "inventory_incharge",
+  as: "incharge_physical_inventories",
+});
+
+User.hasMany(PhysicalInventory, {
+  foreignKey: "branch_manager",
+  as: "manager_physical_inventories",
+});
+
+PhysicalInventory.belongsTo(User, {
+  foreignKey: "inventory_incharge",
+  as: "incharge",
+});
+
+PhysicalInventory.belongsTo(User, {
+  foreignKey: "branch_manager",
+  as: "manager",
+});

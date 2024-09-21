@@ -67,6 +67,11 @@ watch(
   () => [currentActivePage.value, props.itemSelected],
   () => (currentItems.value = paginatedData.value[currentActivePage.value])
 );
+
+watch(
+  () => props.itemSelected,
+  () => (currentActivePage.value = 1)
+)
 </script>
 <style scoped>
 .pg-btn {

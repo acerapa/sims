@@ -6,14 +6,7 @@
     :data="toDelete"
     @after-delete="afterDelete"
   />
-  <PhysicalInventoryCreateModal
-    v-model="showCreationModal"
-    v-if="showCreationModal"
-  />
   <div class="flex flex-col gap-6">
-    <button class="btn w-fit" @click="showCreationModal = true">
-      New Physical Inventory
-    </button>
     <CustomTable
       :has-add-btn="false"
       :data="filteredData"
@@ -50,7 +43,6 @@ const toDelete = ref();
 const selectedId = ref(0);
 const router = useRouter();
 const showRowMenu = ref(false);
-const showCreationModal = ref(false);
 const showDeleteConfirmModal = ref(false);
 const physicalInventoryStore = usePhysicalInventoryStore();
 
