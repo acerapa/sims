@@ -102,7 +102,10 @@
             "
           />
         </div>
-        <div class="flex items-center justify-center" v-if="!items.length">
+        <div
+          class="flex items-center justify-center"
+          v-if="!items.length && !props.isNested"
+        >
           <p class="text-sm">Table has no data!</p>
         </div>
         <slot
@@ -126,7 +129,7 @@
 </template>
 
 <script setup>
-import { getCurrentInstance, ref, watch } from "vue";
+import { computed, getCurrentInstance, ref, watch } from "vue";
 import Paginate from "./Paginate.vue";
 import FilterComponent from "./FilterComponent.vue";
 import Event from "@/event";
@@ -137,6 +140,7 @@ const emit = defineEmits([
   "open-menu",
   "update:searchText",
 ]);
+
 const props = defineProps({
   title: {
     type: String,
@@ -179,7 +183,7 @@ const props = defineProps({
   },
   rowPropInit: {
     type: String,
-    required: true,
+    required: false,
   },
   pgOptions: {
     type: Object,
@@ -188,6 +192,11 @@ const props = defineProps({
     },
   },
 });
+
+// Custom warning for required props with condition
+if (!props.isNested) {
+  if (!props.rowPropInit) console.warn("Missing required prop: `rowPropInit`");
+}
 
 const instance = getCurrentInstance();
 
