@@ -29,8 +29,8 @@ module.exports = {
   },
 
   register: async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-      const transaction = await sequelize.transaction();
       const data = req.body.validated;
       const purchaseOrder = await PurchaseOrder.create(data.order, {
         transaction: transaction,
@@ -59,8 +59,8 @@ module.exports = {
   },
 
   update: async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-      const transaction = await sequelize.transaction();
       const data = req.body.validated;
       if (data.order) {
         await PurchaseOrder.update(data.order, {

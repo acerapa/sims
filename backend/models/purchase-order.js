@@ -1,8 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
 const Supplier = require("./supplier");
-const { PurchaseOrderType } = require("shared/enums/purchase-order");
-const { ProductOrderedStatus } = require("shared/enums/purchase-order");
+const { PurchaseOrderType, PurchaseOrderStatus } = require("shared/enums/purchase-order");
 
 class PurchaseOrder extends Model {}
 
@@ -55,8 +54,8 @@ PurchaseOrder.init(
     status: {
       type: DataTypes.ENUM,
       allowNull: false,
-      values: Object.values(ProductOrderedStatus),
-      defaultValue: ProductOrderedStatus.OPEN,
+      values: Object.values(PurchaseOrderStatus),
+      defaultValue: PurchaseOrderStatus.OPEN,
     },
   },
   {

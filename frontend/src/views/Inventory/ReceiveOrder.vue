@@ -40,23 +40,27 @@
           <p class="text-sm col-span-1 h-[38px] py-2">
             {{ product.amount }}
           </p>
-          <input
+          <CustomInput
             type="number"
-            class="input col-span-1"
-            :value="product.quantity"
+            name="quantity"
+            class="col-span-1"
+            v-model="product.quantity"
           />
-          <textarea
-            class="input col-span-2"
-            rows="1"
-            name=""
-            id=""
+          <CustomInput
+            :rows="1"
+            name="remarks"
+            type="textarea"
+            class="col-span-2"
+            placeholder="Remarks"
             v-model="product.remarks"
-          ></textarea>
-          <CustomSelectInput
-            :options="productOrderStatusOptions"
-            class="w-full [&>select]:w-full"
-            placeholder="Select Ordered Product Status"
+          />
+          <CustomInput
+            type="select"
+            name="status"
             v-model="product.status"
+            class="w-full [&>select]:w-full"
+            :options="productOrderStatusOptions"
+            placeholder="Select Ordered Product Status"
           />
         </div>
       </div>
@@ -76,20 +80,20 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { authenticatedApi, Method } from "@/api";
+import CustomInput from "@/components/shared/CustomInput.vue";
+import { EventEnum } from "@/data/event";
+import Event from "@/event";
+import { getCost } from "@/helper";
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
-import { useRoute, useRouter } from "vue-router";
-import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import {
   ProductOrderedStatus,
   PurchaseOrderStatus,
   PurchaseOrderType,
 } from "shared/enums/purchase-order";
-import Event from "@/event";
-import { getCost } from "@/helper";
-import { EventEnum } from "@/data/event";
-import { ObjectHelpers, DateHelpers } from "shared/helpers";
-import { authenticatedApi, Method } from "@/api";
+import { DateHelpers, ObjectHelpers } from "shared/helpers";
+import { onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();

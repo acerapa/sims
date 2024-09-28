@@ -43,6 +43,7 @@ onMounted(() => {
 });
 
 const onClear = () => {
+  showFilter.value = false;
   filter_form.value.reset();
   const change = new Event("change");
   const reset = new Event("reset");

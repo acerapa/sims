@@ -40,8 +40,10 @@
         <div class="flex flex-col gap-3">
           <div class="flex flex-col">
             <small>Account Type</small>
-            <CustomSelectInput
-              placeholder="Account type"
+            <CustomInput
+              type="select"
+              name="account_type"
+              placeholder="Account Type"
               v-model="filter.type"
               :options="[
                 {
@@ -60,18 +62,18 @@
             <div class="flex gap-3">
               <div class="flex flex-col">
                 <small>From</small>
-                <input
+                <CustomInput
                   type="date"
-                  class="input"
+                  name="from"
                   v-model="dateAdded.from"
                   @reset="dateAdded.from = ''"
                 />
               </div>
               <div class="flex flex-col">
                 <small>To</small>
-                <input
+                <CustomInput
                   type="date"
-                  class="input"
+                  name="to"
                   v-model="dateAdded.to"
                   @reset="dateAdded.to = ''"
                 />
@@ -85,18 +87,18 @@
 </template>
 
 <script setup>
-import { useSettingsStore } from "@/stores/settings";
-import { ref, onMounted, computed } from "vue";
+import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import AccountModal from "@/components/Settings/AccountModal.vue";
 import AccountRow from "@/components/Settings/AccountRow.vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import AccountTableHeader from "@/components/Settings/AccountTableHeader.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
-import AccountTableHeader from "@/components/Settings/AccountTableHeader.vue";
-import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
-import Event from "@/event";
 import { EventEnum } from "@/data/event";
+import Event from "@/event";
+import { useSettingsStore } from "@/stores/settings";
 import { DateHelpers } from "shared/helpers";
+import { computed, onMounted, ref } from "vue";
 
 const top = ref(0);
 const toDelete = ref();
