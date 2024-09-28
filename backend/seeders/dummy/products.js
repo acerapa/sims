@@ -1,6 +1,7 @@
 const ProductCategory = require("../../models/product-category");
 const Supplier = require("../../models/supplier");
 const Account = require("../../models/account");
+const ProductSetting = require("../../models/product-setting");
 
 module.exports = {
   getProducts: async () => {
@@ -13,6 +14,11 @@ module.exports = {
     const mouses = categories.find((cat) => cat.name == "Mouses").id;
     const monitor = categories.find((cat) => cat.name == "Monitors").id;
 
+    const product_settings = (
+      await ProductSetting.findAll({
+        attributes: ["id"],
+      })
+    ).map((item) => item.id);
 
     const suppliers = await Supplier.findAll({
       attributes: ["id"],
@@ -43,7 +49,9 @@ module.exports = {
         // purchase_price: 20000,
         price: 25000,
         quantity_in_stock: 60,
-        status: "",
+        status: "inventory",
+        product_setting_id:
+          product_settings[getRandomDigitBetween(0, product_settings.length)],
         category_id: laptops,
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
@@ -64,8 +72,10 @@ module.exports = {
         // purchase_price: 20000,
         price: 25000,
         quantity_in_stock: 60,
-        status: "",
+        status: "inventory",
         category_id: mouses,
+        product_setting_id:
+          product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
         item_code: "qwertyui12",
@@ -85,11 +95,36 @@ module.exports = {
         // purchase_price: 20000,
         price: 25000,
         quantity_in_stock: 60,
-        status: "",
+        status: "inventory",
         category_id: monitor,
+        product_setting_id:
+          product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
         item_code: "qwertyui3",
+        purchase_description: "This is a sample description",
+        sale_description: "This is a sample description",
+      },
+      {
+        name: "Battery",
+        brand: "Motorola",
+        type: types[getRandomDigitBetween(0, 1)],
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 20000,
+          };
+        }),
+        // purchase_price: 20000,
+        price: 25000,
+        quantity_in_stock: 60,
+        status: "non-inventory",
+        category_id: monitor,
+        product_setting_id:
+          product_settings[getRandomDigitBetween(0, product_settings.length)],
+        expense_account: expense[getRandomDigitBetween(0, expense.length)],
+        income_account: income[getRandomDigitBetween(0, income.length)],
+        item_code: "qwertyui4",
         purchase_description: "This is a sample description",
         sale_description: "This is a sample description",
       },

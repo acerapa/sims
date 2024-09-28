@@ -24,6 +24,16 @@ export default [
         },
       },
       {
+        path: "/inventory-stock-status",
+        name: "inventory-stock-status",
+        component: () =>
+          import("@/views/Inventory/InventoryStockStatusPage.vue"),
+        meta: {
+          title: "Inventory Stock Status Page",
+          requiresAuth: true,
+        },
+      },
+      {
         path: "/purchase-order-create",
         name: "purchase-order-create",
         component: () => import("@/views/Inventory/PurchaseOrderForm.vue"),

@@ -117,4 +117,28 @@ module.exports = {
       res.sendError(e, "Something went wrong! => " + e.message);
     }
   },
+
+  inventoryStockStatus: async (req, res) => {
+    try {
+      const products = await Product.findAll({
+        where: {
+          status: "active",
+          type: "inventory",
+        },
+      });
+
+      const groupedByCat = Object.groupBy(
+        products,
+        ({ category_id }) => category_id
+      );
+
+      res.sendResponse(
+        { grouped_by_gategory: groupedByCat },
+        "Successfully fetched",
+        200
+      );
+    } catch (e) {
+      res.sendError(e, "Something wen't wrong!");
+    }
+  },
 };

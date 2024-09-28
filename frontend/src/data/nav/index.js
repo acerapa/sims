@@ -30,6 +30,11 @@ export default [
         route: "my-inventory",
         icon: dot,
       },
+      {
+        text: "Inventory Stock Status",
+        route: "inventory-stock-status",
+        icon: dot,
+      },
     ],
   },
   {
