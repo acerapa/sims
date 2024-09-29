@@ -19,6 +19,7 @@
         v-model="value"
         @input="emit('input')"
         @focus="emit('focus')"
+        @blur="emit('blur')"
         @change="emit('change')"
         @reset="emit('reset')"
       />
@@ -40,7 +41,8 @@
         ]"
         v-model="value"
         @input="emit('input')"
-        @focus="emit('focus')"
+        @focus="emit('focus', $event)"
+        @blur="emit('blur', $event)"
         @change="emit('change')"
         @reset="emit('reset')"
       ></textarea>
@@ -61,6 +63,7 @@
         @input="emit('input')"
         @focus="emit('focus')"
         @change="emit('change')"
+        @blur="emit('blur')"
         @reset="emit('reset')"
       />
     </div>
@@ -137,7 +140,7 @@ if (props.type == "select" && !props.options) {
 }
 
 const value = defineModel();
-const emit = defineEmits(["focus", "change", "input", "reset"]);
+const emit = defineEmits(["focus", "change", "input", "reset", "blur"]);
 </script>
 
 <style scoped>

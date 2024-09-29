@@ -1,17 +1,19 @@
 <template>
   <ModalWrapper title="New Category" v-model="showModal" @submit="onSubmit">
     <div class="flex mt-7">
-      <input
+      <CustomInput
         type="text"
+        name="category"
+        v-model="model.name"
         class="input flex-1"
         placeholder="Category Name"
-        v-model="model.name"
       />
     </div>
   </ModalWrapper>
 </template>
 <script setup>
 import { Method, authenticatedApi } from "@/api";
+import CustomInput from "../shared/CustomButton.vue";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { useSettingsStore } from "@/stores/settings";
 import { onMounted, ref } from "vue";
@@ -26,7 +28,7 @@ const props = defineProps({
   },
   selectedId: {
     type: Number,
-    required: false
+    required: false,
   },
 });
 

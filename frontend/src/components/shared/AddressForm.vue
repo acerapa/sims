@@ -1,32 +1,36 @@
 <template>
   <div class="flex flex-col gap-3">
     <div class="flex flex-col gap-3">
-      <input
+      <CustomInput
         type="text"
-        class="input w-full"
+        name="address1"
+        class="w-full"
         placeholder="Address 1"
         v-model="model.address1"
         :disabled="props.disabled"
       />
-      <input
+      <CustomInput
         type="text"
-        class="input w-full"
+        class="w-full"
+        name="address2"
         placeholder="Address 2"
         v-model="model.address2"
         :disabled="props.disabled"
       />
     </div>
     <div class="flex gap-6 max-lg:flex-col max-lg:gap-3">
-      <input
+      <CustomInput
         type="text"
-        class="input flex-1"
+        name="city"
+        class="flex-1"
         placeholder="City"
         v-model="model.city"
         :disabled="props.disabled"
       />
-      <input
+      <CustomInput
         type="text"
-        class="input flex-1"
+        name="postal"
+        class="flex-1"
         placeholder="Zip Code"
         v-model="model.postal"
         :disabled="props.disabled"
@@ -36,6 +40,7 @@
 </template>
 <script setup>
 import { ref, watch } from "vue";
+import CustomInput from "./CustomInput.vue";
 
 const props = defineProps({
   address: {
