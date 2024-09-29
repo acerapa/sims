@@ -348,3 +348,8 @@ Accept: application/json
 {
 	"id": 1
 }
+
+
+### [Inventory Stock Status]
+GET http://localhost:3000/api/products/stock-status
+Accept: application/json

@@ -75,6 +75,19 @@ PurchaseOrder.belongsToMany(Product, {
   as: "products",
 });
 
+// Product Order and Product Relationships
+Product.hasMany(ProductOrder, {
+  foreignKey: "product_id",
+  as: "product_orders",
+  onDelete: "CASCADE",
+});
+
+ProductOrder.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+  onDelete: "CASCADE",
+});
+
 PurchaseOrder.belongsTo(Supplier, {
   foreignKey: "supplier_id",
   as: "supplier",

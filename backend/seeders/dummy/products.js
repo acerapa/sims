@@ -49,7 +49,7 @@ module.exports = {
         // purchase_price: 20000,
         price: 25000,
         quantity_in_stock: 60,
-        status: "inventory",
+        status: "active",
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         category_id: laptops,
@@ -72,7 +72,7 @@ module.exports = {
         // purchase_price: 20000,
         price: 25000,
         quantity_in_stock: 60,
-        status: "inventory",
+        status: "active",
         category_id: mouses,
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
@@ -95,7 +95,7 @@ module.exports = {
         // purchase_price: 20000,
         price: 25000,
         quantity_in_stock: 60,
-        status: "inventory",
+        status: "active",
         category_id: monitor,
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
@@ -118,7 +118,7 @@ module.exports = {
         // purchase_price: 20000,
         price: 25000,
         quantity_in_stock: 60,
-        status: "non-inventory",
+        status: "inactive",
         category_id: monitor,
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],

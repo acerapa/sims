@@ -4,6 +4,8 @@ const Supplier = require("../models/supplier");
 const Account = require("../models/account");
 const { Op } = require("sequelize");
 const ProductSettings = require("../models/product-setting");
+const ProductCategory = require("../models/product-category");
+const ProductOrder = require("../models/product-order");
 
 module.exports = {
   all: async (req, res) => {
@@ -125,12 +127,29 @@ module.exports = {
           status: "active",
           type: "inventory",
         },
+        attributes: ["id", "name", "quantity_in_stock"],
+        include: [
+          {
+            model: ProductCategory,
+            as: "category",
+          },
+          {
+            model: ProductOrder,
+            as: "product_orders",
+          },
+        ],
       });
 
-      const groupedByCat = Object.groupBy(
-        products,
-        ({ category_id }) => category_id
-      );
+      const groupedByCat = Object.entries(
+        Object.groupBy(products, ({ category }) => category.id)
+      ).map((item) => {
+        return {
+          category: item[1][0].category,
+          products: item[1],
+        };
+      });
+
+      // TODO: Need to query from PO and Sales
 
       res.sendResponse(
         { grouped_by_gategory: groupedByCat },
