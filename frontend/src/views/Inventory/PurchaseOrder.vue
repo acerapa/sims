@@ -62,7 +62,8 @@
         <div class="flex flex-col gap-3">
           <div>
             <small>Suppliers</small>
-            <CustomSelectInput
+            <CustomInput
+              type="select"
               v-if="supplierOptions"
               :options="supplierOptions"
               v-model="filters.supplier_id"
@@ -74,20 +75,18 @@
             <div class="flex gap-3 mt-1">
               <div class="flex flex-col">
                 <small>from</small>
-                <input
+                <CustomInput
                   type="date"
                   name="from"
-                  class="input"
                   @reset="filters.date_from = ''"
                   v-model="filters.date_from"
                 />
               </div>
               <div class="flex flex-col">
                 <small>to</small>
-                <input
+                <CustomInput
                   type="date"
                   name="to"
-                  class="input"
                   @reset="filters.date_to = ''"
                   v-model="filters.date_to"
                 />
@@ -99,20 +98,18 @@
             <div class="flex gap-3 mt-1">
               <div class="flex flex-col">
                 <small>from</small>
-                <input
+                <CustomInput
                   type="date"
                   name="from"
-                  class="input"
                   @reset="filters.bill_date_from = ''"
                   v-model="filters.bill_date_from"
                 />
               </div>
               <div class="flex flex-col">
                 <small>to</small>
-                <input
+                <CustomInput
                   type="date"
                   name="to"
-                  class="input"
                   @reset="filters.bill_date_to = ''"
                   v-model="filters.bill_date_to"
                 />
@@ -126,23 +123,22 @@
 </template>
 
 <script setup>
-import { usePurchaseOrderStore } from "@/stores/purchase-order";
-import { onMounted, ref } from "vue";
-import PurchaseOrderRow from "@/components/Inventory/PurchaseOrderRow.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import Event from "@/event";
-import { useRouter } from "vue-router";
-import CancelConfirmation from "@/components/Inventory/CancelConfirmation.vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrderTableHeader.vue";
-import { PurchaseOrderStatus } from "shared/enums/purchase-order";
-import { computed } from "vue";
 import { authenticatedApi, Method } from "@/api";
+import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import CancelConfirmation from "@/components/Inventory/CancelConfirmation.vue";
+import PurchaseOrderRow from "@/components/Inventory/PurchaseOrderRow.vue";
+import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrderTableHeader.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
+import CustomTable from "@/components/shared/CustomTable.vue";
+import RowMenu from "@/components/shared/RowMenu.vue";
 import { EventEnum } from "@/data/event";
-import { DateHelpers } from "shared/helpers/date";
+import Event from "@/event";
+import { usePurchaseOrderStore } from "@/stores/purchase-order";
 import { useVendorStore } from "@/stores/supplier";
+import { PurchaseOrderStatus } from "shared/enums/purchase-order";
+import { DateHelpers } from "shared/helpers/date";
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const top = ref(0);
 const toDelete = ref();

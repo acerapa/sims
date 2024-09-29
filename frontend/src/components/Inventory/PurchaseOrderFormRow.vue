@@ -6,13 +6,16 @@
     :class="[props.isDisabled ? 'grid grid-cols-8' : 'grid-cols-9']"
   >
     <div class="col-span-2 flex gap-3">
-      <input
+      <CustomInput
         type="checkbox"
+        name="checkbox"
         v-if="!props.isDisabled"
-        class="input flex-shrink-0 mt-[10px]"
+        class="flex-shrink-0 mt-[10px]"
       />
-      <CustomSelectInput
-        class="w-full [&>select]:w-full"
+      <CustomInput
+        type="select"
+        class="w-full"
+        name="select_product"
         placeholder="Select product"
         :options="productOptions"
         :has-add-new="true"
@@ -23,27 +26,37 @@
         :disabled="props.isDisabled"
       />
     </div>
-    <input
+    <CustomInput
+      type="text"
+      class="col-span-3"
+      name="description"
+      placeholder="Description"
       :disabled="props.isDisabled"
-      class="col-span-3 input"
       v-model="product.description"
     />
-    <input
-      :disabled="props.isDisabled"
-      class="col-span-1 input"
+    <CustomInput
       type="number"
+      name="quantity"
+      class="col-span-1"
+      placeholder="quantity"
       v-model="product.quantity"
-    />
-    <input
       :disabled="props.isDisabled"
-      class="col-span-1 input"
+    />
+    <CustomInput
+      name="cost"
       type="number"
+      class="col-span-1"
+      placeholder="Cost"
       v-model="product.cost"
-    />
-    <input
       :disabled="props.isDisabled"
-      class="col-span-1 input"
+    />
+    <CustomInput
+      type="number"
+      name="amount"
+      class="col-span-1"
+      placeholder="Amount"
       v-model="product.amount"
+      :disabled="props.isDisabled"
     />
     <p
       class="col-span-1 text-sm pl-3 mt-[10px]"
@@ -61,9 +74,9 @@
 
 <script setup>
 import { computed, ref, watch } from "vue";
-import CustomSelectInput from "../shared/CustomSelectInput.vue";
 import { useProductStore } from "@/stores/product";
 import ProductModal from "../Product/ProductModal.vue";
+import CustomInput from "../shared/CustomInput.vue";
 import { getCost } from "@/helper";
 
 const props = defineProps({

@@ -18,7 +18,9 @@
             <p class="text-sm font-semibold">Order Info</p>
             <div class="flex flex-col gap-3">
               <div class="flex gap-3">
-                <CustomSelectInput
+                <CustomInput
+                  type="select"
+                  name="select_supplier"
                   :has-add-new="true"
                   :options="supplierOptions"
                   placeholder="*Select supplier"
@@ -27,8 +29,10 @@
                   class="flex-1"
                   :disabled="isEdit || isDisabled"
                 />
-                <CustomSelectInput
+                <CustomInput
+                  type="select"
                   class="flex-1"
+                  name="order_type"
                   placeholder="*Select Order Type"
                   v-model="model.order.type"
                   :options="[
@@ -44,29 +48,27 @@
                   :disabled="isDisabled"
                 />
               </div>
-              <input
+              <CustomInput
                 type="text"
-                class="input"
+                name="ref_no"
                 v-model="model.order.ref_no"
                 placeholder="Ref. No."
                 :disabled="isDisabled"
               />
               <div class="flex gap-3">
-                <input
-                  type="text"
-                  class="flex-1 input"
+                <CustomInput
+                  type="date"
+                  name="date"
+                  class="flex-1 max-h-[38px]"
                   placeholder="Date"
-                  @focus="$event.target.type = 'date'"
-                  @blur="$event.target.type = 'text'"
                   v-model="model.order.date"
                   :disabled="isDisabled"
                 />
-                <input
-                  type="text"
-                  class="flex-1 input"
+                <CustomInput
+                  type="date"
+                  name="bill_due"
+                  class="flex-1"
                   placeholder="Bill Due"
-                  @focus="$event.target.type = 'date'"
-                  @blur="$event.target.type = 'text'"
                   v-model="model.order.bill_due"
                   :disabled="isDisabled"
                 />
@@ -83,14 +85,14 @@
             />
           </div>
         </div>
-        <textarea
-          name=""
-          id=""
-          class="input resize-none"
+        <CustomInput
+          name="memo"
+          type="textarea"
           placeholder="Memo"
-          v-model="model.order.memo"
           :disabled="isDisabled"
-        ></textarea>
+          input-class="resize-none"
+          v-model="model.order.memo"
+        />
       </div>
 
       <div class="flex justify-between items-center mt-6">
@@ -180,11 +182,11 @@
 </template>
 <script setup>
 import { useVendorStore } from "@/stores/supplier";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import AddressForm from "@/components/shared/AddressForm.vue";
 import PurchaseOrderFormRow from "../../components/Inventory/PurchaseOrderFormRow.vue";
 import { useRoute, useRouter } from "vue-router";
-import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
 import VendorModal from "@/components/Vendor/VendorModal.vue";
 import { Method, authenticatedApi } from "@/api";
 import { DateHelpers } from "shared";
