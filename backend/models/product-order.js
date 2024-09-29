@@ -30,7 +30,7 @@ ProductOrder.init(
     status: {
       type: DataTypes.ENUM,
       values: Object.values(ProductOrderedStatus),
-      allowNull: true,
+      defaultValue: ProductOrderedStatus.OPEN,
     },
     amount: {
       type: DataTypes.INTEGER,
