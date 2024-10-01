@@ -17,7 +17,7 @@ const PurchaseOrderSchema = Joi.object({
   term_start: Joi.date().when("type", {
     is: "term",
     then: Joi.required(),
-    otherwise: Joi.optional(),
+    otherwise: Joi.allow(null, ""),
   }),
   status: Joi.string()
     .valid("open", "confirmed", "completed", "cancelled")

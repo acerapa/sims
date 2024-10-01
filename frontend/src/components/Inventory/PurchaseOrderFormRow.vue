@@ -117,7 +117,7 @@ watch(
   () => product.value.product_id,
   (val) => {
     const prd = productStore.products.find((product) => product.id == val);
-    if (product) {
+    if (prd) {
       product.value.product_id = prd.id;
       product.value.name = prd.name;
       product.value.description = product.value.description
