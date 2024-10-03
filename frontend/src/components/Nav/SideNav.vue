@@ -8,7 +8,7 @@
       </div>
       <img
         class="w-12 h-12 rounded-full cursor-pointer"
-        src="../../assets/images/profile-sample.png"
+        src="@/assets/images/profile-sample.png"
         alt="profile"
         @click.stop="showDropdown = true"
       />
@@ -18,7 +18,7 @@
           @click="console.log(`Redirect to the user info page or profile page`)"
         >
           <img
-            src="../../assets/icons/settings.svg"
+            src="@/assets/icons/settings.svg"
             class="invert"
             alt="setting.svg"
           />
@@ -26,7 +26,7 @@
         </button>
         <button class="dropdown-item flex gap-2 items-center" @click="onLogout">
           <img
-            src="../../assets/icons/logout.png"
+            src="@/assets/icons/logout.png"
             class="invert"
             alt="logout.svg"
           />

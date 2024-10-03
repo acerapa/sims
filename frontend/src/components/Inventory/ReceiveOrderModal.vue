@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import ModalWrapper from '../shared/ModalWrapper.vue';
+import ModalWrapper from '@/components/shared/ModalWrapper.vue';
 
 const showModal = defineModel();
 </script>

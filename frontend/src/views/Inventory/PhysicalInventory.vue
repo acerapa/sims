@@ -29,20 +29,19 @@
 </template>
 
 <script setup>
-import Event from "@/event";
-import { computed, onMounted, ref } from "vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
-import PhysicalInventoryRow from "@/components/Inventory/PhysicalInventoryRow.vue";
-import PhysicalInventoryCreateModal from "@/components/Inventory/PhysicalInventoryCreateModal.vue";
-import PhysicalInventoryTableHeader from "@/components/Inventory/PhysicalInventoryTableHeader.vue";
-import { EventEnum } from "@/data/event";
-import { useRouter } from "vue-router";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import PhysicalInventoryRow from "@/components/Inventory/PhysicalInventory/PhysicalInventoryRow.vue";
+import PhysicalInventoryTableHeader from "@/components/Inventory/PhysicalInventory/PhysicalInventoryTableHeader.vue";
+import CustomTable from "@/components/shared/CustomTable.vue";
+import RowMenu from "@/components/shared/RowMenu.vue";
+import { EventEnum } from "@/data/event";
+import Event from "@/event";
 import { useAuthStore } from "@/stores/auth";
-import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
+import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
 import { useProductStore } from "@/stores/product";
+import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const top = ref(0);
 const toDelete = ref();

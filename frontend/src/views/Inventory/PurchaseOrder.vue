@@ -126,8 +126,8 @@
 import { authenticatedApi, Method } from "@/api";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import CancelConfirmation from "@/components/Inventory/CancelConfirmation.vue";
-import PurchaseOrderRow from "@/components/Inventory/PurchaseOrderRow.vue";
-import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrderTableHeader.vue";
+import PurchaseOrderRow from "@/components/Inventory/PurchaseOrder/PurchaseOrderRow.vue";
+import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrder/PurchaseOrderTableHeader.vue";
 import CustomInput from "@/components/shared/CustomInput.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";

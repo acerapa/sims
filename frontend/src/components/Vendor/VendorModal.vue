@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import CustomInput from "../shared/CustomInput.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import { Method, authenticatedApi } from "@/api";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { useVendorStore } from "@/stores/supplier";
