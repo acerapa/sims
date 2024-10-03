@@ -12,6 +12,10 @@ PhysicalInventoryItem.init(
       autoIncrement: true,
       primaryKey: true,
     },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     physical_quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,

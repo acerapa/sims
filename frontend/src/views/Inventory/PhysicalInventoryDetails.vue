@@ -4,8 +4,8 @@
       <div class="flex justify-between">
         <div>
           <p>
-            <strong>Physical Inventory for date:</strong>
-            {{ DateHelpers.formatDate(physicalInventory.date, "MM/DD/YYYY") }}
+            <strong>Physical Inventory date:</strong>
+            {{ DateHelpers.formatDate(physicalInventory.date_started, "MM/DD/YYYY") }}
           </p>
         </div>
         <BadgeComponent

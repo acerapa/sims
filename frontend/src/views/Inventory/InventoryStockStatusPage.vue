@@ -60,14 +60,14 @@ Event.on(initStockStatusRow, function (data) {
 
 const sampleData = [
   {
-    category: "laptop",
+    category: "Laptops",
     products: [
       {
         name: "Dell latitude 5320",
         on_hand: 20,
         on_sale: 20,
         available: 0,
-        ordered: false,
+        ordered: true,
         on_po: 0,
         next_delivery: null,
       },
@@ -113,7 +113,7 @@ const sampleData = [
         on_hand: 4,
         on_sale: 2,
         available: 2,
-        ordered: false,
+        ordered: true,
         on_po: 0,
         next_delivery: null,
       },

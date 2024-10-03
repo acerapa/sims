@@ -7,6 +7,9 @@
     @after-delete="afterDelete"
   />
   <div class="flex flex-col gap-6">
+    <button class="btn w-fit" @click="onStartPhysicalInventory">
+      Start Physical Inventory
+    </button>
     <CustomTable
       :has-add-btn="false"
       :data="filteredData"
@@ -37,12 +40,17 @@ import PhysicalInventoryTableHeader from "@/components/Inventory/PhysicalInvento
 import { EventEnum } from "@/data/event";
 import { useRouter } from "vue-router";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import { useAuthStore } from "@/stores/auth";
+import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
+import { useProductStore } from "@/stores/product";
 
 const top = ref(0);
 const toDelete = ref();
 const selectedId = ref(0);
 const router = useRouter();
 const showRowMenu = ref(false);
+const authStore = useAuthStore();
+const productStore = useProductStore();
 const showDeleteConfirmModal = ref(false);
 const physicalInventoryStore = usePhysicalInventoryStore();
 
@@ -70,6 +78,42 @@ const filteredData = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
+const onStartPhysicalInventory = async () => {
+  const model = {
+    physical_inventory: {
+      date_started: new Date(),
+      status: PhysicalInventoryStatus.DRAFT,
+      inventory_incharge: authStore.getAuthUser().id,
+      branch_manager: authStore.getAuthUser().id, // temporary for now (supposedly need to set branch manager in the system)
+      date_ended: null,
+    },
+    items: [],
+  };
+  // fetch all products
+  await productStore.fetchAllProducts();
+
+  model.items = productStore.products.map((product) => {
+    return {
+      quantity: product.quantity_in_stock,
+      physical_quantity: 0,
+      product_id: product.id,
+      physical_inventory_id: 0,
+    };
+  });
+
+  console.log(model);
+  const res = await physicalInventoryStore.register(model);
+
+  if (res.status == 200) {
+    router.push({
+      name: "physical-inventory-details",
+      params: {
+        id: res.data.physical_inventory.id,
+      },
+    });
+  }
+};
+
 const onSelectRow = (id) => {
   top.value = event.target.offsetTop;
   showRowMenu.value = true;
