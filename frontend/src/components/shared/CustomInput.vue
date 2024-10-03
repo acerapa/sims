@@ -65,6 +65,7 @@
         @change="emit('change')"
         @blur="emit('blur')"
         @reset="emit('reset')"
+        @add-new="emit('addNew')"
       />
     </div>
   </div>
@@ -140,7 +141,14 @@ if (props.type == "select" && !props.options) {
 }
 
 const value = defineModel();
-const emit = defineEmits(["focus", "change", "input", "reset", "blur"]);
+const emit = defineEmits([
+  "focus",
+  "change",
+  "input",
+  "reset",
+  "blur",
+  "addNew",
+]);
 </script>
 
 <style scoped>
