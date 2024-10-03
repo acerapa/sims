@@ -5,7 +5,7 @@
         type="text"
         name="category"
         v-model="model.name"
-        class="input flex-1"
+        class="flex-1"
         placeholder="Category Name"
       />
     </div>
@@ -13,7 +13,7 @@
 </template>
 <script setup>
 import { Method, authenticatedApi } from "@/api";
-import CustomInput from "@/components/shared/CustomButton.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { useSettingsStore } from "@/stores/settings";
 import { onMounted, ref } from "vue";
