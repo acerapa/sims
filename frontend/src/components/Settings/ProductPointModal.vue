@@ -26,11 +26,11 @@
   <ProductModal v-model="showProductModal" v-if="showProductModal" />
 </template>
 <script setup>
-import ModalWrapper from "../shared/ModalWrapper.vue";
-import CustomSelectInput from "../shared/CustomSelectInput.vue";
+import ModalWrapper from "@/components/shared/ModalWrapper.vue";
+import CustomSelectInput from "@/components/shared/CustomInput.vue";
 import { onMounted, computed, ref } from "vue";
 import { useProductStore } from "@/stores/product";
-import ProductModal from "../Product/ProductModal.vue";
+import ProductModal from "@/components/Product/ProductModal.vue";
 import { authenticatedApi, Method } from "@/api";
 import { useSettingsStore } from "@/stores/settings";
 

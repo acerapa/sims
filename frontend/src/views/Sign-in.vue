@@ -112,7 +112,7 @@ const onSubmit = async () => {
 <style scoped>
 .logo {
   background-size: cover;
-  background-image: url("../assets/logo-icon.png");
+  background-image: url("@/assets/logo-icon.png");
   @apply w-24 h-24 rounded-full mx-auto -mt-16 border-white border text-white flex items-center justify-center;
 }
 </style>

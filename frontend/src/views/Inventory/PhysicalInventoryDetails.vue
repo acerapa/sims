@@ -68,20 +68,20 @@
 </template>
 
 <script setup>
-import Event from "@/event";
-import { useRoute } from "vue-router";
+import PhysicalInventoryItemHeader from "@/components/Inventory/PhysicalInventory/PhysicalInventoryItemHeader.vue";
+import PhysicalInventoryItemRow from "@/components/Inventory/PhysicalInventory/PhysicalInventoryItemRow.vue";
+import BadgeComponent from "@/components/shared/BadgeComponent.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
+import CustomTable from "@/components/shared/CustomTable.vue";
 import { EventEnum } from "@/data/event";
+import Event from "@/event";
+import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
+import { useProductStore } from "@/stores/product";
+import { useSettingsStore } from "@/stores/settings";
+import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
 import { DateHelpers } from "shared/helpers";
 import { computed, onMounted, ref } from "vue";
-import { useProductStore } from "@/stores/product";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import BadgeComponent from "@/components/shared/BadgeComponent.vue";
-import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
-import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
-import PhysicalInventoryItemRow from "@/components/Inventory/PhysicalInventoryItemRow.vue";
-import PhysicalInventoryItemHeader from "@/components/Inventory/PhysicalInventoryItemHeader.vue";
-import { useSettingsStore } from "@/stores/settings";
+import { useRoute } from "vue-router";
 
 const top = ref(0);
 const items = ref([]);

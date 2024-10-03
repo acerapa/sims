@@ -158,13 +158,13 @@
 </template>
 
 <script setup>
-import CustomInput from "../shared/CustomInput.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import { Method, authenticatedApi } from "@/api";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import ProductCategoryModal from "../Settings/ProductCategoryModal.vue";
-import AccountModal from "../Settings/AccountModal.vue";
-import VendorModal from "../Vendor/VendorModal.vue";
-import ProductPointModal from "../Settings/ProductPointModal.vue";
+import ProductCategoryModal from "@/components/Settings/ProductCategoryModal.vue";
+import AccountModal from "@/components/Settings/AccountModal.vue";
+import VendorModal from "@/components/Vendor/VendorModal.vue";
+import ProductPointModal from "@/components/Settings/ProductPointModal.vue";
 import { computed, onMounted, ref } from "vue";
 import { AccountTypes } from "shared";
 

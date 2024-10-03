@@ -75,8 +75,8 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import { useProductStore } from "@/stores/product";
-import ProductModal from "../Product/ProductModal.vue";
-import CustomInput from "../shared/CustomInput.vue";
+import ProductModal from "@/components/Product/ProductModal.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import { getCost } from "@/helper";
 
 const props = defineProps({

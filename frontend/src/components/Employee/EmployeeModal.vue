@@ -67,7 +67,7 @@
 </template>
 <script setup>
 import { Method, authenticatedApi } from "@/api";
-import CustomInput from "../shared/CustomInput.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { useEmployeeStore } from "@/stores/employee";
 import { ObjectHelpers } from "shared";

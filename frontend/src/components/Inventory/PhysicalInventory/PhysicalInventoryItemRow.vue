@@ -25,7 +25,7 @@
 
 <script setup>
 import { ref } from "vue";
-import CustomInput from "../shared/CustomInput.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
 import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
 
