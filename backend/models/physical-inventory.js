@@ -12,23 +12,15 @@ PhysicalInventory.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    date: {
+    date_started: {
       type: DataTypes.DATE,
       allowNull: false,
       comment: "Date intended for the Physical Inventory",
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
     },
     status: {
       type: DataTypes.ENUM,
       values: Object.values(PhysicalInventoryStatus),
       defaultValue: PhysicalInventoryStatus.DRAFT,
-    },
-    remarks: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     inventory_incharge: {
       type: DataTypes.INTEGER,
@@ -46,12 +38,8 @@ PhysicalInventory.init(
         key: "id",
       },
     },
-    time_start: {
-      type: DataTypes.TIME,
-      defaultValue: new Date(),
-    },
-    time_end: {
-      type: DataTypes.TIME,
+    date_ended: {
+      type: DataTypes.DATE,
       allowNull: true,
     },
   },

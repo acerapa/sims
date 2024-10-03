@@ -5,35 +5,43 @@
         type="text"
         name="address1"
         class="w-full"
+        label="Address 1"
         placeholder="Address 1"
         v-model="model.address1"
         :disabled="props.disabled"
+        :has-label="props.hasLabel"
       />
       <CustomInput
         type="text"
         class="w-full"
         name="address2"
+        label="Address 2"
         placeholder="Address 2"
         v-model="model.address2"
         :disabled="props.disabled"
+        :has-label="props.hasLabel"
       />
     </div>
     <div class="flex gap-6 max-lg:flex-col max-lg:gap-3">
       <CustomInput
         type="text"
         name="city"
+        label="City"
         class="flex-1"
         placeholder="City"
         v-model="model.city"
         :disabled="props.disabled"
+        :has-label="props.hasLabel"
       />
       <CustomInput
         type="text"
         name="postal"
         class="flex-1"
+        label="Zip Code"
         placeholder="Zip Code"
         v-model="model.postal"
         :disabled="props.disabled"
+        :has-label="props.hasLabel"
       />
     </div>
   </div>
@@ -48,6 +56,10 @@ const props = defineProps({
     default: () => ({}),
   },
   disabled: {
+    type: Boolean,
+    default: false,
+  },
+  hasLabel: {
     type: Boolean,
     default: false,
   },

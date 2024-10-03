@@ -176,6 +176,12 @@ const onReceiveOrder = async () => {
 
   if (res.status == 200) {
     await purchaseOrderStore.fetchPurchaseOrderById(route.params.id);
+    router.push({
+      name: "purchase-order-create",
+      query: {
+        id: route.params.id,
+      },
+    });
   }
 };
 

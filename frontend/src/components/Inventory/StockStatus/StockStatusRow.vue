@@ -12,12 +12,24 @@
       <p class="col-span-1 text-sm group-last:font-semibold">
         {{ props.product.on_sale }}
       </p>
-      <p class="col-span-1 text-sm group-last:font-semibold">
+      <p
+        class="col-span-1 text-sm group-last:font-semibold"
+        :class="[
+          props.product.name.toLowerCase().includes('total')
+            ? 'text-blue-500'
+            : '',
+        ]"
+      >
         {{ props.product.available }}
       </p>
-      <p class="col-span-1 text-sm group-last:font-semibold">
-        {{ props.product.ordered }}
-      </p>
+      <div class="flex items-center pl-6">
+        <img
+          class="col-span-1 w-4 h-4"
+          :src="check"
+          v-if="props.product.ordered"
+          alt=""
+        />
+      </div>
       <p class="col-span-1 text-sm group-last:font-semibold">
         {{ props.product.on_po }}
       </p>
@@ -29,6 +41,7 @@
 </template>
 
 <script setup>
+import check from "@/assets/icons/check-mark.png";
 const props = defineProps({
   product: {
     type: Object,

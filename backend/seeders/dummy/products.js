@@ -13,6 +13,7 @@ module.exports = {
     const laptops = categories.find((cat) => cat.name == "Laptops").id;
     const mouses = categories.find((cat) => cat.name == "Mouses").id;
     const monitor = categories.find((cat) => cat.name == "Monitors").id;
+    const rj45Cable = categories.find((cat) => cat.name == "RJ45 Cables").id;
 
     const product_settings = (
       await ProductSetting.findAll({
@@ -125,6 +126,121 @@ module.exports = {
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
         item_code: "qwertyui4",
+        purchase_description: "This is a sample description",
+        sale_description: "This is a sample description",
+      },
+      {
+        name: "RJ45 Category 5e (Cat5e) Ethernet Cable",
+        brand: "Jadaol",
+        type: types[getRandomDigitBetween(0, 1)],
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 60,
+          };
+        }),
+        // purchase_price: 20000,
+        price: 60,
+        quantity_in_stock: 100,
+        status: "active",
+        category_id: rj45Cable,
+        product_setting_id:
+          product_settings[getRandomDigitBetween(0, product_settings.length)],
+        expense_account: expense[getRandomDigitBetween(0, expense.length)],
+        income_account: income[getRandomDigitBetween(0, income.length)],
+        item_code: "qwertyui5",
+        purchase_description: "This is a sample description",
+        sale_description: "This is a sample description",
+      },
+      {
+        name: "RJ45 Category 6 (Cat6) Ethernet Cable",
+        brand: "Jadaol",
+        type: types[getRandomDigitBetween(0, 1)],
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 80,
+          };
+        }),
+        // purchase_price: 20000,
+        price: 80,
+        quantity_in_stock: 100,
+        status: "active",
+        category_id: rj45Cable,
+        product_setting_id:
+          product_settings[getRandomDigitBetween(0, product_settings.length)],
+        expense_account: expense[getRandomDigitBetween(0, expense.length)],
+        income_account: income[getRandomDigitBetween(0, income.length)],
+        item_code: "qwertyui6",
+        purchase_description: "This is a sample description",
+        sale_description: "This is a sample description",
+      },
+      {
+        name: "RJ45 Category 6a (Cat6a) Ethernet Cable",
+        brand: "Jadaol",
+        type: types[getRandomDigitBetween(0, 1)],
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 120,
+          };
+        }),
+        // purchase_price: 20000,
+        price: 120,
+        quantity_in_stock: 100,
+        status: "active",
+        category_id: rj45Cable,
+        product_setting_id:
+          product_settings[getRandomDigitBetween(0, product_settings.length)],
+        expense_account: expense[getRandomDigitBetween(0, expense.length)],
+        income_account: income[getRandomDigitBetween(0, income.length)],
+        item_code: "qwertyui7",
+        purchase_description: "This is a sample description",
+        sale_description: "This is a sample description",
+      },
+      {
+        name: "RJ45 Category 7 (Cat7) Ethernet Cable",
+        brand: "Jadaol",
+        type: types[getRandomDigitBetween(0, 1)],
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 180,
+          };
+        }),
+        // purchase_price: 20000,
+        price: 180,
+        quantity_in_stock: 100,
+        status: "active",
+        category_id: rj45Cable,
+        product_setting_id:
+          product_settings[getRandomDigitBetween(0, product_settings.length)],
+        expense_account: expense[getRandomDigitBetween(0, expense.length)],
+        income_account: income[getRandomDigitBetween(0, income.length)],
+        item_code: "qwertyui8",
+        purchase_description: "This is a sample description",
+        sale_description: "This is a sample description",
+      },
+      {
+        name: "RJ45 Category 8 (Cat8) Ethernet Cable",
+        brand: "Jadaol",
+        type: types[getRandomDigitBetween(0, 1)],
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 300,
+          };
+        }),
+        // purchase_price: 20000,
+        price: 300,
+        quantity_in_stock: 100,
+        status: "active",
+        category_id: rj45Cable,
+        product_setting_id:
+          product_settings[getRandomDigitBetween(0, product_settings.length)],
+        expense_account: expense[getRandomDigitBetween(0, expense.length)],
+        income_account: income[getRandomDigitBetween(0, income.length)],
+        item_code: "qwertyui9",
         purchase_description: "This is a sample description",
         sale_description: "This is a sample description",
       },
