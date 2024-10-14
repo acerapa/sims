@@ -7,6 +7,7 @@ import reports from "@/assets/icons/reports.svg";
 import employees from "@/assets/icons/employees.svg";
 import settings from "@/assets/icons/settings.svg";
 import dot from "@/assets/icons/dot.svg";
+import transfer from "@/assets/icons/transfer.png";
 
 export default [
   {
@@ -36,6 +37,11 @@ export default [
         icon: dot,
       },
     ],
+  },
+  {
+    text: "Transfer Stocks",
+    route: "transfer",
+    icon: transfer,
   },
   {
     text: "Vendors/Suppliers",

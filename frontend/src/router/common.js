@@ -44,6 +44,14 @@ export default [
           requiresAuth: true,
         },
       },
+      {
+        path: "/transfer",
+        name: "transfer",
+        component: () => import("@/views/Transfer.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
     ],
   },
   {
