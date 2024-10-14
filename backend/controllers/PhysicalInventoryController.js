@@ -92,7 +92,7 @@ module.exports = {
       res.sendResponse({}, "Successfully Updated", 200);
     } catch (e) {
       await transaction.rollback();
-      res.sendError(e, "Something went wrong!", 400);
+      res.sendError(e, "Something went wrong! =>" + e.message, 400);
     }
   },
 

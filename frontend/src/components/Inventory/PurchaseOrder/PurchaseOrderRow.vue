@@ -33,7 +33,7 @@
 <script setup>
 import { DateHelpers } from "shared/helpers/date";
 import { PurchaseStatusMap } from "shared";
-import BadgeComponent from "../shared/BadgeComponent.vue";
+import BadgeComponent from "@/components/shared/BadgeComponent.vue";
 
 const emit = defineEmits(["openMenu"]);
 

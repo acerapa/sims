@@ -37,17 +37,17 @@ export default [
         },
       },
       {
-        path: "/reports",
-        name: "reports",
-        component: () => import("@/views/Report.vue"),
+        path: "/employees",
+        name: "employees",
+        component: () => import("@/views/Employee.vue"),
         meta: {
           requiresAuth: true,
         },
       },
       {
-        path: "/employees",
-        name: "employees",
-        component: () => import("@/views/Employee.vue"),
+        path: "/transfer",
+        name: "transfer",
+        component: () => import("@/views/Transfer.vue"),
         meta: {
           requiresAuth: true,
         },

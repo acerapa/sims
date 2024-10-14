@@ -1,3 +1,4 @@
+const User = require("./user");
 const Address = require("./address");
 const Account = require("./account");
 const Product = require("./product");
@@ -74,6 +75,19 @@ PurchaseOrder.belongsToMany(Product, {
   as: "products",
 });
 
+// Product Order and Product Relationships
+Product.hasMany(ProductOrder, {
+  foreignKey: "product_id",
+  as: "product_orders",
+  onDelete: "CASCADE",
+});
+
+ProductOrder.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+  onDelete: "CASCADE",
+});
+
 PurchaseOrder.belongsTo(Supplier, {
   foreignKey: "supplier_id",
   as: "supplier",
@@ -124,3 +138,24 @@ PhysicalInventoryItem.belongsTo(PhysicalInventory, {
 module.exports = {
   Supplier,
 };
+
+// PhysicalInventory to User
+User.hasMany(PhysicalInventory, {
+  foreignKey: "inventory_incharge",
+  as: "incharge_physical_inventories",
+});
+
+User.hasMany(PhysicalInventory, {
+  foreignKey: "branch_manager",
+  as: "manager_physical_inventories",
+});
+
+PhysicalInventory.belongsTo(User, {
+  foreignKey: "inventory_incharge",
+  as: "incharge",
+});
+
+PhysicalInventory.belongsTo(User, {
+  foreignKey: "branch_manager",
+  as: "manager",
+});

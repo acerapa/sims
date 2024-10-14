@@ -27,6 +27,14 @@ export const usePhysicalInventoryStore = defineStore(
       return physicalInventory.value;
     };
 
+    const register = async (model) => {
+      return await authenticatedApi(
+        `physical-inventory/register`,
+        Method.POST,
+        model
+      );
+    };
+
     const update = async (id, model) => {
       const res = await authenticatedApi(
         `physical-inventory/update/${id}`,
@@ -67,6 +75,7 @@ export const usePhysicalInventoryStore = defineStore(
       physicalInventories,
       update,
       fetchOne,
+      register,
       updateItem,
       getGroupedItems,
       fetchAllPhysicalInventories,

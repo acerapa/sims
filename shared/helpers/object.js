@@ -53,6 +53,22 @@ class ObjectHelpers {
 
     return newObj;
   };
+
+  /**
+   * This function will create a copy of the object cutting any references from the original
+   *
+   * @param {*} obj target object
+   * @param {*} preserveType preserve the type of the values in the object
+   * @returns object
+   */
+  static copyObj = (obj, preserveType = false) => {
+    if (typeof obj != "object" || Array.isArray(obj)) {
+      console.error("`obj` must be of type object");
+      return;
+    }
+
+    return !preserveType ? JSON.parse(JSON.stringify(obj)) : obj;
+  };
 }
 
 module.exports = { ObjectHelpers };

@@ -1,4 +1,5 @@
 const { DataTypes, Model } = require("sequelize");
+const User = require("./user");
 const { sequelize } = require(".");
 const { PhysicalInventoryStatus } = require("shared/enums/purchase-order");
 
@@ -11,7 +12,7 @@ PhysicalInventory.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    date: {
+    date_started: {
       type: DataTypes.DATE,
       allowNull: false,
       comment: "Date intended for the Physical Inventory",
@@ -21,8 +22,24 @@ PhysicalInventory.init(
       values: Object.values(PhysicalInventoryStatus),
       defaultValue: PhysicalInventoryStatus.DRAFT,
     },
-    remarks: {
-      type: DataTypes.STRING,
+    inventory_incharge: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
+    branch_manager: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
+    date_ended: {
+      type: DataTypes.DATE,
       allowNull: true,
     },
   },

@@ -46,6 +46,11 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        name: "RJ45 Cables",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ];
 
     await queryInterface.bulkInsert(ProductCategory.getTableName(), fields, {});

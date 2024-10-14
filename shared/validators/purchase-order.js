@@ -17,7 +17,7 @@ const PurchaseOrderSchema = Joi.object({
   term_start: Joi.date().when("type", {
     is: "term",
     then: Joi.required(),
-    otherwise: Joi.optional(),
+    otherwise: Joi.allow(null, ""),
   }),
   status: Joi.string()
     .valid("open", "confirmed", "completed", "cancelled")
@@ -52,14 +52,17 @@ const PurchaseOrderUpdateSchema = Joi.object({
 
 // Physical Inventory
 const PhysicalInventorySchema = Joi.object({
-  date: Joi.date().required(),
+  date_started: Joi.date().required(),
+  date_ended: Joi.date().allow(null).optional(),
   status: Joi.string().valid(...Object.values(PhysicalInventoryStatus)),
-  remarks: Joi.string().optional(),
+  inventory_incharge: Joi.number().required(),
+  branch_manager: Joi.number().required(),
 });
 
 // Physical Inventory Item
 const PhysicalInventoryItemSchema = Joi.object({
   id: Joi.number().optional(),
+  quantity: Joi.number().required(),
   product_id: Joi.number().required(),
   physical_inventory_id: Joi.number().required(),
   physical_quantity: Joi.number().min(0).required(),

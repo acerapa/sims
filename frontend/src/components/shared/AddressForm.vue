@@ -1,41 +1,54 @@
 <template>
   <div class="flex flex-col gap-3">
     <div class="flex flex-col gap-3">
-      <input
+      <CustomInput
         type="text"
-        class="input w-full"
+        name="address1"
+        class="w-full"
+        label="Address 1"
         placeholder="Address 1"
         v-model="model.address1"
         :disabled="props.disabled"
+        :has-label="props.hasLabel"
       />
-      <input
+      <CustomInput
         type="text"
-        class="input w-full"
+        class="w-full"
+        name="address2"
+        label="Address 2"
         placeholder="Address 2"
         v-model="model.address2"
         :disabled="props.disabled"
+        :has-label="props.hasLabel"
       />
     </div>
     <div class="flex gap-6 max-lg:flex-col max-lg:gap-3">
-      <input
+      <CustomInput
         type="text"
-        class="input flex-1"
+        name="city"
+        label="City"
+        class="flex-1"
         placeholder="City"
         v-model="model.city"
         :disabled="props.disabled"
+        :has-label="props.hasLabel"
       />
-      <input
+      <CustomInput
         type="text"
-        class="input flex-1"
+        name="postal"
+        class="flex-1"
+        label="Zip Code"
         placeholder="Zip Code"
         v-model="model.postal"
         :disabled="props.disabled"
+        :has-label="props.hasLabel"
       />
     </div>
   </div>
 </template>
 <script setup>
 import { ref, watch } from "vue";
+import CustomInput from "./CustomInput.vue";
 
 const props = defineProps({
   address: {
@@ -43,6 +56,10 @@ const props = defineProps({
     default: () => ({}),
   },
   disabled: {
+    type: Boolean,
+    default: false,
+  },
+  hasLabel: {
     type: Boolean,
     default: false,
   },

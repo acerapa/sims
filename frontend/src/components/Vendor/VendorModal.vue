@@ -1,36 +1,41 @@
 <template>
-  <ModalWrapper
-    :title="title"
-    v-model="showModal"
-    @submit="onSubmit"
-  >
+  <ModalWrapper :title="title" v-model="showModal" @submit="onSubmit">
     <div class="flex flex-col gap-4 my-7">
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Basic Info</p>
         <div class="flex gap-6">
-          <input
+          <CustomInput
             type="text"
-            class="input flex-1"
+            class="flex-1"
+            name="company_name"
             placeholder="Company Name"
             v-model="model.company_name"
           />
-          <select class="input flex-1" v-model="model.annotation">
-            <option value="" hidden>Select annotation</option>
-            <option value="Mr.">Mr.</option>
-            <option value="Ms.">Ms.</option>
-            <option value="Mrs.">Mrs.</option>
-          </select>
+          <CustomInput
+            type="select"
+            class="flex-1"
+            name="annotation"
+            v-model="model.annotation"
+            placeholder="Select annotation"
+            :options="[
+              { text: 'Mr.', value: 'Mr.' },
+              { text: 'Ms.', value: 'Ms.' },
+              { text: 'Mrs.', value: 'Mrs.' },
+            ]"
+          />
         </div>
         <div class="flex gap-6">
-          <input
+          <CustomInput
             type="text"
-            class="input flex-1"
+            class="flex-1"
+            name="first_name"
             placeholder="First Name"
             v-model="model.first_name"
           />
-          <input
+          <CustomInput
             type="text"
-            class="input flex-1"
+            class="flex-1"
+            name="last_name"
             placeholder="Last Name"
             v-model="model.last_name"
           />
@@ -39,29 +44,33 @@
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Address Info</p>
         <div class="flex flex-col gap-3">
-          <input
+          <CustomInput
             type="text"
-            class="input w-full"
+            name="addres1"
+            class="w-full"
             placeholder="Address 1"
             v-model="model.address.address1"
           />
-          <input
+          <CustomInput
             type="text"
-            class="input w-full"
+            name="addess2"
+            class="w-full"
             placeholder="Address 2"
             v-model="model.address.address2"
           />
         </div>
         <div class="flex gap-6">
-          <input
+          <CustomInput
             type="text"
-            class="input flex-1"
+            name="city"
+            class="flex-1"
             placeholder="City"
             v-model="model.address.city"
           />
-          <input
+          <CustomInput
             type="text"
-            class="input flex-1"
+            name="postal"
+            class="flex-1"
             placeholder="Zip Code"
             v-model="model.address.postal"
           />
@@ -70,29 +79,33 @@
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Contact Info</p>
         <div class="flex gap-6">
-          <input
+          <CustomInput
             type="text"
-            class="input flex-1"
+            name="phone"
+            class="flex-1"
             placeholder="Mobile Number"
             v-model="model.phone"
           />
-          <input
+          <CustomInput
             type="text"
-            class="input flex-1"
+            class="flex-1"
+            name="telephone"
             placeholder="Telephone Number"
             v-model="model.telephone"
           />
         </div>
         <div class="flex gap-6">
-          <input
+          <CustomInput
             type="text"
-            class="input flex-1"
+            name="email"
+            class="flex-1"
             placeholder="Email"
             v-model="model.email"
           />
-          <input
+          <CustomInput
+            name="fax"
             type="text"
-            class="input flex-1"
+            class="flex-1"
             placeholder="Fax"
             v-model="model.fax"
           />
@@ -103,6 +116,7 @@
 </template>
 
 <script setup>
+import CustomInput from "@/components/shared/CustomInput.vue";
 import { Method, authenticatedApi } from "@/api";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import { useVendorStore } from "@/stores/supplier";
@@ -115,14 +129,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-	selectedId: {
-		type: Number,
-		required: false
-	}
+  selectedId: {
+    type: Number,
+    required: false,
+  },
 });
 
 const supplierStore = useVendorStore();
-const title = ref(props.isEdit ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier');
+const title = ref(
+  props.isEdit ? "Edit Vendor/Supplier" : "New Vendor/Supplier"
+);
 const apiPath = ref(props.isEdit ? "suppliers/update" : "suppliers/register");
 const model = ref({
   company_name: "",
@@ -143,7 +159,7 @@ const model = ref({
 
 const onSubmit = async () => {
   const res = await authenticatedApi(apiPath.value, Method.POST, model.value);
-	await supplierStore.fetchAllSuppliers();
+  await supplierStore.fetchAllSuppliers();
 
   if (res.status == 200) {
     showModal.value = false;
@@ -151,8 +167,10 @@ const onSubmit = async () => {
 };
 
 onMounted(() => {
-	if (props.isEdit && props.selectedId) {
-		model.value = supplierStore.suppliers.find(sup => sup.id == props.selectedId);
-	}
+  if (props.isEdit && props.selectedId) {
+    model.value = supplierStore.suppliers.find(
+      (sup) => sup.id == props.selectedId
+    );
+  }
 });
 </script>

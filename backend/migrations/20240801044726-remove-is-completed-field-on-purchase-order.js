@@ -40,10 +40,8 @@ module.exports = {
         PurchaseOrder.getTableName(),
         "is_completed",
         {
-          is_completed: {
-            type: Sequelize.BOOLEAN,
-            defaultValue: false,
-          },
+          type: Sequelize.BOOLEAN,
+          defaultValue: false,
         }
       );
     }

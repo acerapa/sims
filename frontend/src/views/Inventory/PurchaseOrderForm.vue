@@ -3,7 +3,13 @@
   <div class="flex flex-col gap-4">
     <div class="bg-white rounded-2xl p-4 shadow flex flex-col gap-3">
       <div class="flex justify-between items-center">
-        <p class="text-base font-semibold">
+        <p
+          class="text-base font-semibold text-success"
+          v-if="status == PurchaseOrderStatus.COMPLETED"
+        >
+          Received Purchase Order
+        </p>
+        <p v-else class="text-base font-semibold">
           {{ isEdit ? "Edit" : "New" }} Purchase Order
         </p>
         <BadgeComponent
@@ -18,17 +24,25 @@
             <p class="text-sm font-semibold">Order Info</p>
             <div class="flex flex-col gap-3">
               <div class="flex gap-3">
-                <CustomSelectInput
+                <CustomInput
+                  type="select"
+                  class="flex-1"
+                  :has-label="true"
+                  label="Suppliers"
                   :has-add-new="true"
+                  name="select_supplier"
                   :options="supplierOptions"
                   placeholder="*Select supplier"
                   v-model="model.order.supplier_id"
                   @add-new="showVendorModal = true"
-                  class="flex-1"
                   :disabled="isEdit || isDisabled"
                 />
-                <CustomSelectInput
+                <CustomInput
+                  type="select"
                   class="flex-1"
+                  :has-label="true"
+                  name="order_type"
+                  label="Order Type"
                   placeholder="*Select Order Type"
                   v-model="model.order.type"
                   :options="[
@@ -44,29 +58,47 @@
                   :disabled="isDisabled"
                 />
               </div>
-              <input
-                type="text"
-                class="input"
-                v-model="model.order.ref_no"
-                placeholder="Ref. No."
-                :disabled="isDisabled"
-              />
               <div class="flex gap-3">
-                <input
+                <CustomInput
                   type="text"
-                  class="flex-1 input"
+                  name="ref_no"
+                  class="flex-1"
+                  :has-label="true"
+                  label="Reference No."
+                  placeholder="Ref. No."
+                  :disabled="isDisabled"
+                  v-model="model.order.ref_no"
+                />
+                <CustomInput
+                  type="date"
+                  class="flex-1"
+                  :has-label="true"
+                  name="start_term"
+                  label="Term Start"
+                  :disabled="isDisabled"
+                  placeholder="Term Start"
+                  v-model="model.order.term_start"
+                  v-if="model.order.type == PurchaseOrderType.TERM"
+                />
+              </div>
+              <div class="flex gap-3">
+                <CustomInput
+                  type="date"
+                  name="date"
+                  label="Date"
+                  :has-label="true"
+                  class="flex-1 max-h-[38px]"
                   placeholder="Date"
-                  @focus="$event.target.type = 'date'"
-                  @blur="$event.target.type = 'text'"
                   v-model="model.order.date"
                   :disabled="isDisabled"
                 />
-                <input
-                  type="text"
-                  class="flex-1 input"
+                <CustomInput
+                  type="date"
+                  name="bill_due"
+                  class="flex-1"
+                  :has-label="true"
+                  label="Bill due"
                   placeholder="Bill Due"
-                  @focus="$event.target.type = 'date'"
-                  @blur="$event.target.type = 'text'"
                   v-model="model.order.bill_due"
                   :disabled="isDisabled"
                 />
@@ -79,18 +111,21 @@
               v-model="model.address"
               :address="model.address"
               :key="model.order"
+              :has-label="true"
               :disabled="isDisabled"
             />
           </div>
         </div>
-        <textarea
-          name=""
-          id=""
-          class="input resize-none"
+        <CustomInput
+          name="memo"
+          label="Memo"
+          type="textarea"
+          :has-label="true"
           placeholder="Memo"
-          v-model="model.order.memo"
           :disabled="isDisabled"
-        ></textarea>
+          input-class="resize-none"
+          v-model="model.order.memo"
+        />
       </div>
 
       <div class="flex justify-between items-center mt-6">
@@ -158,7 +193,12 @@
         >
           {{ isDisabled ? "Back" : "Cancel" }}
         </RouterLink>
-        <button type="button" class="btn-outline" v-if="!isEdit">
+        <button
+          type="button"
+          class="btn-outline"
+          @click="onSubmit(true)"
+          v-if="!isEdit"
+        >
           Save and New
         </button>
         <button type="button" class="btn" @click="onSubmit()" v-if="!isEdit">
@@ -179,31 +219,34 @@
   </div>
 </template>
 <script setup>
-import { useVendorStore } from "@/stores/supplier";
-import { computed, onMounted, ref, watch } from "vue";
-import AddressForm from "@/components/shared/AddressForm.vue";
-import PurchaseOrderFormRow from "../../components/Inventory/PurchaseOrderFormRow.vue";
-import { useRoute, useRouter } from "vue-router";
-import CustomSelectInput from "@/components/shared/CustomSelectInput.vue";
-import VendorModal from "@/components/Vendor/VendorModal.vue";
 import { Method, authenticatedApi } from "@/api";
-import { DateHelpers } from "shared";
+import PurchaseOrderFormRow from "@/components/Inventory/PurchaseOrder/PurchaseOrderFormRow.vue";
+import AddressForm from "@/components/shared/AddressForm.vue";
+import BadgeComponent from "@/components/shared/BadgeComponent.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
+import VendorModal from "@/components/Vendor/VendorModal.vue";
+import { EventEnum } from "@/data/event";
+import Event from "@/event";
+import { getCost } from "@/helper";
 import { useProductStore } from "@/stores/product";
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
-import BadgeComponent from "@/components/shared/BadgeComponent.vue";
-import { PurchaseStatusMap } from "shared/enums/purchase-order";
+import { useVendorStore } from "@/stores/supplier";
+import { DateHelpers } from "shared";
+import {
+  PurchaseOrderStatus,
+  PurchaseOrderType,
+  PurchaseStatusMap,
+} from "shared/enums/purchase-order";
 import { ObjectHelpers } from "shared/helpers/object";
-import Event from "@/event";
-import { PurchaseOrderType } from "shared/enums/purchase-order";
-import { PurchaseOrderStatus } from "shared/enums/purchase-order";
-import { EventEnum } from "@/data/event";
-import { getCost } from "@/helper";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const isEdit = ref(false);
 const router = useRouter();
 const selectedStatus = ref();
 const showVendorModal = ref(false);
+const status = ref(PurchaseOrderStatus.OPEN);
 
 const supplierStore = useVendorStore();
 const purchaseOrderStore = usePurchaseOrderStore();
@@ -218,6 +261,7 @@ const modelDefualtValue = {
     type: PurchaseOrderType.COD,
     memo: "",
     amount: 0,
+    term_start: "",
   },
   address: {
     address1: "",
@@ -237,7 +281,7 @@ const modelDefualtValue = {
   ],
 };
 
-const model = ref({ ...modelDefualtValue });
+const model = ref(ObjectHelpers.copyObj(modelDefualtValue));
 
 /** ================================================
  * EVENTS
@@ -294,6 +338,11 @@ const removeProduct = (ndx) => {
 };
 
 const onSubmit = async (isAddNew = false) => {
+  // pre modification
+  if (model.value.order.type == PurchaseOrderType.COD) {
+    delete model.value.order.term_start;
+  }
+
   const res = await authenticatedApi(
     "purchase-order/register",
     Method.POST,
@@ -301,7 +350,10 @@ const onSubmit = async (isAddNew = false) => {
   );
 
   // reset model
-  model.value = { ...modelDefualtValue };
+  model.value.products = [];
+  model.value.order = { ...modelDefualtValue.order };
+  model.value.address = { ...modelDefualtValue.address };
+  addNewProduct();
 
   if (res.status == 200) {
     if (!isAddNew) {
@@ -314,6 +366,7 @@ const onSubmit = async (isAddNew = false) => {
 
 const onUpdate = async () => {
   if (route.query.id) {
+    Event.emit(EventEnum.IS_PAGE_LOADING, true);
     const res = await authenticatedApi(
       `purchase-order/${route.query.id}/update`,
       Method.POST,
@@ -323,6 +376,7 @@ const onUpdate = async () => {
     if (res.status == 200) {
       console.log("Api is working and need to check the result in db");
     }
+    Event.emit(EventEnum.IS_PAGE_LOADING, false);
   }
 };
 
@@ -335,6 +389,7 @@ onMounted(async () => {
   if (route.query.id) {
     isEdit.value = true;
     await purchaseOrderStore.fetchPurchaseOrderById(route.query.id);
+    status.value = purchaseOrderStore.purchaseOrder.status;
     const order = purchaseOrderStore.purchaseOrder;
     orderStatus.value = order.status;
     selectedStatus.value = PurchaseStatusMap[order.status];

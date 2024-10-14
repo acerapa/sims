@@ -4,16 +4,24 @@
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Product Type & Reordering Point</p>
         <div class="flex gap-3">
-          <select class="input flex-1" v-model="model.type">
-            <option value="" hidden>Select type</option>
-            <option value="inventory">Inventory</option>
-            <option value="non-inventory">Non Inventory</option>
-          </select>
-          <CustomSelectInput
+          <CustomInput
+            type="select"
+            name="type"
+            v-model="model.type"
             class="flex-1"
+            placeholder="Select Type"
+            :options="[
+              { text: 'inventory', value: 'Inventory' },
+              { text: 'non-inventory', value: 'Non Inventory' },
+            ]"
+          />
+          <CustomInput
+            type="select"
+            class="flex-1"
+            name="reordering"
             :has-add-new="true"
-            v-model="model.product_setting_id"
             :options="reorderingPointOptions"
+            v-model="model.product_setting_id"
             placeholder="*Select Reordering Point"
             @add-new="showProductPointModal = true"
           />
@@ -23,30 +31,36 @@
         <p class="text-base font-semibold">Basic Info</p>
         <div class="flex flex-col gap-4">
           <div class="flex gap-3">
-            <input
+            <CustomInput
               type="text"
-              class="input flex-1"
+              name="product_name"
+              class="flex-1"
               placeholder="*Name"
               v-model="model.name"
             />
-            <input
+            <CustomInput
               type="text"
-              class="input flex-1"
+              name="brand"
+              class="flex-1"
               placeholder="*Brand"
               v-model="model.brand"
             />
           </div>
           <div class="flex gap-3 items-start">
-            <CustomSelectInput
-              placeholder="*Select Suppliers"
+            <CustomInput
+              type="select"
               class="flex-1"
+              name="suppliers"
               :has-add-new="true"
               :select-multiple="true"
-              :options="supplierOptions"
-              @add-new="showVendorModal = true"
               v-model="model.suppliers"
+              :options="supplierOptions"
+              placeholder="*Select Suppliers"
+              @add-new="showVendorModal = true"
             />
-            <CustomSelectInput
+            <CustomInput
+              type="select"
+              name="category_id"
               placeholder="*Select Category"
               class="flex-1"
               :has-add-new="true"
@@ -61,68 +75,76 @@
         <p class="text-base font-semibold">Inventory and Sales info</p>
         <div class="flex flex-col gap-4">
           <div class="flex gap-3">
-            <input
+            <CustomInput
               type="number"
-              class="input flex-1"
+              name="cost"
+              class="flex-1"
               placeholder="Cost Price"
               v-model="model.cost"
             />
-            <input
+            <CustomInput
+              name="sale"
               type="number"
-              class="input flex-1"
+              class="flex-1"
               placeholder="Sale Price"
               v-model="model.price"
             />
           </div>
           <div class="flex gap-3 items-start">
-            <CustomSelectInput
-              placeholder="*Select Income Account"
+            <CustomInput
+              type="select"
               class="flex-1"
               :has-add-new="true"
+              name="income_account"
               :options="incomeAccounts"
-              @add-new="showAccountModal = true"
               v-model="model.income_account"
+              @add-new="showAccountModal = true"
+              placeholder="*Select Income Account"
             />
-            <CustomSelectInput
-              placeholder="*Select Expense Account"
+            <CustomInput
+              type="select"
               class="flex-1"
               :has-add-new="true"
+              name="expense_account"
               :options="expenseAccounts"
-              @add-new="showAccountModal = true"
               v-model="model.expense_account"
+              @add-new="showAccountModal = true"
+              placeholder="*Select Expense Account"
             />
           </div>
           <div class="flex gap-3">
-            <input
+            <CustomInput
               type="number"
-              class="input flex-1"
+              class="flex-1"
+              name="quantity_in_stock"
               placeholder="Quantity in stock"
               v-model="model.quantity_in_stock"
             />
-            <input
+            <CustomInput
               type="text"
-              class="input flex-1"
+              class="flex-1"
+              name="item_code"
               placeholder="Item Code"
               v-model="model.item_code"
             />
           </div>
           <div class="flex gap-3 items-start">
-            <textarea
-              name=""
-              id=""
-              rows="5"
-              class="input flex-1"
+            <CustomInput
+              :rows="5"
+              class="flex-1"
+              type="textarea"
+              name="purchase_description"
               placeholder="Purchase Description"
               v-model="model.purchase_description"
-            ></textarea>
-            <textarea
-              name=""
-              id=""
-              rows="5"
-              class="input flex-1"
+            />
+            <CustomInput
+              :rows="5"
+              class="flex-1"
+              type="textarea"
+              name="sale_description"
               placeholder="Sales Description"
               v-model="model.sale_description"
-            ></textarea>
+            />
           </div>
         </div>
       </div>
@@ -138,13 +160,13 @@
 </template>
 
 <script setup>
+import CustomInput from "@/components/shared/CustomInput.vue";
 import { Method, authenticatedApi } from "@/api";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import CustomSelectInput from "../shared/CustomSelectInput.vue";
-import ProductCategoryModal from "../Settings/ProductCategoryModal.vue";
-import AccountModal from "../Settings/AccountModal.vue";
-import VendorModal from "../Vendor/VendorModal.vue";
-import ProductPointModal from "../Settings/ProductPointModal.vue";
+import ProductCategoryModal from "@/components/Settings/ProductCategoryModal.vue";
+import AccountModal from "@/components/Settings/AccountModal.vue";
+import VendorModal from "@/components/Vendor/VendorModal.vue";
+import ProductPointModal from "@/components/Settings/ProductPointModal.vue";
 import { computed, onMounted, ref } from "vue";
 import { AccountTypes } from "shared";
 

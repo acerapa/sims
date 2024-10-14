@@ -7,6 +7,7 @@ import reports from "@/assets/icons/reports.svg";
 import employees from "@/assets/icons/employees.svg";
 import settings from "@/assets/icons/settings.svg";
 import dot from "@/assets/icons/dot.svg";
+import transfer from "@/assets/icons/transfer.png";
 
 export default [
   {
@@ -31,12 +32,16 @@ export default [
         icon: dot,
       },
       {
-        text: "Physical Inventory",
-        route: "physical-inventory",
+        text: "Inventory Stock Status",
+        route: "inventory-stock-status",
         icon: dot,
-        includes_active: ["physical-inventory-details"],
       },
     ],
+  },
+  {
+    text: "Transfer Stocks",
+    route: "transfer",
+    icon: transfer,
   },
   {
     text: "Vendors/Suppliers",
@@ -57,6 +62,13 @@ export default [
     text: "Reports",
     route: "reports",
     icon: reports,
+    children: [
+      {
+        text: "Physical Inventories",
+        route: "physical-inventory",
+        icon: dot,
+      },
+    ],
   },
   {
     text: "Employees",
