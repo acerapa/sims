@@ -11,16 +11,15 @@ const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
 const PhysicalInventoryItem = require("./physical-inventory-item");
 
-Supplier.hasOne(Address, {
-  foreignKey: "supplier_id",
-  as: "address",
-  onDelete: "CASCADE",
+Address.hasMany(Supplier, {
+  foreignKey: "address_id",
+  key: "suppliers",
 });
 
-Address.belongsTo(Supplier, {
-  foreignKey: "supplier_id",
-  as: "supplier",
-  onDelete: "NO ACTION",
+Supplier.belongsTo(Address, {
+  foreignKey: "address_id",
+  key: "address",
+  as: "address",
 });
 
 Product.belongsToMany(Supplier, {
@@ -75,6 +74,11 @@ PurchaseOrder.belongsToMany(Product, {
   as: "products",
 });
 
+PurchaseOrder.belongsTo(Address, {
+  foreignKey: "address_id",
+  as: "address",
+});
+
 // Product Order and Product Relationships
 Product.hasMany(ProductOrder, {
   foreignKey: "product_id",
@@ -91,12 +95,6 @@ ProductOrder.belongsTo(Product, {
 PurchaseOrder.belongsTo(Supplier, {
   foreignKey: "supplier_id",
   as: "supplier",
-  onDelete: "CASCADE",
-});
-
-PurchaseOrder.hasOne(Address, {
-  foreignKey: "order_id",
-  as: "address",
   onDelete: "CASCADE",
 });
 
