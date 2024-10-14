@@ -32,12 +32,15 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      const purchaseOrder = await PurchaseOrder.create(data.order, {
+
+      const address = await Address.create(data.address, {
         transaction: transaction,
       });
 
-      const address = { ...data.address, order_id: purchaseOrder.id };
-      await Address.create(address, { transaction: transaction });
+      const order = { ...data.order, address_id: address.id };
+      const purchaseOrder = await PurchaseOrder.create(order, {
+        transaction: transaction,
+      });
 
       await Promise.all([
         ...data.products.map(async (product) => {
@@ -63,10 +66,13 @@ module.exports = {
     try {
       const data = req.body.validated;
       if (data.order) {
-        await PurchaseOrder.update(data.order, {
+        const purchaseOrder = await PurchaseOrder.findOne({
           where: {
             id: req.params.id,
           },
+        });
+
+        await purchaseOrder.update(data.order, {
           transaction: transaction,
         });
 
@@ -122,7 +128,7 @@ module.exports = {
         if (data.address) {
           await Address.update(data.address, {
             where: {
-              order_id: req.params.id,
+              id: purchaseOrder.address_id,
             },
             transaction: transaction,
           });

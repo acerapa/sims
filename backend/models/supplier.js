@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require(".");
+const Address = require("./address");
 
 class Supplier extends Model {}
 
@@ -41,6 +42,13 @@ Supplier.init(
     fax: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    address_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: Address,
+        key: "id",
+      },
     },
   },
   {
