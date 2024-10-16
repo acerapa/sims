@@ -31,24 +31,24 @@ class ObjectHelpers {
    * @param {*} obj
    * @returns
    */
-  static objectReset = (obj) => {
+  static objectReset = (obj, options) => {
     const keys = Object.keys(obj);
     const newObj = {};
     keys.forEach((key) => {
       switch (typeof obj[key]) {
         case "string":
-          obj[key] = "";
+          newObj[key] = "";
           break;
         case "number":
-          obj[key] = 0;
+          newObj[key] = 0;
         case "object":
           if (Array.isArray(obj[key])) {
-            obj[key] = [];
+            newObj[key] = [];
           } else {
-            obj[key] = {};
+            // reset the child objects recursively
+            newObj[key] = this.objectReset(obj[key]);
           }
       }
-      newObj[key] = "";
     });
 
     return newObj;

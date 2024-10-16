@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const router = Router();
-const { all, register, update, destroy } = require("../controllers/ProductSettingController");
+const { all, register, update, destroy } = require("../controllers/SettingController");
 
 router.get("/all", all);
 router.post("/update", update);

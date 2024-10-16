@@ -30,16 +30,19 @@
         class="px-5 py-2 flex gap-3 w-fit rounded-lg text-sm"
         :class="isIncludedRoute(child) ? 'bg-dark-blue font-bold' : ''"
         :to="{ name: child.route }"
-        active-class="bg-dark-blue font-bold"
+        :active-class="'bg-dark-blue font-bold'"
+        exact-active-class="exact-active"
         @click="emitRouteClick(child.route, child.children)"
       >
-        <img :src="child.icon" alt="" />
+        <img :src="child.icon" class="outline-dot" alt="dot" />
+        <img :src="dot" class="dot" alt="dot" />
         {{ child.text }}
       </RouterLink>
     </div>
   </div>
 </template>
 <script setup>
+import dot from "@/assets/icons/dot.svg";
 import { useAppStore } from "@/stores/app";
 import { useRoute } from "vue-router";
 
@@ -77,3 +80,16 @@ const isIncludedRoute = (rt) => {
   );
 };
 </script>
+
+<style scoped>
+.exact-active .outline-dot {
+  display: none;
+}
+.exact-active .dot {
+  display: block;
+}
+
+.dot {
+  display: none;
+}
+</style>

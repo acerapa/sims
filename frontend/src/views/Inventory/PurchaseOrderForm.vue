@@ -109,8 +109,6 @@
             <p class="text-sm font-semibold">Ship To Info</p>
             <AddressForm
               v-model="model.address"
-              :address="model.address"
-              :key="model.order"
               :has-label="true"
               :disabled="isDisabled"
             />
