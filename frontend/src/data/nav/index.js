@@ -93,6 +93,11 @@ export default [
     icon: settings,
     children: [
       {
+        text: "Branches",
+        route: "branches",
+        icon: outlineDot,
+      },
+      {
         text: "Account Settings",
         route: "account-settings",
         icon: outlineDot,

@@ -26,6 +26,9 @@ router.use("/product-setting", productSettingRoutes);
 
 const physicalInventoryRoutes = require("./PhysicalInventoryRoutes");
 router.use("/physical-inventory", physicalInventoryRoutes);
+
+const branchesRoutes = require("./BranchRoutes");
+router.use("/branch", branchesRoutes);
 // end use routes
 
 module.exports = router;

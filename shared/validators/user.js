@@ -6,7 +6,7 @@ const UserSchema = Joi.object({
   username: Joi.string().required(),
   first_name: Joi.string().required(),
   last_name: Joi.string().required(),
-  middle_name: Joi.string().allow(null),
+  middle_name: Joi.string().allow(null, ""),
   password: Joi.string().required(),
   position: Joi.string()
     .valid(...Object.values(UserType))

@@ -10,6 +10,7 @@ const ProductSupplier = require("./product-supplier");
 const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
 const PhysicalInventoryItem = require("./physical-inventory-item");
+const Branch = require("./branch");
 
 Address.hasMany(Supplier, {
   foreignKey: "address_id",
@@ -154,6 +155,25 @@ PhysicalInventory.belongsTo(User, {
 });
 
 PhysicalInventory.belongsTo(User, {
+  foreignKey: "branch_manager",
+  as: "manager",
+});
+
+// Branch and Address relationships
+Branch.belongsTo(Address, {
+  foreignKey: "address_id",
+  as: "address",
+  onDelete: "NO ACTION",
+});
+
+Address.hasMany(Branch, {
+  foreignKey: "address_id",
+  as: "branches",
+  onDelete: "NO ACTION",
+});
+
+// Branch and User relationships
+Branch.belongsTo(User, {
   foreignKey: "branch_manager",
   as: "manager",
 });
