@@ -47,11 +47,13 @@ export default [
         text: "IBRR List",
         route: "ibrr-list",
         icon: outlineDot,
+        includes_active: ["ibrr-form"],
       },
       {
         text: "STR List",
         route: "str-list",
         icon: outlineDot,
+        includes_active: ["str-form"],
       },
     ],
   },

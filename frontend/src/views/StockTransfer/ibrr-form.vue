@@ -1,5 +1,3 @@
 <template>
-	<div>
-		<h1>Inter Branch Receiving Report</h1>
-	</div>
+  <div class="cont"></div>
 </template>

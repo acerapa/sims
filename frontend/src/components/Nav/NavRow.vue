@@ -28,7 +28,9 @@
         v-for="(child, child_ndx) in props.nav.children"
         :key="child_ndx"
         class="px-5 py-2 flex gap-3 w-fit rounded-lg text-sm"
-        :class="isIncludedRoute(child) ? 'bg-dark-blue font-bold' : ''"
+        :class="
+          isIncludedRoute(child) ? 'bg-dark-blue font-bold exact-active' : ''
+        "
         :to="{ name: child.route }"
         :active-class="'bg-dark-blue font-bold'"
         exact-active-class="exact-active"

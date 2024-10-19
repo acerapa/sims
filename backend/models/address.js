@@ -20,7 +20,11 @@ Address.init(
     },
     city: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
+    },
+    province: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     postal: {
       type: DataTypes.STRING,
