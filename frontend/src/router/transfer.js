@@ -4,7 +4,7 @@ export default [
     name: "transfer",
     component: () => import("@/layout/NavLayout.vue"),
     redirect: {
-      name: "ibrr-list",
+      name: "str-list",
     },
     children: [
       {

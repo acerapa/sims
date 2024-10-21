@@ -11,6 +11,8 @@ const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
 const PhysicalInventoryItem = require("./physical-inventory-item");
 const Branch = require("./branch");
+const B2BTransfer = require("./b2b-transfer");
+const ProductTransfer = require("./product-transfer");
 
 Address.hasMany(Supplier, {
   foreignKey: "address_id",
@@ -176,4 +178,30 @@ Address.hasMany(Branch, {
 Branch.belongsTo(User, {
   foreignKey: "branch_manager",
   as: "manager",
+});
+
+// B2BTransfer to ProductTransfer
+B2BTransfer.belongsToMany(Product, {
+  through: ProductTransfer,
+  foreignKey: "transfer_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(B2BTransfer, {
+  through: ProductTransfer,
+  foreignKey: "transfer_id",
+  otherKey: "product_id",
+  as: "transfers",
+});
+
+// B2BTransfer to Branch
+B2BTransfer.belongsTo(Branch, {
+  foreignKey: "branch_id",
+  as: "branch",
+});
+
+Branch.hasMany(B2BTransfer, {
+  foreignKey: "branch_id",
+  as: "transfers",
 });

@@ -8,7 +8,7 @@ export const useProductStore = defineStore("product", () => {
 
   const products = ref([]);
   const supplierProducts = computed(() => {
-		if (!supplierStore.selectedSupplier) return products.value;
+    if (!supplierStore.selectedSupplier) return products.value;
     return products.value.filter(
       (product) =>
         product.suppliers &&
@@ -26,9 +26,19 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
+  const productOptions = computed(() => {
+    return products.value.map((product) => {
+      return {
+        text: product.name,
+        value: product.id,
+      };
+    });
+  });
+
   return {
     products,
     supplierProducts,
+    productOptions,
     fetchAllProducts,
   };
 });

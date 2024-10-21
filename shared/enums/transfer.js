@@ -14,7 +14,21 @@ const BranchStatusMap = Object.freeze({
   },
 });
 
+const TransferType = Object.freeze({
+  IBRR: "ibrr",
+  STR: "str",
+});
+
+const ProductTransferStatus = Object.freeze({
+  OPEN: "open",
+  COMPLETE: "complete",
+  INCOMPLETE: "incomplete",
+  NOT_RECEIVED: "not-received",
+});
+
 module.exports = {
   BranchStatus,
+  TransferType,
   BranchStatusMap,
+  ProductTransferStatus,
 };
