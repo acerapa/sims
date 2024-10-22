@@ -11,7 +11,13 @@
     :href="`branch/delete/${selectedId}`"
     @after-delete="onAfterDelete"
   />
-  <div>
+  <div class="flex flex-col gap-4">
+    <div class="cont">
+      <p class="text-sm font-bold">Current Branch</p>
+      <div class="flex gap-3">
+        <CustomInput name="name" type="text" />
+      </div>
+    </div>
     <CustomTable
       class="relative"
       title="Branch List"
@@ -39,6 +45,7 @@ import BranchHeader from "@/components/Settings/BranchHeader.vue";
 import BranchModal from "@/components/Settings/BranchModal.vue";
 import BranchRow from "@/components/Settings/BranchRow.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import { EventEnum } from "@/data/event";
@@ -54,6 +61,8 @@ const showModal = ref(false);
 const showRowMenu = ref(false);
 const showConfirmModal = ref(false);
 const settingsStore = useSettingsStore();
+
+const model = ref();
 
 /** ================================================
  * COMPUTED

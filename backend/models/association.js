@@ -1,18 +1,19 @@
 const User = require("./user");
+const Branch = require("./branch");
 const Address = require("./address");
 const Account = require("./account");
 const Product = require("./product");
 const Supplier = require("./supplier");
+const B2BTransfer = require("./b2b-transfer");
+const BranchMember = require("./branch-member");
 const ProductOrder = require("./product-order");
 const PurchaseOrder = require("./purchase-order");
 const ProductSettings = require("./product-setting");
+const ProductTransfer = require("./product-transfer");
 const ProductSupplier = require("./product-supplier");
 const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
 const PhysicalInventoryItem = require("./physical-inventory-item");
-const Branch = require("./branch");
-const B2BTransfer = require("./b2b-transfer");
-const ProductTransfer = require("./product-transfer");
 
 Address.hasMany(Supplier, {
   foreignKey: "address_id",
@@ -214,4 +215,32 @@ B2BTransfer.belongsTo(Branch, {
 Branch.hasMany(B2BTransfer, {
   foreignKey: "branch_from",
   as: "sents",
+});
+
+// BranchMember relation to users and Branch
+Branch.belongsToMany(User, {
+  through: BranchMember,
+  foreignKey: "branch_id",
+  otherKey: "user_id",
+  as: "members",
+});
+
+BranchMember.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+User.hasOne(BranchMember, {
+  foreignKey: "user_id",
+  as: "branch_member",
+});
+
+BranchMember.belongsTo(Branch, {
+  foreignKey: "branch_id",
+  as: "branch",
+});
+
+Branch.hasOne(BranchMember, {
+  foreignKey: "branch_id",
+  as: "branch_through",
 });

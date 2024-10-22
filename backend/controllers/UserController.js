@@ -25,7 +25,7 @@ module.exports = {
 
     try {
       await User.create(data);
-      res.sendResponse({}, "Successfully Registered!", 200);
+      res.sendResponse({}, "Successfully Registered!");
     } catch (e) {
       let message = "Something wen't wrong! => " + e.message;
       if (e.name == "SequelizeUniqueConstraintError") {
