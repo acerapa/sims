@@ -1,8 +1,8 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
 const Branch = require("../models/branch");
-const Address = require("./address");
 const { TransferType } = require("shared/enums");
+const User = require("./user");
 
 class B2BTransfer extends Model {}
 
@@ -28,15 +28,26 @@ B2BTransfer.init(
     },
     ibrr_id: {
       type: DataTypes.INTEGER,
-      references: {
-        model: B2BTransfer,
-        key: "id",
-      },
+      allowNull: true,
     },
-    branch_id: {
+    branch_to: {
       type: DataTypes.INTEGER,
       references: {
         model: Branch,
+        key: "id",
+      },
+    },
+    branch_from: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: Branch,
+        key: "id",
+      },
+    },
+    processed_by: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: User,
         key: "id",
       },
     },

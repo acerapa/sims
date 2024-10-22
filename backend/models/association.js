@@ -197,11 +197,21 @@ Product.belongsToMany(B2BTransfer, {
 
 // B2BTransfer to Branch
 B2BTransfer.belongsTo(Branch, {
-  foreignKey: "branch_id",
-  as: "branch",
+  foreignKey: "branch_to",
+  as: "receiver",
 });
 
 Branch.hasMany(B2BTransfer, {
-  foreignKey: "branch_id",
-  as: "transfers",
+  foreignKey: "branch_to",
+  as: "receives",
+});
+
+B2BTransfer.belongsTo(Branch, {
+  foreignKey: "branch_from",
+  as: "sender",
+});
+
+Branch.hasMany(B2BTransfer, {
+  foreignKey: "branch_from",
+  as: "sents",
 });

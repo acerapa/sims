@@ -371,3 +371,12 @@ Content-Type: application/json
 ### [Branch delete]
 DELETE http://localhost:3000/api/branch/delete/4
 Accept: application/json
+
+### [Branch Transfer]
+POST http://localhost:3000/api/transfer/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"transfer": {}
+}

@@ -9,6 +9,7 @@
       ref="select"
       v-if="!props.selectMultiple && !props.canSearch"
       :disabled="props.disabled"
+      @change="emit('change')"
     >
       <option value="" v-if="props.placeholder" selected disabled>
         {{ props.placeholder }}
