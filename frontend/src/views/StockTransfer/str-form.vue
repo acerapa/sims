@@ -105,7 +105,7 @@ import { useProductStore } from "@/stores/product";
 import { useSettingsStore } from "@/stores/settings";
 import { useTransferStore } from "@/stores/transfer";
 import { TransferType } from "shared/enums/transfer";
-import { ObjectHelpers } from "shared/helpers";
+import { DateHelpers, ObjectHelpers } from "shared/helpers";
 import { computed, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 
@@ -137,7 +137,7 @@ const defaultValue = {
     branch_to: "",
     branch_from: "",
     processed_by: "",
-    date_time: new Date().toISOString().split(":").slice(0, 2).join(":"),
+    date_time: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II"),
     type: TransferType.STR,
   },
   products: [{ ...productDefaultValue }],
@@ -179,12 +179,11 @@ const branchOptions = computed(() => {
 
 // TODO: Regulate the interval when to have or not.
 const timeInterval = setInterval(() => {
-  model.value.date_time = new Date()
-    .toISOString()
-    .split(":")
-    .slice(0, 2)
-    .join(":");
-}, 60000);
+  model.value.transfer.date_time = DateHelpers.formatDate(
+    new Date(),
+    "YYYY-MM-DDTHH:II"
+  );
+}, 1000);
 
 const populateAddress = () => {
   if (model.value.transfer.branch_to) {
@@ -204,6 +203,7 @@ const populateAddress = () => {
 const onSubmit = async () => {
   clearInterval(timeInterval);
 
+  model.value.transfer.date_time = new Date();
   await transferStore.createTransfer(model.value);
 };
 

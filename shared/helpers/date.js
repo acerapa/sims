@@ -30,6 +30,10 @@ class DateHelpers {
     const day = dt.getDate();
     const month = dt.getMonth() + 1;
 
+    const hour = dt.getHours();
+    const minutes = dt.getMinutes();
+    const seconds = dt.getSeconds();
+
     // formatting month start
     if (format.includes("MM")) {
       format = format.replaceAll("MM", month.toString().padStart(2, "0"));
@@ -62,6 +66,59 @@ class DateHelpers {
       );
     }
     // formatting year end
+
+    // formatting hour start
+    if (format.includes("HH")) {
+      if (format.includes("A")) {
+        format = format.replaceAll("HH", hour.toString().padStart(2, "0"));
+      } else {
+        // converting military time to standard
+        const h = hour > 12 ? hour - 12 : hour;
+        format = format.replaceAll("HH", h.toString().padStart(2, "0"));
+      }
+    }
+
+    if (format.includes("H")) {
+      if (format.includes("A")) {
+        format = format.replaceAll("H", hour.toString());
+      } else {
+        // converting military time to standard
+        const h = hour > 12 ? hour - 12 : hour;
+        format = format.replaceAll("H", h.toString());
+      }
+    }
+    // formatting hours end
+
+    // formatting minutes start
+    if (format.includes("II")) {
+      format = format.replaceAll("II", minutes.toString().padStart(2, "0"));
+    }
+
+    if (format.includes("I")) {
+      format = format.replaceAll("I", minutes.toString());
+    }
+    // formatting minutes end
+
+    // formatting seconds start
+    if (format.includes("SS")) {
+      format = format.replaceAll("SS", seconds.toString().padStart(2, "0"));
+    }
+
+    if (format.includes("S")) {
+      format = format.replaceAll("S", seconds.toString());
+    }
+    // formatting seconds end
+
+    // meridian time
+    if (format.includes("A")) {
+      let m = "AM";
+
+      if (hour > 12) {
+        m = "PM";
+      }
+
+      format = format.replaceAll("A", m);
+    }
 
     return format;
   };
