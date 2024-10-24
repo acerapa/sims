@@ -5,8 +5,8 @@
       <p class="table-header">#</p>
     </div>
     <p class="col-span-2 table-header">From</p>
-    <p class="col-span-2 table-header">Manager</p>
-    <p class="col-span-1 table-header">When</p>
+    <p class="col-span-1 table-header">Manager</p>
+    <p class="col-span-2 table-header">When</p>
     <p class="col-span-1 table-header">Action</p>
   </div>
 </template>

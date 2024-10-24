@@ -2,6 +2,9 @@ const { TransferType } = require("shared/enums");
 const { sequelize } = require("../models");
 const B2BTransfer = require("../models/b2b-transfer");
 const ProductTransfer = require("../models/product-transfer");
+const Branch = require("../models/branch");
+const User = require("../models/user");
+const Product = require("../models/product");
 
 module.exports = {
   getAllByType: async (req, res) => {
@@ -11,6 +14,34 @@ module.exports = {
           type: req.params.type,
         },
         order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: Branch,
+            as: "receiver",
+          },
+          {
+            model: Branch,
+            as: "receiver",
+            include: [
+              {
+                model: User,
+                as: "manager",
+                attributes: ["id", "first_name", "last_name", "position"],
+              },
+            ],
+          },
+          {
+            model: User,
+            as: "process_by",
+            attributes: ["id", "first_name", "last_name", "position"],
+          },
+          {
+            model: Product,
+            through: ProductTransfer,
+            as: "products",
+            attributes: ["id"],
+          },
+        ],
       });
 
       res.sendResponse({ transfer }, "Successfully fetched!");

@@ -10,6 +10,7 @@ const { AddressSchema } = require("./user");
 const BranchSchema = Joi.object({
   name: Joi.string().required(),
   branch_manager: Joi.number().required(),
+  is_current: Joi.boolean().optional(),
   status: Joi.string().valid(...Object.values(BranchStatus)),
 });
 
@@ -29,13 +30,17 @@ const BranchTransferSchema = Joi.object({
   date_time: Joi.date().required(),
   branch_to: Joi.number().required(),
   branch_from: Joi.number().required(),
-  ibrr_id: Joi.number().required(),
   processed_by: Joi.number().required(),
+  str_id: Joi.number().when("type", {
+    is: TransferType.STR,
+    then: Joi.allow(null, "").optional(),
+    otherwise: Joi.required(),
+  }),
 });
 
 const ProductTransferSchema = Joi.object({
   product_id: Joi.number().required(),
-  transfer_id: Joi.number().required(),
+  transfer_id: Joi.number().optional(),
   quantity: Joi.number().required(),
   quantity_received: Joi.number().allow(null, 0),
   status: Joi.string().valid(...Object.values(ProductTransferStatus)),

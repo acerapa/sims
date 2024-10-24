@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --danger: #F05252;
+  --danger-20: rgb(240, 82, 82, 0.2);
+  --danger-10: rgb(240, 82, 82, 0.1);
+  --open: #3F83F8;
+  --success: #19BE34;
+  --warning: #C27803;
+  --draft: #6b7280;
+}
+
 @font-face {
   font-family: 'Lexend';
   src: url('./assets/fonts/Lexend-Regular.ttf') format('truetype');
@@ -82,27 +92,27 @@ select.input {
 
 /* Dev defined classes for special used */
 .purchase-status-open {
-  color: #3F83F8;
+  color: var(--open);
   background-color: rgba(63, 131, 248, 0.2);
 }
 
 .purchase-status-confirmed {
-  color: #C27803;
+  color: var(--warning);
   background-color: rgb(194, 120, 3, 0.2);
 }
 
 .purchase-status-completed, .done {
-  color: #19BE34;
+  color: var(--success);
   background-color: rgb(25, 190, 52, 0.2); 
 }
 
 .purchase-status-cancelled {
-  color: #F05252;
-  background-color: rgb(240, 82, 82, 0.2);
+  color: var(--danger);
+  background-color: var(--danger-20);
 }
 
 .draft {
-  color:#6b7280;
+  color: var(--draft);
   background-color: rgb(107, 114, 128, 0.2);
 }
 

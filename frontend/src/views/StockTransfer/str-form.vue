@@ -1,117 +1,151 @@
 <template>
-  <div class="cont">
-    <div class="flex gap-4 max-lg:flex-col">
-      <div class="flex flex-col gap-3 flex-1">
-        <p class="text-base font-semibold">Transfer Information</p>
-        <div class="flex gap-3">
+  <div class="flex flex-col gap-4">
+    <AlertComponent
+      v-if="!currentBranch"
+      type="danger"
+      :text="'Please select current branch'"
+    >
+      Please refer
+      <RouterLink class="text-blue-400 underline" :to="{ name: 'branches' }"
+        >here!</RouterLink
+      >
+    </AlertComponent>
+    <div class="cont">
+      <div class="flex gap-4 max-lg:flex-col">
+        <div class="flex flex-col gap-3 flex-1">
+          <p class="text-base font-semibold">Transfer Information</p>
+          <div class="flex gap-3">
+            <CustomInput
+              type="select"
+              name="branch"
+              class="flex-1"
+              :options="branchOptions"
+              :has-label="true"
+              label="Select Receiving Branch"
+              placeholder="Select Branch"
+              v-model="model.transfer.branch_to"
+              @change="populateAddress"
+            />
+            <CustomInput
+              type="datetime-local"
+              name="date"
+              class="flex-1"
+              :has-label="true"
+              label="Date and Time"
+              :disabled="true"
+              v-model="model.transfer.date_time"
+            />
+          </div>
+
           <CustomInput
-            type="select"
-            name="branch"
-            class="flex-1"
-            :options="branchOptions"
+            type="textarea"
             :has-label="true"
-            label="Select Branch"
-            placeholder="Select Branch"
-            v-model="model.branch_to"
-            @change="populateAddress"
-          />
-          <CustomInput
-            type="datetime-local"
-            name="date"
-            class="flex-1"
-            :has-label="true"
-            label="Date and Time"
-            :disabled="true"
-            v-model="model.date_time"
+            label="Memo"
+            name="memo"
+            v-model="model.transfer.memo"
+            placeholder="Write Something"
           />
         </div>
 
-        <CustomInput
-          type="textarea"
-          :has-label="true"
-          label="Memo"
-          name="memo"
-          placeholder="Write Something"
-        />
+        <div class="flex flex-col gap-3 flex-1">
+          <p class="text-base font-semibold">Address Info</p>
+          <AddressForm v-model="address" :has-label="true" :disabled="true" />
+        </div>
       </div>
-
-      <div class="flex flex-col gap-3 flex-1">
-        <p class="text-base font-semibold">Address Info</p>
-        <AddressForm
-          v-model="model.address"
-          :has-label="true"
-          :disabled="true"
-        />
+      <div class="flex flex-col gap-3 mt-5">
+        <p class="text-base font-semibold">Select Product</p>
+        <ProductMulitpleSelect
+          v-model="model.products"
+          :header-component="ProductSelectHeader"
+          :row-component="ProductSelectRow"
+          :format="productDefaultValue"
+        >
+          <template v-slot:aggregate>
+            <div>
+              <span class="font-bold text-sm">Total: </span>
+              <span class="text-sm"
+                >&#8369; {{ totalAmount ? totalAmount : 0 }}</span
+              >
+            </div>
+          </template>
+        </ProductMulitpleSelect>
       </div>
-    </div>
-    <div class="flex flex-col gap-3 mt-5">
-      <p class="text-base font-semibold">Select Product</p>
-      <ProductMulitpleSelect
-        v-model="model.products"
-        :header-component="ProductSelectHeader"
-        :row-component="ProductSelectRow"
-        :format="productDefaultValue"
-      >
-        <template v-slot:aggregate>
-          <div>
-            <span class="font-bold text-sm">Total: </span>
-            <span class="text-sm">&#8369; {{ totalAmount }}</span>
-          </div>
-        </template>
-      </ProductMulitpleSelect>
-    </div>
-    <div class="flex gap-3">
-      <button class="btn-outline">Cancel</button>
-      <button class="btn-outline">Save and New</button>
-      <button class="btn" @click="onSubmit">Save</button>
+      <div class="flex gap-3 mt-4 justify-end">
+        <button class="btn-outline !border-danger !text-danger">Cancel</button>
+        <button
+          class="btn-outline disabled:opacity-50"
+          :disabled="!currentBranch"
+        >
+          Save and New
+        </button>
+        <button
+          class="btn disabled:opacity-50"
+          @click="onSubmit"
+          :disabled="!currentBranch"
+        >
+          Save
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import CustomInput from "@/components/shared/CustomInput.vue";
 import AddressForm from "@/components/shared/AddressForm.vue";
+import AlertComponent from "@/components/shared/AlertComponent.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
+import ProductMulitpleSelect from "@/components/shared/ProductMultiSelectTable.vue";
 import ProductSelectHeader from "@/components/stock-transfer/ProductSelectHeader.vue";
 import ProductSelectRow from "@/components/stock-transfer/ProductSelectRow.vue";
-import ProductMulitpleSelect from "@/components/shared/ProductMultiSelectTable.vue";
-import { computed, onMounted, ref } from "vue";
+import { EventEnum } from "@/data/event";
+import Event from "@/event";
+import { useAppStore } from "@/stores/app";
+import { useAuthStore } from "@/stores/auth";
 import { useProductStore } from "@/stores/product";
 import { useSettingsStore } from "@/stores/settings";
-import Event from "@/event";
-import { EventEnum } from "@/data/event";
-import { ObjectHelpers } from "shared/helpers";
-import { TransferType } from "shared/enums/transfer";
 import { useTransferStore } from "@/stores/transfer";
+import { TransferType } from "shared/enums/transfer";
+import { ObjectHelpers } from "shared/helpers";
+import { computed, onMounted, ref } from "vue";
+import { RouterLink } from "vue-router";
+
+const appStore = useAppStore();
+const authStore = useAuthStore();
+const productStore = useProductStore();
+const settingStore = useSettingsStore();
+const transferStore = useTransferStore();
 
 const productDefaultValue = {
   product_id: "",
-  name: "",
   description: "",
   quantity: "",
   cost: "",
   amount: "",
 };
 
+const address = ref({
+  address1: "",
+  address2: "",
+  province: "",
+  city: "",
+  postal: "",
+});
+
 const defaultValue = {
-  memo: "",
-  branch_to: "",
-  date_time: new Date().toISOString().split(":").slice(0, 2).join(":"),
-  address: {
-    address1: "",
-    address2: "",
-    province: "",
-    city: "",
-    postal: "",
+  transfer: {
+    memo: "",
+    branch_to: "",
+    branch_from: "",
+    processed_by: "",
+    date_time: new Date().toISOString().split(":").slice(0, 2).join(":"),
+    type: TransferType.STR,
   },
-  type: TransferType.STR,
   products: [{ ...productDefaultValue }],
 };
 
 const model = ref(defaultValue);
+const currentBranch = ref();
 
-const productStore = useProductStore();
-const settingStore = useSettingsStore();
-const transferStore = useTransferStore();
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -127,12 +161,16 @@ const totalAmount = computed(() => {
 });
 
 const branchOptions = computed(() => {
-  return settingStore.branches.map((branch) => {
-    return {
-      text: branch.name,
-      value: branch.id,
-    };
-  });
+  return settingStore.branches
+    .map((branch) => {
+      return {
+        text: branch.name,
+        value: branch.id,
+      };
+    })
+    .filter((opt) =>
+      currentBranch.value ? currentBranch.value.id != opt.value : true
+    );
 });
 
 /** ================================================
@@ -149,14 +187,14 @@ const timeInterval = setInterval(() => {
 }, 60000);
 
 const populateAddress = () => {
-  if (model.value.branch_to) {
+  if (model.value.transfer.branch_to) {
     const branch = settingStore.branches.find(
-      (b) => b.id == model.value.branch_to
+      (b) => b.id == model.value.transfer.branch_to
     );
 
     if (branch) {
-      model.value.address = ObjectHelpers.assignSameFields(
-        model.value.address,
+      address.value = ObjectHelpers.assignSameFields(
+        address.value,
         branch.address
       );
     }
@@ -175,6 +213,15 @@ const onSubmit = async () => {
 onMounted(async () => {
   await productStore.fetchAllProducts();
   await settingStore.fetchAllBranches();
+
+  // set branch from
+  currentBranch.value = appStore.currentBranch;
+  if (currentBranch.value) {
+    model.value.transfer.branch_from = currentBranch.value.id;
+  }
+
+  // set processed by
+  model.value.transfer.processed_by = authStore.getAuthUser().id;
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });

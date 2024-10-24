@@ -233,7 +233,7 @@ const searchText = defineModel("searchText");
 // methods
 const onAddNew = () => {
   showModal.value = true;
-  isEdit.value = true;
+  isEdit.value = false;
 
   emit("addNewRecord");
 };

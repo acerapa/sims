@@ -100,7 +100,6 @@ const onChange = () => {
     );
 
     if (product) {
-      model.value.name = product.name;
       model.value.description = product.purchase_description;
       model.value.cost = product.price;
       model.value.quantity = 1;

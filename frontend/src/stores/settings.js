@@ -72,6 +72,7 @@ export const useSettingsStore = defineStore("settings", () => {
     return branches.value;
   };
 
+  // branches methods
   const createBranch = async (model) => {
     return await authenticatedApi("branch/register", Method.POST, model);
   };

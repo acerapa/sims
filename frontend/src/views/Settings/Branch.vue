@@ -12,12 +12,6 @@
     @after-delete="onAfterDelete"
   />
   <div class="flex flex-col gap-4">
-    <div class="cont">
-      <p class="text-sm font-bold">Current Branch</p>
-      <div class="flex gap-3">
-        <CustomInput name="name" type="text" />
-      </div>
-    </div>
     <CustomTable
       class="relative"
       title="Branch List"
@@ -35,7 +29,11 @@
         v-if="showRowMenu"
         @view="viewRow"
         @delete="deleteRow"
-      ></RowMenu>
+      >
+        <button class="row-menu-item" @click="onSetCurrentBranch">
+          Set as current
+        </button>
+      </RowMenu>
     </CustomTable>
   </div>
 </template>
@@ -45,7 +43,6 @@ import BranchHeader from "@/components/Settings/BranchHeader.vue";
 import BranchModal from "@/components/Settings/BranchModal.vue";
 import BranchRow from "@/components/Settings/BranchRow.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import { EventEnum } from "@/data/event";
@@ -61,8 +58,6 @@ const showModal = ref(false);
 const showRowMenu = ref(false);
 const showConfirmModal = ref(false);
 const settingsStore = useSettingsStore();
-
-const model = ref();
 
 /** ================================================
  * COMPUTED
@@ -114,6 +109,31 @@ const deleteRow = () => {
 };
 
 const onAfterDelete = async () => {
+  await settingsStore.fetchAllBranches();
+};
+
+const onSetCurrentBranch = async () => {
+  // get the current branch
+  const currentBranch = settingsStore.branches.find(
+    (branch) => branch.is_current
+  );
+
+  if (currentBranch) {
+    await settingsStore.updateBranch(currentBranch.id, {
+      branch: { is_current: false },
+    });
+  }
+
+  const toUpdateBranch = settingsStore.branches.find(
+    (branch) => branch.id == selectedId.value
+  );
+
+  if (toUpdateBranch) {
+    await settingsStore.updateBranch(toUpdateBranch.id, {
+      branch: { is_current: true },
+    });
+  }
+
   await settingsStore.fetchAllBranches();
 };
 

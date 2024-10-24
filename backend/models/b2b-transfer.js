@@ -26,7 +26,7 @@ B2BTransfer.init(
       type: DataTypes.DATE,
       defaultValue: new Date(),
     },
-    ibrr_id: {
+    str_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },

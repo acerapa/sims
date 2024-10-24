@@ -191,8 +191,8 @@ B2BTransfer.belongsToMany(Product, {
 
 Product.belongsToMany(B2BTransfer, {
   through: ProductTransfer,
-  foreignKey: "transfer_id",
-  otherKey: "product_id",
+  foreignKey: "product_id",
+  otherKey: "transfer_id",
   as: "transfers",
 });
 
@@ -215,6 +215,11 @@ B2BTransfer.belongsTo(Branch, {
 Branch.hasMany(B2BTransfer, {
   foreignKey: "branch_from",
   as: "sents",
+});
+
+B2BTransfer.belongsTo(User, {
+  foreignKey: "processed_by",
+  as: "process_by",
 });
 
 // BranchMember relation to users and Branch

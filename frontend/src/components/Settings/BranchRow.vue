@@ -4,7 +4,10 @@
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.branch.id }}</p>
     </div>
-    <p class="col-span-2 text-sm">{{ props.branch.name }}</p>
+    <p class="col-span-2 text-sm">
+      {{ props.branch.name }}
+      <span v-if="props.branch.is_current" class="badge-outline">current</span>
+    </p>
     <p class="col-span-3 text-sm">{{ concatenatedAddress }}</p>
     <p class="col-span-2 text-sm">{{ managerName }}</p>
     <div class="col-span-1 text-sm">
@@ -57,3 +60,9 @@ const openMenu = (id) => {
   emit("openMenu", id);
 };
 </script>
+
+<style scoped>
+.badge-outline {
+  @apply leading-none !text-success border border-success px-1 rounded-md text-xs;
+}
+</style>

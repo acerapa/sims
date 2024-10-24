@@ -3,7 +3,8 @@
     <CustomTable
       :data="filteredData"
       @add-new-record="onAddNewRecord"
-      :row-prop-init="'test'"
+      :row-prop-init="rowPropInit"
+      :table-row-component="StrListRow"
       :table-header-component="StrListHeader"
     >
     </CustomTable>
@@ -11,6 +12,7 @@
 </template>
 
 <script setup>
+import StrListRow from "@/components/stock-transfer/str-list-row.vue";
 import StrListHeader from "@/components/stock-transfer/str-list-header.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
 import { EventEnum } from "@/data/event";
@@ -28,11 +30,15 @@ const transferStore = useTransferStore();
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true);
 
+const rowPropInit = "str-row-prop-init";
+Event.on(rowPropInit, function (data) {
+  return { str: data };
+});
 /** ================================================
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  transferStore.strs.filter((str) => str);
+  return transferStore.strs.filter((str) => true);
 });
 
 /** ================================================
