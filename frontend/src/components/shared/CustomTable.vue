@@ -59,10 +59,7 @@
           <button
             v-if="props.hasAddBtn"
             class="bg-primary p-2 rounded"
-            @click="
-              showModal = true;
-              isEdit = false;
-            "
+            @click="onAddNew"
           >
             <img src="@/assets/icons/plus.svg" alt="Plus" />
           </button>
@@ -139,6 +136,7 @@ const emit = defineEmits([
   "update:isEdit",
   "open-menu",
   "update:searchText",
+  "addNewRecord",
 ]);
 
 const props = defineProps({
@@ -231,6 +229,14 @@ watch(
 const isEdit = defineModel("isEdit");
 const showModal = defineModel("showModal");
 const searchText = defineModel("searchText");
+
+// methods
+const onAddNew = () => {
+  showModal.value = true;
+  isEdit.value = false;
+
+  emit("addNewRecord");
+};
 </script>
 
 <style scoped></style>

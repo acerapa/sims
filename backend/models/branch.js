@@ -36,6 +36,10 @@ Branch.init(
         key: "id",
       },
     },
+    is_current: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     sequelize,

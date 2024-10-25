@@ -6,8 +6,8 @@
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ user.id }}</p>
     </div>
-    <p class="col-span-2 text-sm">{{ user.first_name }}</p>
-    <p class="col-span-2 text-sm">{{ user.last_name }}</p>
+    <p class="col-span-2 text-sm">{{ `${user.first_name} ${user.last_name}` }}</p>
+    <p class="col-span-2 text-sm">Branch 1</p>
     <p class="col-span-2 text-sm">{{ user.position }}</p>
     <p class="col-span-2 text-sm">
       {{ DateHelpers.formatDate(user.date_started, "M/D/YYYY") }}

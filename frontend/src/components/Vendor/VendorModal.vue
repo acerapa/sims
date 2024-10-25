@@ -43,38 +43,7 @@
       </div>
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Address Info</p>
-        <div class="flex flex-col gap-3">
-          <CustomInput
-            type="text"
-            name="addres1"
-            class="w-full"
-            placeholder="Address 1"
-            v-model="model.address.address1"
-          />
-          <CustomInput
-            type="text"
-            name="addess2"
-            class="w-full"
-            placeholder="Address 2"
-            v-model="model.address.address2"
-          />
-        </div>
-        <div class="flex gap-6">
-          <CustomInput
-            type="text"
-            name="city"
-            class="flex-1"
-            placeholder="City"
-            v-model="model.address.city"
-          />
-          <CustomInput
-            type="text"
-            name="postal"
-            class="flex-1"
-            placeholder="Zip Code"
-            v-model="model.address.postal"
-          />
-        </div>
+        <AddressForm :has-label="true" v-model="model.address" />
       </div>
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Contact Info</p>
@@ -119,6 +88,7 @@
 import CustomInput from "@/components/shared/CustomInput.vue";
 import { Method, authenticatedApi } from "@/api";
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
+import AddressForm from "../shared/AddressForm.vue";
 import { useVendorStore } from "@/stores/supplier";
 import { onMounted, ref } from "vue";
 
@@ -153,6 +123,7 @@ const model = ref({
     address1: "",
     address2: "",
     city: "",
+    province: "",
     postal: "",
   },
 });

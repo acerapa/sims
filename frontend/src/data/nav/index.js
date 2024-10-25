@@ -44,14 +44,16 @@ export default [
     icon: transfer,
     children: [
       {
-        text: "IBRR List",
-        route: "ibrr-list",
-        icon: outlineDot,
-      },
-      {
         text: "STR List",
         route: "str-list",
         icon: outlineDot,
+        includes_active: ["str-form"],
+      },
+      {
+        text: "IBRR List",
+        route: "ibrr-list",
+        icon: outlineDot,
+        includes_active: ["ibrr-form"],
       },
     ],
   },

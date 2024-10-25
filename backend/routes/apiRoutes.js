@@ -29,6 +29,9 @@ router.use("/physical-inventory", physicalInventoryRoutes);
 
 const branchesRoutes = require("./BranchRoutes");
 router.use("/branch", branchesRoutes);
+
+const branchTransferRoutes = require("./B2BTransferRoutes");
+router.use("/transfer", branchTransferRoutes);
 // end use routes
 
 module.exports = router;

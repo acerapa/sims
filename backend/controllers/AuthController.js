@@ -1,6 +1,8 @@
 const User = require("../models/user");
 const bcryptJS = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const BranchMember = require("../models/branch-member");
+const Branch = require("../models/branch");
 
 // Validation Schema
 const { VerifyTokenSchema } = require("shared");
@@ -12,6 +14,18 @@ module.exports = {
     const user = await User.findOne({
       where: { username: validated.username },
       raw: true,
+      include: [
+        {
+          model: BranchMember,
+          as: "branch_member",
+          include: [
+            {
+              model: Branch,
+              as: "branch",
+            },
+          ],
+        },
+      ],
     });
     if (user) {
       if (await bcryptJS.compare(validated.password, user.password)) {

@@ -11,7 +11,7 @@
     :href="`branch/delete/${selectedId}`"
     @after-delete="onAfterDelete"
   />
-  <div>
+  <div class="flex flex-col gap-4">
     <CustomTable
       class="relative"
       title="Branch List"
@@ -29,7 +29,11 @@
         v-if="showRowMenu"
         @view="viewRow"
         @delete="deleteRow"
-      ></RowMenu>
+      >
+        <button class="row-menu-item" @click="onSetCurrentBranch">
+          Set as current
+        </button>
+      </RowMenu>
     </CustomTable>
   </div>
 </template>
@@ -105,6 +109,31 @@ const deleteRow = () => {
 };
 
 const onAfterDelete = async () => {
+  await settingsStore.fetchAllBranches();
+};
+
+const onSetCurrentBranch = async () => {
+  // get the current branch
+  const currentBranch = settingsStore.branches.find(
+    (branch) => branch.is_current
+  );
+
+  if (currentBranch) {
+    await settingsStore.updateBranch(currentBranch.id, {
+      branch: { is_current: false },
+    });
+  }
+
+  const toUpdateBranch = settingsStore.branches.find(
+    (branch) => branch.id == selectedId.value
+  );
+
+  if (toUpdateBranch) {
+    await settingsStore.updateBranch(toUpdateBranch.id, {
+      branch: { is_current: true },
+    });
+  }
+
   await settingsStore.fetchAllBranches();
 };
 

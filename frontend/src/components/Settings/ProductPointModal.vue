@@ -6,13 +6,16 @@
     @submit="onSubmit"
   >
     <div class="flex flex-col gap-3">
-      <input
+      <CustomInput
+        name="points"
         type="number"
-        class="input mt-6"
+        class="mt-6"
         placeholder="Re-ordering Points"
         v-model="model.point"
       />
-      <CustomSelectInput
+      <CustomInput
+        type="select"
+        name="included-products"
         :options="productOptions"
         v-model="model.products"
         @add-new="showProductModal = true"
@@ -27,6 +30,7 @@
 </template>
 <script setup>
 import ModalWrapper from "@/components/shared/ModalWrapper.vue";
+import CustomInput from "@/components/shared/CustomInput.vue";
 import CustomSelectInput from "@/components/shared/CustomInput.vue";
 import { onMounted, computed, ref } from "vue";
 import { useProductStore } from "@/stores/product";

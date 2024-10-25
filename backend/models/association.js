@@ -1,16 +1,19 @@
 const User = require("./user");
+const Branch = require("./branch");
 const Address = require("./address");
 const Account = require("./account");
 const Product = require("./product");
 const Supplier = require("./supplier");
+const B2BTransfer = require("./b2b-transfer");
+const BranchMember = require("./branch-member");
 const ProductOrder = require("./product-order");
 const PurchaseOrder = require("./purchase-order");
 const ProductSettings = require("./product-setting");
+const ProductTransfer = require("./product-transfer");
 const ProductSupplier = require("./product-supplier");
 const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
 const PhysicalInventoryItem = require("./physical-inventory-item");
-const Branch = require("./branch");
 
 Address.hasMany(Supplier, {
   foreignKey: "address_id",
@@ -176,4 +179,73 @@ Address.hasMany(Branch, {
 Branch.belongsTo(User, {
   foreignKey: "branch_manager",
   as: "manager",
+});
+
+// B2BTransfer to ProductTransfer
+B2BTransfer.belongsToMany(Product, {
+  through: ProductTransfer,
+  foreignKey: "transfer_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(B2BTransfer, {
+  through: ProductTransfer,
+  foreignKey: "product_id",
+  otherKey: "transfer_id",
+  as: "transfers",
+});
+
+// B2BTransfer to Branch
+B2BTransfer.belongsTo(Branch, {
+  foreignKey: "branch_to",
+  as: "receiver",
+});
+
+Branch.hasMany(B2BTransfer, {
+  foreignKey: "branch_to",
+  as: "receives",
+});
+
+B2BTransfer.belongsTo(Branch, {
+  foreignKey: "branch_from",
+  as: "sender",
+});
+
+Branch.hasMany(B2BTransfer, {
+  foreignKey: "branch_from",
+  as: "sents",
+});
+
+B2BTransfer.belongsTo(User, {
+  foreignKey: "processed_by",
+  as: "process_by",
+});
+
+// BranchMember relation to users and Branch
+Branch.belongsToMany(User, {
+  through: BranchMember,
+  foreignKey: "branch_id",
+  otherKey: "user_id",
+  as: "members",
+});
+
+BranchMember.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+User.hasOne(BranchMember, {
+  foreignKey: "user_id",
+  as: "branch_member",
+});
+
+BranchMember.belongsTo(Branch, {
+  foreignKey: "branch_id",
+  as: "branch",
+});
+
+Branch.hasOne(BranchMember, {
+  foreignKey: "branch_id",
+  as: "branch_through",
 });

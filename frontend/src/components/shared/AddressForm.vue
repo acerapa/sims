@@ -22,12 +22,12 @@
         :has-label="props.hasLabel"
       />
     </div>
-    <div class="flex gap-6 max-lg:flex-col max-lg:gap-3">
+    <div class="grid grid-cols-3 gap-6 max-lg:grid-cols-1 max-lg:gap-3">
       <CustomInput
         type="text"
         name="city"
         label="City"
-        class="flex-1"
+        input-class="!min-w-0"
         placeholder="City"
         v-model="formModel.city"
         :disabled="props.disabled"
@@ -35,9 +35,19 @@
       />
       <CustomInput
         type="text"
+        name="province"
+        label="Province"
+        input-class="!min-w-0"
+        placeholder="Province"
+        v-model="formModel.province"
+        :disabled="props.disabled"
+        :has-label="props.hasLabel"
+      />
+      <CustomInput
+        type="text"
         name="postal"
-        class="flex-1"
         label="Zip Code"
+        input-class="!min-w-0"
         placeholder="Zip Code"
         v-model="formModel.postal"
         :disabled="props.disabled"
@@ -47,7 +57,6 @@
   </div>
 </template>
 <script setup>
-import { ref, watch } from "vue";
 import CustomInput from "./CustomInput.vue";
 
 const props = defineProps({
