@@ -31,6 +31,17 @@ module.exports = {
             ],
           },
           {
+            model: Branch,
+            as: "sender",
+            include: [
+              {
+                model: User,
+                as: "manager",
+                attributes: ["id", "first_name", "last_name", "position"],
+              },
+            ],
+          },
+          {
             model: User,
             as: "process_by",
             attributes: ["id", "first_name", "last_name", "position"],

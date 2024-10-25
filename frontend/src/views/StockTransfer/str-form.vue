@@ -106,7 +106,7 @@ import { useSettingsStore } from "@/stores/settings";
 import { useTransferStore } from "@/stores/transfer";
 import { TransferType } from "shared/enums/transfer";
 import { DateHelpers, ObjectHelpers } from "shared/helpers";
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 
 const appStore = useAppStore();
@@ -137,7 +137,7 @@ const defaultValue = {
     branch_to: "",
     branch_from: "",
     processed_by: "",
-    date_time: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II"),
+    date_time: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II-A"),
     type: TransferType.STR,
   },
   products: [{ ...productDefaultValue }],
@@ -181,7 +181,7 @@ const branchOptions = computed(() => {
 const timeInterval = setInterval(() => {
   model.value.transfer.date_time = DateHelpers.formatDate(
     new Date(),
-    "YYYY-MM-DDTHH:II"
+    "YYYY-MM-DDTHH:II-A"
   );
 }, 1000);
 
@@ -224,5 +224,10 @@ onMounted(async () => {
   model.value.transfer.processed_by = authStore.getAuthUser().id;
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
+});
+
+onBeforeUnmount(() => {
+  // remove interval
+  clearInterval(timeInterval);
 });
 </script>

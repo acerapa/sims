@@ -42,12 +42,12 @@ const ProductTransferSchema = Joi.object({
   product_id: Joi.number().required(),
   transfer_id: Joi.number().optional(),
   quantity: Joi.number().required(),
-  quantity_received: Joi.number().allow(null, 0),
-  status: Joi.string().valid(...Object.values(ProductTransferStatus)),
+  // quantity_received: Joi.number().allow(null, 0),
+  // status: Joi.string().valid(...Object.values(ProductTransferStatus)),
   amount: Joi.number().required(),
   cost: Joi.number().required(),
   description: Joi.string().allow(null, ""),
-  remarks: Joi.string().allow(null, ""),
+  // remarks: Joi.string().allow(null, ""),
 });
 
 const BranchTransferCreateSchema = Joi.object({

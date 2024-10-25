@@ -34,6 +34,10 @@ class DateHelpers {
     const minutes = dt.getMinutes();
     const seconds = dt.getSeconds();
 
+    const meridiems = ["-A", "-a"];
+
+    const doFormatHasRmMeridiem = meridiems.find((m) => format.includes(m));
+
     // formatting month start
     if (format.includes("MM")) {
       format = format.replaceAll("MM", month.toString().padStart(2, "0"));
@@ -71,20 +75,32 @@ class DateHelpers {
     if (format.includes("HH")) {
       if (format.includes("A")) {
         format = format.replaceAll("HH", hour.toString().padStart(2, "0"));
-      } else {
+        if (!doFormatHasRmMeridiem) {
+          format = format.replaceAll("a", hour > 12 ? "PM" : "AM");
+        }
+      } else if (format.includes("a")) {
         // converting military time to standard
         const h = hour > 12 ? hour - 12 : hour;
         format = format.replaceAll("HH", h.toString().padStart(2, "0"));
+        if (!doFormatHasRmMeridiem) {
+          format = format.replaceAll("a", hour > 12 ? "PM" : "AM");
+        }
+      } else {
+        format = format.replaceAll("HH", hour.toString().padStart(2, "0"));
       }
     }
 
     if (format.includes("H")) {
       if (format.includes("A")) {
         format = format.replaceAll("H", hour.toString());
-      } else {
+        format = format.replaceAll("a", hour > 12 ? "PM" : "AM");
+      } else if (format.includes("a")) {
         // converting military time to standard
         const h = hour > 12 ? hour - 12 : hour;
         format = format.replaceAll("H", h.toString());
+        format = format.replaceAll("a", hour > 12 ? "PM" : "AM");
+      } else {
+        format = format.replaceAll("H", hour.toString());
       }
     }
     // formatting hours end
@@ -109,15 +125,8 @@ class DateHelpers {
     }
     // formatting seconds end
 
-    // meridian time
-    if (format.includes("A")) {
-      let m = "AM";
-
-      if (hour > 12) {
-        m = "PM";
-      }
-
-      format = format.replaceAll("A", m);
+    if (doFormatHasRmMeridiem) {
+      format = format.replaceAll(doFormatHasRmMeridiem, "").trim();
     }
 
     return format;
