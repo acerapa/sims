@@ -2,8 +2,9 @@
   <div>
     <CustomTable
       :data="filteredData"
-      @add-new-record="onAddNewRecord"
+      :has-pagination="true"
       :row-prop-init="rowPropInit"
+      @add-new-record="onAddNewRecord"
       :table-row-component="StrListRow"
       :table-header-component="StrListHeader"
     >

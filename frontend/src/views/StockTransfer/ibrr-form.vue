@@ -95,8 +95,10 @@ import { useTransferStore } from "@/stores/transfer";
 import { TransferType } from "shared/enums/transfer";
 import { DateHelpers, ObjectHelpers } from "shared/helpers";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const currentBranch = ref();
+const router = useRouter()
 const settingStore = useSettingsStore();
 const productStore = useProductStore();
 const appStore = useAppStore();
@@ -181,6 +183,8 @@ const onSubmit = async () => {
   clearInterval(timeInterval);
 
   await transferStore.createTransfer(model.value);
+
+  router.push({ name: "ibrr-list" });
 };
 
 /** ================================================

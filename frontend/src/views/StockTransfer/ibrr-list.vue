@@ -2,6 +2,7 @@
   <CustomTable
     :has-add-btn="true"
     :data="filteredData"
+    :has-pagination="true"
     :row-prop-init="rowPropInit"
     @add-new-record="onAddNewRecord"
     :table-row-component="IbrrListRow"
