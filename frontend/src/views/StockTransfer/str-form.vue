@@ -108,7 +108,9 @@ import { TransferType } from "shared/enums/transfer";
 import { DateHelpers, ObjectHelpers } from "shared/helpers";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const appStore = useAppStore();
 const authStore = useAuthStore();
 const productStore = useProductStore();
@@ -205,6 +207,9 @@ const onSubmit = async () => {
 
   model.value.transfer.date_time = new Date();
   await transferStore.createTransfer(model.value);
+  router.push({
+    name: "str-list",
+  });
 };
 
 /** ================================================
