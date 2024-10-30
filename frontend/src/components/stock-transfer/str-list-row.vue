@@ -6,7 +6,9 @@
     </div>
     <p class="col-span-2 text-sm truncate">{{ props.str.receiver.name }}</p>
     <p class="col-span-1 text-sm truncate">{{ managerName }}</p>
-    <p class="col-span-2 text-sm truncate">{{ DateHelpers.formatDate(props.str.date_time, "MM/DD/YYYY HH:II a") }}</p>
+    <p class="col-span-2 text-sm truncate">
+      {{ DateHelpers.formatDate(props.str.date_time, "MM/DD/YYYY HH:II a") }}
+    </p>
     <div class="col-span-1 text-sm">
       <img
         @click.stop="openMenu(props.str.id)"
@@ -20,8 +22,9 @@
 
 <script setup>
 import { computed } from "vue";
-import { DateHelpers } from "shared/helpers"
+import { DateHelpers } from "shared/helpers";
 
+const emit = defineEmits(["openMenu"]);
 const props = defineProps({
   str: {
     type: Object,
@@ -35,6 +38,6 @@ const managerName = computed(() => {
 });
 
 const openMenu = (id) => {
-  console.log("TODO: here is a todo");
+  emit("openMenu", id);
 };
 </script>
