@@ -82,4 +82,69 @@ module.exports = {
       res.sendError(e);
     }
   },
+  getById: async (req, res) => {
+    try {
+      const transfer = await B2BTransfer.findOne({
+        where: {
+          id: req.params.id,
+        },
+        include: [
+          {
+            model: Branch,
+            as: "receiver",
+          },
+          {
+            model: Branch,
+            as: "receiver",
+            include: [
+              {
+                model: User,
+                as: "manager",
+                attributes: ["id", "first_name", "last_name", "position"],
+              },
+            ],
+          },
+          {
+            model: Branch,
+            as: "sender",
+            include: [
+              {
+                model: User,
+                as: "manager",
+                attributes: ["id", "first_name", "last_name", "position"],
+              },
+            ],
+          },
+          {
+            model: User,
+            as: "process_by",
+            attributes: ["id", "first_name", "last_name", "position"],
+          },
+          {
+            model: Product,
+            through: ProductTransfer,
+            as: "products",
+            attributes: ["id"],
+          },
+        ],
+      });
+
+      res.sendResponse({ transfer }, "Successfully fetched!");
+    } catch (e) {
+      res.sendError(e);
+    }
+  },
+  destroy: async (req, res) => {
+    try {
+      await B2BTransfer.destroy({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      return res.sendResponse({}, "Successfully deleted!");
+    } catch (error) {
+      res.sendError(error);
+    }
+  },
 };

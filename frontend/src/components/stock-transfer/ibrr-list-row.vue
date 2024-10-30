@@ -25,6 +25,8 @@
 import { DateHelpers } from "shared/helpers";
 import { computed } from "vue";
 
+const emit = defineEmits(["openMenu"]);
+
 const props = defineProps({
   ibrr: {
     type: Object,
@@ -38,6 +40,6 @@ const managerName = computed(() => {
 });
 
 const openMenu = (id) => {
-  console.log(id);
+  emit("openMenu", id);
 };
 </script>

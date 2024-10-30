@@ -100,7 +100,6 @@ const onStartPhysicalInventory = async () => {
     };
   });
 
-  console.log(model);
   const res = await physicalInventoryStore.register(model);
 
   if (res.status == 200) {

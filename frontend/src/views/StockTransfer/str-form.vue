@@ -71,7 +71,12 @@
         </ProductMulitpleSelect>
       </div>
       <div class="flex gap-3 mt-4 justify-end">
-        <button class="btn-outline !border-danger !text-danger">Cancel</button>
+        <button
+          class="btn-outline !border-danger !text-danger"
+          @click="onCancel"
+        >
+          Cancel
+        </button>
         <button
           class="btn-outline disabled:opacity-50"
           :disabled="!currentBranch"
@@ -107,9 +112,10 @@ import { useTransferStore } from "@/stores/transfer";
 import { TransferType } from "shared/enums/transfer";
 import { DateHelpers, ObjectHelpers } from "shared/helpers";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 
+const route = useRoute();
 const router = useRouter();
 const appStore = useAppStore();
 const authStore = useAuthStore();
@@ -181,10 +187,12 @@ const branchOptions = computed(() => {
 
 // TODO: Regulate the interval when to have or not.
 const timeInterval = setInterval(() => {
-  model.value.transfer.date_time = DateHelpers.formatDate(
-    new Date(),
-    "YYYY-MM-DDTHH:II-A"
-  );
+  if (route.query.id) {
+    model.value.transfer.date_time = DateHelpers.formatDate(
+      new Date(),
+      "YYYY-MM-DDTHH:II:SS-A"
+    );
+  }
 }, 1000);
 
 const populateAddress = () => {
@@ -212,12 +220,60 @@ const onSubmit = async () => {
   });
 };
 
+const onCancel = () => {
+  router.push({
+    name: "str-list",
+  });
+};
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
   await productStore.fetchAllProducts();
   await settingStore.fetchAllBranches();
+
+  // check if there is an id query param
+  if (route.query.id) {
+    // clear interval automatically
+    clearInterval(timeInterval);
+
+    const transfer = await transferStore.getByIdAndOrType(
+      route.query.id,
+      TransferType.STR
+    );
+
+    if (transfer) {
+      // model.value = ObjectHelpers.assignSameFields(model.value, transfer);
+      model.value.transfer = ObjectHelpers.assignSameFields(
+        model.value.transfer,
+        transfer
+      );
+
+      // custom modification
+      model.value.transfer.date_time = DateHelpers.formatDate(
+        new Date(transfer.date_time),
+        "YYYY-MM-DDTHH:II:SS-A"
+      );
+
+      // populate address from the receiver in the transfer
+      populateAddress();
+
+      // populate products
+      model.value.products = transfer.products.map((p) => {
+        return {
+          product_id: p.ProductTransfer.product_id,
+          description: p.ProductTransfer.description,
+          quantity: p.ProductTransfer.quantity,
+          cost: p.ProductTransfer.cost,
+          amount: p.ProductTransfer.amount,
+        };
+      });
+    } else {
+      //TODO: raise and error or alert or maybe navigate to 404 notifs
+      console.error("STR not found");
+    }
+  }
 
   // set branch from
   currentBranch.value = appStore.currentBranch;

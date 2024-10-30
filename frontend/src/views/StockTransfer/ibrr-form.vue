@@ -71,8 +71,26 @@
           :format="productDefaultValue"
         />
       </div>
-      <div class="flex gap-3 mt-3 justify-end">
-        <button class="btn" @click="onSubmit">Save</button>
+      <div class="flex gap-3 mt-4 justify-end">
+        <button
+          class="btn-outline !border-danger !text-danger"
+          @click="onCancel"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn-outline disabled:opacity-50"
+          :disabled="!currentBranch"
+        >
+          Save and New
+        </button>
+        <button
+          class="btn disabled:opacity-50"
+          @click="onSubmit"
+          :disabled="!currentBranch"
+        >
+          Save
+        </button>
       </div>
     </div>
   </div>
@@ -95,14 +113,15 @@ import { useTransferStore } from "@/stores/transfer";
 import { TransferType } from "shared/enums/transfer";
 import { DateHelpers, ObjectHelpers } from "shared/helpers";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
+const route = useRoute();
+const router = useRouter();
 const currentBranch = ref();
-const router = useRouter()
-const settingStore = useSettingsStore();
-const productStore = useProductStore();
 const appStore = useAppStore();
 const authStore = useAuthStore();
+const productStore = useProductStore();
+const settingStore = useSettingsStore();
 const transferStore = useTransferStore();
 
 const productDefaultValue = {
@@ -187,12 +206,51 @@ const onSubmit = async () => {
   router.push({ name: "ibrr-list" });
 };
 
+const onCancel = () => {
+  router.push({ name: "ibrr-list" });
+};
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
   await settingStore.fetchAllBranches();
   await productStore.fetchAllProducts();
+
+  // check if route has transfer id
+  if (route.query.id) {
+    const transfer = await transferStore.getByIdAndOrType(
+      route.query.id,
+      TransferType.IBRR
+    );
+
+    if (transfer) {
+      model.value.transfer = ObjectHelpers.assignSameFields(
+        model.value.transfer,
+        transfer
+      );
+
+      // custom modification
+      model.value.transfer.date_time = DateHelpers.formatDate(
+        new Date(),
+        "YYYY-MM-DDTHH:II:SS-A"
+      );
+
+      // populate address
+      populateAddress();
+
+      // populate products
+      model.value.products = transfer.products.map((p) => {
+        return {
+          product_id: p.ProductTransfer.product_id,
+          description: p.ProductTransfer.description,
+          cost: p.ProductTransfer.cost,
+          quantity: p.ProductTransfer.quantity,
+          amount: p.ProductTransfer.amount,
+        };
+      });
+    }
+  }
 
   currentBranch.value = appStore.currentBranch;
   if (currentBranch.value) {
@@ -204,5 +262,8 @@ onMounted(async () => {
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });
 
-onBeforeUnmount(() => {});
+onBeforeUnmount(() => {
+  // clear interval
+  clearInterval(timeInterval);
+});
 </script>
