@@ -45,8 +45,28 @@
         v-model="model.products"
         :header-component="RmaProductSelectHeader"
         :row-component="RmaProductSelectRow"
+        :format="productDefaultValue"
       >
       </ProductMultiSelectTable>
+
+      <div class="flex gap-3 mt-4 justify-end">
+        <button
+          class="btn-outline !border-danger !text-danger"
+          @click="onCancel"
+        >
+          Cancel
+        </button>
+        <button class="btn-outline disabled:opacity-50" :disabled="false">
+          Save and New
+        </button>
+        <button
+          class="btn disabled:opacity-50"
+          @click="onSubmit"
+          :disabled="false"
+        >
+          Save
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -60,6 +80,9 @@ import ProductMultiSelectTable from "@/components/shared/ProductMultiSelectTable
 import { useVendorStore } from "@/stores/supplier";
 import { computed, onMounted, ref } from "vue";
 import { ObjectHelpers } from "shared/helpers";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const address = ref({
   address1: "",
@@ -115,6 +138,10 @@ const populateAddress = () => {
     address.value,
     supplier.address
   );
+};
+
+const onCancel = () => {
+  router.back();
 };
 
 /** ================================================

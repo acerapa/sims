@@ -33,6 +33,41 @@
         :disabled="props.isDisabled"
         v-model="model.serial_number"
       />
+      <CustomInput
+        class="col-span-3"
+        type="textarea"
+        name="Problem"
+        v-model="model.problem"
+        :disabled="props.isDisabled"
+        placeholder="Problem"
+      />
+      <CustomInput
+        class="col-span-1"
+        type="number"
+        name="quantity"
+        placeholder="Quantity"
+        :disabled="props.isDisabled"
+        v-model="model.quantity"
+      />
+      <CustomInput
+        class="col-span-1"
+        type="number"
+        name="amount"
+        placeholder="Amount"
+        :disabled="props.isDisabled"
+        v-model="model.amount"
+      />
+      <p
+        class="col-span-1 text-sm pl-3 mt-[10px]"
+        :class="[props.isDisabled ? 'hidden' : '']"
+      >
+        <img
+          @click="emit('remove')"
+          src="@/assets/icons/remove.svg"
+          class="cursor-pointer w-5 h-5"
+          alt="remove"
+        />
+      </p>
     </div>
   </div>
 </template>
@@ -40,6 +75,7 @@
 <script setup>
 import { useProductStore } from "@/stores/product";
 import CustomInput from "../shared/CustomInput.vue";
+import { onMounted } from "vue";
 const props = defineProps({
   isDisabled: {
     type: Boolean,
@@ -47,6 +83,7 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["remove"]);
 const productStore = useProductStore();
 const model = defineModel();
 
@@ -69,4 +106,10 @@ const onChange = () => {
     model.value.cost = "";
   }
 };
+
+onMounted(async () => {
+  if (productStore.productOptions.length === 0) {
+    await productStore.fetchAllProducts();
+  }
+});
 </script>

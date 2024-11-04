@@ -64,8 +64,8 @@
             <small>Suppliers</small>
             <CustomInput
               type="select"
-              v-if="supplierOptions"
-              :options="supplierOptions"
+              v-if="supplierStore.supplierOptions.length"
+              :options="supplierStore.supplierOptions"
               v-model="filters.supplier_id"
               placeholder="Select Supplier"
             />
@@ -303,7 +303,9 @@ const purchaseOrderStore = usePurchaseOrderStore();
  ** ================================================*/
 
 onMounted(async () => {
-  supplierOptions.value = await supplierStore.getSupplierOptions();
+  if (supplierStore.supplierOptions.length == 0) {
+    await supplierStore.fetchAllSuppliers();
+  }
   await purchaseOrderStore.fetchPurchaseOrders();
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });
