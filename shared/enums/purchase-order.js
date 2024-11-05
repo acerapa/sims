@@ -3,6 +3,7 @@ const PurchaseOrderStatus = Object.freeze({
   CONFIRMED: "confirmed",
   COMPLETED: "completed",
   CANCELLED: "cancelled",
+  OVERDUE: "overdue",
 });
 
 const ProductOrderedStatus = Object.freeze({

@@ -20,6 +20,7 @@ const AddressSchema = Joi.object({
   address1: Joi.string().required(),
   address2: Joi.string().optional(),
   city: Joi.string().required(),
+  province: Joi.string().required(),
   postal: Joi.string().required()
 })
 
