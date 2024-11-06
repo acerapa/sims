@@ -8,7 +8,7 @@
     <p class="col-span-2 text-sm truncate">{{ props.ibrr.sender.name }}</p>
     <p class="col-span-1 text-sm truncate">{{ managerName }}</p>
     <p class="col-span-2 text-sm truncate">
-      {{ DateHelpers.formatDate(props.ibrr.date_time, "MM/DD/YYYY HH:II a") }}
+      {{ DateHelpers.formatDate(props.ibrr.when, "MM/DD/YYYY HH:II a") }}
     </p>
     <div class="col-span-1 text-sm">
       <img

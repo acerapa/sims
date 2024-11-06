@@ -4,7 +4,7 @@ const {
   getAllByType,
   getById,
   destroy,
-} = require("../controllers/B2BController");
+} = require("../controllers/StockTransferController");
 const { validateBody } = require("../middleware/request-validator");
 const { BranchTransferCreateSchema } = require("shared/validators/transfer");
 

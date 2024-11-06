@@ -218,20 +218,20 @@ onMounted(async () => {
         return {
           product_id: product.id,
           name: product.name,
-          remarks: product.ProductOrder.remarks,
-          description: product.ProductOrder.description
-            ? product.ProductOrder.description
+          remarks: product.ProductTransaction.remarks,
+          description: product.ProductTransaction.description
+            ? product.ProductTransaction.description
             : product.purchase_description,
-          quantity: product.ProductOrder.quantity,
-          status: product.ProductOrder.status
-            ? product.ProductOrder.status
-            : ProductOrderedStatus.OPEN,
+          quantity: product.ProductTransaction.quantity,
+          status: product.ProductTransaction.status
+            ? product.ProductTransaction.status
+            : ProductTransactionedStatus.OPEN,
           cost: getCost(
-            product.ProductOrder.cost,
+            product.ProductTransaction.cost,
             product,
             purchaseOrderStore.purchaseOrder.supplier_id
           ),
-          amount: product.ProductOrder.amount,
+          amount: product.ProductTransaction.amount,
         };
       }),
     ];

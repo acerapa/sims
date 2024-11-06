@@ -18,11 +18,11 @@
           <div class="flex gap-3 items-center mt-3">
             <CustomInput
               type="datetime-local"
-              name="date_time"
+              name="when"
               :has-label="true"
               label="Receiving date and time"
               :disabled="true"
-              v-model="model.transfer.date_time"
+              v-model="model.transfer.when"
             />
           </div>
           <div class="flex gap-3 items-center">
@@ -140,7 +140,7 @@ const model = ref({
     branch_from: "",
     processed_by: "",
     type: TransferType.IBRR,
-    date_time: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II-A"),
+    when: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II-A"),
   },
   products: [{ ...productDefaultValue }],
 });
@@ -177,7 +177,7 @@ const branchOptions = computed(() => {
  * METHODS
  ** ================================================*/
 const timeInterval = setInterval(() => {
-  model.value.transfer.date_time = DateHelpers.formatDate(
+  model.value.transfer.when = DateHelpers.formatDate(
     new Date(),
     "YYYY-MM-DDTHH:II-A"
   );
@@ -231,7 +231,7 @@ onMounted(async () => {
       );
 
       // custom modification
-      model.value.transfer.date_time = DateHelpers.formatDate(
+      model.value.transfer.when = DateHelpers.formatDate(
         new Date(),
         "YYYY-MM-DDTHH:II:SS-A"
       );
@@ -242,11 +242,11 @@ onMounted(async () => {
       // populate products
       model.value.products = transfer.products.map((p) => {
         return {
-          product_id: p.ProductTransfer.product_id,
-          description: p.ProductTransfer.description,
-          cost: p.ProductTransfer.cost,
-          quantity: p.ProductTransfer.quantity,
-          amount: p.ProductTransfer.amount,
+          product_id: p.ProductTransaction.product_id,
+          description: p.ProductTransaction.description,
+          cost: p.ProductTransaction.cost,
+          quantity: p.ProductTransaction.quantity,
+          amount: p.ProductTransaction.amount,
         };
       });
     }

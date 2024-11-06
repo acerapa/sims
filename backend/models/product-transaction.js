@@ -57,3 +57,5 @@ ProductTransaction.init(
     timestamps: true,
   }
 );
+
+module.exports = ProductTransaction;
