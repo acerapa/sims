@@ -27,7 +27,7 @@ const BranchUpdateSchema = Joi.object({
 const BranchTransferSchema = Joi.object({
   memo: Joi.string().allow(null, ""),
   type: Joi.valid(...Object.values(TransferType)).required(),
-  date_time: Joi.date().required(),
+  when: Joi.date().required(),
   branch_to: Joi.number().required(),
   branch_from: Joi.number().required(),
   processed_by: Joi.number().required(),

@@ -2,8 +2,7 @@ const Address = require("../models/address");
 const PurchaseOrder = require("../models/purchase-order");
 const Supplier = require("../models/supplier");
 const Product = require("../models/product");
-const ProductOrder = require("../models/product-order");
-const { ProductOrderedStatus } = require("shared/enums");
+const ProductTransaction = require("../models/product-transaction");
 const { sequelize } = require("../models");
 
 module.exports = {
@@ -44,10 +43,10 @@ module.exports = {
 
       await Promise.all([
         ...data.products.map(async (product) => {
-          return await ProductOrder.create(
+          return await ProductTransaction.create(
             {
               ...product,
-              order_id: purchaseOrder.id,
+              transfer_id: purchaseOrder.id,
             },
             { transaction: transaction }
           );
@@ -78,10 +77,11 @@ module.exports = {
 
         // update related products
         if (data.products) {
-          const products = await ProductOrder.findAll({
-            where: { order_id: req.params.id },
+          const products = await ProductTransaction.findAll({
+            where: { transfer_id: req.params.id },
             attributes: ["id", "product_id"],
           });
+
 
           const currentProductIds = products.map((p) => p.product_id);
 
@@ -90,8 +90,8 @@ module.exports = {
             ...data.products
               .filter((p) => !currentProductIds.includes(p.product_id))
               .map((p) =>
-                ProductOrder.create(
-                  { ...p, order_id: req.params.id },
+                ProductTransaction.create(
+                  { ...p, transfer_id: req.params.id },
                   { transaction: transaction }
                 )
               ),
@@ -106,14 +106,14 @@ module.exports = {
                   (p) => p.product_id == product.product_id
                 );
 
-                return ProductOrder.update(toUpdateFields, {
+                return ProductTransaction.update(toUpdateFields, {
                   where: {
                     id: product.id,
                   },
                   transaction: transaction,
                 });
               } else {
-                return ProductOrder.destroy({
+                return ProductTransaction.destroy({
                   where: {
                     id: product.id,
                   },

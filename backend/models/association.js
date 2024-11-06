@@ -4,15 +4,14 @@ const Address = require("./address");
 const Account = require("./account");
 const Product = require("./product");
 const Supplier = require("./supplier");
-const B2BTransfer = require("./b2b-transfer");
 const BranchMember = require("./branch-member");
-const ProductOrder = require("./product-order");
+const StockTransfer = require("./stock-transfer");
 const PurchaseOrder = require("./purchase-order");
 const ProductSettings = require("./product-setting");
-const ProductTransfer = require("./product-transfer");
 const ProductSupplier = require("./product-supplier");
 const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
+const ProductTransaction = require("./product-transaction");
 const PhysicalInventoryItem = require("./physical-inventory-item");
 
 Address.hasMany(Supplier, {
@@ -65,35 +64,22 @@ ProductCategory.hasMany(Product, {
 });
 
 Product.belongsToMany(PurchaseOrder, {
-  through: ProductOrder,
+  through: ProductTransaction,
   foreignKey: "product_id",
-  otherKey: "order_id",
+  otherKey: "transfer_id",
+  as: "orders",
 });
 
 PurchaseOrder.belongsToMany(Product, {
-  through: ProductOrder,
-  foreignKey: "order_id",
+  through: ProductTransaction,
+  foreignKey: "transfer_id",
   otherKey: "product_id",
-  onDelete: "NO ACTION",
   as: "products",
 });
 
 PurchaseOrder.belongsTo(Address, {
   foreignKey: "address_id",
   as: "address",
-});
-
-// Product Order and Product Relationships
-Product.hasMany(ProductOrder, {
-  foreignKey: "product_id",
-  as: "product_orders",
-  onDelete: "CASCADE",
-});
-
-ProductOrder.belongsTo(Product, {
-  foreignKey: "product_id",
-  as: "product",
-  onDelete: "CASCADE",
 });
 
 PurchaseOrder.belongsTo(Supplier, {
@@ -181,47 +167,6 @@ Branch.belongsTo(User, {
   as: "manager",
 });
 
-// B2BTransfer to ProductTransfer
-B2BTransfer.belongsToMany(Product, {
-  through: ProductTransfer,
-  foreignKey: "transfer_id",
-  otherKey: "product_id",
-  as: "products",
-});
-
-Product.belongsToMany(B2BTransfer, {
-  through: ProductTransfer,
-  foreignKey: "product_id",
-  otherKey: "transfer_id",
-  as: "transfers",
-});
-
-// B2BTransfer to Branch
-B2BTransfer.belongsTo(Branch, {
-  foreignKey: "branch_to",
-  as: "receiver",
-});
-
-Branch.hasMany(B2BTransfer, {
-  foreignKey: "branch_to",
-  as: "receives",
-});
-
-B2BTransfer.belongsTo(Branch, {
-  foreignKey: "branch_from",
-  as: "sender",
-});
-
-Branch.hasMany(B2BTransfer, {
-  foreignKey: "branch_from",
-  as: "sents",
-});
-
-B2BTransfer.belongsTo(User, {
-  foreignKey: "processed_by",
-  as: "process_by",
-});
-
 // BranchMember relation to users and Branch
 Branch.belongsToMany(User, {
   through: BranchMember,
@@ -248,4 +193,45 @@ BranchMember.belongsTo(Branch, {
 Branch.hasOne(BranchMember, {
   foreignKey: "branch_id",
   as: "branch_through",
+});
+
+
+// Stock transfer version
+StockTransfer.belongsToMany(Product, {
+  through: ProductTransaction,
+  foreignKey: "transfer_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(StockTransfer, {
+  through: ProductTransaction,
+  foreignKey: "product_id",
+  otherKey: "transfer_id",
+  as: "transfers",
+});
+
+StockTransfer.belongsTo(Branch, {
+  foreignKey: "branch_to",
+  as: "receiver",
+});
+
+Branch.hasMany(StockTransfer, {
+  foreignKey: "branch_to",
+  as: "receives",
+});
+
+StockTransfer.belongsTo(Branch, {
+  foreignKey: "branch_from",
+  as: "sender",
+});
+
+Branch.hasMany(StockTransfer, {
+  foreignKey: "branch_from",
+  as: "sents",
+});
+
+StockTransfer.belongsTo(User, {
+  foreignKey: "processed_by",
+  as: "process_by",
 });

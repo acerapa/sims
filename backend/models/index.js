@@ -77,28 +77,26 @@ const areColumnsExistInTable = async (table, columns) => {
   return data;
 };
 
-
 /**
- * THIS IS AN IN-PROGRESS FUNCTION! PLEASE DON'T USE IT YET
- * @param {*} table 
- * @param {*} column 
+ * This function will get all the
+ * @param {*} table
  */
-const getColumnConstrains = async (table, column) => {
+const getColumnConstrains = async (table) => {
   const [results] = await sequelize.query(
     `
-    SELECT COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME
-    FROM information_schema.KEY_COLUMN_USAGE
-    WHERE table_schema='${config.database}'
-    AND table_name='${table}'
-    AND REFERENCED_COLUMN_NAME = 'id'
+    SELECT 
+      TABLE_NAME as tableName, 
+      CONSTRAINT_NAME as constraintName, 
+      COLUMN_NAME as columnName
+    FROM 
+      information_schema.KEY_COLUMN_USAGE
+    WHERE
+      REFERENCED_TABLE_NAME = '${table}'
+      AND TABLE_SCHEMA = '${config.database}';
     `
   );
-  /**
-   * AND REFERENCED_TABLE_NAME IS NOT NULL'
-   * AND CONSTRAINT_TYPE = 'FOREIGN KEY'
-   */
 
-  console.log(results);
+  return results;
 };
 
 db.getColumnConstrains = getColumnConstrains;

@@ -33,7 +33,7 @@
               :has-label="true"
               label="Date and Time"
               :disabled="true"
-              v-model="model.transfer.date_time"
+              v-model="model.transfer.when"
             />
           </div>
 
@@ -145,7 +145,7 @@ const defaultValue = {
     branch_to: "",
     branch_from: "",
     processed_by: "",
-    date_time: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II-A"),
+    when: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II-A"),
     type: TransferType.STR,
   },
   products: [{ ...productDefaultValue }],
@@ -188,7 +188,7 @@ const branchOptions = computed(() => {
 // TODO: Regulate the interval when to have or not.
 const timeInterval = setInterval(() => {
   if (route.query.id) {
-    model.value.transfer.date_time = DateHelpers.formatDate(
+    model.value.transfer.when = DateHelpers.formatDate(
       new Date(),
       "YYYY-MM-DDTHH:II:SS-A"
     );
@@ -213,7 +213,7 @@ const populateAddress = () => {
 const onSubmit = async () => {
   clearInterval(timeInterval);
 
-  model.value.transfer.date_time = new Date();
+  model.value.transfer.when = new Date();
   await transferStore.createTransfer(model.value);
   router.push({
     name: "str-list",
@@ -251,8 +251,8 @@ onMounted(async () => {
       );
 
       // custom modification
-      model.value.transfer.date_time = DateHelpers.formatDate(
-        new Date(transfer.date_time),
+      model.value.transfer.when = DateHelpers.formatDate(
+        new Date(transfer.when),
         "YYYY-MM-DDTHH:II:SS-A"
       );
 
@@ -262,11 +262,11 @@ onMounted(async () => {
       // populate products
       model.value.products = transfer.products.map((p) => {
         return {
-          product_id: p.ProductTransfer.product_id,
-          description: p.ProductTransfer.description,
-          quantity: p.ProductTransfer.quantity,
-          cost: p.ProductTransfer.cost,
-          amount: p.ProductTransfer.amount,
+          product_id: p.ProductTransaction.product_id,
+          description: p.ProductTransaction.description,
+          quantity: p.ProductTransaction.quantity,
+          cost: p.ProductTransaction.cost,
+          amount: p.ProductTransaction.amount,
         };
       });
     } else {

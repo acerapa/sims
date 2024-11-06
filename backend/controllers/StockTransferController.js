@@ -1,15 +1,17 @@
-const { TransferType } = require("shared/enums");
 const { sequelize } = require("../models");
-const B2BTransfer = require("../models/b2b-transfer");
 const ProductTransfer = require("../models/product-transfer");
 const Branch = require("../models/branch");
 const User = require("../models/user");
 const Product = require("../models/product");
 
+// test
+const ProductTransaction = require("../models/product-transaction");
+const StockTranfer = require("../models/stock-transfer");
+
 module.exports = {
   getAllByType: async (req, res) => {
     try {
-      const transfer = await B2BTransfer.findAll({
+      const transfer = await StockTranfer.findAll({
         where: {
           type: req.params.type,
         },
@@ -64,14 +66,16 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      const transfer = await B2BTransfer.create(data.transfer, {
+      const transfer = await StockTranfer.create(data.transfer, {
         transaction: transaction,
       });
 
       await Promise.all(
         data.products.map((product) => {
           product.transfer_id = transfer.id;
-          return ProductTransfer.create(product, { transaction: transaction });
+          return ProductTransaction.create(product, {
+            transaction: transaction,
+          });
         })
       );
 
@@ -84,7 +88,7 @@ module.exports = {
   },
   getById: async (req, res) => {
     try {
-      const transfer = await B2BTransfer.findOne({
+      const transfer = await StockTranfer.findOne({
         where: {
           id: req.params.id,
         },
@@ -136,7 +140,7 @@ module.exports = {
   },
   destroy: async (req, res) => {
     try {
-      await B2BTransfer.destroy({
+      await StockTranfer.destroy({
         where: {
           id: req.params.id,
         },

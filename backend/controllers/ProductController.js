@@ -5,7 +5,6 @@ const Account = require("../models/account");
 const { Op } = require("sequelize");
 const ProductSettings = require("../models/product-setting");
 const ProductCategory = require("../models/product-category");
-const ProductOrder = require("../models/product-order");
 
 module.exports = {
   all: async (req, res) => {
@@ -132,10 +131,6 @@ module.exports = {
           {
             model: ProductCategory,
             as: "category",
-          },
-          {
-            model: ProductOrder,
-            as: "product_orders",
           },
         ],
       });
