@@ -55,7 +55,7 @@ import ModalWrapper from "@/components/shared/ModalWrapper.vue";
 import CustomInput from "@/components/shared/CustomInput.vue";
 import { useEmployeeStore } from "@/stores/employee";
 import EmployeeModal from "@/components/Employee/EmployeeModal.vue";
-import { BranchStatusMap } from "shared/enums/transfer";
+import { BranchStatusMap } from "shared/enums";
 import AddressForm from "@/components/shared/AddressForm.vue";
 import { useSettingsStore } from "@/stores/settings";
 import { ObjectHelpers } from "shared/helpers";

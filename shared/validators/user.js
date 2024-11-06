@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { UserType } = require("../enums/user");
+const { UserType } = require("../enums");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
 
 const UserSchema = Joi.object({
@@ -20,6 +20,7 @@ const AddressSchema = Joi.object({
   address1: Joi.string().required(),
   address2: Joi.string().optional(),
   city: Joi.string().required(),
+  province: Joi.string().required(),
   postal: Joi.string().required()
 })
 

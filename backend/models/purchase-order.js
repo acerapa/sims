@@ -4,7 +4,7 @@ const Supplier = require("./supplier");
 const {
   PurchaseOrderType,
   PurchaseOrderStatus,
-} = require("shared/enums/purchase-order");
+} = require("shared/enums");
 const Address = require("./address");
 
 class PurchaseOrder extends Model {}

@@ -1,6 +1,6 @@
 import { authenticatedApi, Method } from "@/api";
 import { defineStore } from "pinia";
-import { TransferType } from "shared/enums/transfer";
+import { TransferType } from "shared/enums";
 import { ref } from "vue";
 
 export const useTransferStore = defineStore("tranfer", function () {

@@ -39,7 +39,7 @@ import Event from "@/event";
 import { useAuthStore } from "@/stores/auth";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
 import { useProductStore } from "@/stores/product";
-import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
+import { PhysicalInventoryStatus } from "shared/enums";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 

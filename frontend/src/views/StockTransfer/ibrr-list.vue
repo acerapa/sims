@@ -26,7 +26,7 @@ import CustomTable from "@/components/shared/CustomTable.vue";
 import ibrrListHeader from "@/components/stock-transfer/ibrr-list-header.vue";
 import { useRouter } from "vue-router";
 import { useTransferStore } from "@/stores/transfer";
-import { TransferType } from "shared/enums/transfer";
+import { TransferType } from "shared/enums";
 import IbrrListRow from "@/components/stock-transfer/ibrr-list-row.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";

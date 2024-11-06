@@ -110,7 +110,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useProductStore } from "@/stores/product";
 import { useSettingsStore } from "@/stores/settings";
 import { useTransferStore } from "@/stores/transfer";
-import { TransferType } from "shared/enums/transfer";
+import { TransferType } from "shared/enums";
 import { DateHelpers, ObjectHelpers } from "shared/helpers";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";

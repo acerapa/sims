@@ -1,4 +1,4 @@
-const { BranchStatus } = require("shared/enums/transfer");
+const { BranchStatus } = require("shared/enums");
 const bcryptJS = require("bcryptjs");
 
 const generateBranchDummy = async () => {

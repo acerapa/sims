@@ -27,7 +27,7 @@
 import { ref } from "vue";
 import CustomInput from "@/components/shared/CustomInput.vue";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
-import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
+import { PhysicalInventoryStatus } from "shared/enums";
 
 const props = defineProps({
   item: {

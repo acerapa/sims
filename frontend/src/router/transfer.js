@@ -43,6 +43,24 @@ export default [
           title: "Stock Transfer Report Form",
         },
       },
+      {
+        path: "rma-list",
+        name: "rma-list",
+        component: () => import("@/views/StockTransfer/rma-list.vue"),
+        meta: {
+          title: "Return Merchandise Authority List",
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "rma-form",
+        name: "rma-form",
+        component: () => import("@/views/StockTransfer/rma-form.vue"),
+        meta: {
+          title: "Return Merchandise Authority Form",
+          requiresAuth: true,
+        },
+      },
     ],
   },
 ];

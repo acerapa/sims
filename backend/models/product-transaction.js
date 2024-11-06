@@ -1,10 +1,10 @@
 const { Model, DataTypes } = require("sequelize");
-const Product = require("../models/product");
-const B2BTransfer = require("./b2b-transfer");
 const { sequelize } = require(".");
-class ProductTransfer extends Model {}
+const { ProductOrderedStatus } = require("shared/enums");
 
-ProductTransfer.init(
+class ProductTransaction extends Model {}
+
+ProductTransaction.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -13,17 +13,19 @@ ProductTransfer.init(
     },
     product_id: {
       type: DataTypes.INTEGER,
-      references: {
-        model: Product,
-        key: "id",
-      },
+      allowNull: false,
     },
     transfer_id: {
       type: DataTypes.INTEGER,
-      references: {
-        model: B2BTransfer,
-        key: "id",
-      }
+    },
+    quantity_received: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.ENUM,
+      values: Object.values(ProductOrderedStatus),
+      defaultValue: ProductOrderedStatus.OPEN,
     },
     quantity: {
       type: DataTypes.INTEGER,
@@ -37,7 +39,15 @@ ProductTransfer.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    problem: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     description: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    remarks: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -47,5 +57,3 @@ ProductTransfer.init(
     timestamps: true,
   }
 );
-
-module.exports = ProductTransfer;

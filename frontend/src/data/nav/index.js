@@ -55,6 +55,12 @@ export default [
         icon: outlineDot,
         includes_active: ["ibrr-form"],
       },
+      {
+        text: "RMA List",
+        route: "rma-list",
+        icon: outlineDot,
+        includes_active: ["rma-form"],
+      },
     ],
   },
   {

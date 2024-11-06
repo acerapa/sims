@@ -90,7 +90,7 @@ import {
   ProductOrderedStatus,
   PurchaseOrderStatus,
   PurchaseOrderType,
-} from "shared/enums/purchase-order";
+} from "shared/enums";
 import { DateHelpers, ObjectHelpers } from "shared/helpers";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
