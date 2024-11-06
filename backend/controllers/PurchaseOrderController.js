@@ -3,7 +3,7 @@ const PurchaseOrder = require("../models/purchase-order");
 const Supplier = require("../models/supplier");
 const Product = require("../models/product");
 const ProductOrder = require("../models/product-order");
-const { ProductOrderedStatus } = require("shared/enums/purchase-order");
+const { ProductOrderedStatus } = require("shared/enums");
 const { sequelize } = require("../models");
 
 module.exports = {

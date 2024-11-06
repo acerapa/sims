@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { UserType } = require("../enums/user");
+const { UserType } = require("../enums");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
 
 const UserSchema = Joi.object({

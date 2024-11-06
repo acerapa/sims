@@ -1,7 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const User = require("./user");
 const { sequelize } = require(".");
-const { PhysicalInventoryStatus } = require("shared/enums/purchase-order");
+const { PhysicalInventoryStatus } = require("shared/enums");
 
 class PhysicalInventory extends Model {}
 

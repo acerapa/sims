@@ -4,7 +4,7 @@ const { ValidatorHelpers } = require("../helpers/validators-helpers");
 const {
   ProductOrderedStatus,
   PhysicalInventoryStatus,
-} = require("./../enums/purchase-order");
+} = require("./../enums");
 
 const PurchaseOrderSchema = Joi.object({
   ref_no: Joi.string().required(),

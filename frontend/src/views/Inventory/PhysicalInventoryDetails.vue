@@ -103,7 +103,7 @@ import Event from "@/event";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
 import { useProductStore } from "@/stores/product";
 import { useSettingsStore } from "@/stores/settings";
-import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
+import { PhysicalInventoryStatus } from "shared/enums";
 import { DateHelpers } from "shared/helpers";
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";

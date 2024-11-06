@@ -29,7 +29,7 @@
 
 <script setup>
 import { computed } from "vue";
-import { BranchStatusMap } from "shared/enums/transfer";
+import { BranchStatusMap } from "shared/enums";
 import BadgeComponent from "../shared/BadgeComponent.vue";
 
 const props = defineProps({

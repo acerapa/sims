@@ -15,6 +15,9 @@ ProductTransaction.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    transfer_id: {
+      type: DataTypes.INTEGER,
+    },
     quantity_received: {
       type: DataTypes.INTEGER,
       allowNull: true,

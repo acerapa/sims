@@ -220,7 +220,7 @@ import {
   PurchaseOrderStatus,
   PurchaseOrderType,
   PurchaseStatusMap,
-} from "shared/enums/purchase-order";
+} from "shared/enums";
 import { ObjectHelpers } from "shared/helpers/object";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";

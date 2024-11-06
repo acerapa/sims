@@ -33,7 +33,7 @@ import Event from "@/event";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useTransferStore } from "@/stores/transfer";
-import { TransferType } from "shared/enums/transfer";
+import { TransferType } from "shared/enums";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 

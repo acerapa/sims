@@ -135,7 +135,7 @@ import { EventEnum } from "@/data/event";
 import Event from "@/event";
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
 import { useVendorStore } from "@/stores/supplier";
-import { PurchaseOrderStatus } from "shared/enums/purchase-order";
+import { PurchaseOrderStatus } from "shared/enums";
 import { DateHelpers } from "shared/helpers/date";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
