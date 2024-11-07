@@ -6,7 +6,7 @@ import products from "@/assets/icons/products.svg";
 import reports from "@/assets/icons/reports.svg";
 import employees from "@/assets/icons/employees.svg";
 import settings from "@/assets/icons/settings.svg";
-import dot from "@/assets/icons/dot.svg";
+import outlineDot from "@/assets/icons/outline-dot.svg";
 import transfer from "@/assets/icons/transfer.png";
 
 export default [
@@ -23,18 +23,18 @@ export default [
       {
         text: "Purchase Order",
         route: "purchase-order",
-        icon: dot,
+        icon: outlineDot,
         includes_active: ["purchase-order-create"],
       },
       {
         text: "My Inventory",
         route: "my-inventory",
-        icon: dot,
+        icon: outlineDot,
       },
       {
         text: "Inventory Stock Status",
         route: "inventory-stock-status",
-        icon: dot,
+        icon: outlineDot,
       },
     ],
   },
@@ -42,6 +42,26 @@ export default [
     text: "Transfer Stocks",
     route: "transfer",
     icon: transfer,
+    children: [
+      {
+        text: "STR List",
+        route: "str-list",
+        icon: outlineDot,
+        includes_active: ["str-form"],
+      },
+      {
+        text: "IBRR List",
+        route: "ibrr-list",
+        icon: outlineDot,
+        includes_active: ["ibrr-form"],
+      },
+      {
+        text: "RMA List",
+        route: "rma-list",
+        icon: outlineDot,
+        includes_active: ["rma-form"],
+      },
+    ],
   },
   {
     text: "Vendors/Suppliers",
@@ -66,7 +86,7 @@ export default [
       {
         text: "Physical Inventories",
         route: "physical-inventory",
-        icon: dot,
+        icon: outlineDot,
       },
     ],
   },
@@ -81,14 +101,19 @@ export default [
     icon: settings,
     children: [
       {
+        text: "Branches",
+        route: "branches",
+        icon: outlineDot,
+      },
+      {
         text: "Account Settings",
         route: "account-settings",
-        icon: dot,
+        icon: outlineDot,
       },
       {
         text: "Product Settings",
         route: "product-settings",
-        icon: dot,
+        icon: outlineDot,
       },
     ],
   },

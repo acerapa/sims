@@ -1,10 +1,11 @@
-import { authenticatedApi } from "@/api";
+import { authenticatedApi, Method } from "@/api";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useSettingsStore = defineStore("settings", () => {
   const productCategories = ref([]);
   const accounts = ref([]);
+  const branches = ref([]);
   const productReorderingPoints = ref([]);
 
   const fetchAllProductCategories = async () => {
@@ -61,12 +62,35 @@ export const useSettingsStore = defineStore("settings", () => {
     return category;
   };
 
+  const fetchAllBranches = async () => {
+    const res = await authenticatedApi("branch/all");
+
+    if (res.status == 200) {
+      branches.value = res.data.branches;
+    }
+
+    return branches.value;
+  };
+
+  // branches methods
+  const createBranch = async (model) => {
+    return await authenticatedApi("branch/register", Method.POST, model);
+  };
+
+  const updateBranch = async (id, model) => {
+    return await authenticatedApi(`branch/update/${id}`, Method.POST, model);
+  };
+
   return {
     accounts,
+    branches,
     productCategories,
     productReorderingPoints,
+    createBranch,
+    updateBranch,
     categoryOption,
     fetchAllAccounts,
+    fetchAllBranches,
     fetchAllProductCategories,
     getProductCategoryByIdSync,
     getProductCategoryByIdAsync,

@@ -1,8 +1,13 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
+import { useSettingsStore } from "./settings";
 
-export const useAppStore = defineStore('app', () => {
-	const currentNav = ref('');
+const settingsStore = useSettingsStore();
+export const useAppStore = defineStore("app", () => {
+  const currentNav = ref("");
+  const currentBranch = computed(() =>
+    settingsStore.branches.find((branch) => branch.is_current)
+  );
 
-	return { currentNav }
+  return { currentNav, currentBranch };
 });

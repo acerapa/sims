@@ -7,7 +7,7 @@ import {
 } from "@/api";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { LocalStorageKeys } from "shared/enums/local-storage";
+import { LocalStorageKeys } from "shared/enums";
 
 export const useAuthStore = defineStore("auth", () => {
   const accessToken = ref("");

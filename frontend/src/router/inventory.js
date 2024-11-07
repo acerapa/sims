@@ -39,6 +39,7 @@ export default [
         component: () => import("@/views/Inventory/PurchaseOrderForm.vue"),
         meta: {
           requiresAuth: true,
+          title: "Purchase Order Form",
         },
       },
       {

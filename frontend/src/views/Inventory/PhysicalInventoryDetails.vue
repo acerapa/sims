@@ -1,11 +1,16 @@
 <template>
-  <div class="flex flex-col gap-3">
+  <div class="flex flex-col gap-3" v-if="physicalInventory">
     <div class="cont flex flex-col gap-3" v-if="physicalInventory">
       <div class="flex justify-between">
         <div>
           <p>
             <strong>Physical Inventory date:</strong>
-            {{ DateHelpers.formatDate(physicalInventory.date_started, "MM/DD/YYYY") }}
+            {{
+              DateHelpers.formatDate(
+                physicalInventory.date_started,
+                "MM/DD/YYYY"
+              )
+            }}
           </p>
         </div>
         <BadgeComponent
@@ -31,7 +36,27 @@
       @open-menu="onSelectRow"
     >
       <template v-slot:buttons>
-        <button class="btn !bg-success" @click="onSubmit">Submit</button>
+        <button
+          v-if="physicalInventory.status != PhysicalInventoryStatus.DONE"
+          class="btn-outline"
+          @click="onContinueLater"
+        >
+          Continue Later
+        </button>
+        <button
+          class="btn !bg-success"
+          @click="onSubmit"
+          v-if="physicalInventory.status != PhysicalInventoryStatus.DONE"
+        >
+          Submit
+        </button>
+        <button
+          class="btn-outline"
+          @click="onContinueLater"
+          v-if="physicalInventory.status == PhysicalInventoryStatus.DONE"
+        >
+          Back
+        </button>
       </template>
       <template v-slot:filters>
         <CustomInput
@@ -78,16 +103,17 @@ import Event from "@/event";
 import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
 import { useProductStore } from "@/stores/product";
 import { useSettingsStore } from "@/stores/settings";
-import { PhysicalInventoryStatus } from "shared/enums/purchase-order";
+import { PhysicalInventoryStatus } from "shared/enums";
 import { DateHelpers } from "shared/helpers";
 import { computed, onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const top = ref(0);
 const items = ref([]);
 const route = useRoute();
 const selectedId = ref();
 const searchText = ref("");
+const router = useRouter();
 const showRowMenu = ref(false);
 const physicalInventory = ref();
 const isItemChecked = ref(false);
@@ -150,10 +176,22 @@ const onSelectRow = (data) => {
 };
 
 const onSubmit = async () => {
-  await physicalInventoryStore.update(physicalInventory.value.id, {
+  const res = await physicalInventoryStore.update(physicalInventory.value.id, {
     physical_inventory: {
       status: PhysicalInventoryStatus.DONE,
     },
+  });
+
+  if (res.status == 200) {
+    router.push({
+      name: "physical-inventory",
+    });
+  }
+};
+
+const onContinueLater = () => {
+  router.push({
+    name: "physical-inventory",
   });
 };
 

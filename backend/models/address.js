@@ -1,7 +1,5 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
-const Supplier = require("./supplier");
-const PurchaseOrder = require("./purchase-order");
 
 class Address extends Model {}
 
@@ -22,27 +20,16 @@ Address.init(
     },
     city: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
+    },
+    province: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     postal: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    supplier_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: Supplier,
-        key: "id",
-      },
-      allowNull: true
-    },
-    order_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: PurchaseOrder,
-        key: "id"
-      }
-    }
   },
   {
     sequelize,

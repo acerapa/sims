@@ -1,10 +1,10 @@
-const { DataTypes, Model } = require("sequelize");
+const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require(".");
-const { ProductOrderedStatus } = require("shared/enums/purchase-order");
+const { ProductOrderedStatus } = require("shared/enums");
 
-class ProductOrder extends Model {}
+class ProductTransaction extends Model {}
 
-ProductOrder.init(
+ProductTransaction.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -15,13 +15,8 @@ ProductOrder.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    order_id: {
+    transfer_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
     },
     quantity_received: {
       type: DataTypes.INTEGER,
@@ -32,6 +27,10 @@ ProductOrder.init(
       values: Object.values(ProductOrderedStatus),
       defaultValue: ProductOrderedStatus.OPEN,
     },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     amount: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -40,7 +39,15 @@ ProductOrder.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    problem: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     description: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    serial_number: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -55,4 +62,4 @@ ProductOrder.init(
   }
 );
 
-module.exports = ProductOrder;
+module.exports = ProductTransaction;

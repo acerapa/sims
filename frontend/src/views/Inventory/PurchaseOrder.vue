@@ -64,8 +64,8 @@
             <small>Suppliers</small>
             <CustomInput
               type="select"
-              v-if="supplierOptions"
-              :options="supplierOptions"
+              v-if="supplierStore.supplierOptions.length"
+              :options="supplierStore.supplierOptions"
               v-model="filters.supplier_id"
               placeholder="Select Supplier"
             />
@@ -135,7 +135,7 @@ import { EventEnum } from "@/data/event";
 import Event from "@/event";
 import { usePurchaseOrderStore } from "@/stores/purchase-order";
 import { useVendorStore } from "@/stores/supplier";
-import { PurchaseOrderStatus } from "shared/enums/purchase-order";
+import { PurchaseOrderStatus } from "shared/enums";
 import { DateHelpers } from "shared/helpers/date";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -303,7 +303,9 @@ const purchaseOrderStore = usePurchaseOrderStore();
  ** ================================================*/
 
 onMounted(async () => {
-  supplierOptions.value = await supplierStore.getSupplierOptions();
+  if (supplierStore.supplierOptions.length == 0) {
+    await supplierStore.fetchAllSuppliers();
+  }
   await purchaseOrderStore.fetchPurchaseOrders();
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });

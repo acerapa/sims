@@ -353,3 +353,30 @@ Accept: application/json
 ### [Inventory Stock Status]
 GET http://localhost:3000/api/products/stock-status
 Accept: application/json
+
+
+### [Branches Get all routes]
+GET http://localhost:3000/api/branch/all
+Accept: application/json
+
+### [Branches register]
+POST http://localhost:3000/api/branch/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"branch": {}
+}
+
+### [Branch delete]
+DELETE http://localhost:3000/api/branch/delete/4
+Accept: application/json
+
+### [Branch Transfer]
+POST http://localhost:3000/api/transfer/register
+Accept: application/json
+Content-Type: application/json
+
+{
+	"transfer": {}
+}

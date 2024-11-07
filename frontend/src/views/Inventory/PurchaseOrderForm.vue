@@ -109,8 +109,6 @@
             <p class="text-sm font-semibold">Ship To Info</p>
             <AddressForm
               v-model="model.address"
-              :address="model.address"
-              :key="model.order"
               :has-label="true"
               :disabled="isDisabled"
             />
@@ -134,22 +132,7 @@
 
       <div class="max-[750px]:w-[calc(100vw-328px)]">
         <div class="flex flex-col gap-4 max-w-full overflow-x-auto mb-4 pb-4">
-          <div
-            class="grid gap-3 min-w-[750px] pb-2 border-b"
-            :class="[isDisabled ? 'grid-cols-8' : 'grid-cols-9']"
-          >
-            <div class="col-span-2 flex gap-3 items-center">
-              <input type="checkbox" class="input" v-if="!isDisabled" />
-              <p class="table-header pl-3">Item</p>
-            </div>
-            <p class="col-span-3 table-header pl-3">Description</p>
-            <p class="col-span-1 table-header pl-3">Qty</p>
-            <p class="col-span-1 table-header pl-3">Cost</p>
-            <p class="col-span-1 table-header pl-3">Amount</p>
-            <p class="col-span-1 table-header pl-3" v-if="!isDisabled">
-              Action
-            </p>
-          </div>
+          <PurchaseOrderFormHeader :is-disabled="isDisabled" />
           <div class="flex flex-col gap-4">
             <PurchaseOrderFormRow
               v-for="(product, ndx) in model.products"
@@ -221,6 +204,7 @@
 <script setup>
 import { Method, authenticatedApi } from "@/api";
 import PurchaseOrderFormRow from "@/components/Inventory/PurchaseOrder/PurchaseOrderFormRow.vue";
+import PurchaseOrderFormHeader from "@/components/Inventory/PurchaseOrder/PurchaseOrderFormHeader.vue";
 import AddressForm from "@/components/shared/AddressForm.vue";
 import BadgeComponent from "@/components/shared/BadgeComponent.vue";
 import CustomInput from "@/components/shared/CustomInput.vue";
@@ -236,7 +220,7 @@ import {
   PurchaseOrderStatus,
   PurchaseOrderType,
   PurchaseStatusMap,
-} from "shared/enums/purchase-order";
+} from "shared/enums";
 import { ObjectHelpers } from "shared/helpers/object";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -411,12 +395,12 @@ onMounted(async () => {
         return {
           product_id: product.id,
           name: product.name,
-          description: product.ProductOrder.description
-            ? product.ProductOrder.description
+          description: product.ProductTransaction.description
+            ? product.ProductTransaction.description
             : product.purchase_description,
-          quantity: product.ProductOrder.quantity,
-          cost: getCost(product.ProductOrder.cost, product, order.supplier_id),
-          amount: product.ProductOrder.amount,
+          quantity: product.ProductTransaction.quantity,
+          cost: getCost(product.ProductTransaction.cost, product, order.supplier_id),
+          amount: product.ProductTransaction.amount,
         };
       }),
     ];

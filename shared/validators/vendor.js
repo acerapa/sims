@@ -5,6 +5,7 @@ const AddressSchema = Joi.object({
   address2: Joi.string(),
   city: Joi.string(),
   postal: Joi.string(),
+  province: Joi.string(),
 }).options({
   allowUnknown: true,
 });

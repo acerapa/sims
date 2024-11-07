@@ -2,8 +2,7 @@ const Address = require("../models/address");
 const PurchaseOrder = require("../models/purchase-order");
 const Supplier = require("../models/supplier");
 const Product = require("../models/product");
-const ProductOrder = require("../models/product-order");
-const { ProductOrderedStatus } = require("shared/enums/purchase-order");
+const ProductTransaction = require("../models/product-transaction");
 const { sequelize } = require("../models");
 
 module.exports = {
@@ -32,19 +31,22 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      const purchaseOrder = await PurchaseOrder.create(data.order, {
+
+      const address = await Address.create(data.address, {
         transaction: transaction,
       });
 
-      const address = { ...data.address, order_id: purchaseOrder.id };
-      await Address.create(address, { transaction: transaction });
+      const order = { ...data.order, address_id: address.id };
+      const purchaseOrder = await PurchaseOrder.create(order, {
+        transaction: transaction,
+      });
 
       await Promise.all([
         ...data.products.map(async (product) => {
-          return await ProductOrder.create(
+          return await ProductTransaction.create(
             {
               ...product,
-              order_id: purchaseOrder.id,
+              transfer_id: purchaseOrder.id,
             },
             { transaction: transaction }
           );
@@ -63,19 +65,23 @@ module.exports = {
     try {
       const data = req.body.validated;
       if (data.order) {
-        await PurchaseOrder.update(data.order, {
+        const purchaseOrder = await PurchaseOrder.findOne({
           where: {
             id: req.params.id,
           },
+        });
+
+        await purchaseOrder.update(data.order, {
           transaction: transaction,
         });
 
         // update related products
         if (data.products) {
-          const products = await ProductOrder.findAll({
-            where: { order_id: req.params.id },
+          const products = await ProductTransaction.findAll({
+            where: { transfer_id: req.params.id },
             attributes: ["id", "product_id"],
           });
+
 
           const currentProductIds = products.map((p) => p.product_id);
 
@@ -84,8 +90,8 @@ module.exports = {
             ...data.products
               .filter((p) => !currentProductIds.includes(p.product_id))
               .map((p) =>
-                ProductOrder.create(
-                  { ...p, order_id: req.params.id },
+                ProductTransaction.create(
+                  { ...p, transfer_id: req.params.id },
                   { transaction: transaction }
                 )
               ),
@@ -100,14 +106,14 @@ module.exports = {
                   (p) => p.product_id == product.product_id
                 );
 
-                return ProductOrder.update(toUpdateFields, {
+                return ProductTransaction.update(toUpdateFields, {
                   where: {
                     id: product.id,
                   },
                   transaction: transaction,
                 });
               } else {
-                return ProductOrder.destroy({
+                return ProductTransaction.destroy({
                   where: {
                     id: product.id,
                   },
@@ -122,7 +128,7 @@ module.exports = {
         if (data.address) {
           await Address.update(data.address, {
             where: {
-              order_id: req.params.id,
+              id: purchaseOrder.address_id,
             },
             transaction: transaction,
           });

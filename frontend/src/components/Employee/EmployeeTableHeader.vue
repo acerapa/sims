@@ -4,8 +4,8 @@
       <input type="checkbox" class="input" />
       <p class="table-header">#</p>
     </div>
-    <p class="col-span-2 table-header">First Name</p>
-    <p class="col-span-2 table-header">Last Name</p>
+    <p class="col-span-2 table-header">Name</p>
+    <p class="col-span-2 table-header">Branch</p>
     <p class="col-span-2 table-header">Position</p>
     <p class="col-span-2 table-header">Date Started</p>
     <p class="col-span-2 table-header">Date Ended</p>

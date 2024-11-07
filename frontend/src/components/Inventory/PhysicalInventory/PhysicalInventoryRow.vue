@@ -34,7 +34,7 @@
 <script setup>
 import { DateHelpers } from "shared/helpers";
 import BadgeComponent from "@/components/shared/BadgeComponent.vue";
-import { PhysicalInventoryStatusMap } from "shared/enums/purchase-order";
+import { PhysicalInventoryStatusMap } from "shared/enums";
 
 const props = defineProps({
   inventory: {

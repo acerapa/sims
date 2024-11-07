@@ -1,7 +1,8 @@
 "use strict";
 
 const { isColumnExistInTable } = require("../models");
-const ProductOrder = require("../models/product-order");
+const Branch = require("../models/branch");
+const column = "is_current";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -12,15 +13,14 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    const isExist = await isColumnExistInTable(
-      ProductOrder.getTableName(),
-      "description"
-    );
+
+    const isExist = await isColumnExistInTable(Branch.getTableName(), column);
+
     if (!isExist) {
       await queryInterface.addColumn(
-        ProductOrder.getTableName(),
-        "description",
-        ProductOrder.getAttributes()["description"]
+        Branch.getTableName(),
+        column,
+        Branch.getAttributes()[column]
       );
     }
   },
@@ -33,16 +33,10 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
 
-    const isExist = await isColumnExistInTable(
-      ProductOrder.getTableName(),
-      "description"
-    );
+    const isExist = await isColumnExistInTable(Branch.getTableName(), column);
 
     if (isExist) {
-      await queryInterface.removeColumn(
-        ProductOrder.getTableName(),
-        "description"
-      );
+      await queryInterface.removeColumn(Branch.getTableName(), column);
     }
   },
 };

@@ -7,7 +7,7 @@
         class="w-full"
         label="Address 1"
         placeholder="Address 1"
-        v-model="model.address1"
+        v-model="formModel.address1"
         :disabled="props.disabled"
         :has-label="props.hasLabel"
       />
@@ -17,29 +17,39 @@
         name="address2"
         label="Address 2"
         placeholder="Address 2"
-        v-model="model.address2"
+        v-model="formModel.address2"
         :disabled="props.disabled"
         :has-label="props.hasLabel"
       />
     </div>
-    <div class="flex gap-6 max-lg:flex-col max-lg:gap-3">
+    <div class="grid grid-cols-3 gap-6 max-lg:grid-cols-1 max-lg:gap-3">
       <CustomInput
         type="text"
         name="city"
         label="City"
-        class="flex-1"
+        input-class="!min-w-0"
         placeholder="City"
-        v-model="model.city"
+        v-model="formModel.city"
+        :disabled="props.disabled"
+        :has-label="props.hasLabel"
+      />
+      <CustomInput
+        type="text"
+        name="province"
+        label="Province"
+        input-class="!min-w-0"
+        placeholder="Province"
+        v-model="formModel.province"
         :disabled="props.disabled"
         :has-label="props.hasLabel"
       />
       <CustomInput
         type="text"
         name="postal"
-        class="flex-1"
         label="Zip Code"
+        input-class="!min-w-0"
         placeholder="Zip Code"
-        v-model="model.postal"
+        v-model="formModel.postal"
         :disabled="props.disabled"
         :has-label="props.hasLabel"
       />
@@ -47,14 +57,9 @@
   </div>
 </template>
 <script setup>
-import { ref, watch } from "vue";
 import CustomInput from "./CustomInput.vue";
 
 const props = defineProps({
-  address: {
-    type: Object,
-    default: () => ({}),
-  },
   disabled: {
     type: Boolean,
     default: false,
@@ -65,22 +70,5 @@ const props = defineProps({
   },
 });
 
-const model = ref({
-  address1: props.address.address1,
-  address2: props.address.address2,
-  city: props.address.city,
-  postal: props.address.postal,
-});
-
 const formModel = defineModel();
-
-watch(
-  () => model.value,
-  (val) => {
-    formModel.value = val;
-  },
-  {
-    deep: true,
-  }
-);
 </script>

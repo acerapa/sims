@@ -9,6 +9,7 @@
       ref="select"
       v-if="!props.selectMultiple && !props.canSearch"
       :disabled="props.disabled"
+      @change="emit('change')"
     >
       <option value="" v-if="props.placeholder" selected disabled>
         {{ props.placeholder }}
@@ -39,6 +40,7 @@
         ref="singleDropdown"
         v-model="search"
         :disabled="props.disabled"
+        @blur="onBlurSelect"
       />
       <div
         class="hidden bg-white group-focus-within:block rounded shadow w-full max-h-40 overflow-y-auto"
@@ -128,7 +130,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 
-const emit = defineEmits(["addNew"]);
+const emit = defineEmits(["addNew", "change"]);
 
 const props = defineProps({
   placeholder: {
@@ -184,6 +186,7 @@ const getName = (value) => {
 const selectOption = (value) => {
   selected.value = value;
   search.value = getName(value);
+  emit("change");
 };
 
 const onSelectOpt = (value) => {
@@ -201,6 +204,16 @@ const multiSelectOptions = computed(() => {
     ? opts.filter((opt) => !selected.value.includes(opt.value))
     : opts;
 });
+
+const onBlurSelect = () => {
+  setTimeout(() => {
+    if (props.canSearch && !props.selectMultiple && !search.value) {
+      // selectOption(selected.value);
+      selected.value = "";
+      emit("change");
+    }
+  }, 500);
+};
 
 watch(
   () => selected.value,

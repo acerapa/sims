@@ -5,6 +5,7 @@ import commonRoutes from "./common";
 import reportRoutes from "./report";
 import inventoryRoutes from "./inventory";
 import settingsRoutes from "./settings";
+import transferRoutes from "./transfer";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -13,6 +14,7 @@ const router = createRouter({
     ...inventoryRoutes,
     ...settingsRoutes,
     ...reportRoutes,
+    ...transferRoutes,
   ],
 });
 
