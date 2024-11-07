@@ -3,7 +3,9 @@
     <div class="flex gap-6">
       <div class="flex-1">
         <p class="font-bold">Transfer Information</p>
-        <div class="flex gap-3 items-center">
+        <div
+          class="flex gap-3 items-center max-lg:flex-col max-lg:gap-3 max-lg:items-start max-lg:[&>div]:w-full"
+        >
           <CustomInput
             type="select"
             class="flex-1"
@@ -80,9 +82,20 @@ import ProductMultiSelectTable from "@/components/shared/ProductMultiSelectTable
 import { useVendorStore } from "@/stores/supplier";
 import { computed, onMounted, ref } from "vue";
 import { ObjectHelpers } from "shared/helpers";
+import { TransferType } from "shared/enums";
 import { useRouter } from "vue-router";
+import { useTransferStore } from "@/stores/transfer";
+import { useAppStore } from "@/stores/app";
+import { useSettingsStore } from "@/stores/settings";
+import { useAuthStore } from "@/stores/auth";
+
+const currentBranch = ref(null);
 
 const router = useRouter();
+const appStore = useAppStore();
+const authStore = useAuthStore(); // this is temporary
+const transferStore = useTransferStore();
+const settingsStore = useSettingsStore(); // this is temporaru
 
 const address = ref({
   address1: "",
@@ -108,6 +121,9 @@ const defualtValue = {
     supplier_id: "",
     when: "",
     memo: "",
+    branch_from: "",
+    processed_by: "",
+    type: TransferType.RMA,
   },
   products: [{ ...productDefaultValue }],
 };
@@ -140,6 +156,17 @@ const populateAddress = () => {
   );
 };
 
+const onSubmit = () => {
+  model.value.transfer.when = new Date();
+  const res = transferStore.createTransfer(model.value);
+
+  if (res.status == 200) {
+    router.push({
+      name: "rma-list",
+    });
+  }
+};
+
 const onCancel = () => {
   router.back();
 };
@@ -149,5 +176,10 @@ const onCancel = () => {
  ** ================================================*/
 onMounted(async () => {
   await vendorStore.fetchAllSuppliers();
+  await settingsStore.fetchAllBranches();
+  currentBranch.value = appStore.currentBranch;
+
+  model.value.transfer.branch_from = currentBranch.value.id;
+  model.value.transfer.processed_by = authStore.getAuthUser().id;
 });
 </script>

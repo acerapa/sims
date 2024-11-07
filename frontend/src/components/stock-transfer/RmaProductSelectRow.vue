@@ -99,7 +99,8 @@ const onChange = () => {
       model.value.quantity = 1;
     }
   } else {
-    model.value.name = "";
+    model.value.serial_number = "";
+    model.value.problem = "";
     model.value.product_id = "";
     model.value.description = "";
     model.value.quantity = "";

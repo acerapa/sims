@@ -61,7 +61,7 @@ Event.on(rowPropInit, function (data) {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return transferStore.strs.filter((str) => true);
+  return transferStore.strs ? transferStore.strs.filter((str) => true) : 0;
 });
 
 /** ================================================
@@ -94,7 +94,7 @@ const onDeleteRow = () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await transferStore.fetchByType(TransferType.STR);
+  await transferStore.fetchTransfers();
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });
 </script>

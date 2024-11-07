@@ -195,7 +195,6 @@ Branch.hasOne(BranchMember, {
   as: "branch_through",
 });
 
-
 // Stock transfer version
 StockTransfer.belongsToMany(Product, {
   through: ProductTransaction,
@@ -234,4 +233,9 @@ Branch.hasMany(StockTransfer, {
 StockTransfer.belongsTo(User, {
   foreignKey: "processed_by",
   as: "process_by",
+});
+
+StockTransfer.belongsTo(Supplier, {
+  foreignKey: "supplier_id",
+  as: "supplier",
 });

@@ -238,10 +238,7 @@ onMounted(async () => {
     // clear interval automatically
     clearInterval(timeInterval);
 
-    const transfer = await transferStore.getByIdAndOrType(
-      route.query.id,
-      TransferType.STR
-    );
+    const transfer = await transferStore.getById(route.query.id);
 
     if (transfer) {
       // model.value = ObjectHelpers.assignSameFields(model.value, transfer);
