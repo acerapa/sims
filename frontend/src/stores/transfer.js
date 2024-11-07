@@ -28,7 +28,19 @@ export const useTransferStore = defineStore("tranfer", function () {
   };
 
   const createTransfer = async (model) => {
-    return await authenticatedApi(`stock-transfer/register`, Method.POST, model);
+    return await authenticatedApi(
+      `stock-transfer/register`,
+      Method.POST,
+      model
+    );
+  };
+
+  const updateTransfer = async (model, id) => {
+    return await authenticatedApi(
+      `stock-transfer/update/${id}`,
+      Method.POST,
+      model
+    );
   };
 
   const fetchById = async (id) => {
@@ -52,6 +64,7 @@ export const useTransferStore = defineStore("tranfer", function () {
     ibrrs,
     getById,
     fetchTransfers,
+    updateTransfer,
     createTransfer,
   };
 });

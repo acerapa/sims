@@ -81,6 +81,7 @@
         <button
           class="btn-outline disabled:opacity-50"
           :disabled="!currentBranch"
+          v-if="!isEdit"
         >
           Save and New
         </button>
@@ -89,7 +90,7 @@
           @click="onSubmit"
           :disabled="!currentBranch"
         >
-          Save
+          {{ isEdit ? "Update" : "Save" }}
         </button>
       </div>
     </div>
@@ -116,6 +117,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
+const isEdit = ref(false);
 const router = useRouter();
 const currentBranch = ref();
 const appStore = useAppStore();
@@ -201,11 +203,13 @@ const populateAddress = () => {
 const onSubmit = async () => {
   clearInterval(timeInterval);
 
-  await transferStore.createTransfer(model.value);
-
-  router.push({ name: "ibrr-list" });
+  if (!isEdit.value) {
+    await transferStore.createTransfer(model.value);
+    router.push({ name: "ibrr-list" });
+  } else {
+    await transferStore.updateTransfer(model.value, route.query.id);
+  }
 };
-
 const onCancel = () => {
   router.push({ name: "ibrr-list" });
 };
@@ -247,6 +251,7 @@ onMounted(async () => {
         };
       });
     }
+    isEdit.value = true;
   }
 
   currentBranch.value = appStore.currentBranch;

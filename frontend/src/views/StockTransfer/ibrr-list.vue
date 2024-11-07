@@ -42,6 +42,10 @@ const transferStore = useTransferStore();
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true);
 
+Event.on(EventEnum.GLOBAL_CLICK, function () {
+  showRowMenu.value = false;
+});
+
 const rowPropInit = "ibrr-row-prop-init";
 Event.on(rowPropInit, (data) => {
   return {

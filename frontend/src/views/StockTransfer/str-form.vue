@@ -80,6 +80,7 @@
         <button
           class="btn-outline disabled:opacity-50"
           :disabled="!currentBranch"
+          v-if="!isEdit"
         >
           Save and New
         </button>
@@ -88,7 +89,7 @@
           @click="onSubmit"
           :disabled="!currentBranch"
         >
-          Save
+          {{ isEdit ? "Update" : "Save" }}
         </button>
       </div>
     </div>
@@ -117,6 +118,7 @@ import { useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
+const isEdit = ref(false);
 const appStore = useAppStore();
 const authStore = useAuthStore();
 const productStore = useProductStore();
@@ -213,11 +215,15 @@ const populateAddress = () => {
 const onSubmit = async () => {
   clearInterval(timeInterval);
 
-  model.value.transfer.when = new Date();
-  await transferStore.createTransfer(model.value);
-  router.push({
-    name: "str-list",
-  });
+  if (!isEdit.value) {
+    model.value.transfer.when = new Date();
+    await transferStore.createTransfer(model.value);
+    router.push({
+      name: "str-list",
+    });
+  } else {
+    await transferStore.updateTransfer(model.value, route.query.id);
+  }
 };
 
 const onCancel = () => {
@@ -270,6 +276,8 @@ onMounted(async () => {
       //TODO: raise and error or alert or maybe navigate to 404 notifs
       console.error("STR not found");
     }
+
+    isEdit.value = true;
   }
 
   // set branch from

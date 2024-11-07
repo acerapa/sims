@@ -58,7 +58,11 @@
         >
           Cancel
         </button>
-        <button class="btn-outline disabled:opacity-50" :disabled="false">
+        <button
+          class="btn-outline disabled:opacity-50"
+          :disabled="false"
+          v-if="!isEdit"
+        >
           Save and New
         </button>
         <button
@@ -66,7 +70,7 @@
           @click="onSubmit"
           :disabled="false"
         >
-          Save
+          {{ isEdit ? "Update" : "Save" }}
         </button>
       </div>
     </div>
@@ -80,17 +84,21 @@ import RmaProductSelectRow from "@/components/stock-transfer/RmaProductSelectRow
 import RmaProductSelectHeader from "@/components/stock-transfer/RmaProductSelectHeader.vue";
 import ProductMultiSelectTable from "@/components/shared/ProductMultiSelectTable.vue";
 import { useVendorStore } from "@/stores/supplier";
-import { computed, onMounted, ref } from "vue";
-import { ObjectHelpers } from "shared/helpers";
+import { computed, isVNode, onMounted, ref } from "vue";
+import { DateHelpers, ObjectHelpers } from "shared/helpers";
 import { TransferType } from "shared/enums";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useTransferStore } from "@/stores/transfer";
 import { useAppStore } from "@/stores/app";
 import { useSettingsStore } from "@/stores/settings";
 import { useAuthStore } from "@/stores/auth";
+import Event from "@/event";
+import { EventEnum } from "@/data/event";
 
 const currentBranch = ref(null);
 
+const route = useRoute();
+const isEdit = ref(false);
 const router = useRouter();
 const appStore = useAppStore();
 const authStore = useAuthStore(); // this is temporary
@@ -131,6 +139,11 @@ const defualtValue = {
 const model = ref({ ...defualtValue });
 
 /** ================================================
+ * EVENTS
+ ** ================================================*/
+Event.emit(EventEnum.IS_PAGE_LOADING, true);
+
+/** ================================================
  * COMPUTED
  ** ================================================*/
 const supplierOptions = computed(() => {
@@ -156,14 +169,17 @@ const populateAddress = () => {
   );
 };
 
-const onSubmit = () => {
-  model.value.transfer.when = new Date();
-  const res = transferStore.createTransfer(model.value);
-
-  if (res.status == 200) {
-    router.push({
-      name: "rma-list",
-    });
+const onSubmit = async () => {
+  if (!isEdit.value) {
+    model.value.transfer.when = new Date();
+    const res = await transferStore.createTransfer(model.value);
+    if (res.status == 200) {
+      router.push({
+        name: "rma-list",
+      });
+    }
+  } else {
+    await transferStore.updateTransfer(model.value, route.query.id);
   }
 };
 
@@ -181,5 +197,39 @@ onMounted(async () => {
 
   model.value.transfer.branch_from = currentBranch.value.id;
   model.value.transfer.processed_by = authStore.getAuthUser().id;
+
+  if (route.query.id) {
+    const rma = await transferStore.getById(route.query.id);
+
+    if (rma) {
+      model.value.transfer = ObjectHelpers.assignSameFields(
+        model.value.transfer,
+        rma
+      );
+      model.value.transfer.when = DateHelpers.formatDate(
+        new Date(),
+        "YYYY-MM-DDTHH:II:SS-A"
+      );
+      populateAddress();
+
+      model.value.products = rma.products.map((p) => {
+        return {
+          product_id: p.ProductTransaction.product_id,
+          description: p.ProductTransaction.description,
+          quantity: p.ProductTransaction.quantity,
+          cost: p.ProductTransaction.cost,
+          amount: p.ProductTransaction.amount,
+          problem: p.ProductTransaction.problem,
+          serial_number: p.ProductTransaction.serial_number,
+        };
+      });
+    } else {
+      console.log("RMA not found");
+    }
+
+    isEdit.value = true;
+  }
+
+  Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });
 </script>
