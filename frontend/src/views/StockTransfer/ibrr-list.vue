@@ -85,7 +85,7 @@ const onDelete = async () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await transferStore.fetchByType(TransferType.IBRR);
+  await transferStore.fetchTransfers();
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false);
 });

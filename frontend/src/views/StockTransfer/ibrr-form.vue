@@ -219,10 +219,7 @@ onMounted(async () => {
 
   // check if route has transfer id
   if (route.query.id) {
-    const transfer = await transferStore.getByIdAndOrType(
-      route.query.id,
-      TransferType.IBRR
-    );
+    const transfer = await transferStore.getById(route.query.id);
 
     if (transfer) {
       model.value.transfer = ObjectHelpers.assignSameFields(

@@ -3,18 +3,14 @@ const ProductTransfer = require("../models/product-transfer");
 const Branch = require("../models/branch");
 const User = require("../models/user");
 const Product = require("../models/product");
-
-// test
 const ProductTransaction = require("../models/product-transaction");
 const StockTranfer = require("../models/stock-transfer");
+const Supplier = require("../models/supplier");
 
 module.exports = {
-  getAllByType: async (req, res) => {
+  all: async (req, res) => {
     try {
-      const transfer = await StockTranfer.findAll({
-        where: {
-          type: req.params.type,
-        },
+      const transfers = await StockTranfer.findAll({
         order: [["createdAt", "DESC"]],
         include: [
           {
@@ -54,10 +50,14 @@ module.exports = {
             as: "products",
             attributes: ["id"],
           },
+          {
+            model: Supplier,
+            as: "supplier",
+          },
         ],
       });
 
-      res.sendResponse({ transfer }, "Successfully fetched!");
+      res.sendResponse({ transfers }, "Successfully fetched!");
     } catch (e) {
       res.sendError(e);
     }

@@ -1,16 +1,16 @@
 const router = require("express").Router();
 const {
   register,
-  getAllByType,
+  all,
   getById,
   destroy,
 } = require("../controllers/StockTransferController");
 const { validateBody } = require("../middleware/request-validator");
-const { BranchTransferCreateSchema } = require("shared/validators/transfer");
+const { StockTransferCreateSchema } = require("shared/validators/transfer");
 
+router.get("/", all);
 router.get("/:id", getById);
 router.delete("/:id", destroy);
-router.get("/all/:type", getAllByType);
-router.post("/register", validateBody(BranchTransferCreateSchema), register);
+router.post("/register", validateBody(StockTransferCreateSchema), register);
 
 module.exports = router;

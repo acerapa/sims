@@ -47,6 +47,10 @@ ProductTransaction.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    serial_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     remarks: {
       type: DataTypes.STRING,
       allowNull: true,
