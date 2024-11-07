@@ -30,7 +30,13 @@
         @view="viewRow"
         @delete="deleteRow"
       >
-        <button class="row-menu-item" @click="onSetCurrentBranch">
+        <button
+          class="row-menu-item"
+          @click="onSetCurrentBranch"
+          v-if="
+            !appStore.currentBranch || appStore.currentBranch.id != selectedId
+          "
+        >
           Set as current
         </button>
       </RowMenu>
@@ -49,6 +55,7 @@ import { EventEnum } from "@/data/event";
 import Event from "@/event";
 import { useSettingsStore } from "@/stores/settings";
 import { computed, onMounted, ref } from "vue";
+import { useAppStore } from "@/stores/app";
 
 const top = ref(0);
 const selectedId = ref(0);
@@ -56,6 +63,7 @@ const isEdit = ref(false);
 const searchText = ref("");
 const showModal = ref(false);
 const showRowMenu = ref(false);
+const appStore = useAppStore();
 const showConfirmModal = ref(false);
 const settingsStore = useSettingsStore();
 

@@ -1,4 +1,10 @@
 <template>
+  <DeleteConfirmModal
+    :href="`transfer/${selectedId}`"
+    v-if="showDeleteModal"
+    v-model="showDeleteModal"
+    @after-delete="onAfterDelete"
+  />
   <div>
     <CustomTable
       title="RMA list"
@@ -10,13 +16,19 @@
       :table-row-component="RmaListRow"
       :table-header-component="RmaListHeader"
     >
-      <RowMenu v-if="showRowMenu" :top="top" />
+      <RowMenu
+        v-if="showRowMenu"
+        :top="top"
+        @view="onviewRow"
+        @delete="onDelete"
+      />
     </CustomTable>
   </div>
 </template>
 
 <script setup>
 import RowMenu from "@/components/shared/RowMenu.vue";
+import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import RmaListHeader from "@/components/stock-transfer/rma-list-header.vue";
 import RmaListRow from "@/components/stock-transfer/rma-list-row.vue";
 import CustomTable from "@/components/shared/CustomTable.vue";
@@ -30,6 +42,7 @@ const top = ref(0);
 const router = useRouter();
 const selectedId = ref(null);
 const showRowMenu = ref(false);
+const showDeleteModal = ref(false);
 const transferStore = useTransferStore();
 
 /** ================================================
@@ -68,6 +81,23 @@ const onSelectRow = (id) => {
   top.value = event.target.offsetTop;
   selectedId.value = id;
   showRowMenu.value = true;
+};
+
+const onviewRow = () => {
+  router.push({
+    name: "rma-form",
+    query: {
+      id: selectedId.value,
+    },
+  });
+};
+
+const onDelete = () => {
+  showDeleteModal.value = true;
+};
+
+const onAfterDelete = async () => {
+  await transferStore.fetchTransfers();
 };
 
 /** ================================================
