@@ -71,7 +71,7 @@ watch(
 watch(
   () => props.itemSelected,
   () => (currentActivePage.value = 1)
-)
+);
 </script>
 <style scoped>
 .pg-btn {

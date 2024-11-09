@@ -14,6 +14,7 @@
   />
   <CustomTable
     class="relative"
+    title="Employee table"
     :has-add-btn="true"
     :data="filteredData"
     :has-pagination="true"
@@ -39,7 +40,7 @@ import { computed, onMounted, ref } from "vue";
 import EmployeeRow from "@/components/Employee/EmployeeRow.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import { useEmployeeStore } from "@/stores/employee";
-import CustomTable from "@/components/shared/CustomTable.vue";
+import CustomTable from "@/components/shared/CustomTableV2.vue";
 import EmployeeTableHeader from "@/components/Employee/EmployeeTableHeader.vue";
 import RowMenu from "@/components/shared/RowMenu.vue";
 import Event from "@/event";

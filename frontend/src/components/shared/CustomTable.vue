@@ -1,125 +1,131 @@
 <template>
-  <div class="w-full flex flex-col gap-4">
-    <div class="table-wrapper w-full relative">
-      <!-- filter -->
-      <div ref="filter">
-        <FilterComponent
-          v-model="showFilter"
-          v-if="showFilter"
-          v-model:is-filter-used="filterUsed"
+  <div class="w-full relative">
+    <div class="table-wrapper">
+      <div class="w-full relative flex flex-col gap-4">
+        <div class="sticky top-0">
+          <!-- filter -->
+          <div ref="filter">
+            <FilterComponent
+              v-model="showFilter"
+              v-if="showFilter"
+              v-model:is-filter-used="filterUsed"
+            >
+              <template v-slot:filters>
+                <slot name="filters"></slot>
+              </template>
+            </FilterComponent>
+          </div>
+          <p v-if="props.title" class="font-bold text-sm">{{ props.title }}</p>
+          <div class="flex justify-between items-center" v-if="props.hasTools">
+            <div class="flex gap-3 items-center">
+              <div
+                class="rounded border cursor-pointer w-[64px] h-[38px] p-1 flex items-center justify-center"
+                :class="
+                  filterUsed
+                    ? '[&>img]:brightness-0 [&>img]:invert bg-primary border-primary '
+                    : ''
+                "
+                @click.stop="showFilter = true"
+                v-if="props.hasFilter"
+              >
+                <img
+                  src="@/assets/icons/funnel.png"
+                  class="max-w-[30px] max-h-[26px] w-full h-full object-fill"
+                  alt="funnel"
+                />
+              </div>
+              <input
+                type="search"
+                name="search"
+                placeholder="Search"
+                v-model="searchText"
+                class="input w-full max-w-72"
+                :id="`search-${instance.uid}`"
+              />
+              <select
+                name="show-item"
+                id="show-item"
+                class="input"
+                v-model="showItemSelected"
+              >
+                <option
+                  v-for="(val, ndx) in props.pgOptions.showItems"
+                  :key="ndx"
+                  :value="val"
+                >
+                  {{ val }}
+                </option>
+              </select>
+            </div>
+            <div class="flex gap-3">
+              <button
+                v-if="props.hasAddBtn"
+                class="bg-primary p-2 rounded"
+                @click="onAddNew"
+              >
+                <img src="@/assets/icons/plus.svg" alt="Plus" />
+              </button>
+
+              <!-- Custom buttons -->
+              <slot name="buttons"></slot>
+            </div>
+          </div>
+        </div>
+        <hr class="bg-gray-50 -mx-4" v-if="props.hasTools" />
+        <div
+          class="flex flex-col gap-7 w-full pb-5 overflow-x-auto overflow-y-hidden"
         >
-          <template v-slot:filters>
-            <slot name="filters"></slot>
-          </template>
-        </FilterComponent>
-      </div>
-      <p v-if="props.title" class="font-bold text-sm">{{ props.title }}</p>
-      <div class="flex justify-between items-center" v-if="props.hasTools">
-        <div class="flex gap-3 items-center">
+          <!-- Default slot -->
+          <slot></slot>
+
+          <!-- Table Header -->
+          <component
+            :is="props.tableHeaderComponent"
+            :has-check-box="props.hasCheckBox"
+          />
+          <slot v-if="!props.tableHeaderComponent" name="table_header"></slot>
+
+          <!-- Table Body -->
           <div
-            class="rounded border cursor-pointer w-[64px] h-[38px] p-1 flex items-center justify-center"
-            :class="
-              filterUsed
-                ? '[&>img]:brightness-0 [&>img]:invert bg-primary border-primary '
-                : ''
-            "
-            @click.stop="showFilter = true"
-            v-if="props.hasFilter"
+            class="flex flex-col gap-4"
+            v-if="props.tableRowComponent && items.length && !props.isNested"
+            :key="props.data"
           >
-            <img
-              src="@/assets/icons/funnel.png"
-              class="max-w-[30px] max-h-[26px] w-full h-full object-fill"
-              alt="funnel"
+            <component
+              :is="props.tableRowComponent"
+              v-for="item in items"
+              :key="item.hasOwnProperty('id') ? item.id : item"
+              v-bind="Event.emit(props.rowPropInit, item)"
+              :has-check-box="props.hasCheckBox"
+              @open-menu="
+                (data) => {
+                  emit('open-menu', data);
+                }
+              "
             />
           </div>
-          <input
-            type="search"
-            name="search"
-            placeholder="Search"
-            v-model="searchText"
-            class="input w-full max-w-72"
-            :id="`search-${instance.uid}`"
-          />
-          <select
-            name="show-item"
-            id="show-item"
-            class="input"
-            v-model="showItemSelected"
+          <div
+            class="flex items-center justify-center"
+            v-if="!items.length && !props.isNested"
           >
-            <option
-              v-for="(val, ndx) in props.pgOptions.showItems"
-              :key="ndx"
-              :value="val"
-            >
-              {{ val }}
-            </option>
-          </select>
+            <p class="text-sm">Table has no data!</p>
+          </div>
+          <slot
+            v-if="!props.tableRowComponent && !props.isNested"
+            name="table_body"
+          ></slot>
         </div>
-        <div class="flex gap-3">
-          <button
-            v-if="props.hasAddBtn"
-            class="bg-primary p-2 rounded"
-            @click="onAddNew"
-          >
-            <img src="@/assets/icons/plus.svg" alt="Plus" />
-          </button>
-
-          <!-- Custom buttons -->
-          <slot name="buttons"></slot>
-        </div>
-      </div>
-      <hr class="bg-gray-50 -mx-4" v-if="props.hasTools" />
-      <div class="flex flex-col gap-7 overflow-x-auto pb-5">
-        <!-- Default slot -->
-        <slot></slot>
-
-        <!-- Table Header -->
-        <component
-          :is="props.tableHeaderComponent"
-          :has-check-box="props.hasCheckBox"
-        />
-        <slot v-if="!props.tableHeaderComponent" name="table_header"></slot>
-
-        <!-- Table Body -->
-        <div
-          class="flex flex-col gap-4"
-          v-if="props.tableRowComponent && items.length && !props.isNested"
+        <Paginate
+          class="ml-auto mr-0"
+          v-if="props.hasPagination && items.length"
+          :data="props.data"
           :key="props.data"
-        >
-          <component
-            :is="props.tableRowComponent"
-            v-for="item in items"
-            :key="item.hasOwnProperty('id') ? item.id : item"
-            v-bind="Event.emit(props.rowPropInit, item)"
-            :has-check-box="props.hasCheckBox"
-            @open-menu="
-              (data) => {
-                emit('open-menu', data);
-              }
-            "
-          />
-        </div>
-        <div
-          class="flex items-center justify-center"
-          v-if="!items.length && !props.isNested"
-        >
-          <p class="text-sm">Table has no data!</p>
-        </div>
-        <slot
-          v-if="!props.tableRowComponent && !props.isNested"
-          name="table_body"
-        ></slot>
+          :items-show="props.pgOptions.showItems"
+          :item-selected="showItemSelected"
+          v-model:show-item-selected="showItemSelected"
+          v-model:current-items="items"
+        />
       </div>
-      <Paginate
-        class="ml-auto mr-0"
-        v-if="props.hasPagination && items.length"
-        :data="props.data"
-        :key="props.data"
-        :items-show="props.pgOptions.showItems"
-        :item-selected="showItemSelected"
-        v-model:show-item-selected="showItemSelected"
-        v-model:current-items="items"
-      />
     </div>
     <slot v-if="props.isNested" name="tables"></slot>
   </div>

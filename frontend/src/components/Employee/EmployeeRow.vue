@@ -27,13 +27,20 @@
         {{ user.status ? "Active" : "Inactive" }}
       </button>
     </p>
-    <div class="col-span-1 text-sm">
-      <img
+    <div class="col-span-1 text-sm relative">
+      <!-- <img
         @click.stop="openMenu(props.user.id)"
         class="cursor-pointer menu-btn-trigger"
         src="@/assets/icons/vertical-menu.svg"
         alt=""
+      /> -->
+      <img
+        class="cursor-pointer menu-btn-trigger"
+        src="@/assets/icons/vertical-menu.svg"
+        alt=""
       />
+
+      <div class="cont absolute">Test</div>
     </div>
   </div>
 </template>
