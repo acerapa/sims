@@ -68,28 +68,28 @@ const pagination = usePagination();
 const props = defineProps({
   tableRow: {
     type: Object,
-    default: () => ({}),
+    default: () => ({})
   },
   tableHeader: {
     type: Object,
-    default: () => ({}),
+    default: () => ({})
   },
   data: {
     type: Array,
-    default: [],
+    default: []
   },
   title: {
     type: String,
-    required: false,
+    required: false
   },
   hasAddBtn: {
     type: Boolean,
-    default: true,
+    default: true
   },
   hasPagination: {
     type: Boolean,
-    default: true,
-  },
+    default: true
+  }
 });
 
 const emit = defineEmits(['addNew']);

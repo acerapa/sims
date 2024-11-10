@@ -18,5 +18,14 @@
   "javascript.referencesCodeLens.enabled": true,
   "javascript.updateImportsOnFileMove.enabled": "always",
   "editor.fontFamily": "JetBrains Mono",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
