@@ -32,7 +32,22 @@
         <slot name="buttons"></slot>
       </div>
     </div>
-    <div class="content"></div>
+    <div class="content">
+      <div class="table-header">
+        <component v-if="props.tableHeader" :is="props.tableHeader"></component>
+        <slot v-if="!props.tableHeader" name="table-header"></slot>
+      </div>
+      <div class="table-body">
+        <component
+          v-if="props.tableRow"
+          :is="props.tableRow"
+          v-for="item in paginatedItems"
+          :key="item.hasOwnProperty('id') ? item.id : item"
+          v-bind="{ row: item }"
+        ></component>
+        <slot v-if="!props.tableRow" name="table-body"></slot>
+      </div>
+    </div>
     <Paginate
       :data="props.data"
       :items-show="pagination.showItems"
@@ -43,10 +58,10 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
-import Paginate from "./Paginate.vue";
-import CustomInput from "./CustomInput.vue";
-import { usePagination } from "@/use/usePagination";
+import { ref } from 'vue';
+import Paginate from './Paginate.vue';
+import CustomInput from './CustomInput.vue';
+import { usePagination } from '@/use/usePagination';
 
 const pagination = usePagination();
 
@@ -77,14 +92,16 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["addNew"]);
+const emit = defineEmits(['addNew']);
 
 const itemSelected = ref(pagination.showItems[0]);
 
-const searchText = defineModel("searchText");
+const searchText = defineModel('searchText');
 
 // pagination test
 const testItems = ref([]);
+
+const paginatedItems = props.data;
 </script>
 
 <style scoped>

@@ -90,7 +90,7 @@
           @click="onSubmit"
           :disabled="!currentBranch"
         >
-          {{ isEdit ? "Update" : "Save" }}
+          {{ isEdit ? 'Update' : 'Save' }}
         </button>
       </div>
     </div>
@@ -98,23 +98,23 @@
 </template>
 
 <script setup>
-import AddressForm from "@/components/shared/AddressForm.vue";
-import AlertComponent from "@/components/shared/AlertComponent.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import ProductMultiSelectTable from "@/components/shared/ProductMultiSelectTable.vue";
-import IbrrSelectHeader from "@/components/stock-transfer/ibrr-select-header.vue";
-import ProductSelectRow from "@/components/stock-transfer/ProductSelectRow.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { useAppStore } from "@/stores/app";
-import { useAuthStore } from "@/stores/auth";
-import { useProductStore } from "@/stores/product";
-import { useSettingsStore } from "@/stores/settings";
-import { useTransferStore } from "@/stores/transfer";
-import { TransferType } from "shared/enums";
-import { DateHelpers, ObjectHelpers } from "shared/helpers";
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import AddressForm from '@/components/shared/AddressForm.vue';
+import AlertComponent from '@/components/shared/AlertComponent.vue';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue';
+import IbrrSelectHeader from '@/components/stock-transfer/ibrr-select-header.vue';
+import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue';
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { useAppStore } from '@/stores/app';
+import { useAuthStore } from '@/stores/auth';
+import { useProductStore } from '@/stores/product';
+import { useSettingsStore } from '@/stores/settings';
+import { useTransferStore } from '@/stores/transfer';
+import { TransferType } from 'shared/enums';
+import { DateHelpers, ObjectHelpers } from 'shared/helpers';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const isEdit = ref(false);
@@ -127,32 +127,32 @@ const settingStore = useSettingsStore();
 const transferStore = useTransferStore();
 
 const productDefaultValue = {
-  product_id: "",
-  description: "",
-  cost: "",
-  quantity: "",
-  amount: "",
+  product_id: '',
+  description: '',
+  cost: '',
+  quantity: '',
+  amount: '',
 };
 
 const model = ref({
   transfer: {
-    memo: "",
-    str_id: "",
-    branch_to: "",
-    branch_from: "",
-    processed_by: "",
+    memo: '',
+    str_id: '',
+    branch_to: '',
+    branch_from: '',
+    processed_by: '',
     type: TransferType.IBRR,
-    when: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II-A"),
+    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A'),
   },
   products: [{ ...productDefaultValue }],
 });
 
 const address = ref({
-  address1: "",
-  address2: "",
-  province: "",
-  city: "",
-  postal: "",
+  address1: '',
+  address2: '',
+  province: '',
+  city: '',
+  postal: '',
 });
 /** ================================================
  * EVENTS
@@ -171,7 +171,7 @@ const branchOptions = computed(() => {
       };
     })
     .filter((opt) =>
-      currentBranch.value ? currentBranch.value.id != opt.value : true
+      currentBranch.value ? currentBranch.value.id != opt.value : true,
     );
 });
 
@@ -181,20 +181,20 @@ const branchOptions = computed(() => {
 const timeInterval = setInterval(() => {
   model.value.transfer.when = DateHelpers.formatDate(
     new Date(),
-    "YYYY-MM-DDTHH:II-A"
+    'YYYY-MM-DDTHH:II-A',
   );
 }, 1000);
 
 const populateAddress = () => {
   if (model.value.transfer.branch_from) {
     const branch = settingStore.branches.find(
-      (b) => b.id == model.value.transfer.branch_from
+      (b) => b.id == model.value.transfer.branch_from,
     );
 
     if (branch) {
       address.value = ObjectHelpers.assignSameFields(
         address.value,
-        branch.address
+        branch.address,
       );
     }
   }
@@ -205,13 +205,13 @@ const onSubmit = async () => {
 
   if (!isEdit.value) {
     await transferStore.createTransfer(model.value);
-    router.push({ name: "ibrr-list" });
+    router.push({ name: 'ibrr-list' });
   } else {
     await transferStore.updateTransfer(model.value, route.query.id);
   }
 };
 const onCancel = () => {
-  router.push({ name: "ibrr-list" });
+  router.push({ name: 'ibrr-list' });
 };
 
 /** ================================================
@@ -228,13 +228,13 @@ onMounted(async () => {
     if (transfer) {
       model.value.transfer = ObjectHelpers.assignSameFields(
         model.value.transfer,
-        transfer
+        transfer,
       );
 
       // custom modification
       model.value.transfer.when = DateHelpers.formatDate(
         new Date(),
-        "YYYY-MM-DDTHH:II:SS-A"
+        'YYYY-MM-DDTHH:II:SS-A',
       );
 
       // populate address

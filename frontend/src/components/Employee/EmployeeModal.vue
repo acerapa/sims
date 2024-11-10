@@ -66,12 +66,12 @@
   </ModalWrapper>
 </template>
 <script setup>
-import { Method, authenticatedApi } from "@/api";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import { useEmployeeStore } from "@/stores/employee";
-import { ObjectHelpers } from "shared";
-import { computed, onMounted, ref } from "vue";
+import { Method, authenticatedApi } from '@/api';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import ModalWrapper from '@/components/shared/ModalWrapper.vue';
+import { useEmployeeStore } from '@/stores/employee';
+import { ObjectHelpers } from 'shared';
+import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps({
   isEdit: {
@@ -87,18 +87,18 @@ const props = defineProps({
 
 const apiPath = props.isEdit
   ? `users/${props.selectedId}/update`
-  : "users/register";
+  : 'users/register';
 const employeeStore = useEmployeeStore();
 
 const model = ref({
-  username: "",
-  status: "",
-  first_name: "",
-  middle_name: "",
-  last_name: "",
-  position: "",
-  date_started: "",
-  password: "",
+  username: '',
+  status: '',
+  first_name: '',
+  middle_name: '',
+  last_name: '',
+  position: '',
+  date_started: '',
+  password: '',
 });
 
 const showModal = defineModel();
@@ -108,9 +108,9 @@ const showModal = defineModel();
  ** ================================================*/
 const positionOptions = computed(() => {
   return [
-    { text: "Admin", value: "admin" },
-    { text: "Inventory Manager", value: "inventory" },
-    { text: "Cashier", value: "cashier" },
+    { text: 'Admin', value: 'admin' },
+    { text: 'Inventory Manager', value: 'inventory' },
+    { text: 'Cashier', value: 'cashier' },
   ];
 });
 
@@ -136,13 +136,13 @@ const onSubmit = async () => {
 onMounted(() => {
   if (props.isEdit) {
     const employee = employeeStore.employees.find(
-      (emp) => emp.id == props.selectedId
+      (emp) => emp.id == props.selectedId,
     );
     if (employee) {
       model.value = ObjectHelpers.assignSameFields(model.value, employee);
 
       // update date
-      model.value.date_started = model.value.date_started.split("T")[0];
+      model.value.date_started = model.value.date_started.split('T')[0];
     }
   } else {
     model.value = ObjectHelpers.objectReset(model.value);

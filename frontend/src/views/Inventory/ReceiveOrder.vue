@@ -80,20 +80,20 @@
 </template>
 
 <script setup>
-import { authenticatedApi, Method } from "@/api";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { getCost } from "@/helper";
-import { usePurchaseOrderStore } from "@/stores/purchase-order";
+import { authenticatedApi, Method } from '@/api';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { getCost } from '@/helper';
+import { usePurchaseOrderStore } from '@/stores/purchase-order';
 import {
   ProductOrderedStatus,
   PurchaseOrderStatus,
   PurchaseOrderType,
-} from "shared/enums";
-import { DateHelpers, ObjectHelpers } from "shared/helpers";
-import { onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+} from 'shared/enums';
+import { DateHelpers, ObjectHelpers } from 'shared/helpers';
+import { onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
@@ -101,50 +101,50 @@ const purchaseOrderStore = usePurchaseOrderStore();
 
 const productOrderStatusOptions = [
   {
-    text: "Open",
+    text: 'Open',
     value: ProductOrderedStatus.OPEN,
   },
   {
-    text: "Complete",
+    text: 'Complete',
     value: ProductOrderedStatus.COMPLETE,
   },
   {
-    text: "Incomplete",
+    text: 'Incomplete',
     value: ProductOrderedStatus.INCOMPLETE,
   },
   {
-    text: "Not Received",
+    text: 'Not Received',
     value: ProductOrderedStatus.NOT_RECEIVED,
   },
 ];
 
 const modelDefualtValue = {
   order: {
-    supplier_id: "",
-    ref_no: "",
-    date: DateHelpers.formatDate(new Date(), "YYYY-MM-DD"),
-    bill_due: "",
+    supplier_id: '',
+    ref_no: '',
+    date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
+    bill_due: '',
     type: PurchaseOrderType.COD,
-    memo: "",
+    memo: '',
     amount: 0,
   },
   address: {
-    address1: "",
-    address2: "",
-    city: "",
-    postal: "",
+    address1: '',
+    address2: '',
+    city: '',
+    postal: '',
   },
   products: [
     {
-      product_id: "",
-      name: "",
-      description: "",
-      quantity: "",
-      cost: "",
-      amount: "",
-      remarks: "",
-      status: "",
-      quantity_received: "",
+      product_id: '',
+      name: '',
+      description: '',
+      quantity: '',
+      cost: '',
+      amount: '',
+      remarks: '',
+      status: '',
+      quantity_received: '',
     },
   ],
 };
@@ -163,7 +163,7 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true);
 
 const onCancel = () => {
   router.push({
-    name: "purchase-order",
+    name: 'purchase-order',
   });
 };
 
@@ -171,13 +171,13 @@ const onReceiveOrder = async () => {
   const res = await authenticatedApi(
     `purchase-order/${route.params.id}/update`,
     Method.POST,
-    model.value
+    model.value,
   );
 
   if (res.status == 200) {
     await purchaseOrderStore.fetchPurchaseOrderById(route.params.id);
     router.push({
-      name: "purchase-order-create",
+      name: 'purchase-order-create',
       query: {
         id: route.params.id,
       },
@@ -193,22 +193,22 @@ onMounted(async () => {
     await purchaseOrderStore.fetchPurchaseOrderById(route.params.id);
     model.value.order = ObjectHelpers.assignSameFields(
       model.value.order,
-      purchaseOrderStore.purchaseOrder
+      purchaseOrderStore.purchaseOrder,
     );
 
     // few modification
     model.value.order.bill_due = DateHelpers.formatDate(
       model.value.order.bill_due,
-      "YYYY-MM-DD"
+      'YYYY-MM-DD',
     );
     model.value.order.date = DateHelpers.formatDate(
       model.value.order.date,
-      "YYYY-MM-DD"
+      'YYYY-MM-DD',
     );
 
     model.value.address = ObjectHelpers.assignSameFields(
       model.value.address,
-      purchaseOrderStore.purchaseOrder.address
+      purchaseOrderStore.purchaseOrder.address,
     );
 
     model.value.order.status = PurchaseOrderStatus.COMPLETED;
@@ -229,7 +229,7 @@ onMounted(async () => {
           cost: getCost(
             product.ProductTransaction.cost,
             product,
-            purchaseOrderStore.purchaseOrder.supplier_id
+            purchaseOrderStore.purchaseOrder.supplier_id,
           ),
           amount: product.ProductTransaction.amount,
         };

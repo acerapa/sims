@@ -132,17 +132,17 @@
 </template>
 
 <script setup>
-import { computed, getCurrentInstance, ref, watch } from "vue";
-import Paginate from "./Paginate.vue";
-import FilterComponent from "./FilterComponent.vue";
-import Event from "@/event";
+import { computed, getCurrentInstance, ref, watch } from 'vue';
+import Paginate from './Paginate.vue';
+import FilterComponent from './FilterComponent.vue';
+import Event from '@/event';
 
 const emit = defineEmits([
-  "update:showModal",
-  "update:isEdit",
-  "open-menu",
-  "update:searchText",
-  "addNewRecord",
+  'update:showModal',
+  'update:isEdit',
+  'open-menu',
+  'update:searchText',
+  'addNewRecord',
 ]);
 
 const props = defineProps({
@@ -199,14 +199,14 @@ const props = defineProps({
 
 // Custom warning for required props with condition
 if (!props.isNested) {
-  if (!props.rowPropInit) console.warn("Missing required prop: `rowPropInit`");
+  if (!props.rowPropInit) console.warn('Missing required prop: `rowPropInit`');
 }
 
 const instance = getCurrentInstance();
 
 const filter = ref();
 Event.on(
-  "global-click",
+  'global-click',
   function () {
     if (filter.value) {
       if (!filter.value.contains(event.target)) {
@@ -214,7 +214,7 @@ Event.on(
       }
     }
   },
-  true
+  true,
 );
 
 // vars
@@ -228,20 +228,20 @@ const filterUsed = ref(false);
 // watchers
 watch(
   () => props.data,
-  (value) => (items.value = value)
+  (value) => (items.value = value),
 );
 
 // models
-const isEdit = defineModel("isEdit");
-const showModal = defineModel("showModal");
-const searchText = defineModel("searchText");
+const isEdit = defineModel('isEdit');
+const showModal = defineModel('showModal');
+const searchText = defineModel('searchText');
 
 // methods
 const onAddNew = () => {
   showModal.value = true;
   isEdit.value = false;
 
-  emit("addNewRecord");
+  emit('addNewRecord');
 };
 </script>
 

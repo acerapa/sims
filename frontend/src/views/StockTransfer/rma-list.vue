@@ -27,16 +27,16 @@
 </template>
 
 <script setup>
-import RowMenu from "@/components/shared/RowMenu.vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import RmaListHeader from "@/components/stock-transfer/rma-list-header.vue";
-import RmaListRow from "@/components/stock-transfer/rma-list-row.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import { useRouter } from "vue-router";
-import { computed, onMounted, ref } from "vue";
-import { useTransferStore } from "@/stores/transfer";
-import Event from "@/event";
-import { EventEnum } from "@/data/event";
+import RowMenu from '@/components/shared/RowMenu.vue';
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
+import RmaListHeader from '@/components/stock-transfer/rma-list-header.vue';
+import RmaListRow from '@/components/stock-transfer/rma-list-row.vue';
+import CustomTable from '@/components/shared/CustomTable.vue';
+import { useRouter } from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
+import { useTransferStore } from '@/stores/transfer';
+import Event from '@/event';
+import { EventEnum } from '@/data/event';
 
 const top = ref(0);
 const router = useRouter();
@@ -54,7 +54,7 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });
 
-const rowInitProp = "rma-row-init-prop";
+const rowInitProp = 'rma-row-init-prop';
 Event.on(rowInitProp, (data) => {
   return {
     rma: data,
@@ -73,7 +73,7 @@ const filterData = computed(() => {
  ** ================================================*/
 const onNewRecord = () => {
   router.push({
-    name: "rma-form",
+    name: 'rma-form',
   });
 };
 
@@ -85,7 +85,7 @@ const onSelectRow = (id) => {
 
 const onviewRow = () => {
   router.push({
-    name: "rma-form",
+    name: 'rma-form',
     query: {
       id: selectedId.value,
     },

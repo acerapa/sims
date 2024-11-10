@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { GeneralHelpers } from "shared/helpers";
+import { GeneralHelpers } from 'shared/helpers';
 
 const props = defineProps({
   isDisabled: {

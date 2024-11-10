@@ -25,17 +25,17 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref } from 'vue';
 
 const showFilter = defineModel(false);
-const isFilterUsed = defineModel("isFilterUsed");
+const isFilterUsed = defineModel('isFilterUsed');
 
 const filter_form = ref();
 
 onMounted(() => {
   if (filter_form.value.elements.length) {
     for (let el of Array.from(filter_form.value)) {
-      el.addEventListener("change", function () {
+      el.addEventListener('change', function () {
         isFilterUsed.value = true;
       });
     }
@@ -45,8 +45,8 @@ onMounted(() => {
 const onClear = () => {
   showFilter.value = false;
   filter_form.value.reset();
-  const change = new Event("change");
-  const reset = new Event("reset");
+  const change = new Event('change');
+  const reset = new Event('reset');
   for (let el of filter_form.value.elements) {
     el.dispatchEvent(change);
     el.dispatchEvent(reset);

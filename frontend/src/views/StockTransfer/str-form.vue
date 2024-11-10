@@ -89,7 +89,7 @@
           @click="onSubmit"
           :disabled="!currentBranch"
         >
-          {{ isEdit ? "Update" : "Save" }}
+          {{ isEdit ? 'Update' : 'Save' }}
         </button>
       </div>
     </div>
@@ -97,24 +97,24 @@
 </template>
 
 <script setup>
-import AddressForm from "@/components/shared/AddressForm.vue";
-import AlertComponent from "@/components/shared/AlertComponent.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import ProductMulitpleSelect from "@/components/shared/ProductMultiSelectTable.vue";
-import ProductSelectHeader from "@/components/stock-transfer/ProductSelectHeader.vue";
-import ProductSelectRow from "@/components/stock-transfer/ProductSelectRow.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { useAppStore } from "@/stores/app";
-import { useAuthStore } from "@/stores/auth";
-import { useProductStore } from "@/stores/product";
-import { useSettingsStore } from "@/stores/settings";
-import { useTransferStore } from "@/stores/transfer";
-import { TransferType } from "shared/enums";
-import { DateHelpers, ObjectHelpers } from "shared/helpers";
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { RouterLink, useRoute } from "vue-router";
-import { useRouter } from "vue-router";
+import AddressForm from '@/components/shared/AddressForm.vue';
+import AlertComponent from '@/components/shared/AlertComponent.vue';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import ProductMulitpleSelect from '@/components/shared/ProductMultiSelectTable.vue';
+import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue';
+import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue';
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { useAppStore } from '@/stores/app';
+import { useAuthStore } from '@/stores/auth';
+import { useProductStore } from '@/stores/product';
+import { useSettingsStore } from '@/stores/settings';
+import { useTransferStore } from '@/stores/transfer';
+import { TransferType } from 'shared/enums';
+import { DateHelpers, ObjectHelpers } from 'shared/helpers';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
@@ -126,28 +126,28 @@ const settingStore = useSettingsStore();
 const transferStore = useTransferStore();
 
 const productDefaultValue = {
-  product_id: "",
-  description: "",
-  quantity: "",
-  cost: "",
-  amount: "",
+  product_id: '',
+  description: '',
+  quantity: '',
+  cost: '',
+  amount: '',
 };
 
 const address = ref({
-  address1: "",
-  address2: "",
-  province: "",
-  city: "",
-  postal: "",
+  address1: '',
+  address2: '',
+  province: '',
+  city: '',
+  postal: '',
 });
 
 const defaultValue = {
   transfer: {
-    memo: "",
-    branch_to: "",
-    branch_from: "",
-    processed_by: "",
-    when: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II-A"),
+    memo: '',
+    branch_to: '',
+    branch_from: '',
+    processed_by: '',
+    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A'),
     type: TransferType.STR,
   },
   products: [{ ...productDefaultValue }],
@@ -179,7 +179,7 @@ const branchOptions = computed(() => {
       };
     })
     .filter((opt) =>
-      currentBranch.value ? currentBranch.value.id != opt.value : true
+      currentBranch.value ? currentBranch.value.id != opt.value : true,
     );
 });
 
@@ -192,7 +192,7 @@ const timeInterval = setInterval(() => {
   if (route.query.id) {
     model.value.transfer.when = DateHelpers.formatDate(
       new Date(),
-      "YYYY-MM-DDTHH:II:SS-A"
+      'YYYY-MM-DDTHH:II:SS-A',
     );
   }
 }, 1000);
@@ -200,13 +200,13 @@ const timeInterval = setInterval(() => {
 const populateAddress = () => {
   if (model.value.transfer.branch_to) {
     const branch = settingStore.branches.find(
-      (b) => b.id == model.value.transfer.branch_to
+      (b) => b.id == model.value.transfer.branch_to,
     );
 
     if (branch) {
       address.value = ObjectHelpers.assignSameFields(
         address.value,
-        branch.address
+        branch.address,
       );
     }
   }
@@ -219,7 +219,7 @@ const onSubmit = async () => {
     model.value.transfer.when = new Date();
     await transferStore.createTransfer(model.value);
     router.push({
-      name: "str-list",
+      name: 'str-list',
     });
   } else {
     await transferStore.updateTransfer(model.value, route.query.id);
@@ -228,7 +228,7 @@ const onSubmit = async () => {
 
 const onCancel = () => {
   router.push({
-    name: "str-list",
+    name: 'str-list',
   });
 };
 
@@ -250,13 +250,13 @@ onMounted(async () => {
       // model.value = ObjectHelpers.assignSameFields(model.value, transfer);
       model.value.transfer = ObjectHelpers.assignSameFields(
         model.value.transfer,
-        transfer
+        transfer,
       );
 
       // custom modification
       model.value.transfer.when = DateHelpers.formatDate(
         new Date(transfer.when),
-        "YYYY-MM-DDTHH:II:SS-A"
+        'YYYY-MM-DDTHH:II:SS-A',
       );
 
       // populate address from the receiver in the transfer
@@ -274,7 +274,7 @@ onMounted(async () => {
       });
     } else {
       //TODO: raise and error or alert or maybe navigate to 404 notifs
-      console.error("STR not found");
+      console.error('STR not found');
     }
 
     isEdit.value = true;

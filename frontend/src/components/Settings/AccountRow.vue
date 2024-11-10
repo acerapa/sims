@@ -7,7 +7,7 @@
     <p class="col-span-3 text-sm">{{ props.account.name }}</p>
     <p class="col-span-2 text-sm">{{ props.account.type }}</p>
     <p class="col-span-2 text-sm">
-      {{ DateHelpers.formatDate(props.account.createdAt, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.account.createdAt, 'M/D/YYYY') }}
     </p>
     <p class="col-span-1 text-sm">
       <img
@@ -21,8 +21,8 @@
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared/helpers/date'
-const emit = defineEmits(["openMenu"]);
+import { DateHelpers } from 'shared/helpers/date';
+const emit = defineEmits(['openMenu']);
 const props = defineProps({
   account: {
     type: Object,
@@ -31,6 +31,6 @@ const props = defineProps({
 });
 
 const openMenu = (id) => {
-  emit("openMenu", id);
+  emit('openMenu', id);
 };
 </script>

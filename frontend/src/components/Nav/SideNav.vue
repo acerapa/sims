@@ -47,14 +47,14 @@
   </div>
 </template>
 <script setup>
-import { useAppStore } from "@/stores/app";
-import { useRoute, useRouter } from "vue-router";
-import NavRow from "./NavRow.vue";
-import navs from "@/data/nav";
-import { onMounted, ref, watch } from "vue";
-import Event from "@/event";
-import { EventEnum } from "@/data/event";
-import { useAuthStore } from "@/stores/auth";
+import { useAppStore } from '@/stores/app';
+import { useRoute, useRouter } from 'vue-router';
+import NavRow from './NavRow.vue';
+import navs from '@/data/nav';
+import { onMounted, ref, watch } from 'vue';
+import Event from '@/event';
+import { EventEnum } from '@/data/event';
+import { useAuthStore } from '@/stores/auth';
 
 const route = useRoute();
 const router = useRouter();
@@ -70,7 +70,7 @@ onMounted(() => {
     function () {
       showDropdown.value = false;
     },
-    true
+    true,
   );
 });
 

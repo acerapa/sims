@@ -35,17 +35,17 @@
   </CustomTable>
 </template>
 <script setup>
-import EmployeeModal from "@/components/Employee/EmployeeModal.vue";
-import { computed, onMounted, ref } from "vue";
-import EmployeeRow from "@/components/Employee/EmployeeRow.vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import { useEmployeeStore } from "@/stores/employee";
-import CustomTable from "@/components/shared/CustomTableV2.vue";
-import EmployeeTableHeader from "@/components/Employee/EmployeeTableHeader.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import Event from "@/event";
-import { EventEnum } from "@/data/event";
-import { DateHelpers } from "shared/helpers/date";
+import EmployeeModal from '@/components/Employee/EmployeeModal.vue';
+import { computed, onMounted, ref } from 'vue';
+import EmployeeRow from '@/components/Employee/EmployeeRow.vue';
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
+import { useEmployeeStore } from '@/stores/employee';
+import CustomTable from '@/components/shared/CustomTableV2.vue';
+import EmployeeTableHeader from '@/components/Employee/EmployeeTableHeader.vue';
+import RowMenu from '@/components/shared/RowMenu.vue';
+import Event from '@/event';
+import { EventEnum } from '@/data/event';
+import { DateHelpers } from 'shared/helpers/date';
 
 const top = ref(0);
 const showRowMenu = ref(false);
@@ -69,7 +69,7 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
 });
 
 // define employee row props
-const employeeRowEvent = "employee-row-init-props";
+const employeeRowEvent = 'employee-row-init-props';
 Event.on(employeeRowEvent, function (data) {
   return { user: data };
 });
@@ -81,7 +81,7 @@ Event.on(employeeRowEvent, function (data) {
 const filteredData = computed(() => {
   return employeeStore.employees.filter((employee) => {
     const searchCondition =
-      `${employee.id} ${employee.first_name} ${employee.last_name} ${employee.username} ${DateHelpers.formatDate(employee.date_started, "M/D/YYYY")} ${employee.position} ${employee.date_ended ? DateHelpers.formatDate(employee.date_ended, "M/D/YYYY") : ""}`.toLowerCase();
+      `${employee.id} ${employee.first_name} ${employee.last_name} ${employee.username} ${DateHelpers.formatDate(employee.date_started, 'M/D/YYYY')} ${employee.position} ${employee.date_ended ? DateHelpers.formatDate(employee.date_ended, 'M/D/YYYY') : ''}`.toLowerCase();
     return searchText.value
       ? searchCondition.includes(searchText.value.toLowerCase())
       : employee;

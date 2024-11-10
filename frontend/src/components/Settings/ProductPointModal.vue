@@ -29,14 +29,14 @@
   <ProductModal v-model="showProductModal" v-if="showProductModal" />
 </template>
 <script setup>
-import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import CustomSelectInput from "@/components/shared/CustomInput.vue";
-import { onMounted, computed, ref } from "vue";
-import { useProductStore } from "@/stores/product";
-import ProductModal from "@/components/Product/ProductModal.vue";
-import { authenticatedApi, Method } from "@/api";
-import { useSettingsStore } from "@/stores/settings";
+import ModalWrapper from '@/components/shared/ModalWrapper.vue';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import CustomSelectInput from '@/components/shared/CustomInput.vue';
+import { onMounted, computed, ref } from 'vue';
+import { useProductStore } from '@/stores/product';
+import ProductModal from '@/components/Product/ProductModal.vue';
+import { authenticatedApi, Method } from '@/api';
+import { useSettingsStore } from '@/stores/settings';
 
 const props = defineProps({
   isEdit: {
@@ -54,7 +54,7 @@ const productStore = useProductStore();
 const settingStore = useSettingsStore();
 
 const href = ref(
-  props.isEdit ? "product-setting/update" : "product-setting/register"
+  props.isEdit ? 'product-setting/update' : 'product-setting/register',
 );
 
 const showProductModal = ref(false);
@@ -69,7 +69,7 @@ const productOptions = computed(() => {
 });
 
 const model = ref({
-  point: "",
+  point: '',
   products: [],
 });
 
@@ -77,13 +77,13 @@ onMounted(async () => {
   await productStore.fetchAllProducts();
   if (props.isEdit && props.selectedId) {
     let orderingPoint = settingStore.productReorderingPoints.find(
-      (point) => point.id == props.selectedId
+      (point) => point.id == props.selectedId,
     );
 
     if (orderingPoint) {
       model.value = { ...orderingPoint };
       model.value.products = orderingPoint.products.map(
-        (product) => product.id
+        (product) => product.id,
       );
     }
   }

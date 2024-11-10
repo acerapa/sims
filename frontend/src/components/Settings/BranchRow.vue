@@ -28,9 +28,9 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { BranchStatusMap } from "shared/enums";
-import BadgeComponent from "../shared/BadgeComponent.vue";
+import { computed } from 'vue';
+import { BranchStatusMap } from 'shared/enums';
+import BadgeComponent from '../shared/BadgeComponent.vue';
 
 const props = defineProps({
   branch: {
@@ -39,25 +39,25 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["openMenu"]);
+const emit = defineEmits(['openMenu']);
 
 /** ================================================
  * COMPUTED
  ** ================================================*/
 const concatenatedAddress = computed(
   () =>
-    `${props.branch.address.address1}, ${props.branch.address.address2}, ${props.branch.address.city}, ${props.branch.address.postal}`
+    `${props.branch.address.address1}, ${props.branch.address.address2}, ${props.branch.address.city}, ${props.branch.address.postal}`,
 );
 
 const managerName = computed(
-  () => `${props.branch.manager.first_name} ${props.branch.manager.last_name}`
+  () => `${props.branch.manager.first_name} ${props.branch.manager.last_name}`,
 );
 
 /** ================================================
  * METHODS
  ** ================================================*/
 const openMenu = (id) => {
-  emit("openMenu", id);
+  emit('openMenu', id);
 };
 </script>
 

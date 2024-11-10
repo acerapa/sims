@@ -160,19 +160,19 @@
 </template>
 
 <script setup>
-import CustomInput from "@/components/shared/CustomInput.vue";
-import { Method, authenticatedApi } from "@/api";
-import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import ProductCategoryModal from "@/components/Settings/ProductCategoryModal.vue";
-import AccountModal from "@/components/Settings/AccountModal.vue";
-import VendorModal from "@/components/Vendor/VendorModal.vue";
-import ProductPointModal from "@/components/Settings/ProductPointModal.vue";
-import { computed, onMounted, ref } from "vue";
-import { AccountTypes } from "shared";
+import CustomInput from '@/components/shared/CustomInput.vue';
+import { Method, authenticatedApi } from '@/api';
+import ModalWrapper from '@/components/shared/ModalWrapper.vue';
+import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue';
+import AccountModal from '@/components/Settings/AccountModal.vue';
+import VendorModal from '@/components/Vendor/VendorModal.vue';
+import ProductPointModal from '@/components/Settings/ProductPointModal.vue';
+import { computed, onMounted, ref } from 'vue';
+import { AccountTypes } from 'shared';
 
-import { useVendorStore } from "@/stores/supplier";
-import { useSettingsStore } from "@/stores/settings";
-import { useProductStore } from "@/stores/product";
+import { useVendorStore } from '@/stores/supplier';
+import { useSettingsStore } from '@/stores/settings';
+import { useProductStore } from '@/stores/product';
 
 const props = defineProps({
   isEdit: {
@@ -185,7 +185,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["newAccount"]);
+const emit = defineEmits(['newAccount']);
 
 const showModal = defineModel();
 const showAccountModal = ref(false);
@@ -194,25 +194,25 @@ const showVendorModal = ref(false);
 const showProductPointModal = ref(false);
 
 const model = ref({
-  name: "",
-  purchase_description: "",
-  sale_description: "",
-  cost: "",
-  price: "",
-  item_code: "",
-  brand: "",
-  quantity_in_stock: "",
-  status: "",
-  type: "",
-  category_id: "",
+  name: '',
+  purchase_description: '',
+  sale_description: '',
+  cost: '',
+  price: '',
+  item_code: '',
+  brand: '',
+  quantity_in_stock: '',
+  status: '',
+  type: '',
+  category_id: '',
   suppliers: [],
-  income_account: "",
-  expense_account: "",
-  product_setting_id: "",
+  income_account: '',
+  expense_account: '',
+  product_setting_id: '',
 });
 
-const title = ref(props.isEdit ? "Edit Product" : "New Product");
-const apiPath = ref(props.isEdit ? "products/update" : "products/register");
+const title = ref(props.isEdit ? 'Edit Product' : 'New Product');
+const apiPath = ref(props.isEdit ? 'products/update' : 'products/register');
 
 const supplierStore = useVendorStore();
 const settingStore = useSettingsStore();
@@ -268,7 +268,7 @@ const reorderingPointOptions = computed(() => {
 });
 
 const generateItemCode = async () => {
-  const res = await authenticatedApi("products/item-code");
+  const res = await authenticatedApi('products/item-code');
   if (res.status == 200) {
     model.value.item_code = res.data.item_code;
   }
@@ -283,7 +283,7 @@ onMounted(async () => {
   if (props.isEdit && props.selectedId) {
     model.value = (() => {
       let product = productStore.products.find(
-        (product) => product.id == props.selectedId
+        (product) => product.id == props.selectedId,
       );
 
       // remove pass by reference

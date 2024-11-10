@@ -1,9 +1,9 @@
-import { authenticatedApi, Method } from "@/api";
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { authenticatedApi, Method } from '@/api';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export const usePhysicalInventoryStore = defineStore(
-  "physical-inventory",
+  'physical-inventory',
   () => {
     const physicalInventories = ref([]);
     const physicalInventory = ref(null);
@@ -31,7 +31,7 @@ export const usePhysicalInventoryStore = defineStore(
       return await authenticatedApi(
         `physical-inventory/register`,
         Method.POST,
-        model
+        model,
       );
     };
 
@@ -39,7 +39,7 @@ export const usePhysicalInventoryStore = defineStore(
       const res = await authenticatedApi(
         `physical-inventory/update/${id}`,
         Method.POST,
-        model
+        model,
       );
 
       return res;
@@ -49,7 +49,7 @@ export const usePhysicalInventoryStore = defineStore(
       const res = await authenticatedApi(
         `physical-inventory/item/${id}`,
         Method.POST,
-        model
+        model,
       );
 
       return res;
@@ -64,7 +64,7 @@ export const usePhysicalInventoryStore = defineStore(
 
       physicalInventoryCopy.grouped_items = Object.groupBy(
         physicalInventory.value.items,
-        ({ product }) => product.category_id
+        ({ product }) => product.category_id,
       );
 
       return physicalInventoryCopy;
@@ -80,5 +80,5 @@ export const usePhysicalInventoryStore = defineStore(
       getGroupedItems,
       fetchAllPhysicalInventories,
     };
-  }
+  },
 );

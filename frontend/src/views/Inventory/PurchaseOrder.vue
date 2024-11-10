@@ -123,37 +123,37 @@
 </template>
 
 <script setup>
-import { authenticatedApi, Method } from "@/api";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import CancelConfirmation from "@/components/Inventory/CancelConfirmation.vue";
-import PurchaseOrderRow from "@/components/Inventory/PurchaseOrder/PurchaseOrderRow.vue";
-import PurchaseOrderTableHeader from "@/components/Inventory/PurchaseOrder/PurchaseOrderTableHeader.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { usePurchaseOrderStore } from "@/stores/purchase-order";
-import { useVendorStore } from "@/stores/supplier";
-import { PurchaseOrderStatus } from "shared/enums";
-import { DateHelpers } from "shared/helpers/date";
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { authenticatedApi, Method } from '@/api';
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
+import CancelConfirmation from '@/components/Inventory/CancelConfirmation.vue';
+import PurchaseOrderRow from '@/components/Inventory/PurchaseOrder/PurchaseOrderRow.vue';
+import PurchaseOrderTableHeader from '@/components/Inventory/PurchaseOrder/PurchaseOrderTableHeader.vue';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import CustomTable from '@/components/shared/CustomTable.vue';
+import RowMenu from '@/components/shared/RowMenu.vue';
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { usePurchaseOrderStore } from '@/stores/purchase-order';
+import { useVendorStore } from '@/stores/supplier';
+import { PurchaseOrderStatus } from 'shared/enums';
+import { DateHelpers } from 'shared/helpers/date';
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const top = ref(0);
 const toDelete = ref();
 const toUpdate = ref();
 const filters = ref({
-  supplier_id: "",
-  date_from: "",
-  date_to: "",
-  bill_date_to: "",
-  bill_date_from: "",
+  supplier_id: '',
+  date_from: '',
+  date_to: '',
+  bill_date_to: '',
+  bill_date_from: '',
 });
 const selectedId = ref(0);
 const selectedRow = ref();
 const isEdit = ref(false);
-const searchText = ref("");
+const searchText = ref('');
 const showModal = ref(false);
 const showRowMenu = ref(false);
 const supplierOptions = ref([]);
@@ -174,7 +174,7 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
 });
 
 // define purchase order props init
-const purchaseOrderRowEvent = "purchase-order-row-props-init";
+const purchaseOrderRowEvent = 'purchase-order-row-props-init';
 Event.on(purchaseOrderRowEvent, function (data) {
   return { order: data };
 });
@@ -212,15 +212,15 @@ const filteredData = computed(() => {
       DateHelpers.getRangeDates(
         filters.value.date_from,
         filters.value.date_to,
-        purchaseOrder.date
-      )
+        purchaseOrder.date,
+      ),
     )
     .filter((purchaseOrder) =>
       DateHelpers.getRangeDates(
         filters.value.bill_date_from,
         filters.value.bill_date_to,
-        purchaseOrder.bill_due
-      )
+        purchaseOrder.bill_due,
+      ),
     )
     .filter((purchaseOrder) => {
       return filters.value.supplier_id
@@ -229,7 +229,7 @@ const filteredData = computed(() => {
     })
     .filter((purchaseOrder) => {
       const searchCondition =
-        `${purchaseOrder.id} ${purchaseOrder.ref_no} ${purchaseOrder.supplier.company_name} ${purchaseOrder.amount} ${DateHelpers.formatDate(purchaseOrder.date, "M/D/YYYY")} ${DateHelpers.formatDate(purchaseOrder.bill_due, "M/D/YYYY")}`.toLowerCase();
+        `${purchaseOrder.id} ${purchaseOrder.ref_no} ${purchaseOrder.supplier.company_name} ${purchaseOrder.amount} ${DateHelpers.formatDate(purchaseOrder.date, 'M/D/YYYY')} ${DateHelpers.formatDate(purchaseOrder.bill_due, 'M/D/YYYY')}`.toLowerCase();
 
       return searchText.value
         ? searchCondition.includes(searchText.value.toLowerCase())
@@ -244,7 +244,7 @@ const filteredData = computed(() => {
 const onSelectRow = (id) => {
   selectedId.value = id;
   selectedRow.value = purchaseOrderStore.purchaseOrders.find(
-    (order) => order.id == id
+    (order) => order.id == id,
   );
 
   top.value = event.target.offsetTop;
@@ -253,7 +253,7 @@ const onSelectRow = (id) => {
 
 const onView = () => {
   router.push({
-    name: "purchase-order-create",
+    name: 'purchase-order-create',
     query: {
       id: selectedId.value,
     },
@@ -280,7 +280,7 @@ const onConfirmPO = async () => {
       order: {
         status: PurchaseOrderStatus.CONFIRMED,
       },
-    }
+    },
   );
 
   if (res.status == 200) {
@@ -290,7 +290,7 @@ const onConfirmPO = async () => {
 
 const onReceivePO = () => {
   router.push({
-    name: "purchase-receive-order",
+    name: 'purchase-receive-order',
     params: {
       id: selectedId.value,
     },

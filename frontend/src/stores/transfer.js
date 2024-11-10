@@ -1,9 +1,9 @@
-import { authenticatedApi, Method } from "@/api";
-import { defineStore } from "pinia";
-import { TransferType } from "shared/enums";
-import { computed, ref } from "vue";
+import { authenticatedApi, Method } from '@/api';
+import { defineStore } from 'pinia';
+import { TransferType } from 'shared/enums';
+import { computed, ref } from 'vue';
 
-export const useTransferStore = defineStore("tranfer", function () {
+export const useTransferStore = defineStore('tranfer', function () {
   const transfers = ref([]);
   const transfer = ref(null);
 
@@ -31,7 +31,7 @@ export const useTransferStore = defineStore("tranfer", function () {
     return await authenticatedApi(
       `stock-transfer/register`,
       Method.POST,
-      model
+      model,
     );
   };
 
@@ -39,7 +39,7 @@ export const useTransferStore = defineStore("tranfer", function () {
     return await authenticatedApi(
       `stock-transfer/update/${id}`,
       Method.POST,
-      model
+      model,
     );
   };
 

@@ -13,7 +13,7 @@
     </p>
     <p class="col-span-1 text-sm">{{ props.product.quantity_in_stock }}</p>
     <p class="col-span-1 text-sm">
-      {{ DateHelpers.formatDate(props.product.createdAt, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.product.createdAt, 'M/D/YYYY') }}
     </p>
     <div class="col-span-1 text-sm flex">
       <button
@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { DateHelpers } from "shared/helpers/date";
+import { DateHelpers } from 'shared/helpers/date';
 const props = defineProps({
   product: {
     type: Object,
@@ -62,9 +62,9 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["openMenu"]);
+const emit = defineEmits(['openMenu']);
 
 const openMenu = () => {
-  emit("openMenu", props.product.id);
+  emit('openMenu', props.product.id);
 };
 </script>

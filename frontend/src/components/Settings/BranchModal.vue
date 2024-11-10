@@ -50,15 +50,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
-import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import { useEmployeeStore } from "@/stores/employee";
-import EmployeeModal from "@/components/Employee/EmployeeModal.vue";
-import { BranchStatusMap } from "shared/enums";
-import AddressForm from "@/components/shared/AddressForm.vue";
-import { useSettingsStore } from "@/stores/settings";
-import { ObjectHelpers } from "shared/helpers";
+import { computed, onMounted, ref } from 'vue';
+import ModalWrapper from '@/components/shared/ModalWrapper.vue';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import { useEmployeeStore } from '@/stores/employee';
+import EmployeeModal from '@/components/Employee/EmployeeModal.vue';
+import { BranchStatusMap } from 'shared/enums';
+import AddressForm from '@/components/shared/AddressForm.vue';
+import { useSettingsStore } from '@/stores/settings';
+import { ObjectHelpers } from 'shared/helpers';
 
 const showModal = defineModel();
 const showEmployeeModal = ref(false);
@@ -76,18 +76,18 @@ const props = defineProps({
 const settingStore = useSettingsStore();
 const employeeStore = useEmployeeStore();
 
-const title = props.isEdit ? "Edit Branch" : "New Branch";
+const title = props.isEdit ? 'Edit Branch' : 'New Branch';
 const model = ref({
   branch: {
-    name: "",
-    status: "",
-    branch_manager: "",
+    name: '',
+    status: '',
+    branch_manager: '',
   },
   address: {
-    address1: "",
-    address2: "",
-    city: "",
-    postal: "",
+    address1: '',
+    address2: '',
+    city: '',
+    postal: '',
   },
 });
 
@@ -112,24 +112,24 @@ const statusOptions = computed(() =>
       text: status[1].text,
       value: status[0],
     };
-  })
+  }),
 );
 
 onMounted(async () => {
   // TODO: Setup skeleton
   if (props.isEdit) {
     const branch = settingStore.branches.find(
-      (branch) => branch.id == props.selectedId
+      (branch) => branch.id == props.selectedId,
     );
 
     if (branch) {
       model.value.branch = ObjectHelpers.assignSameFields(
         model.value.branch,
-        branch
+        branch,
       );
       model.value.address = ObjectHelpers.assignSameFields(
         model.value.address,
-        branch.address
+        branch.address,
       );
     }
   } else {

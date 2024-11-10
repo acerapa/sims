@@ -75,12 +75,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
-import CustomInput from "../shared/CustomInput.vue";
-import ProductModal from "../Product/ProductModal.vue";
-import { useProductStore } from "@/stores/product";
+import { computed, ref, watch } from 'vue';
+import CustomInput from '../shared/CustomInput.vue';
+import ProductModal from '../Product/ProductModal.vue';
+import { useProductStore } from '@/stores/product';
 
-const emit = defineEmits(["remove"]);
+const emit = defineEmits(['remove']);
 
 const props = defineProps({
   isDisabled: {
@@ -96,7 +96,7 @@ const productStore = useProductStore();
 const onChange = () => {
   if (model.value.product_id) {
     const product = productStore.products.find(
-      (prd) => prd.id == model.value.product_id
+      (prd) => prd.id == model.value.product_id,
     );
 
     if (product) {
@@ -105,11 +105,11 @@ const onChange = () => {
       model.value.quantity = 1;
     }
   } else {
-    model.value.name = "";
-    model.value.product_id = "";
-    model.value.description = "";
-    model.value.quantity = "";
-    model.value.cost = "";
+    model.value.name = '';
+    model.value.product_id = '';
+    model.value.description = '';
+    model.value.quantity = '';
+    model.value.cost = '';
   }
 };
 
@@ -117,6 +117,6 @@ watch(
   () => model.value.quantity,
   () => {
     model.value.amount = model.value.cost * model.value.quantity;
-  }
+  },
 );
 </script>

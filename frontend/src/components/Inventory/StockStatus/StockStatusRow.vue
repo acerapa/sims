@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import check from "@/assets/icons/check-mark.png";
+import check from '@/assets/icons/check-mark.png';
 const props = defineProps({
   product: {
     type: Object,

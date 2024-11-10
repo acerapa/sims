@@ -4,14 +4,14 @@ import {
   getPersistedTokens,
   getRefreshToken,
   verifyAccessToken,
-} from "@/api";
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import { LocalStorageKeys } from "shared/enums";
+} from '@/api';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { LocalStorageKeys } from 'shared/enums';
 
-export const useAuthStore = defineStore("auth", () => {
-  const accessToken = ref("");
-  const refreshToken = ref("");
+export const useAuthStore = defineStore('auth', () => {
+  const accessToken = ref('');
+  const refreshToken = ref('');
   const authUser = ref(null);
 
   const setAuthAndTokens = (access, refresh, auth, isPersist = false) => {
@@ -24,7 +24,7 @@ export const useAuthStore = defineStore("auth", () => {
       localStorage.setItem(LocalStorageKeys.REFRESH, refreshToken.value);
       localStorage.setItem(
         LocalStorageKeys.CURRENT_USER,
-        JSON.stringify(authUser.value)
+        JSON.stringify(authUser.value),
       );
     }
   };
@@ -53,7 +53,7 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const authenticate = async (credentials) => {
-    const res = await api("auth/login", Method.POST, credentials);
+    const res = await api('auth/login', Method.POST, credentials);
     if (res.status == 200 && res.data) {
       setAuthAndTokens(res.data.access, res.data.refresh, res.data.user, true);
     }
@@ -65,8 +65,8 @@ export const useAuthStore = defineStore("auth", () => {
     localStorage.removeItem(LocalStorageKeys.REFRESH);
     localStorage.removeItem(LocalStorageKeys.CURRENT_USER);
 
-    accessToken.value = "";
-    refreshToken.value = "";
+    accessToken.value = '';
+    refreshToken.value = '';
     authUser.value = null;
   };
 

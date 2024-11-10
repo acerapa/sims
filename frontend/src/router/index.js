@@ -1,11 +1,11 @@
-import { createRouter, createWebHistory } from "vue-router";
-import { isAuthenticated } from "@/stores/auth";
+import { createRouter, createWebHistory } from 'vue-router';
+import { isAuthenticated } from '@/stores/auth';
 
-import commonRoutes from "./common";
-import reportRoutes from "./report";
-import inventoryRoutes from "./inventory";
-import settingsRoutes from "./settings";
-import transferRoutes from "./transfer";
+import commonRoutes from './common';
+import reportRoutes from './report';
+import inventoryRoutes from './inventory';
+import settingsRoutes from './settings';
+import transferRoutes from './transfer';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -25,11 +25,11 @@ router.beforeEach(async (to, from, next) => {
     if (isAuth) {
       next();
     } else {
-      if (to.name == "login") {
+      if (to.name == 'login') {
         next();
         return;
       } else {
-        next({ name: "login" });
+        next({ name: 'login' });
         return;
       }
     }

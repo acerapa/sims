@@ -1,20 +1,22 @@
 <template>
-  <div
-    class="grid grid-cols-13 gap-3 items-center min-w-[792px]"
-  >
+  <div class="grid grid-cols-13 gap-3 items-center min-w-[792px]">
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ user.id }}</p>
     </div>
-    <p class="col-span-2 text-sm">{{ `${user.first_name} ${user.last_name}` }}</p>
+    <p class="col-span-2 text-sm">
+      {{ `${user.first_name} ${user.last_name}` }}
+    </p>
     <p class="col-span-2 text-sm">Branch 1</p>
     <p class="col-span-2 text-sm">{{ user.position }}</p>
     <p class="col-span-2 text-sm">
-      {{ DateHelpers.formatDate(user.date_started, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(user.date_started, 'M/D/YYYY') }}
     </p>
     <p class="col-span-2 text-sm">
       {{
-        user.date_ended ? DateHelpers.formatDate(user.date_ended, "M/D/YYYY") : "-"
+        user.date_ended
+          ? DateHelpers.formatDate(user.date_ended, 'M/D/YYYY')
+          : '-'
       }}
     </p>
     <p class="col-span-1 text-sm">
@@ -24,7 +26,7 @@
           user.status ? 'text-success bg-success' : 'text-gray-500 bg-gray-500'
         "
       >
-        {{ user.status ? "Active" : "Inactive" }}
+        {{ user.status ? 'Active' : 'Inactive' }}
       </button>
     </p>
     <div class="col-span-1 text-sm relative">
@@ -46,7 +48,7 @@
 </template>
 
 <script setup>
-import { DateHelpers } from "shared";
+import { DateHelpers } from 'shared';
 
 const props = defineProps({
   user: {
@@ -55,9 +57,9 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["openMenu", "view", "delete"]);
+const emit = defineEmits(['openMenu', 'view', 'delete']);
 
 const openMenu = (id) => {
-  emit("openMenu", id);
+  emit('openMenu', id);
 };
 </script>

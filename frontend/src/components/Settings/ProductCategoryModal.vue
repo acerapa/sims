@@ -12,11 +12,11 @@
   </ModalWrapper>
 </template>
 <script setup>
-import { Method, authenticatedApi } from "@/api";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import { useSettingsStore } from "@/stores/settings";
-import { onMounted, ref } from "vue";
+import { Method, authenticatedApi } from '@/api';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import ModalWrapper from '@/components/shared/ModalWrapper.vue';
+import { useSettingsStore } from '@/stores/settings';
+import { onMounted, ref } from 'vue';
 
 const showModal = defineModel();
 const settingsStore = useSettingsStore();
@@ -33,20 +33,20 @@ const props = defineProps({
 });
 
 const model = ref({
-  name: "",
+  name: '',
 });
 
 onMounted(async () => {
   if (props.isEdit && props.selectedId) {
     model.value = settingsStore.productCategories.find(
-      (pc) => pc.id == props.selectedId
+      (pc) => pc.id == props.selectedId,
     );
   }
 });
 
 const apiPath = props.isEdit
-  ? "product-category/update"
-  : "product-category/register";
+  ? 'product-category/update'
+  : 'product-category/register';
 
 const onSubmit = async () => {
   const res = await authenticatedApi(apiPath, Method.POST, model.value);

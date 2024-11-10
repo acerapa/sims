@@ -92,7 +92,7 @@ const props = defineProps({
   type: {
     type: String,
     validator: (value) => {
-      return ["danger", "info", "warning", "success"].includes(value);
+      return ['danger', 'info', 'warning', 'success'].includes(value);
     },
     required: true,
   },
@@ -108,20 +108,20 @@ const props = defineProps({
 
 const alertTypes = Object.freeze({
   danger: {
-    text: "Danger",
-    class: "alert-danger",
+    text: 'Danger',
+    class: 'alert-danger',
   },
   info: {
-    text: "Information",
-    class: "alert-info",
+    text: 'Information',
+    class: 'alert-info',
   },
   warning: {
-    text: "Warning",
-    class: "alert-warning",
+    text: 'Warning',
+    class: 'alert-warning',
   },
   success: {
-    text: "success",
-    class: "alert-success",
+    text: 'success',
+    class: 'alert-success',
   },
 });
 </script>

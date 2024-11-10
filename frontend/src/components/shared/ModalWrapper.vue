@@ -39,20 +39,20 @@ const props = defineProps({
   action: String,
   saveBtn: {
     type: String,
-    default: "Save",
+    default: 'Save',
   },
   modalClass: {
     type: String,
-    default: ""
-  }
+    default: '',
+  },
 });
 
 const showModal = defineModel();
 
-const emit = defineEmits(["submit"]);
+const emit = defineEmits(['submit']);
 
 const onSave = () => {
-  emit("submit");
+  emit('submit');
 };
 </script>
 

@@ -4,9 +4,9 @@
 </template>
 
 <script setup>
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { onMounted } from "vue";
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { onMounted } from 'vue';
 
 Event.emit(EventEnum.IS_PAGE_LOADING, true);
 

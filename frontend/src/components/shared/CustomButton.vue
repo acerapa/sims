@@ -10,7 +10,7 @@ const props = defineProps({
   },
   btnClass: {
     type: String,
-    default: "btn",
+    default: 'btn',
   },
 });
 </script>

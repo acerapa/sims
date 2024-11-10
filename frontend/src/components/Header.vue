@@ -7,9 +7,9 @@
 </template>
 
 <script setup>
-import { useAppStore } from "@/stores/app";
-import { computed } from "vue";
-import { useRoute } from "vue-router";
+import { useAppStore } from '@/stores/app';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 const appStore = useAppStore();
 
 const route = useRoute();

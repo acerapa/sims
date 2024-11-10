@@ -10,7 +10,7 @@
           Received Purchase Order
         </p>
         <p v-else class="text-base font-semibold">
-          {{ isEdit ? "Edit" : "New" }} Purchase Order
+          {{ isEdit ? 'Edit' : 'New' }} Purchase Order
         </p>
         <BadgeComponent
           v-if="isEdit && selectedStatus"
@@ -160,7 +160,7 @@
           <p>
             Total: &#8369;
             {{
-              model.order.amount.toLocaleString("en", {
+              model.order.amount.toLocaleString('en', {
                 minimumFractionDigits: 2,
               })
             }}
@@ -174,7 +174,7 @@
           :to="{ name: 'purchase-order' }"
           class="btn-outline !border-danger !text-danger"
         >
-          {{ isDisabled ? "Back" : "Cancel" }}
+          {{ isDisabled ? 'Back' : 'Cancel' }}
         </RouterLink>
         <button
           type="button"
@@ -202,28 +202,28 @@
   </div>
 </template>
 <script setup>
-import { Method, authenticatedApi } from "@/api";
-import PurchaseOrderFormRow from "@/components/Inventory/PurchaseOrder/PurchaseOrderFormRow.vue";
-import PurchaseOrderFormHeader from "@/components/Inventory/PurchaseOrder/PurchaseOrderFormHeader.vue";
-import AddressForm from "@/components/shared/AddressForm.vue";
-import BadgeComponent from "@/components/shared/BadgeComponent.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import VendorModal from "@/components/Vendor/VendorModal.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { getCost } from "@/helper";
-import { useProductStore } from "@/stores/product";
-import { usePurchaseOrderStore } from "@/stores/purchase-order";
-import { useVendorStore } from "@/stores/supplier";
-import { DateHelpers } from "shared";
+import { Method, authenticatedApi } from '@/api';
+import PurchaseOrderFormRow from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormRow.vue';
+import PurchaseOrderFormHeader from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormHeader.vue';
+import AddressForm from '@/components/shared/AddressForm.vue';
+import BadgeComponent from '@/components/shared/BadgeComponent.vue';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import VendorModal from '@/components/Vendor/VendorModal.vue';
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { getCost } from '@/helper';
+import { useProductStore } from '@/stores/product';
+import { usePurchaseOrderStore } from '@/stores/purchase-order';
+import { useVendorStore } from '@/stores/supplier';
+import { DateHelpers } from 'shared';
 import {
   PurchaseOrderStatus,
   PurchaseOrderType,
   PurchaseStatusMap,
-} from "shared/enums";
-import { ObjectHelpers } from "shared/helpers/object";
-import { computed, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+} from 'shared/enums';
+import { ObjectHelpers } from 'shared/helpers/object';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const isEdit = ref(false);
@@ -238,29 +238,29 @@ const productStore = useProductStore();
 
 const modelDefualtValue = {
   order: {
-    supplier_id: "",
-    ref_no: "",
-    date: DateHelpers.formatDate(new Date(), "YYYY-MM-DD"),
-    bill_due: "",
+    supplier_id: '',
+    ref_no: '',
+    date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
+    bill_due: '',
     type: PurchaseOrderType.COD,
-    memo: "",
+    memo: '',
     amount: 0,
-    term_start: "",
+    term_start: '',
   },
   address: {
-    address1: "",
-    address2: "",
-    city: "",
-    postal: "",
+    address1: '',
+    address2: '',
+    city: '',
+    postal: '',
   },
   products: [
     {
-      product_id: "",
-      name: "",
-      description: "",
-      quantity: "",
-      cost: "",
-      amount: "",
+      product_id: '',
+      name: '',
+      description: '',
+      quantity: '',
+      cost: '',
+      amount: '',
     },
   ],
 };
@@ -276,7 +276,7 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true);
 
 // Custom global event
 const isCustomSelectFocused = ref(false);
-Event.on("custom-select-focus", function (data) {
+Event.on('custom-select-focus', function (data) {
   isCustomSelectFocused.value = data;
 });
 
@@ -307,12 +307,12 @@ const isDisabled = computed(() => {
 const addNewProduct = () => {
   if (!isDisabled.value) {
     model.value.products.push({
-      product_id: "",
-      name: "",
-      description: "",
-      quantity: "",
-      cost: "",
-      amount: "",
+      product_id: '',
+      name: '',
+      description: '',
+      quantity: '',
+      cost: '',
+      amount: '',
     });
   }
 };
@@ -328,9 +328,9 @@ const onSubmit = async (isAddNew = false) => {
   }
 
   const res = await authenticatedApi(
-    "purchase-order/register",
+    'purchase-order/register',
     Method.POST,
-    model.value
+    model.value,
   );
 
   // reset model
@@ -342,7 +342,7 @@ const onSubmit = async (isAddNew = false) => {
   if (res.status == 200) {
     if (!isAddNew) {
       router.push({
-        name: "purchase-order",
+        name: 'purchase-order',
       });
     }
   }
@@ -354,11 +354,11 @@ const onUpdate = async () => {
     const res = await authenticatedApi(
       `purchase-order/${route.query.id}/update`,
       Method.POST,
-      model.value
+      model.value,
     );
 
     if (res.status == 200) {
-      console.log("Api is working and need to check the result in db");
+      console.log('Api is working and need to check the result in db');
     }
     Event.emit(EventEnum.IS_PAGE_LOADING, false);
   }
@@ -379,13 +379,13 @@ onMounted(async () => {
     selectedStatus.value = PurchaseStatusMap[order.status];
     model.value.address = ObjectHelpers.assignSameFields(
       model.value.address,
-      order.address
+      order.address,
     );
     model.value.order = {
       supplier_id: order.supplier.id,
       amount: order.amount,
-      bill_due: DateHelpers.formatDate(order.bill_due, "YYYY-MM-DD"),
-      date: DateHelpers.formatDate(order.date, "YYYY-MM-DD"),
+      bill_due: DateHelpers.formatDate(order.bill_due, 'YYYY-MM-DD'),
+      date: DateHelpers.formatDate(order.date, 'YYYY-MM-DD'),
       memo: order.memo,
       ref_no: order.ref_no,
       type: order.type,
@@ -399,7 +399,11 @@ onMounted(async () => {
             ? product.ProductTransaction.description
             : product.purchase_description,
           quantity: product.ProductTransaction.quantity,
-          cost: getCost(product.ProductTransaction.cost, product, order.supplier_id),
+          cost: getCost(
+            product.ProductTransaction.cost,
+            product,
+            order.supplier_id,
+          ),
           amount: product.ProductTransaction.amount,
         };
       }),
@@ -413,7 +417,7 @@ watch(
   () => model.value.order.supplier_id,
   (val) => {
     supplierStore.selectedSupplier = supplierStore.suppliers.find(
-      (sup) => sup.id == val
+      (sup) => sup.id == val,
     );
 
     // remove the products in the order which are not related to the supplier
@@ -424,7 +428,7 @@ watch(
         return p.suppliers.map((sup) => sup.id).includes(val);
       }
     });
-  }
+  },
 );
 
 watch(
@@ -438,6 +442,6 @@ watch(
   },
   {
     deep: true,
-  }
+  },
 );
 </script>

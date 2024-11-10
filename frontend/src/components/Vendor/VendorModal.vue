@@ -85,12 +85,12 @@
 </template>
 
 <script setup>
-import CustomInput from "@/components/shared/CustomInput.vue";
-import { Method, authenticatedApi } from "@/api";
-import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import AddressForm from "../shared/AddressForm.vue";
-import { useVendorStore } from "@/stores/supplier";
-import { onMounted, ref } from "vue";
+import CustomInput from '@/components/shared/CustomInput.vue';
+import { Method, authenticatedApi } from '@/api';
+import ModalWrapper from '@/components/shared/ModalWrapper.vue';
+import AddressForm from '../shared/AddressForm.vue';
+import { useVendorStore } from '@/stores/supplier';
+import { onMounted, ref } from 'vue';
 
 const showModal = defineModel();
 
@@ -107,24 +107,24 @@ const props = defineProps({
 
 const supplierStore = useVendorStore();
 const title = ref(
-  props.isEdit ? "Edit Vendor/Supplier" : "New Vendor/Supplier"
+  props.isEdit ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier',
 );
-const apiPath = ref(props.isEdit ? "suppliers/update" : "suppliers/register");
+const apiPath = ref(props.isEdit ? 'suppliers/update' : 'suppliers/register');
 const model = ref({
-  company_name: "",
-  first_name: "",
-  last_name: "",
-  annotation: "",
-  phone: "",
-  email: "",
-  telephone: "",
-  fax: "",
+  company_name: '',
+  first_name: '',
+  last_name: '',
+  annotation: '',
+  phone: '',
+  email: '',
+  telephone: '',
+  fax: '',
   address: {
-    address1: "",
-    address2: "",
-    city: "",
-    province: "",
-    postal: "",
+    address1: '',
+    address2: '',
+    city: '',
+    province: '',
+    postal: '',
   },
 });
 
@@ -140,7 +140,7 @@ const onSubmit = async () => {
 onMounted(() => {
   if (props.isEdit && props.selectedId) {
     model.value = supplierStore.suppliers.find(
-      (sup) => sup.id == props.selectedId
+      (sup) => sup.id == props.selectedId,
     );
   }
 });

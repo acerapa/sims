@@ -8,10 +8,10 @@
     <p class="col-span-2 text-sm">{{ props.order.supplier.company_name }}</p>
     <p class="col-span-1 text-sm">{{ props.order.amount }}</p>
     <p class="col-span-2 text-sm">
-      {{ DateHelpers.formatDate(props.order.date, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.order.date, 'M/D/YYYY') }}
     </p>
     <p class="col-span-2 text-sm">
-      {{ DateHelpers.formatDate(props.order.bill_due, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.order.bill_due, 'M/D/YYYY') }}
     </p>
     <div class="col-span-1">
       <BadgeComponent
@@ -31,11 +31,11 @@
 </template>
 
 <script setup>
-import { DateHelpers } from "shared/helpers/date";
-import { PurchaseStatusMap } from "shared";
-import BadgeComponent from "@/components/shared/BadgeComponent.vue";
+import { DateHelpers } from 'shared/helpers/date';
+import { PurchaseStatusMap } from 'shared';
+import BadgeComponent from '@/components/shared/BadgeComponent.vue';
 
-const emit = defineEmits(["openMenu"]);
+const emit = defineEmits(['openMenu']);
 
 const props = defineProps({
   order: {
