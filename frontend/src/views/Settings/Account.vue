@@ -87,18 +87,18 @@
 </template>
 
 <script setup>
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import AccountModal from "@/components/Settings/AccountModal.vue";
-import AccountRow from "@/components/Settings/AccountRow.vue";
-import AccountTableHeader from "@/components/Settings/AccountTableHeader.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { useSettingsStore } from "@/stores/settings";
-import { DateHelpers } from "shared/helpers";
-import { computed, onMounted, ref } from "vue";
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
+import AccountModal from '@/components/Settings/AccountModal.vue';
+import AccountRow from '@/components/Settings/AccountRow.vue';
+import AccountTableHeader from '@/components/Settings/AccountTableHeader.vue';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import CustomTable from '@/components/shared/CustomTable.vue';
+import RowMenu from '@/components/shared/RowMenu.vue';
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { useSettingsStore } from '@/stores/settings';
+import { DateHelpers } from 'shared/helpers';
+import { computed, onMounted, ref } from 'vue';
 
 const top = ref(0);
 const toDelete = ref();
@@ -111,13 +111,13 @@ const showDeleteConfirmationModal = ref(false);
 const settingsStore = useSettingsStore();
 
 const filter = ref({
-  type: "",
+  type: '',
 });
 
 const searchText = ref();
 const dateAdded = ref({
-  from: "",
-  to: "",
+  from: '',
+  to: '',
 });
 
 /** ================================================
@@ -133,7 +133,7 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
 });
 
 // define account row props
-const accountRowEvent = "account-row-init-props";
+const accountRowEvent = 'account-row-init-props';
 Event.on(accountRowEvent, function (data) {
   // initize the value of props here
   return { account: data };
@@ -146,14 +146,14 @@ Event.on(accountRowEvent, function (data) {
 const filteredData = computed(() => {
   return settingsStore.accounts
     .filter((account) =>
-      filter.value.type ? account.type == filter.value.type : account
+      filter.value.type ? account.type == filter.value.type : account,
     )
     .filter((account) =>
       DateHelpers.getRangeDates(
         dateAdded.value.from,
         dateAdded.value.to,
-        account.createdAt
-      )
+        account.createdAt,
+      ),
     )
     .filter((account) => {
       const searchCondition =

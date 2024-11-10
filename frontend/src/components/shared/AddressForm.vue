@@ -57,7 +57,7 @@
   </div>
 </template>
 <script setup>
-import CustomInput from "./CustomInput.vue";
+import CustomInput from './CustomInput.vue';
 
 const props = defineProps({
   disabled: {

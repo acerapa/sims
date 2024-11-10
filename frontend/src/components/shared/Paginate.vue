@@ -13,7 +13,7 @@
   </div>
 </template>
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
   data: {
@@ -38,24 +38,24 @@ const paginatedData = computed(() => {
     ndx = Number.parseInt(ndx, 10);
     pgData[ndx + 1] = props.data.slice(
       ndx * props.itemSelected,
-      (ndx + 1) * props.itemSelected
+      (ndx + 1) * props.itemSelected,
     );
   }
 
   return pgData;
 });
 
-const currentItems = defineModel("currentItems");
+const currentItems = defineModel('currentItems');
 currentItems.value = paginatedData.value[currentActivePage.value];
 
 const navigatePagination = (direction) => {
   let tempRes = 0;
   switch (direction) {
-    case "prev":
+    case 'prev':
       tempRes = currentActivePage.value - 1;
       if (tempRes > 0) currentActivePage.value--;
       break;
-    case "next":
+    case 'next':
       tempRes = currentActivePage.value + 1;
       if (tempRes <= btnNums.value)
         currentActivePage.value = currentActivePage.value + 1;
@@ -65,13 +65,13 @@ const navigatePagination = (direction) => {
 
 watch(
   () => [currentActivePage.value, props.itemSelected],
-  () => (currentItems.value = paginatedData.value[currentActivePage.value])
+  () => (currentItems.value = paginatedData.value[currentActivePage.value]),
 );
 
 watch(
   () => props.itemSelected,
-  () => (currentActivePage.value = 1)
-)
+  () => (currentActivePage.value = 1),
+);
 </script>
 <style scoped>
 .pg-btn {

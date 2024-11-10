@@ -1,5 +1,5 @@
-import { LocalStorageKeys } from "shared/enums";
-import { FunctionCooldownManager } from "shared/helpers/fn-cooldown-manager";
+import { LocalStorageKeys } from 'shared/enums';
+import { FunctionCooldownManager } from 'shared/helpers/fn-cooldown-manager';
 
 const apiConfig = {
   serverUrls: {
@@ -8,26 +8,26 @@ const apiConfig = {
     test: import.meta.env.VITE_TEST_SERVER,
   },
   defaultHeaders: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
 };
 
 const BASE_PATH = apiConfig.serverUrls[import.meta.env.MODE];
 
 export const Method = Object.freeze({
-  GET: "GET",
-  PUT: "PUT",
-  POST: "POST",
-  PATCH: "PATCH",
-  DELETE: "DELETE",
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  PATCH: 'PATCH',
+  DELETE: 'DELETE',
 });
 
 export const api = async (
   url,
   method = Method.GET,
   payload = null,
-  hdrs = {}
+  hdrs = {},
 ) => {
   const headers = { ...apiConfig.defaultHeaders, ...hdrs };
   const requestInit = { method, headers };
@@ -41,19 +41,19 @@ export const api = async (
 
   const response = await fetch(request);
 
-  const contentType = response.headers.get("Content-Type");
+  const contentType = response.headers.get('Content-Type');
   let responseData;
 
   if (contentType) {
-    if (contentType.includes("application/json")) {
+    if (contentType.includes('application/json')) {
       responseData = await response.json();
-    } else if (contentType.includes("text/")) {
+    } else if (contentType.includes('text/')) {
       responseData = await response.text();
     } else if (
-      contentType.includes("image/") ||
-      contentType.includes("audio/") ||
-      contentType.includes("video/") ||
-      contentType.includes("application/octet-stream")
+      contentType.includes('image/') ||
+      contentType.includes('audio/') ||
+      contentType.includes('video/') ||
+      contentType.includes('application/octet-stream')
     ) {
       responseData = await response.blob();
     } else {
@@ -68,7 +68,7 @@ export const authenticatedApi = async (
   url,
   method = Method.GET,
   payload = null,
-  hdrs = {}
+  hdrs = {},
 ) => {
   const verifyToken = await verifyAccessToken();
   if (!verifyToken) {
@@ -84,12 +84,12 @@ export const authenticatedApi = async (
 export const verifyAccessToken = async () => {
   let isValid = false;
 
-  const manager = new FunctionCooldownManager("verifyAccessToken", 10000);
+  const manager = new FunctionCooldownManager('verifyAccessToken', 10000);
   isValid = await manager.executeAsync(async () => {
     let iV = false;
     const tokens = getPersistedTokens();
     if (Object.keys(tokens).length) {
-      const res = await api("auth/token/verify", Method.POST, {
+      const res = await api('auth/token/verify', Method.POST, {
         token: tokens.access,
       });
       if (res.status == 200 && res.data) iV = res.data.isValid;
@@ -101,7 +101,7 @@ export const verifyAccessToken = async () => {
 };
 
 export const getRefreshToken = async () => {
-  const res = await api("auth/token/refresh", Method.POST, {
+  const res = await api('auth/token/refresh', Method.POST, {
     refresh: getPersistedTokens().refresh,
   });
 
@@ -113,7 +113,7 @@ export const getRefreshToken = async () => {
     localStorage.setItem(LocalStorageKeys.REFRESH, res.data.refresh);
     localStorage.setItem(
       LocalStorageKeys.CURRENT_USER,
-      JSON.stringify(res.data.user)
+      JSON.stringify(res.data.user),
     );
   }
 

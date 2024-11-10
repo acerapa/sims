@@ -25,17 +25,17 @@
 </template>
 
 <script setup>
-import StrListRow from "@/components/stock-transfer/str-list-row.vue";
-import StrListHeader from "@/components/stock-transfer/str-list-header.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
-import { useTransferStore } from "@/stores/transfer";
-import { TransferType } from "shared/enums";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import StrListRow from '@/components/stock-transfer/str-list-row.vue';
+import StrListHeader from '@/components/stock-transfer/str-list-header.vue';
+import CustomTable from '@/components/shared/CustomTable.vue';
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useTransferStore } from '@/stores/transfer';
+import { TransferType } from 'shared/enums';
+import RowMenu from '@/components/shared/RowMenu.vue';
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
 
 const top = ref(0);
 const router = useRouter();
@@ -53,7 +53,7 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });
 
-const rowPropInit = "str-row-prop-init";
+const rowPropInit = 'str-row-prop-init';
 Event.on(rowPropInit, function (data) {
   return { str: data };
 });
@@ -69,7 +69,7 @@ const filteredData = computed(() => {
  ** ================================================*/
 const onAddNewRecord = () => {
   router.push({
-    name: "str-form",
+    name: 'str-form',
   });
 };
 
@@ -81,7 +81,7 @@ const onSelectRow = (id) => {
 
 const onViewRow = () => {
   router.push({
-    name: "str-form",
+    name: 'str-form',
     query: { id: selectedId.value },
   });
 };

@@ -7,7 +7,7 @@
     <p class="col-span-2 text-sm truncate">{{ props.str.receiver.name }}</p>
     <p class="col-span-1 text-sm truncate">{{ managerName }}</p>
     <p class="col-span-2 text-sm truncate">
-      {{ DateHelpers.formatDate(props.str.when, "MM/DD/YYYY HH:II a") }}
+      {{ DateHelpers.formatDate(props.str.when, 'MM/DD/YYYY HH:II a') }}
     </p>
     <div class="col-span-1 text-sm">
       <img
@@ -21,10 +21,10 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { DateHelpers } from "shared/helpers";
+import { computed } from 'vue';
+import { DateHelpers } from 'shared/helpers';
 
-const emit = defineEmits(["openMenu"]);
+const emit = defineEmits(['openMenu']);
 const props = defineProps({
   str: {
     type: Object,
@@ -38,6 +38,6 @@ const managerName = computed(() => {
 });
 
 const openMenu = (id) => {
-  emit("openMenu", id);
+  emit('openMenu', id);
 };
 </script>

@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import CustomSelectInput from "./CustomSelectInput.vue";
+import CustomSelectInput from './CustomSelectInput.vue';
 const props = defineProps({
   name: {
     type: String,
@@ -80,7 +80,7 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: "text",
+    default: 'text',
   },
   id: {
     type: String,
@@ -100,7 +100,7 @@ const props = defineProps({
   },
   label: {
     type: String,
-    default: "",
+    default: '',
   },
   error: {
     type: String,
@@ -136,18 +136,18 @@ const props = defineProps({
 });
 
 // custom props validation
-if (props.type == "select" && !props.options) {
-  console.warn("Select type CustomInput must have options props");
+if (props.type == 'select' && !props.options) {
+  console.warn('Select type CustomInput must have options props');
 }
 
 const value = defineModel();
 const emit = defineEmits([
-  "focus",
-  "change",
-  "input",
-  "reset",
-  "blur",
-  "addNew",
+  'focus',
+  'change',
+  'input',
+  'reset',
+  'blur',
+  'addNew',
 ]);
 </script>
 

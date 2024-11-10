@@ -73,11 +73,11 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
-import { useProductStore } from "@/stores/product";
-import ProductModal from "@/components/Product/ProductModal.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import { getCost } from "@/helper";
+import { computed, ref, watch } from 'vue';
+import { useProductStore } from '@/stores/product';
+import ProductModal from '@/components/Product/ProductModal.vue';
+import CustomInput from '@/components/shared/CustomInput.vue';
+import { getCost } from '@/helper';
 
 const props = defineProps({
   selectedProducts: {
@@ -95,7 +95,7 @@ const props = defineProps({
 
 const product = defineModel();
 const showModal = ref(false);
-const emit = defineEmits(["remove"]);
+const emit = defineEmits(['remove']);
 const productStore = useProductStore();
 const productOptions = computed(() => {
   return productStore.supplierProducts
@@ -128,7 +128,7 @@ watch(
         : 1; // will always set quantity upon create
       product.value.cost = getCost(product.value.cost, prd, props.sup_id);
     }
-  }
+  },
 );
 
 watch(
@@ -137,6 +137,6 @@ watch(
     if (val) {
       product.value.amount = product.value.cost * product.value.quantity;
     }
-  }
+  },
 );
 </script>

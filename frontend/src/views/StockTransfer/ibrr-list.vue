@@ -19,17 +19,17 @@
 </template>
 
 <script setup>
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { computed, onMounted, ref } from "vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import ibrrListHeader from "@/components/stock-transfer/ibrr-list-header.vue";
-import { useRouter } from "vue-router";
-import { useTransferStore } from "@/stores/transfer";
-import { TransferType } from "shared/enums";
-import IbrrListRow from "@/components/stock-transfer/ibrr-list-row.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { computed, onMounted, ref } from 'vue';
+import CustomTable from '@/components/shared/CustomTable.vue';
+import ibrrListHeader from '@/components/stock-transfer/ibrr-list-header.vue';
+import { useRouter } from 'vue-router';
+import { useTransferStore } from '@/stores/transfer';
+import { TransferType } from 'shared/enums';
+import IbrrListRow from '@/components/stock-transfer/ibrr-list-row.vue';
+import RowMenu from '@/components/shared/RowMenu.vue';
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
 
 const top = ref(0);
 const router = useRouter();
@@ -46,7 +46,7 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });
 
-const rowPropInit = "ibrr-row-prop-init";
+const rowPropInit = 'ibrr-row-prop-init';
 Event.on(rowPropInit, (data) => {
   return {
     ibrr: data,
@@ -65,7 +65,7 @@ const filteredData = computed(() => {
  ** ================================================*/
 const onAddNewRecord = () => {
   router.push({
-    name: "ibrr-form",
+    name: 'ibrr-form',
   });
 };
 
@@ -77,7 +77,7 @@ const onSelectRow = (id) => {
 
 const onView = () => {
   router.push({
-    name: "ibrr-form",
+    name: 'ibrr-form',
     query: { id: selectedId.value },
   });
 };

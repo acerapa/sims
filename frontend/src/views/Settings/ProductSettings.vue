@@ -62,25 +62,25 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from "vue";
-import ProductPointModal from "@/components/Settings/ProductPointModal.vue";
-import ProductCategoryModal from "@/components/Settings/ProductCategoryModal.vue";
-import ProductCategoryRow from "@/components/Settings/ProductCategoryRow.vue";
-import { useSettingsStore } from "@/stores/settings";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import ProductReorderingPointRow from "@/components/Settings/ProductReorderingPointRow.vue";
-import ProductCategoryTableHeader from "@/components/Settings/ProductCategoryTableHeader.vue";
-import ProductReorderingPointTableHeader from "@/components/Settings/ProductReorderingPointTableHeader.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import Event from "@/event";
-import { EventEnum } from "@/data/event";
+import { onMounted, ref } from 'vue';
+import ProductPointModal from '@/components/Settings/ProductPointModal.vue';
+import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue';
+import ProductCategoryRow from '@/components/Settings/ProductCategoryRow.vue';
+import { useSettingsStore } from '@/stores/settings';
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
+import CustomTable from '@/components/shared/CustomTable.vue';
+import ProductReorderingPointRow from '@/components/Settings/ProductReorderingPointRow.vue';
+import ProductCategoryTableHeader from '@/components/Settings/ProductCategoryTableHeader.vue';
+import ProductReorderingPointTableHeader from '@/components/Settings/ProductReorderingPointTableHeader.vue';
+import RowMenu from '@/components/shared/RowMenu.vue';
+import Event from '@/event';
+import { EventEnum } from '@/data/event';
 
 const top = ref(0);
 const toDelete = ref({});
 const isEdit = ref(false);
 const selectedId = ref(-1);
-const deleteHref = ref("");
+const deleteHref = ref('');
 const showModal = ref(false);
 const showRowMenu = ref(false);
 const selectedReorderingId = ref(-1);
@@ -102,13 +102,13 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
 });
 
 // define Product categories row props
-const productCategoryRowEvent = "product-category-row-props-init";
+const productCategoryRowEvent = 'product-category-row-props-init';
 Event.on(productCategoryRowEvent, function (item) {
   return { productCategory: item };
 });
 
 // define Product reordering point row props
-const productReorderingRowEvent = "product-reordering-row-props-init";
+const productReorderingRowEvent = 'product-reordering-row-props-init';
 Event.on(productReorderingRowEvent, function (item) {
   return { productReordering: item };
 });
@@ -131,13 +131,13 @@ const onSelectReorderingRow = (id) => {
 
 const onDelete = () => {
   toDelete.value = { id: selectedId.value };
-  deleteHref.value = "product-category/delete";
+  deleteHref.value = 'product-category/delete';
   showDeleteConfirmationModal.value = true;
 };
 
 const onDeleteReordering = () => {
   toDelete.value = { id: selectedReorderingId.value };
-  deleteHref.value = "product-setting/delete";
+  deleteHref.value = 'product-setting/delete';
   showDeleteConfirmationModal.value = true;
 };
 

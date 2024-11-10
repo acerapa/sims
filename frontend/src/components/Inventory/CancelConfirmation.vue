@@ -19,9 +19,9 @@
 </template>
 
 <script setup>
-import { authenticatedApi, Method } from "@/api";
-import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import { usePurchaseOrderStore } from "@/stores/purchase-order";
+import { authenticatedApi, Method } from '@/api';
+import ModalWrapper from '@/components/shared/ModalWrapper.vue';
+import { usePurchaseOrderStore } from '@/stores/purchase-order';
 const showModal = defineModel();
 
 const props = defineProps({
@@ -35,7 +35,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["afterUpdate"]);
+const emit = defineEmits(['afterUpdate']);
 const purchaseOrderStore = usePurchaseOrderStore();
 
 const onSubmit = async () => {

@@ -45,22 +45,22 @@
 </template>
 
 <script setup>
-import BranchHeader from "@/components/Settings/BranchHeader.vue";
-import BranchModal from "@/components/Settings/BranchModal.vue";
-import BranchRow from "@/components/Settings/BranchRow.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { useSettingsStore } from "@/stores/settings";
-import { computed, onMounted, ref } from "vue";
-import { useAppStore } from "@/stores/app";
+import BranchHeader from '@/components/Settings/BranchHeader.vue';
+import BranchModal from '@/components/Settings/BranchModal.vue';
+import BranchRow from '@/components/Settings/BranchRow.vue';
+import CustomTable from '@/components/shared/CustomTable.vue';
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
+import RowMenu from '@/components/shared/RowMenu.vue';
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { useSettingsStore } from '@/stores/settings';
+import { computed, onMounted, ref } from 'vue';
+import { useAppStore } from '@/stores/app';
 
 const top = ref(0);
 const selectedId = ref(0);
 const isEdit = ref(false);
-const searchText = ref("");
+const searchText = ref('');
 const showModal = ref(false);
 const showRowMenu = ref(false);
 const appStore = useAppStore();
@@ -90,10 +90,10 @@ Event.on(
   function () {
     showRowMenu.value = false;
   },
-  true
+  true,
 );
 
-const rowPropInit = "branch-init-rows";
+const rowPropInit = 'branch-init-rows';
 Event.on(rowPropInit, function (data) {
   return { branch: data };
 });
@@ -123,7 +123,7 @@ const onAfterDelete = async () => {
 const onSetCurrentBranch = async () => {
   // get the current branch
   const currentBranch = settingsStore.branches.find(
-    (branch) => branch.is_current
+    (branch) => branch.is_current,
   );
 
   if (currentBranch) {
@@ -133,7 +133,7 @@ const onSetCurrentBranch = async () => {
   }
 
   const toUpdateBranch = settingsStore.branches.find(
-    (branch) => branch.id == selectedId.value
+    (branch) => branch.id == selectedId.value,
   );
 
   if (toUpdateBranch) {

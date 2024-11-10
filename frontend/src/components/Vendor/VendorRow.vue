@@ -7,7 +7,7 @@
     <p class="col-span-3 text-sm truncate">{{ props.supplier.company_name }}</p>
     <p class="col-span-2 text-sm truncate">
       {{
-        `${props.supplier.annotation ? props.supplier.annotation : ""} ${props.supplier.first_name} ${props.supplier.last_name}`
+        `${props.supplier.annotation ? props.supplier.annotation : ''} ${props.supplier.first_name} ${props.supplier.last_name}`
       }}
     </p>
     <div class="col-span-1 text-sm">
@@ -28,9 +28,9 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["openMenu"]);
+const emit = defineEmits(['openMenu']);
 
 const openMenu = (id) => {
-  emit("openMenu", id);
+  emit('openMenu', id);
 };
 </script>

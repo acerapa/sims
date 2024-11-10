@@ -70,7 +70,7 @@
           @click="onSubmit"
           :disabled="false"
         >
-          {{ isEdit ? "Update" : "Save" }}
+          {{ isEdit ? 'Update' : 'Save' }}
         </button>
       </div>
     </div>
@@ -78,22 +78,22 @@
 </template>
 
 <script setup>
-import CustomInput from "@/components/shared/CustomInput.vue";
-import AddressForm from "@/components/shared/AddressForm.vue";
-import RmaProductSelectRow from "@/components/stock-transfer/RmaProductSelectRow.vue";
-import RmaProductSelectHeader from "@/components/stock-transfer/RmaProductSelectHeader.vue";
-import ProductMultiSelectTable from "@/components/shared/ProductMultiSelectTable.vue";
-import { useVendorStore } from "@/stores/supplier";
-import { computed, isVNode, onMounted, ref } from "vue";
-import { DateHelpers, ObjectHelpers } from "shared/helpers";
-import { TransferType } from "shared/enums";
-import { useRoute, useRouter } from "vue-router";
-import { useTransferStore } from "@/stores/transfer";
-import { useAppStore } from "@/stores/app";
-import { useSettingsStore } from "@/stores/settings";
-import { useAuthStore } from "@/stores/auth";
-import Event from "@/event";
-import { EventEnum } from "@/data/event";
+import CustomInput from '@/components/shared/CustomInput.vue';
+import AddressForm from '@/components/shared/AddressForm.vue';
+import RmaProductSelectRow from '@/components/stock-transfer/RmaProductSelectRow.vue';
+import RmaProductSelectHeader from '@/components/stock-transfer/RmaProductSelectHeader.vue';
+import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue';
+import { useVendorStore } from '@/stores/supplier';
+import { computed, isVNode, onMounted, ref } from 'vue';
+import { DateHelpers, ObjectHelpers } from 'shared/helpers';
+import { TransferType } from 'shared/enums';
+import { useRoute, useRouter } from 'vue-router';
+import { useTransferStore } from '@/stores/transfer';
+import { useAppStore } from '@/stores/app';
+import { useSettingsStore } from '@/stores/settings';
+import { useAuthStore } from '@/stores/auth';
+import Event from '@/event';
+import { EventEnum } from '@/data/event';
 
 const currentBranch = ref(null);
 
@@ -106,31 +106,31 @@ const transferStore = useTransferStore();
 const settingsStore = useSettingsStore(); // this is temporaru
 
 const address = ref({
-  address1: "",
-  address2: "",
-  city: "",
-  province: "",
-  state: "",
-  postal: "",
+  address1: '',
+  address2: '',
+  city: '',
+  province: '',
+  state: '',
+  postal: '',
 });
 
 const productDefaultValue = {
-  product_id: "",
-  description: "",
-  quantity: "",
-  cost: "",
-  amount: "",
+  product_id: '',
+  description: '',
+  quantity: '',
+  cost: '',
+  amount: '',
 };
 
 const vendorStore = useVendorStore();
 
 const defualtValue = {
   transfer: {
-    supplier_id: "",
-    when: "",
-    memo: "",
-    branch_from: "",
-    processed_by: "",
+    supplier_id: '',
+    when: '',
+    memo: '',
+    branch_from: '',
+    processed_by: '',
     type: TransferType.RMA,
   },
   products: [{ ...productDefaultValue }],
@@ -165,7 +165,7 @@ const populateAddress = () => {
 
   address.value = ObjectHelpers.assignSameFields(
     address.value,
-    supplier.address
+    supplier.address,
   );
 };
 
@@ -175,7 +175,7 @@ const onSubmit = async () => {
     const res = await transferStore.createTransfer(model.value);
     if (res.status == 200) {
       router.push({
-        name: "rma-list",
+        name: 'rma-list',
       });
     }
   } else {
@@ -204,11 +204,11 @@ onMounted(async () => {
     if (rma) {
       model.value.transfer = ObjectHelpers.assignSameFields(
         model.value.transfer,
-        rma
+        rma,
       );
       model.value.transfer.when = DateHelpers.formatDate(
         new Date(),
-        "YYYY-MM-DDTHH:II:SS-A"
+        'YYYY-MM-DDTHH:II:SS-A',
       );
       populateAddress();
 
@@ -224,7 +224,7 @@ onMounted(async () => {
         };
       });
     } else {
-      console.log("RMA not found");
+      console.log('RMA not found');
     }
 
     isEdit.value = true;

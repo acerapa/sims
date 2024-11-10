@@ -1,7 +1,5 @@
 <template>
-	<ModalWrapper title="Receive Order" v-model="showModal">
-
-	</ModalWrapper>
+  <ModalWrapper title="Receive Order" v-model="showModal"> </ModalWrapper>
 </template>
 
 <script setup>

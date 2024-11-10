@@ -29,19 +29,19 @@
 </template>
 
 <script setup>
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import PhysicalInventoryRow from "@/components/Inventory/PhysicalInventory/PhysicalInventoryRow.vue";
-import PhysicalInventoryTableHeader from "@/components/Inventory/PhysicalInventory/PhysicalInventoryTableHeader.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { useAuthStore } from "@/stores/auth";
-import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
-import { useProductStore } from "@/stores/product";
-import { PhysicalInventoryStatus } from "shared/enums";
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
+import PhysicalInventoryRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryRow.vue';
+import PhysicalInventoryTableHeader from '@/components/Inventory/PhysicalInventory/PhysicalInventoryTableHeader.vue';
+import CustomTable from '@/components/shared/CustomTable.vue';
+import RowMenu from '@/components/shared/RowMenu.vue';
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { useAuthStore } from '@/stores/auth';
+import { usePhysicalInventoryStore } from '@/stores/physical-inventory';
+import { useProductStore } from '@/stores/product';
+import { PhysicalInventoryStatus } from 'shared/enums';
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const top = ref(0);
 const toDelete = ref();
@@ -62,7 +62,7 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
   showRowMenu.value = false;
 });
 
-const eventRowInit = "event-initialize-row";
+const eventRowInit = 'event-initialize-row';
 Event.on(eventRowInit, function (data) {
   return { inventory: data };
 });
@@ -104,7 +104,7 @@ const onStartPhysicalInventory = async () => {
 
   if (res.status == 200) {
     router.push({
-      name: "physical-inventory-details",
+      name: 'physical-inventory-details',
       params: {
         id: res.data.physical_inventory.id,
       },
@@ -120,7 +120,7 @@ const onSelectRow = (id) => {
 
 const onView = () => {
   router.push({
-    name: "physical-inventory-details",
+    name: 'physical-inventory-details',
     params: {
       id: selectedId.value,
     },

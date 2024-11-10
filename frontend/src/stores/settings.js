@@ -1,15 +1,15 @@
-import { authenticatedApi, Method } from "@/api";
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { authenticatedApi, Method } from '@/api';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
-export const useSettingsStore = defineStore("settings", () => {
+export const useSettingsStore = defineStore('settings', () => {
   const productCategories = ref([]);
   const accounts = ref([]);
   const branches = ref([]);
   const productReorderingPoints = ref([]);
 
   const fetchAllProductCategories = async () => {
-    const res = await authenticatedApi("product-category/all");
+    const res = await authenticatedApi('product-category/all');
     if (res.status == 200) {
       productCategories.value = res.data.categories;
     }
@@ -18,7 +18,7 @@ export const useSettingsStore = defineStore("settings", () => {
   };
 
   const fetchAllAccounts = async () => {
-    const res = await authenticatedApi("settings/accounts/all");
+    const res = await authenticatedApi('settings/accounts/all');
     if (res.status == 200) {
       accounts.value = res.data.accounts;
     }
@@ -26,7 +26,7 @@ export const useSettingsStore = defineStore("settings", () => {
   };
 
   const fetchAllProductReorderingPoints = async () => {
-    const res = await authenticatedApi("product-setting/all");
+    const res = await authenticatedApi('product-setting/all');
     if (res.status == 200) {
       productReorderingPoints.value = res.data.productReorderingPoints;
     }
@@ -63,7 +63,7 @@ export const useSettingsStore = defineStore("settings", () => {
   };
 
   const fetchAllBranches = async () => {
-    const res = await authenticatedApi("branch/all");
+    const res = await authenticatedApi('branch/all');
 
     if (res.status == 200) {
       branches.value = res.data.branches;
@@ -74,7 +74,7 @@ export const useSettingsStore = defineStore("settings", () => {
 
   // branches methods
   const createBranch = async (model) => {
-    return await authenticatedApi("branch/register", Method.POST, model);
+    return await authenticatedApi('branch/register', Method.POST, model);
   };
 
   const updateBranch = async (id, model) => {

@@ -128,9 +128,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from 'vue';
 
-const emit = defineEmits(["addNew", "change"]);
+const emit = defineEmits(['addNew', 'change']);
 
 const props = defineProps({
   placeholder: {
@@ -159,7 +159,7 @@ const props = defineProps({
   },
 });
 
-const search = ref("");
+const search = ref('');
 
 const singleDropdown = ref();
 const singleDropdownGroup = ref();
@@ -175,7 +175,7 @@ onMounted(() => {
 
 const filteredOptions = computed(() => {
   return props.options.filter((option) =>
-    option.text.toLowerCase().includes(search.value.toLowerCase())
+    option.text.toLowerCase().includes(search.value.toLowerCase()),
   );
 });
 
@@ -186,7 +186,7 @@ const getName = (value) => {
 const selectOption = (value) => {
   selected.value = value;
   search.value = getName(value);
-  emit("change");
+  emit('change');
 };
 
 const onSelectOpt = (value) => {
@@ -209,8 +209,8 @@ const onBlurSelect = () => {
   setTimeout(() => {
     if (props.canSearch && !props.selectMultiple && !search.value) {
       // selectOption(selected.value);
-      selected.value = "";
-      emit("change");
+      selected.value = '';
+      emit('change');
     }
   }, 500);
 };
@@ -218,12 +218,12 @@ const onBlurSelect = () => {
 watch(
   () => selected.value,
   (val) => {
-    if (val == "add-new") {
-      emit("addNew");
-      selected.value = "";
+    if (val == 'add-new') {
+      emit('addNew');
+      selected.value = '';
       select.value.selectedIndex = 0;
     }
-  }
+  },
 );
 </script>
 

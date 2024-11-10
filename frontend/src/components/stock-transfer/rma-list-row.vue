@@ -11,7 +11,7 @@
       {{ preparedByName }}
     </p>
     <p class="col-span-2 text-sm">
-      {{ DateHelpers.formatDate(props.rma.when, "MM/DD/YYYY HH:II a") }}
+      {{ DateHelpers.formatDate(props.rma.when, 'MM/DD/YYYY HH:II a') }}
     </p>
     <div class="col-span-1 text-sm">
       <img
@@ -25,10 +25,10 @@
 </template>
 
 <script setup>
-import { DateHelpers } from "shared/helpers";
-import { computed } from "vue";
+import { DateHelpers } from 'shared/helpers';
+import { computed } from 'vue';
 
-const emit = defineEmits(["openMenu"]);
+const emit = defineEmits(['openMenu']);
 
 const props = defineProps({
   rma: {
@@ -42,6 +42,6 @@ const preparedByName = computed(() => {
 });
 
 const openMenu = (id) => {
-  emit("openMenu", id);
+  emit('openMenu', id);
 };
 </script>

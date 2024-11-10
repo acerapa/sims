@@ -35,5 +35,5 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["delete", "view"]);
+const emit = defineEmits(['delete', 'view']);
 </script>

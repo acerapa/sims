@@ -7,9 +7,9 @@
 </template>
 
 <script setup>
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { onMounted } from "vue";
+import { EventEnum } from '@/data/event';
+import Event from '@/event';
+import { onMounted } from 'vue';
 
 /** ================================================
  * EVENTS

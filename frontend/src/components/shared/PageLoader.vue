@@ -19,7 +19,7 @@
   left: 50%;
   z-index: 1;
   width: 112%;
-  content: "";
+  content: '';
   height: 112%;
   position: absolute;
   @apply rounded-full;
@@ -33,12 +33,12 @@
   left: 0;
   z-index: 2;
   width: 100%;
-  content: "";
+  content: '';
   height: 100%;
   position: absolute;
   background-size: cover;
   background-position: center;
-  background-image: url("@/assets/logo-icon.png");
+  background-image: url('@/assets/logo-icon.png');
 }
 
 @keyframes rotate-loader {

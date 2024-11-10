@@ -5,7 +5,7 @@
       <p class="text-sm">{{ props.inventory.id }}</p>
     </div>
     <p class="col-span-1 text-sm">
-      {{ DateHelpers.formatDate(props.inventory.date_started, "M/D/YYYY") }}
+      {{ DateHelpers.formatDate(props.inventory.date_started, 'M/D/YYYY') }}
     </p>
     <div class="col-span-1 text-sm">
       <BadgeComponent
@@ -16,8 +16,8 @@
     <p class="col-span-1 text-sm">
       {{
         props.inventory.date_ended
-          ? DateHelpers.formatDate(props.inventory.date_ended, "M/D/YYYY")
-          : "-"
+          ? DateHelpers.formatDate(props.inventory.date_ended, 'M/D/YYYY')
+          : '-'
       }}
     </p>
     <div class="col-span-1 text-sm">
@@ -32,9 +32,9 @@
 </template>
 
 <script setup>
-import { DateHelpers } from "shared/helpers";
-import BadgeComponent from "@/components/shared/BadgeComponent.vue";
-import { PhysicalInventoryStatusMap } from "shared/enums";
+import { DateHelpers } from 'shared/helpers';
+import BadgeComponent from '@/components/shared/BadgeComponent.vue';
+import { PhysicalInventoryStatusMap } from 'shared/enums';
 
 const props = defineProps({
   inventory: {
@@ -43,9 +43,9 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["openMenu"]);
+const emit = defineEmits(['openMenu']);
 
 const openMenu = () => {
-  emit("openMenu", props.inventory.id);
+  emit('openMenu', props.inventory.id);
 };
 </script>

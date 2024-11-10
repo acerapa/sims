@@ -37,16 +37,16 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import VendorModal from "@/components/Vendor/VendorModal.vue";
-import VendorRow from "@/components/Vendor/VendorRow.vue";
-import { useVendorStore } from "@/stores/supplier";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import Event from "@/event";
-import VendorTableHeader from "@/components/Vendor/VendorTableHeader.vue";
-import { EventEnum } from "@/data/event";
+import { computed, onMounted, ref } from 'vue';
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
+import VendorModal from '@/components/Vendor/VendorModal.vue';
+import VendorRow from '@/components/Vendor/VendorRow.vue';
+import { useVendorStore } from '@/stores/supplier';
+import CustomTable from '@/components/shared/CustomTable.vue';
+import RowMenu from '@/components/shared/RowMenu.vue';
+import Event from '@/event';
+import VendorTableHeader from '@/components/Vendor/VendorTableHeader.vue';
+import { EventEnum } from '@/data/event';
 
 const vendorStore = useVendorStore();
 const top = ref(0);
@@ -71,7 +71,7 @@ Event.on(EventEnum.GLOBAL_CLICK, function () {
 });
 
 // define vendor row init props
-const vendorRowEvent = "vendor-row-props-init";
+const vendorRowEvent = 'vendor-row-props-init';
 Event.on(vendorRowEvent, function (data) {
   return {
     supplier: data,
@@ -84,7 +84,7 @@ Event.on(vendorRowEvent, function (data) {
 const filteredData = computed(() => {
   return vendorStore.suppliers.filter((supplier) => {
     const searchCondition =
-      `${supplier.id} ${supplier.company_name} ${supplier.first_name} ${supplier.last_name} ${supplier.annotation ? supplier.annotation : ""}`.toLowerCase();
+      `${supplier.id} ${supplier.company_name} ${supplier.first_name} ${supplier.last_name} ${supplier.annotation ? supplier.annotation : ''}`.toLowerCase();
     return searchText.value
       ? searchCondition.includes(searchText.value.toLowerCase())
       : supplier;
