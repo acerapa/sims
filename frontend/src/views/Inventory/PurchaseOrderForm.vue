@@ -48,12 +48,12 @@
                   :options="[
                     {
                       text: 'Term',
-                      value: PurchaseOrderType.TERM,
+                      value: PurchaseOrderType.TERM
                     },
                     {
                       text: 'COD',
-                      value: PurchaseOrderType.COD,
-                    },
+                      value: PurchaseOrderType.COD
+                    }
                   ]"
                   :disabled="isDisabled"
                 />
@@ -161,7 +161,7 @@
             Total: &#8369;
             {{
               model.order.amount.toLocaleString('en', {
-                minimumFractionDigits: 2,
+                minimumFractionDigits: 2
               })
             }}
           </p>
@@ -202,39 +202,39 @@
   </div>
 </template>
 <script setup>
-import { Method, authenticatedApi } from '@/api';
-import PurchaseOrderFormRow from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormRow.vue';
-import PurchaseOrderFormHeader from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormHeader.vue';
-import AddressForm from '@/components/shared/AddressForm.vue';
-import BadgeComponent from '@/components/shared/BadgeComponent.vue';
-import CustomInput from '@/components/shared/CustomInput.vue';
-import VendorModal from '@/components/Vendor/VendorModal.vue';
-import { EventEnum } from '@/data/event';
-import Event from '@/event';
-import { getCost } from '@/helper';
-import { useProductStore } from '@/stores/product';
-import { usePurchaseOrderStore } from '@/stores/purchase-order';
-import { useVendorStore } from '@/stores/supplier';
-import { DateHelpers } from 'shared';
+import { Method, authenticatedApi } from '@/api'
+import PurchaseOrderFormRow from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormRow.vue'
+import PurchaseOrderFormHeader from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormHeader.vue'
+import AddressForm from '@/components/shared/AddressForm.vue'
+import BadgeComponent from '@/components/shared/BadgeComponent.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import VendorModal from '@/components/Vendor/VendorModal.vue'
+import { EventEnum } from '@/data/event'
+import Event from '@/event'
+import { getCost } from '@/helper'
+import { useProductStore } from '@/stores/product'
+import { usePurchaseOrderStore } from '@/stores/purchase-order'
+import { useVendorStore } from '@/stores/supplier'
+import { DateHelpers } from 'shared'
 import {
   PurchaseOrderStatus,
   PurchaseOrderType,
-  PurchaseStatusMap,
-} from 'shared/enums';
-import { ObjectHelpers } from 'shared/helpers/object';
-import { computed, onMounted, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+  PurchaseStatusMap
+} from 'shared/enums'
+import { ObjectHelpers } from 'shared/helpers/object'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const route = useRoute();
-const isEdit = ref(false);
-const router = useRouter();
-const selectedStatus = ref();
-const showVendorModal = ref(false);
-const status = ref(PurchaseOrderStatus.OPEN);
+const route = useRoute()
+const isEdit = ref(false)
+const router = useRouter()
+const selectedStatus = ref()
+const showVendorModal = ref(false)
+const status = ref(PurchaseOrderStatus.OPEN)
 
-const supplierStore = useVendorStore();
-const purchaseOrderStore = usePurchaseOrderStore();
-const productStore = useProductStore();
+const supplierStore = useVendorStore()
+const purchaseOrderStore = usePurchaseOrderStore()
+const productStore = useProductStore()
 
 const modelDefualtValue = {
   order: {
@@ -245,13 +245,13 @@ const modelDefualtValue = {
     type: PurchaseOrderType.COD,
     memo: '',
     amount: 0,
-    term_start: '',
+    term_start: ''
   },
   address: {
     address1: '',
     address2: '',
     city: '',
-    postal: '',
+    postal: ''
   },
   products: [
     {
@@ -260,25 +260,25 @@ const modelDefualtValue = {
       description: '',
       quantity: '',
       cost: '',
-      amount: '',
-    },
-  ],
-};
+      amount: ''
+    }
+  ]
+}
 
-const model = ref(ObjectHelpers.copyObj(modelDefualtValue));
+const model = ref(ObjectHelpers.copyObj(modelDefualtValue))
 
 /** ================================================
  * EVENTS
  ** ================================================*/
 
 // is page loading event
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 // Custom global event
-const isCustomSelectFocused = ref(false);
+const isCustomSelectFocused = ref(false)
 Event.on('custom-select-focus', function (data) {
-  isCustomSelectFocused.value = data;
-});
+  isCustomSelectFocused.value = data
+})
 
 /** ================================================
  * COMPUTED
@@ -287,19 +287,19 @@ const supplierOptions = computed(() => {
   return supplierStore.suppliers.map((supplier) => {
     return {
       value: supplier.id,
-      text: supplier.company_name,
-    };
-  });
-});
+      text: supplier.company_name
+    }
+  })
+})
 
-const orderStatus = ref();
+const orderStatus = ref()
 const isDisabled = computed(() => {
   return orderStatus.value
     ? orderStatus.value == PurchaseOrderStatus.CANCELLED ||
         orderStatus.value == PurchaseOrderStatus.COMPLETED ||
         orderStatus.value == PurchaseOrderStatus.CONFIRMED
-    : false;
-});
+    : false
+})
 
 /** ================================================
  * METHODS
@@ -312,75 +312,75 @@ const addNewProduct = () => {
       description: '',
       quantity: '',
       cost: '',
-      amount: '',
-    });
+      amount: ''
+    })
   }
-};
+}
 
 const removeProduct = (ndx) => {
-  model.value.products.splice(ndx, 1);
-};
+  model.value.products.splice(ndx, 1)
+}
 
 const onSubmit = async (isAddNew = false) => {
   // pre modification
   if (model.value.order.type == PurchaseOrderType.COD) {
-    delete model.value.order.term_start;
+    delete model.value.order.term_start
   }
 
   const res = await authenticatedApi(
     'purchase-order/register',
     Method.POST,
-    model.value,
-  );
+    model.value
+  )
 
   // reset model
-  model.value.products = [];
-  model.value.order = { ...modelDefualtValue.order };
-  model.value.address = { ...modelDefualtValue.address };
-  addNewProduct();
+  model.value.products = []
+  model.value.order = { ...modelDefualtValue.order }
+  model.value.address = { ...modelDefualtValue.address }
+  addNewProduct()
 
   if (res.status == 200) {
     if (!isAddNew) {
       router.push({
-        name: 'purchase-order',
-      });
+        name: 'purchase-order'
+      })
     }
   }
-};
+}
 
 const onUpdate = async () => {
   if (route.query.id) {
-    Event.emit(EventEnum.IS_PAGE_LOADING, true);
+    Event.emit(EventEnum.IS_PAGE_LOADING, true)
     const res = await authenticatedApi(
       `purchase-order/${route.query.id}/update`,
       Method.POST,
-      model.value,
-    );
+      model.value
+    )
 
     if (res.status == 200) {
-      console.log('Api is working and need to check the result in db');
+      console.log('Api is working and need to check the result in db')
     }
-    Event.emit(EventEnum.IS_PAGE_LOADING, false);
+    Event.emit(EventEnum.IS_PAGE_LOADING, false)
   }
-};
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await supplierStore.fetchAllSuppliers();
-  await productStore.fetchAllProducts();
+  await supplierStore.fetchAllSuppliers()
+  await productStore.fetchAllProducts()
   if (route.query.id) {
-    isEdit.value = true;
-    await purchaseOrderStore.fetchPurchaseOrderById(route.query.id);
-    status.value = purchaseOrderStore.purchaseOrder.status;
-    const order = purchaseOrderStore.purchaseOrder;
-    orderStatus.value = order.status;
-    selectedStatus.value = PurchaseStatusMap[order.status];
+    isEdit.value = true
+    await purchaseOrderStore.fetchPurchaseOrderById(route.query.id)
+    status.value = purchaseOrderStore.purchaseOrder.status
+    const order = purchaseOrderStore.purchaseOrder
+    orderStatus.value = order.status
+    selectedStatus.value = PurchaseStatusMap[order.status]
     model.value.address = ObjectHelpers.assignSameFields(
       model.value.address,
-      order.address,
-    );
+      order.address
+    )
     model.value.order = {
       supplier_id: order.supplier.id,
       amount: order.amount,
@@ -388,8 +388,8 @@ onMounted(async () => {
       date: DateHelpers.formatDate(order.date, 'YYYY-MM-DD'),
       memo: order.memo,
       ref_no: order.ref_no,
-      type: order.type,
-    };
+      type: order.type
+    }
     model.value.products = [
       ...order.products.map((product) => {
         return {
@@ -402,34 +402,34 @@ onMounted(async () => {
           cost: getCost(
             product.ProductTransaction.cost,
             product,
-            order.supplier_id,
+            order.supplier_id
           ),
-          amount: product.ProductTransaction.amount,
-        };
-      }),
-    ];
+          amount: product.ProductTransaction.amount
+        }
+      })
+    ]
   }
 
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 
 watch(
   () => model.value.order.supplier_id,
   (val) => {
     supplierStore.selectedSupplier = supplierStore.suppliers.find(
-      (sup) => sup.id == val,
-    );
+      (sup) => sup.id == val
+    )
 
     // remove the products in the order which are not related to the supplier
     model.value.products = model.value.products.filter((prod) => {
-      if (!prod.id) return true;
-      const p = productStore.products.find((prd) => prd.id == prod.id);
+      if (!prod.id) return true
+      const p = productStore.products.find((prd) => prd.id == prod.id)
       if (p) {
-        return p.suppliers.map((sup) => sup.id).includes(val);
+        return p.suppliers.map((sup) => sup.id).includes(val)
       }
-    });
-  },
-);
+    })
+  }
+)
 
 watch(
   () => model.value.products,
@@ -437,11 +437,11 @@ watch(
     if (model.value.products.length) {
       model.value.order.amount = model.value.products
         .map((prod) => prod.amount)
-        .reduce((a, b) => a + b, 0);
+        .reduce((a, b) => a + b, 0)
     }
   },
   {
-    deep: true,
-  },
-);
+    deep: true
+  }
+)
 </script>

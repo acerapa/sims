@@ -27,7 +27,7 @@ module.exports = {
         { name: req.body.name },
         { where: { id: req.body.id } }
       );
-			res.sendResponse({}, "Successfully updated!", 200);
+      res.sendResponse({}, "Successfully updated!", 200);
     } catch (e) {
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
     }
@@ -35,8 +35,8 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      await ProductCategory.destroy({ where: { id: req.body.id } });
-			res.sendResponse({}, "Successfully deleted!", 200);
+      await ProductCategory.destroy({ where: { id: req.params.id } });
+      res.sendResponse({}, "Successfully deleted!", 200);
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message, 400);
     }

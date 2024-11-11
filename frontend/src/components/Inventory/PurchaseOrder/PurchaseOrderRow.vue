@@ -31,18 +31,18 @@
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared/helpers/date';
-import { PurchaseStatusMap } from 'shared';
-import BadgeComponent from '@/components/shared/BadgeComponent.vue';
+import { DateHelpers } from 'shared/helpers/date'
+import { PurchaseStatusMap } from 'shared'
+import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 
-const emit = defineEmits(['openMenu']);
+const emit = defineEmits(['openMenu'])
 
 const props = defineProps({
   order: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
-const selectedStatus = PurchaseStatusMap[props.order.status];
+const selectedStatus = PurchaseStatusMap[props.order.status]
 </script>

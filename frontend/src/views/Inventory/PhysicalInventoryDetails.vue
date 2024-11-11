@@ -8,7 +8,7 @@
             {{
               DateHelpers.formatDate(
                 physicalInventory.date_started,
-                'MM/DD/YYYY',
+                'MM/DD/YYYY'
               )
             }}
           </p>
@@ -67,7 +67,7 @@
           placeholder="Status"
           :options="[
             { text: 'Checked', value: true },
-            { text: 'Unchecked', value: false },
+            { text: 'Unchecked', value: false }
           ]"
           v-model="filters.status"
         />
@@ -93,58 +93,58 @@
 </template>
 
 <script setup>
-import PhysicalInventoryItemHeader from '@/components/Inventory/PhysicalInventory/PhysicalInventoryItemHeader.vue';
-import PhysicalInventoryItemRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryItemRow.vue';
-import BadgeComponent from '@/components/shared/BadgeComponent.vue';
-import CustomInput from '@/components/shared/CustomInput.vue';
-import CustomTable from '@/components/shared/CustomTable.vue';
-import { EventEnum } from '@/data/event';
-import Event from '@/event';
-import { usePhysicalInventoryStore } from '@/stores/physical-inventory';
-import { useProductStore } from '@/stores/product';
-import { useSettingsStore } from '@/stores/settings';
-import { PhysicalInventoryStatus } from 'shared/enums';
-import { DateHelpers } from 'shared/helpers';
-import { computed, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import PhysicalInventoryItemHeader from '@/components/Inventory/PhysicalInventory/PhysicalInventoryItemHeader.vue'
+import PhysicalInventoryItemRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryItemRow.vue'
+import BadgeComponent from '@/components/shared/BadgeComponent.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import CustomTable from '@/components/shared/CustomTable.vue'
+import { EventEnum } from '@/data/event'
+import Event from '@/event'
+import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
+import { useProductStore } from '@/stores/product'
+import { useSettingsStore } from '@/stores/settings'
+import { PhysicalInventoryStatus } from 'shared/enums'
+import { DateHelpers } from 'shared/helpers'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const top = ref(0);
-const items = ref([]);
-const route = useRoute();
-const selectedId = ref();
-const searchText = ref('');
-const router = useRouter();
-const showRowMenu = ref(false);
-const physicalInventory = ref();
-const isItemChecked = ref(false);
-const productStore = useProductStore();
-const settingStore = useSettingsStore();
-const physicalInventoryStore = usePhysicalInventoryStore();
+const top = ref(0)
+const items = ref([])
+const route = useRoute()
+const selectedId = ref()
+const searchText = ref('')
+const router = useRouter()
+const showRowMenu = ref(false)
+const physicalInventory = ref()
+const isItemChecked = ref(false)
+const productStore = useProductStore()
+const settingStore = useSettingsStore()
+const physicalInventoryStore = usePhysicalInventoryStore()
 
 const PhysicalInventoryStatusMap = {
   [PhysicalInventoryStatus.DRAFT]: {
     text: 'Draft',
-    class: 'draft',
+    class: 'draft'
   },
   [PhysicalInventoryStatus.DONE]: {
     text: 'Done',
-    class: 'done',
-  },
-};
+    class: 'done'
+  }
+}
 
 /** ================================================
  * EVENTS
  ** ================================================*/
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 Event.on(EventEnum.GLOBAL_CLICK, function () {
-  showRowMenu.value = false;
-});
+  showRowMenu.value = false
+})
 
-const physicalItemInitRow = 'physical-item-init-row';
+const physicalItemInitRow = 'physical-item-init-row'
 Event.on(physicalItemInitRow, function (data) {
-  return { item: data };
-});
+  return { item: data }
+})
 
 /** ================================================
  * COMPUTED
@@ -154,61 +154,61 @@ const filteredData = computed(() => {
     return productStore.products
       .filter((product) => {
         const searchCondition =
-          `${product.id} ${product.name} ${product.quantity_in_stock} ${product.purchase_description}`.toLowerCase();
+          `${product.id} ${product.name} ${product.quantity_in_stock} ${product.purchase_description}`.toLowerCase()
 
         return searchText.value
           ? searchCondition.includes(searchText.value.toLowerCase())
-          : product;
+          : product
       })
       .map((product) => product.id)
-      .includes(item.product_id);
-  });
-});
+      .includes(item.product_id)
+  })
+})
 
 /** ================================================
  * METHODS
  ** ================================================*/
 const onSelectRow = (data) => {
-  top.value = event.target.offsetTop;
-  selectedId.value = data.id;
-  showRowMenu.value = true;
-  isItemChecked.value = data.is_done;
-};
+  top.value = event.target.offsetTop
+  selectedId.value = data.id
+  showRowMenu.value = true
+  isItemChecked.value = data.is_done
+}
 
 const onSubmit = async () => {
   const res = await physicalInventoryStore.update(physicalInventory.value.id, {
     physical_inventory: {
-      status: PhysicalInventoryStatus.DONE,
-    },
-  });
+      status: PhysicalInventoryStatus.DONE
+    }
+  })
 
   if (res.status == 200) {
     router.push({
-      name: 'physical-inventory',
-    });
+      name: 'physical-inventory'
+    })
   }
-};
+}
 
 const onContinueLater = () => {
   router.push({
-    name: 'physical-inventory',
-  });
-};
+    name: 'physical-inventory'
+  })
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await productStore.fetchAllProducts();
-  await settingStore.fetchAllProductCategories();
+  await productStore.fetchAllProducts()
+  await settingStore.fetchAllProductCategories()
 
   if (route.params.id) {
     physicalInventory.value = await physicalInventoryStore.getGroupedItems(
-      route.params.id,
-    );
-    items.value = physicalInventory.value.items;
+      route.params.id
+    )
+    items.value = physicalInventory.value.items
   }
 
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 </script>

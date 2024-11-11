@@ -45,9 +45,9 @@ module.exports = {
     }
   },
 
-  delete: async (req, res) => {
+  destroy: async (req, res) => {
     try {
-      const user = await User.findByPk(req.body.user_id);
+      const user = await User.findByPk(req.params.id);
       if (user !== null) {
         await user.destroy();
         res.sendResponse({}, "Successfully deleted!", 200);

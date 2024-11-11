@@ -4,7 +4,7 @@ export default [
     name: 'transfer',
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
-      name: 'str-list',
+      name: 'str-list'
     },
     children: [
       {
@@ -13,8 +13,8 @@ export default [
         component: () => import('@/views/StockTransfer/ibrr-list.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Inter Branch Receive Report List',
-        },
+          title: 'Inter Branch Receive Report List'
+        }
       },
       {
         path: '/ibrr-form',
@@ -22,8 +22,8 @@ export default [
         component: () => import('@/views/StockTransfer/ibrr-form.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Inter Branch Receive Report Form',
-        },
+          title: 'Inter Branch Receive Report Form'
+        }
       },
       {
         path: '/str-list',
@@ -31,8 +31,8 @@ export default [
         component: () => import('@/views/StockTransfer/str-list.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Stock Transfer Report List',
-        },
+          title: 'Stock Transfer Report List'
+        }
       },
       {
         path: '/str-form',
@@ -40,8 +40,8 @@ export default [
         component: () => import('@/views/StockTransfer/str-form.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Stock Transfer Report Form',
-        },
+          title: 'Stock Transfer Report Form'
+        }
       },
       {
         path: 'rma-list',
@@ -49,8 +49,8 @@ export default [
         component: () => import('@/views/StockTransfer/rma-list.vue'),
         meta: {
           title: 'Return Merchandise Authority List',
-          requiresAuth: true,
-        },
+          requiresAuth: true
+        }
       },
       {
         path: 'rma-form',
@@ -58,9 +58,9 @@ export default [
         component: () => import('@/views/StockTransfer/rma-form.vue'),
         meta: {
           title: 'Return Merchandise Authority Form',
-          requiresAuth: true,
-        },
-      },
-    ],
-  },
-];
+          requiresAuth: true
+        }
+      }
+    ]
+  }
+]

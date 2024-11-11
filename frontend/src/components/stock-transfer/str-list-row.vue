@@ -21,23 +21,23 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { DateHelpers } from 'shared/helpers';
+import { computed } from 'vue'
+import { DateHelpers } from 'shared/helpers'
 
-const emit = defineEmits(['openMenu']);
+const emit = defineEmits(['openMenu'])
 const props = defineProps({
   str: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
 const managerName = computed(() => {
-  const { receiver } = props.str;
-  return `${receiver.manager.first_name} ${receiver.manager.last_name}`;
-});
+  const { receiver } = props.str
+  return `${receiver.manager.first_name} ${receiver.manager.last_name}`
+})
 
 const openMenu = (id) => {
-  emit('openMenu', id);
-};
+  emit('openMenu', id)
+}
 </script>

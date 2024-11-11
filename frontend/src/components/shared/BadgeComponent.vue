@@ -6,11 +6,11 @@
 const props = defineProps({
   customClass: {
     type: String,
-    required: true,
+    required: true
   },
   text: {
     type: String,
-    required: true,
-  },
-});
+    required: true
+  }
+})
 </script>

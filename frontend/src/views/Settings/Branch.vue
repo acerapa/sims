@@ -1,16 +1,5 @@
 <template>
-  <BranchModal
-    v-model="showModal"
-    v-if="showModal"
-    :selected-id="selectedId"
-    :is-edit="isEdit"
-  />
-  <DeleteConfirmModal
-    v-model="showConfirmModal"
-    v-if="showConfirmModal"
-    :href="`branch/delete/${selectedId}`"
-    @after-delete="onAfterDelete"
-  />
+  <BranchModal v-model="showModal" v-if="showModal" :selected-id="selectedId" />
   <div class="flex flex-col gap-4">
     <CustomTable
       class="relative"
@@ -18,139 +7,92 @@
       :data="filterData"
       :has-pagination="true"
       :row-prop-init="rowPropInit"
-      v-model:showModal="showModal"
       v-model:search-text="searchText"
       :table-row-component="BranchRow"
-      :table-header-component="BranchHeader"
-      @open-menu="onSelectRow"
+      @view="onView"
+      @add-new-record="onNewRecord()"
     >
-      <RowMenu
-        :top="top"
-        v-if="showRowMenu"
-        @view="viewRow"
-        @delete="deleteRow"
-      >
-        <button
-          class="row-menu-item"
-          @click="onSetCurrentBranch"
-          v-if="
-            !appStore.currentBranch || appStore.currentBranch.id != selectedId
-          "
-        >
-          Set as current
-        </button>
-      </RowMenu>
+      <template #table_header>
+        <div class="grid grid-cols-9 gap-3">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-2 table-header">Name</p>
+          <p class="col-span-3 table-header">Address</p>
+          <p class="col-span-2 table-header">Manager</p>
+          <p class="col-span-1 table-header">Status</p>
+        </div>
+      </template>
     </CustomTable>
   </div>
 </template>
 
 <script setup>
-import BranchHeader from '@/components/Settings/BranchHeader.vue';
-import BranchModal from '@/components/Settings/BranchModal.vue';
-import BranchRow from '@/components/Settings/BranchRow.vue';
-import CustomTable from '@/components/shared/CustomTable.vue';
-import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
-import RowMenu from '@/components/shared/RowMenu.vue';
-import { EventEnum } from '@/data/event';
-import Event from '@/event';
-import { useSettingsStore } from '@/stores/settings';
-import { computed, onMounted, ref } from 'vue';
-import { useAppStore } from '@/stores/app';
+import BranchModal from '@/components/Settings/BranchModal.vue'
+import BranchRow from '@/components/Settings/BranchRow.vue'
+import CustomTable from '@/components/shared/CustomTable.vue'
+import { EventEnum } from '@/data/event'
+import Event from '@/event'
+import { useSettingsStore } from '@/stores/settings'
+import { computed, onMounted, ref } from 'vue'
 
-const top = ref(0);
-const selectedId = ref(0);
-const isEdit = ref(false);
-const searchText = ref('');
-const showModal = ref(false);
-const showRowMenu = ref(false);
-const appStore = useAppStore();
-const showConfirmModal = ref(false);
-const settingsStore = useSettingsStore();
+const selectedId = ref(0)
+const searchText = ref('')
+const showModal = ref(false)
+const showRowMenu = ref(false)
+const settingsStore = useSettingsStore()
 
 /** ================================================
  * COMPUTED
  ** ================================================*/
 const filterData = computed(() => {
   return settingsStore.branches.filter((branch) => {
-    const searchCondition = `${branch.id} ${branch.name} ${branch.status} ${branch.address.address1} ${branch.address.address2} ${branch.address.city} ${branch.address.postal} ${branch.manager.first_name} ${branch.manager.last_name}`;
+    const searchCondition = `${branch.id} ${branch.name} ${branch.status} ${branch.address.address1} ${branch.address.address2} ${branch.address.city} ${branch.address.postal} ${branch.manager.first_name} ${branch.manager.last_name}`
 
     return searchText.value
       ? searchCondition.toLowerCase().includes(searchText.value.toLowerCase())
-      : branch;
-  });
-});
+      : branch
+  })
+})
 
 /** ================================================
  * EVENTS
  ** ================================================*/
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 Event.on(
   EventEnum.GLOBAL_CLICK,
   function () {
-    showRowMenu.value = false;
+    showRowMenu.value = false
   },
-  true,
-);
+  true
+)
 
-const rowPropInit = 'branch-init-rows';
+const rowPropInit = 'branch-init-rows'
 Event.on(rowPropInit, function (data) {
-  return { branch: data };
-});
+  return { branch: data }
+})
 
 /** ================================================
  * METHODS
  ** ================================================*/
-const onSelectRow = (id) => {
-  selectedId.value = id;
-  top.value = event.target.offsetTop;
-  showRowMenu.value = true;
-};
+const onView = (id) => {
+  selectedId.value = id
+  showModal.value = true
+}
 
-const viewRow = () => {
-  isEdit.value = true;
-  showModal.value = true;
-};
-
-const deleteRow = () => {
-  showConfirmModal.value = true;
-};
-
-const onAfterDelete = async () => {
-  await settingsStore.fetchAllBranches();
-};
-
-const onSetCurrentBranch = async () => {
-  // get the current branch
-  const currentBranch = settingsStore.branches.find(
-    (branch) => branch.is_current,
-  );
-
-  if (currentBranch) {
-    await settingsStore.updateBranch(currentBranch.id, {
-      branch: { is_current: false },
-    });
-  }
-
-  const toUpdateBranch = settingsStore.branches.find(
-    (branch) => branch.id == selectedId.value,
-  );
-
-  if (toUpdateBranch) {
-    await settingsStore.updateBranch(toUpdateBranch.id, {
-      branch: { is_current: true },
-    });
-  }
-
-  await settingsStore.fetchAllBranches();
-};
+const onNewRecord = () => {
+  selectedId.value = 0
+  showModal.value = true
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await settingsStore.fetchAllBranches();
+  await settingsStore.fetchAllBranches()
 
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 </script>

@@ -18,26 +18,26 @@
   </ModalWrapper>
 </template>
 <script setup>
-import { Method, authenticatedApi } from '@/api';
-import ModalWrapper from '@/components/shared/ModalWrapper.vue';
-const showModal = defineModel();
+import { Method, authenticatedApi } from '@/api'
+import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+const showModal = defineModel()
 
 const props = defineProps({
   href: {
     type: String,
-    required: true,
+    required: true
   },
   data: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
-const emit = defineEmits(['afterDelete']);
+const emit = defineEmits(['afterDelete'])
 
 const submit = async () => {
-  await authenticatedApi(props.href, Method.DELETE, props.data);
-  showModal.value = false;
-  emit('afterDelete');
-};
+  await authenticatedApi(props.href, Method.DELETE, props.data)
+  showModal.value = false
+  emit('afterDelete')
+}
 </script>
