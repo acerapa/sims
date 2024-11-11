@@ -4,7 +4,7 @@ export default [
     name: 'reports',
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
-      name: 'physical-inventory',
+      name: 'physical-inventory'
     },
     children: [
       {
@@ -13,9 +13,9 @@ export default [
         component: () => import('@/views/Inventory/PhysicalInventory.vue'),
         meta: {
           title: 'Physical Inventories',
-          requiresAuth: true,
-        },
-      },
-    ],
-  },
-];
+          requiresAuth: true
+        }
+      }
+    ]
+  }
+]

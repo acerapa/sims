@@ -25,23 +25,23 @@
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared/helpers';
-import { computed } from 'vue';
+import { DateHelpers } from 'shared/helpers'
+import { computed } from 'vue'
 
-const emit = defineEmits(['openMenu']);
+const emit = defineEmits(['openMenu'])
 
 const props = defineProps({
   rma: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
 const preparedByName = computed(() => {
-  return `${props.rma.process_by.first_name} ${props.rma.process_by.last_name}`;
-});
+  return `${props.rma.process_by.first_name} ${props.rma.process_by.last_name}`
+})
 
 const openMenu = (id) => {
-  emit('openMenu', id);
-};
+  emit('openMenu', id)
+}
 </script>

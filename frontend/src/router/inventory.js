@@ -4,7 +4,7 @@ export default [
     name: 'inventory',
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
-      name: 'purchase-order',
+      name: 'purchase-order'
     },
     children: [
       {
@@ -12,16 +12,16 @@ export default [
         name: 'my-inventory',
         component: () => import('@/views/Inventory/Inventory.vue'),
         meta: {
-          requiresAuth: true,
-        },
+          requiresAuth: true
+        }
       },
       {
         path: '/purchase-order',
         name: 'purchase-order',
         component: () => import('@/views/Inventory/PurchaseOrder.vue'),
         meta: {
-          requiresAuth: true,
-        },
+          requiresAuth: true
+        }
       },
       {
         path: '/inventory-stock-status',
@@ -30,8 +30,8 @@ export default [
           import('@/views/Inventory/InventoryStockStatusPage.vue'),
         meta: {
           title: 'Inventory Stock Status Page',
-          requiresAuth: true,
-        },
+          requiresAuth: true
+        }
       },
       {
         path: '/purchase-order-create',
@@ -39,8 +39,8 @@ export default [
         component: () => import('@/views/Inventory/PurchaseOrderForm.vue'),
         meta: {
           requiresAuth: true,
-          title: 'Purchase Order Form',
-        },
+          title: 'Purchase Order Form'
+        }
       },
       {
         path: '/purchase-receive-order/:id',
@@ -48,8 +48,8 @@ export default [
         component: () => import('@/views/Inventory/ReceiveOrder.vue'),
         meta: {
           title: 'Receive Order',
-          requiresAuth: true,
-        },
+          requiresAuth: true
+        }
       },
       {
         path: '/physical-inventory-details/:id',
@@ -58,9 +58,9 @@ export default [
           import('@/views/Inventory/PhysicalInventoryDetails.vue'),
         meta: {
           title: 'Physical Inventory',
-          requiresAuth: true,
-        },
-      },
-    ],
-  },
-];
+          requiresAuth: true
+        }
+      }
+    ]
+  }
+]

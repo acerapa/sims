@@ -1,5 +1,11 @@
 <template>
-  <ModalWrapper title="New Account" @submit="onSubmit" v-model="showModal">
+  <ModalWrapper
+    title="New Account"
+    @submit="onSubmit"
+    v-model="showModal"
+    :has-delete="props.selectedId ? true : false"
+    @delete="onDelete"
+  >
     <div class="flex gap-3 my-7">
       <input
         type="text"
@@ -15,48 +21,65 @@
       </select>
     </div>
   </ModalWrapper>
+  <DeleteConfirmModal
+    v-model="showConfirmModal"
+    v-if="showConfirmModal"
+    :href="`settings/accounts/delete/${props.selectedId}`"
+    @after-delete="onAfterDelete"
+  />
 </template>
 
 <script setup>
-import { Method, authenticatedApi } from '@/api';
-import ModalWrapper from '@/components/shared/ModalWrapper.vue';
-import { useSettingsStore } from '@/stores/settings';
-import { onMounted, ref } from 'vue';
+import { Method, authenticatedApi } from '@/api'
+import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+import DeleteConfirmModal from '../DeleteConfirmModal.vue'
+import { useSettingsStore } from '@/stores/settings'
+import { onMounted, ref } from 'vue'
 
-const settingsStore = useSettingsStore();
+const showConfirmModal = ref(false)
+const settingsStore = useSettingsStore()
 const model = ref({
   name: '',
-  type: '',
-});
+  type: ''
+})
 
 const props = defineProps({
-  isEdit: {
-    type: Boolean,
-    default: false,
-  },
   selectedId: {
-    type: Number,
-  },
-});
+    type: Number
+  }
+})
 
-const showModal = defineModel();
+const showModal = defineModel()
 
-const apiPath = props.isEdit
+const apiPath = props.selectedId
   ? 'settings/accounts/update'
-  : 'settings/accounts/register';
+  : 'settings/accounts/register'
 
 onMounted(() => {
-  if (props.isEdit && props.selectedId) {
+  if (props.selectedId && props.selectedId) {
     model.value = settingsStore.accounts.find(
-      (acc) => acc.id == props.selectedId,
-    );
+      (acc) => acc.id == props.selectedId
+    )
   }
-});
+})
 
 const onSubmit = async () => {
-  const res = await authenticatedApi(apiPath, Method.POST, model.value);
-  showModal.value = false;
+  const res = await authenticatedApi(apiPath, Method.POST, model.value)
+  showModal.value = false
 
-  await settingsStore.fetchAllAccounts();
-};
+  await settingsStore.fetchAllAccounts()
+  if (res.status == 200) {
+    showModal.value = false
+  }
+}
+
+const onDelete = async () => {
+  showConfirmModal.value = true
+}
+
+const onAfterDelete = async () => {
+  showModal.value = false
+  showConfirmModal.value = false
+  await settingsStore.fetchAllAccounts()
+}
 </script>

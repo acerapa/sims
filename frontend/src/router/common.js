@@ -9,46 +9,46 @@ export default [
         name: 'dashboard',
         component: () => import('@/views/Dashboard.vue'),
         meta: {
-          requiresAuth: true,
-        },
+          requiresAuth: true
+        }
       },
       {
         path: '/vendors',
         name: 'vendors',
         component: () => import('@/views/Vendor.vue'),
         meta: {
-          requiresAuth: true,
-        },
+          requiresAuth: true
+        }
       },
       {
         path: '/customers',
         name: 'customers',
         component: () => import('@/views/Customer.vue'),
         meta: {
-          requiresAuth: true,
-        },
+          requiresAuth: true
+        }
       },
       {
         path: '/products',
         name: 'products',
         component: () => import('@/views/Product.vue'),
         meta: {
-          requiresAuth: true,
-        },
+          requiresAuth: true
+        }
       },
       {
         path: '/employees',
         name: 'employees',
         component: () => import('@/views/Employee.vue'),
         meta: {
-          requiresAuth: true,
-        },
-      },
-    ],
+          requiresAuth: true
+        }
+      }
+    ]
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/Sign-in.vue'),
-  },
-];
+    component: () => import('@/views/Sign-in.vue')
+  }
+]

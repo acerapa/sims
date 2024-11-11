@@ -17,8 +17,10 @@
       :to="{ name: 'purchase-order-create' }"
       class="btn w-fit"
       @click="
-        showModal = true;
-        isEdit = false;
+        () => {
+          showModal = true
+          isEdit = false
+        }
       "
     >
       New Purchase Order
@@ -123,61 +125,61 @@
 </template>
 
 <script setup>
-import { authenticatedApi, Method } from '@/api';
-import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
-import CancelConfirmation from '@/components/Inventory/CancelConfirmation.vue';
-import PurchaseOrderRow from '@/components/Inventory/PurchaseOrder/PurchaseOrderRow.vue';
-import PurchaseOrderTableHeader from '@/components/Inventory/PurchaseOrder/PurchaseOrderTableHeader.vue';
-import CustomInput from '@/components/shared/CustomInput.vue';
-import CustomTable from '@/components/shared/CustomTable.vue';
-import RowMenu from '@/components/shared/RowMenu.vue';
-import { EventEnum } from '@/data/event';
-import Event from '@/event';
-import { usePurchaseOrderStore } from '@/stores/purchase-order';
-import { useVendorStore } from '@/stores/supplier';
-import { PurchaseOrderStatus } from 'shared/enums';
-import { DateHelpers } from 'shared/helpers/date';
-import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { authenticatedApi, Method } from '@/api'
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
+import CancelConfirmation from '@/components/Inventory/CancelConfirmation.vue'
+import PurchaseOrderRow from '@/components/Inventory/PurchaseOrder/PurchaseOrderRow.vue'
+import PurchaseOrderTableHeader from '@/components/Inventory/PurchaseOrder/PurchaseOrderTableHeader.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import CustomTable from '@/components/shared/CustomTable.vue'
+import RowMenu from '@/components/shared/RowMenu.vue'
+import { EventEnum } from '@/data/event'
+import Event from '@/event'
+import { usePurchaseOrderStore } from '@/stores/purchase-order'
+import { useVendorStore } from '@/stores/supplier'
+import { PurchaseOrderStatus } from 'shared/enums'
+import { DateHelpers } from 'shared/helpers/date'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const top = ref(0);
-const toDelete = ref();
-const toUpdate = ref();
+const top = ref(0)
+const toDelete = ref()
+const toUpdate = ref()
 const filters = ref({
   supplier_id: '',
   date_from: '',
   date_to: '',
   bill_date_to: '',
-  bill_date_from: '',
-});
-const selectedId = ref(0);
-const selectedRow = ref();
-const isEdit = ref(false);
-const searchText = ref('');
-const showModal = ref(false);
-const showRowMenu = ref(false);
-const supplierOptions = ref([]);
-const showCancelModal = ref(false);
-const showDeleteConfirmation = ref(false);
+  bill_date_from: ''
+})
+const selectedId = ref(0)
+const selectedRow = ref()
+const isEdit = ref(false)
+const searchText = ref('')
+const showModal = ref(false)
+const showRowMenu = ref(false)
+const supplierOptions = ref([])
+const showCancelModal = ref(false)
+const showDeleteConfirmation = ref(false)
 
-const router = useRouter();
-const supplierStore = useVendorStore();
+const router = useRouter()
+const supplierStore = useVendorStore()
 
 /** ================================================
  * EVENTS
  ** ================================================*/
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 // custom event
 Event.on(EventEnum.GLOBAL_CLICK, function () {
-  showRowMenu.value = false;
-});
+  showRowMenu.value = false
+})
 
 // define purchase order props init
-const purchaseOrderRowEvent = 'purchase-order-row-props-init';
+const purchaseOrderRowEvent = 'purchase-order-row-props-init'
 Event.on(purchaseOrderRowEvent, function (data) {
-  return { order: data };
-});
+  return { order: data }
+})
 
 /** ================================================
  * COMPUTED
@@ -190,8 +192,8 @@ const showCancelPO = computed(() => {
     selectedRow.value.status != PurchaseOrderStatus.COMPLETED &&
     selectedRow.value.status != PurchaseOrderStatus.CONFIRMED &&
     selectedRow.value.status == PurchaseOrderStatus.OPEN
-  );
-});
+  )
+})
 
 const showReceivePO = computed(() => {
   return (
@@ -199,12 +201,12 @@ const showReceivePO = computed(() => {
     selectedRow.value.status != PurchaseOrderStatus.COMPLETED &&
     selectedRow.value.status != PurchaseOrderStatus.OPEN &&
     selectedRow.value.status == PurchaseOrderStatus.CONFIRMED
-  );
-});
+  )
+})
 
 const showDeleteAndConfirmPO = computed(() => {
-  return selectedRow.value.status == PurchaseOrderStatus.OPEN;
-});
+  return selectedRow.value.status == PurchaseOrderStatus.OPEN
+})
 
 const filteredData = computed(() => {
   return purchaseOrderStore.purchaseOrders
@@ -212,65 +214,65 @@ const filteredData = computed(() => {
       DateHelpers.getRangeDates(
         filters.value.date_from,
         filters.value.date_to,
-        purchaseOrder.date,
-      ),
+        purchaseOrder.date
+      )
     )
     .filter((purchaseOrder) =>
       DateHelpers.getRangeDates(
         filters.value.bill_date_from,
         filters.value.bill_date_to,
-        purchaseOrder.bill_due,
-      ),
+        purchaseOrder.bill_due
+      )
     )
     .filter((purchaseOrder) => {
       return filters.value.supplier_id
         ? purchaseOrder.supplier.id == filters.value.supplier_id
-        : purchaseOrder;
+        : purchaseOrder
     })
     .filter((purchaseOrder) => {
       const searchCondition =
-        `${purchaseOrder.id} ${purchaseOrder.ref_no} ${purchaseOrder.supplier.company_name} ${purchaseOrder.amount} ${DateHelpers.formatDate(purchaseOrder.date, 'M/D/YYYY')} ${DateHelpers.formatDate(purchaseOrder.bill_due, 'M/D/YYYY')}`.toLowerCase();
+        `${purchaseOrder.id} ${purchaseOrder.ref_no} ${purchaseOrder.supplier.company_name} ${purchaseOrder.amount} ${DateHelpers.formatDate(purchaseOrder.date, 'M/D/YYYY')} ${DateHelpers.formatDate(purchaseOrder.bill_due, 'M/D/YYYY')}`.toLowerCase()
 
       return searchText.value
         ? searchCondition.includes(searchText.value.toLowerCase())
-        : purchaseOrder;
-    });
-});
+        : purchaseOrder
+    })
+})
 
 /** ================================================
  * METHODS
  ** ================================================*/
 
 const onSelectRow = (id) => {
-  selectedId.value = id;
+  selectedId.value = id
   selectedRow.value = purchaseOrderStore.purchaseOrders.find(
-    (order) => order.id == id,
-  );
+    (order) => order.id == id
+  )
 
-  top.value = event.target.offsetTop;
-  showRowMenu.value = true;
-};
+  top.value = event.target.offsetTop
+  showRowMenu.value = true
+}
 
 const onView = () => {
   router.push({
     name: 'purchase-order-create',
     query: {
-      id: selectedId.value,
-    },
-  });
-};
+      id: selectedId.value
+    }
+  })
+}
 
 const onDelete = () => {
   toDelete.value = {
-    order_id: selectedId.value,
-  };
-  showDeleteConfirmation.value = true;
-};
+    order_id: selectedId.value
+  }
+  showDeleteConfirmation.value = true
+}
 
 const onCancelPO = () => {
-  toUpdate.value = { order: { status: PurchaseOrderStatus.CANCELLED } };
-  showCancelModal.value = true;
-};
+  toUpdate.value = { order: { status: PurchaseOrderStatus.CANCELLED } }
+  showCancelModal.value = true
+}
 
 const onConfirmPO = async () => {
   const res = await authenticatedApi(
@@ -278,25 +280,25 @@ const onConfirmPO = async () => {
     Method.POST,
     {
       order: {
-        status: PurchaseOrderStatus.CONFIRMED,
-      },
-    },
-  );
+        status: PurchaseOrderStatus.CONFIRMED
+      }
+    }
+  )
 
   if (res.status == 200) {
-    await purchaseOrderStore.fetchPurchaseOrders();
+    await purchaseOrderStore.fetchPurchaseOrders()
   }
-};
+}
 
 const onReceivePO = () => {
   router.push({
     name: 'purchase-receive-order',
     params: {
-      id: selectedId.value,
-    },
-  });
-};
-const purchaseOrderStore = usePurchaseOrderStore();
+      id: selectedId.value
+    }
+  })
+}
+const purchaseOrderStore = usePurchaseOrderStore()
 
 /** ================================================
  * LIFE CYCLE HOOKS
@@ -304,9 +306,9 @@ const purchaseOrderStore = usePurchaseOrderStore();
 
 onMounted(async () => {
   if (supplierStore.supplierOptions.length == 0) {
-    await supplierStore.fetchAllSuppliers();
+    await supplierStore.fetchAllSuppliers()
   }
-  await purchaseOrderStore.fetchPurchaseOrders();
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  await purchaseOrderStore.fetchPurchaseOrders()
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 </script>

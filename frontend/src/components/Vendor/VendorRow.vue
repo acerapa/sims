@@ -24,13 +24,13 @@
 const props = defineProps({
   supplier: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
-const emit = defineEmits(['openMenu']);
+const emit = defineEmits(['openMenu'])
 
 const openMenu = (id) => {
-  emit('openMenu', id);
-};
+  emit('openMenu', id)
+}
 </script>

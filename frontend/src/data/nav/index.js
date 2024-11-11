@@ -1,19 +1,19 @@
-import dashboard from '@/assets/icons/dashboard.svg';
-import inventory from '@/assets/icons/inventory.svg';
-import vendors from '@/assets/icons/vendors.svg';
-import customers from '@/assets/icons/customers.svg';
-import products from '@/assets/icons/products.svg';
-import reports from '@/assets/icons/reports.svg';
-import employees from '@/assets/icons/employees.svg';
-import settings from '@/assets/icons/settings.svg';
-import outlineDot from '@/assets/icons/outline-dot.svg';
-import transfer from '@/assets/icons/transfer.png';
+import dashboard from '@/assets/icons/dashboard.svg'
+import inventory from '@/assets/icons/inventory.svg'
+import vendors from '@/assets/icons/vendors.svg'
+import customers from '@/assets/icons/customers.svg'
+import products from '@/assets/icons/products.svg'
+import reports from '@/assets/icons/reports.svg'
+import employees from '@/assets/icons/employees.svg'
+import settings from '@/assets/icons/settings.svg'
+import outlineDot from '@/assets/icons/outline-dot.svg'
+import transfer from '@/assets/icons/transfer.png'
 
 export default [
   {
     text: 'Dashboard',
     route: 'dashboard',
-    icon: dashboard,
+    icon: dashboard
   },
   {
     text: 'Inventory',
@@ -24,19 +24,19 @@ export default [
         text: 'Purchase Order',
         route: 'purchase-order',
         icon: outlineDot,
-        includes_active: ['purchase-order-create'],
+        includes_active: ['purchase-order-create']
       },
       {
         text: 'My Inventory',
         route: 'my-inventory',
-        icon: outlineDot,
+        icon: outlineDot
       },
       {
         text: 'Inventory Stock Status',
         route: 'inventory-stock-status',
-        icon: outlineDot,
-      },
-    ],
+        icon: outlineDot
+      }
+    ]
   },
   {
     text: 'Transfer Stocks',
@@ -47,36 +47,36 @@ export default [
         text: 'STR List',
         route: 'str-list',
         icon: outlineDot,
-        includes_active: ['str-form'],
+        includes_active: ['str-form']
       },
       {
         text: 'IBRR List',
         route: 'ibrr-list',
         icon: outlineDot,
-        includes_active: ['ibrr-form'],
+        includes_active: ['ibrr-form']
       },
       {
         text: 'RMA List',
         route: 'rma-list',
         icon: outlineDot,
-        includes_active: ['rma-form'],
-      },
-    ],
+        includes_active: ['rma-form']
+      }
+    ]
   },
   {
     text: 'Vendors/Suppliers',
     route: 'vendors',
-    icon: vendors,
+    icon: vendors
   },
   {
     text: 'Customers',
     route: 'customers',
-    icon: customers,
+    icon: customers
   },
   {
     text: 'Products',
     route: 'products',
-    icon: products,
+    icon: products
   },
   {
     text: 'Reports',
@@ -86,14 +86,14 @@ export default [
       {
         text: 'Physical Inventories',
         route: 'physical-inventory',
-        icon: outlineDot,
-      },
-    ],
+        icon: outlineDot
+      }
+    ]
   },
   {
     text: 'Employees',
     route: 'employees',
-    icon: employees,
+    icon: employees
   },
   {
     text: 'Settings',
@@ -103,18 +103,18 @@ export default [
       {
         text: 'Branches',
         route: 'branches',
-        icon: outlineDot,
+        icon: outlineDot
       },
       {
         text: 'Account Settings',
         route: 'account-settings',
-        icon: outlineDot,
+        icon: outlineDot
       },
       {
         text: 'Product Settings',
         route: 'product-settings',
-        icon: outlineDot,
-      },
-    ],
-  },
-];
+        icon: outlineDot
+      }
+    ]
+  }
+]

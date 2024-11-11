@@ -57,18 +57,18 @@
   </div>
 </template>
 <script setup>
-import CustomInput from './CustomInput.vue';
+import CustomInput from './CustomInput.vue'
 
 const props = defineProps({
   disabled: {
     type: Boolean,
-    default: false,
+    default: false
   },
   hasLabel: {
     type: Boolean,
-    default: false,
-  },
-});
+    default: false
+  }
+})
 
-const formModel = defineModel();
+const formModel = defineModel()
 </script>

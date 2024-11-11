@@ -98,41 +98,41 @@
 </template>
 
 <script setup>
-import AddressForm from '@/components/shared/AddressForm.vue';
-import AlertComponent from '@/components/shared/AlertComponent.vue';
-import CustomInput from '@/components/shared/CustomInput.vue';
-import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue';
-import IbrrSelectHeader from '@/components/stock-transfer/ibrr-select-header.vue';
-import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue';
-import { EventEnum } from '@/data/event';
-import Event from '@/event';
-import { useAppStore } from '@/stores/app';
-import { useAuthStore } from '@/stores/auth';
-import { useProductStore } from '@/stores/product';
-import { useSettingsStore } from '@/stores/settings';
-import { useTransferStore } from '@/stores/transfer';
-import { TransferType } from 'shared/enums';
-import { DateHelpers, ObjectHelpers } from 'shared/helpers';
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import AddressForm from '@/components/shared/AddressForm.vue'
+import AlertComponent from '@/components/shared/AlertComponent.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue'
+import IbrrSelectHeader from '@/components/stock-transfer/ibrr-select-header.vue'
+import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
+import { EventEnum } from '@/data/event'
+import Event from '@/event'
+import { useAppStore } from '@/stores/app'
+import { useAuthStore } from '@/stores/auth'
+import { useProductStore } from '@/stores/product'
+import { useSettingsStore } from '@/stores/settings'
+import { useTransferStore } from '@/stores/transfer'
+import { TransferType } from 'shared/enums'
+import { DateHelpers, ObjectHelpers } from 'shared/helpers'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const route = useRoute();
-const isEdit = ref(false);
-const router = useRouter();
-const currentBranch = ref();
-const appStore = useAppStore();
-const authStore = useAuthStore();
-const productStore = useProductStore();
-const settingStore = useSettingsStore();
-const transferStore = useTransferStore();
+const route = useRoute()
+const isEdit = ref(false)
+const router = useRouter()
+const currentBranch = ref()
+const appStore = useAppStore()
+const authStore = useAuthStore()
+const productStore = useProductStore()
+const settingStore = useSettingsStore()
+const transferStore = useTransferStore()
 
 const productDefaultValue = {
   product_id: '',
   description: '',
   cost: '',
   quantity: '',
-  amount: '',
-};
+  amount: ''
+}
 
 const model = ref({
   transfer: {
@@ -142,22 +142,22 @@ const model = ref({
     branch_from: '',
     processed_by: '',
     type: TransferType.IBRR,
-    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A'),
+    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A')
   },
-  products: [{ ...productDefaultValue }],
-});
+  products: [{ ...productDefaultValue }]
+})
 
 const address = ref({
   address1: '',
   address2: '',
   province: '',
   city: '',
-  postal: '',
-});
+  postal: ''
+})
 /** ================================================
  * EVENTS
  ** ================================================*/
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 /** ================================================
  * COMPUTED
@@ -167,13 +167,13 @@ const branchOptions = computed(() => {
     .map((branch) => {
       return {
         text: branch.name,
-        value: branch.id,
-      };
+        value: branch.id
+      }
     })
     .filter((opt) =>
-      currentBranch.value ? currentBranch.value.id != opt.value : true,
-    );
-});
+      currentBranch.value ? currentBranch.value.id != opt.value : true
+    )
+})
 
 /** ================================================
  * METHODS
@@ -181,64 +181,64 @@ const branchOptions = computed(() => {
 const timeInterval = setInterval(() => {
   model.value.transfer.when = DateHelpers.formatDate(
     new Date(),
-    'YYYY-MM-DDTHH:II-A',
-  );
-}, 1000);
+    'YYYY-MM-DDTHH:II-A'
+  )
+}, 1000)
 
 const populateAddress = () => {
   if (model.value.transfer.branch_from) {
     const branch = settingStore.branches.find(
-      (b) => b.id == model.value.transfer.branch_from,
-    );
+      (b) => b.id == model.value.transfer.branch_from
+    )
 
     if (branch) {
       address.value = ObjectHelpers.assignSameFields(
         address.value,
-        branch.address,
-      );
+        branch.address
+      )
     }
   }
-};
+}
 
 const onSubmit = async () => {
-  clearInterval(timeInterval);
+  clearInterval(timeInterval)
 
   if (!isEdit.value) {
-    await transferStore.createTransfer(model.value);
-    router.push({ name: 'ibrr-list' });
+    await transferStore.createTransfer(model.value)
+    router.push({ name: 'ibrr-list' })
   } else {
-    await transferStore.updateTransfer(model.value, route.query.id);
+    await transferStore.updateTransfer(model.value, route.query.id)
   }
-};
+}
 const onCancel = () => {
-  router.push({ name: 'ibrr-list' });
-};
+  router.push({ name: 'ibrr-list' })
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await settingStore.fetchAllBranches();
-  await productStore.fetchAllProducts();
+  await settingStore.fetchAllBranches()
+  await productStore.fetchAllProducts()
 
   // check if route has transfer id
   if (route.query.id) {
-    const transfer = await transferStore.getById(route.query.id);
+    const transfer = await transferStore.getById(route.query.id)
 
     if (transfer) {
       model.value.transfer = ObjectHelpers.assignSameFields(
         model.value.transfer,
-        transfer,
-      );
+        transfer
+      )
 
       // custom modification
       model.value.transfer.when = DateHelpers.formatDate(
         new Date(),
-        'YYYY-MM-DDTHH:II:SS-A',
-      );
+        'YYYY-MM-DDTHH:II:SS-A'
+      )
 
       // populate address
-      populateAddress();
+      populateAddress()
 
       // populate products
       model.value.products = transfer.products.map((p) => {
@@ -247,25 +247,25 @@ onMounted(async () => {
           description: p.ProductTransaction.description,
           cost: p.ProductTransaction.cost,
           quantity: p.ProductTransaction.quantity,
-          amount: p.ProductTransaction.amount,
-        };
-      });
+          amount: p.ProductTransaction.amount
+        }
+      })
     }
-    isEdit.value = true;
+    isEdit.value = true
   }
 
-  currentBranch.value = appStore.currentBranch;
+  currentBranch.value = appStore.currentBranch
   if (currentBranch.value) {
-    model.value.transfer.branch_to = currentBranch.value.id;
+    model.value.transfer.branch_to = currentBranch.value.id
   }
 
-  model.value.transfer.processed_by = authStore.getAuthUser().id;
+  model.value.transfer.processed_by = authStore.getAuthUser().id
 
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 
 onBeforeUnmount(() => {
   // clear interval
-  clearInterval(timeInterval);
-});
+  clearInterval(timeInterval)
+})
 </script>

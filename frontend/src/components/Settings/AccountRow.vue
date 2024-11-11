@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-9 gap-3">
+  <div
+    class="grid grid-cols-8 gap-3 gen-table-row"
+    @click="emit('view', props.account.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.account.id }}</p>
@@ -9,28 +12,16 @@
     <p class="col-span-2 text-sm">
       {{ DateHelpers.formatDate(props.account.createdAt, 'M/D/YYYY') }}
     </p>
-    <p class="col-span-1 text-sm">
-      <img
-        src="@/assets/icons/vertical-menu.svg"
-        alt=""
-        class="cursor-pointer menu-btn-trigger"
-        @click.stop="openMenu(props.account.id)"
-      />
-    </p>
   </div>
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared/helpers/date';
-const emit = defineEmits(['openMenu']);
+import { DateHelpers } from 'shared/helpers/date'
+const emit = defineEmits(['view'])
 const props = defineProps({
   account: {
     type: Object,
-    default: () => ({}),
-  },
-});
-
-const openMenu = (id) => {
-  emit('openMenu', id);
-};
+    default: () => ({})
+  }
+})
 </script>

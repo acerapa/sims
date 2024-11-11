@@ -22,24 +22,24 @@
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared/helpers';
-import { computed } from 'vue';
+import { DateHelpers } from 'shared/helpers'
+import { computed } from 'vue'
 
-const emit = defineEmits(['openMenu']);
+const emit = defineEmits(['openMenu'])
 
 const props = defineProps({
   ibrr: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
 const managerName = computed(() => {
-  const { sender } = props.ibrr;
-  return `${sender.manager.first_name} ${sender.manager.last_name}`;
-});
+  const { sender } = props.ibrr
+  return `${sender.manager.first_name} ${sender.manager.last_name}`
+})
 
 const openMenu = (id) => {
-  emit('openMenu', id);
-};
+  emit('openMenu', id)
+}
 </script>

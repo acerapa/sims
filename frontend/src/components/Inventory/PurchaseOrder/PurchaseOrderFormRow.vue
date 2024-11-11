@@ -73,70 +73,70 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
-import { useProductStore } from '@/stores/product';
-import ProductModal from '@/components/Product/ProductModal.vue';
-import CustomInput from '@/components/shared/CustomInput.vue';
-import { getCost } from '@/helper';
+import { computed, ref, watch } from 'vue'
+import { useProductStore } from '@/stores/product'
+import ProductModal from '@/components/Product/ProductModal.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import { getCost } from '@/helper'
 
 const props = defineProps({
   selectedProducts: {
     type: Array,
-    defualt: [],
+    defualt: []
   },
   isDisabled: {
     type: Boolean,
-    default: false,
+    default: false
   },
   sup_id: {
-    type: String,
-  },
-});
+    type: String
+  }
+})
 
-const product = defineModel();
-const showModal = ref(false);
-const emit = defineEmits(['remove']);
-const productStore = useProductStore();
+const product = defineModel()
+const showModal = ref(false)
+const emit = defineEmits(['remove'])
+const productStore = useProductStore()
 const productOptions = computed(() => {
   return productStore.supplierProducts
     .map((product) => {
       return {
         text: product.name,
-        value: product.id,
-      };
+        value: product.id
+      }
     })
     .filter((prod) => {
-      if (product.value.product_id == prod.value) return true;
+      if (product.value.product_id == prod.value) return true
       return !props.selectedProducts
         .map((p) => p.product_id)
-        .includes(prod.value);
-    });
-});
+        .includes(prod.value)
+    })
+})
 
 watch(
   () => product.value.product_id,
   (val) => {
-    const prd = productStore.products.find((product) => product.id == val);
+    const prd = productStore.products.find((product) => product.id == val)
     if (prd) {
-      product.value.product_id = prd.id;
-      product.value.name = prd.name;
+      product.value.product_id = prd.id
+      product.value.name = prd.name
       product.value.description = product.value.description
         ? product.value.description
-        : prd.purchase_description;
+        : prd.purchase_description
       product.value.quantity = product.value.quantity
         ? product.value.quantity
-        : 1; // will always set quantity upon create
-      product.value.cost = getCost(product.value.cost, prd, props.sup_id);
+        : 1 // will always set quantity upon create
+      product.value.cost = getCost(product.value.cost, prd, props.sup_id)
     }
-  },
-);
+  }
+)
 
 watch(
   () => [product.value.quantity, product.value.cost],
   (val) => {
     if (val) {
-      product.value.amount = product.value.cost * product.value.quantity;
+      product.value.amount = product.value.cost * product.value.quantity
     }
-  },
-);
+  }
+)
 </script>

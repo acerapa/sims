@@ -32,20 +32,20 @@
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared/helpers';
-import BadgeComponent from '@/components/shared/BadgeComponent.vue';
-import { PhysicalInventoryStatusMap } from 'shared/enums';
+import { DateHelpers } from 'shared/helpers'
+import BadgeComponent from '@/components/shared/BadgeComponent.vue'
+import { PhysicalInventoryStatusMap } from 'shared/enums'
 
 const props = defineProps({
   inventory: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
-const emit = defineEmits(['openMenu']);
+const emit = defineEmits(['openMenu'])
 
 const openMenu = () => {
-  emit('openMenu', props.inventory.id);
-};
+  emit('openMenu', props.inventory.id)
+}
 </script>

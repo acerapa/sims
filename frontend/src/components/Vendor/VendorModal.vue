@@ -20,7 +20,7 @@
             :options="[
               { text: 'Mr.', value: 'Mr.' },
               { text: 'Ms.', value: 'Ms.' },
-              { text: 'Mrs.', value: 'Mrs.' },
+              { text: 'Mrs.', value: 'Mrs.' }
             ]"
           />
         </div>
@@ -85,31 +85,29 @@
 </template>
 
 <script setup>
-import CustomInput from '@/components/shared/CustomInput.vue';
-import { Method, authenticatedApi } from '@/api';
-import ModalWrapper from '@/components/shared/ModalWrapper.vue';
-import AddressForm from '../shared/AddressForm.vue';
-import { useVendorStore } from '@/stores/supplier';
-import { onMounted, ref } from 'vue';
+import CustomInput from '@/components/shared/CustomInput.vue'
+import { Method, authenticatedApi } from '@/api'
+import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+import AddressForm from '../shared/AddressForm.vue'
+import { useVendorStore } from '@/stores/supplier'
+import { onMounted, ref } from 'vue'
 
-const showModal = defineModel();
+const showModal = defineModel()
 
 const props = defineProps({
   isEdit: {
     type: Boolean,
-    default: false,
+    default: false
   },
   selectedId: {
     type: Number,
-    required: false,
-  },
-});
+    required: false
+  }
+})
 
-const supplierStore = useVendorStore();
-const title = ref(
-  props.isEdit ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier',
-);
-const apiPath = ref(props.isEdit ? 'suppliers/update' : 'suppliers/register');
+const supplierStore = useVendorStore()
+const title = ref(props.isEdit ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier')
+const apiPath = ref(props.isEdit ? 'suppliers/update' : 'suppliers/register')
 const model = ref({
   company_name: '',
   first_name: '',
@@ -124,24 +122,24 @@ const model = ref({
     address2: '',
     city: '',
     province: '',
-    postal: '',
-  },
-});
+    postal: ''
+  }
+})
 
 const onSubmit = async () => {
-  const res = await authenticatedApi(apiPath.value, Method.POST, model.value);
-  await supplierStore.fetchAllSuppliers();
+  const res = await authenticatedApi(apiPath.value, Method.POST, model.value)
+  await supplierStore.fetchAllSuppliers()
 
   if (res.status == 200) {
-    showModal.value = false;
+    showModal.value = false
   }
-};
+}
 
 onMounted(() => {
   if (props.isEdit && props.selectedId) {
     model.value = supplierStore.suppliers.find(
-      (sup) => sup.id == props.selectedId,
-    );
+      (sup) => sup.id == props.selectedId
+    )
   }
-});
+})
 </script>

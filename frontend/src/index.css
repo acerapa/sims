@@ -59,6 +59,7 @@ select.input {
 
 .gen-table-row {
   padding: 4px 0px;
+  cursor: pointer;
 }
 
 .gen-table-row:hover {

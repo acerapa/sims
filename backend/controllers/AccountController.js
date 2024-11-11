@@ -1,5 +1,5 @@
 const Account = require("../models/account");
-const { AccountSchema } = require("shared")
+const { AccountSchema } = require("shared");
 
 module.exports = {
   all: async (req, res) => {
@@ -50,10 +50,10 @@ module.exports = {
     try {
       await Account.destroy({
         where: {
-          id: req.body.id,
+          id: req.params.id,
         },
       });
-			res.sendResponse({}, "Successfully deleted!", 200);
+      res.sendResponse({}, "Successfully deleted!", 200);
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message);
     }

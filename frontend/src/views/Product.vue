@@ -85,7 +85,7 @@
       </div>
     </template>
     <RowMenu
-      :top="top"
+      :target="target"
       v-if="showRowMenu"
       @view="onViewRow"
       @delete="onDeleteRow"
@@ -94,55 +94,55 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import ProductModal from '@/components/Product/ProductModal.vue';
-import ProductRow from '@/components/Product/ProductRow.vue';
-import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue';
-import CustomTable from '@/components/shared/CustomTable.vue';
-import CustomInput from '@/components/shared/CustomInput.vue';
-import RowMenu from '@/components/shared/RowMenu.vue';
-import { useProductStore } from '@/stores/product';
-import Event from '@/event';
-import { EventEnum } from '@/data/event';
-import ProductTableHeader from '@/components/Product/ProductTableHeader.vue';
-import { DateHelpers } from 'shared/helpers';
-import { useSettingsStore } from '@/stores/settings';
+import { computed, onMounted, ref } from 'vue'
+import ProductModal from '@/components/Product/ProductModal.vue'
+import ProductRow from '@/components/Product/ProductRow.vue'
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
+import CustomTable from '@/components/shared/CustomTable.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import RowMenu from '@/components/shared/RowMenu.vue'
+import { useProductStore } from '@/stores/product'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import ProductTableHeader from '@/components/Product/ProductTableHeader.vue'
+import { DateHelpers } from 'shared/helpers'
+import { useSettingsStore } from '@/stores/settings'
 
-const top = ref(0);
-const toDelete = ref({});
-const isEdit = ref(false);
-const selectedId = ref(0);
-const searchText = ref('');
-const showModal = ref(false);
-const showRowMenu = ref(false);
-const categoryOptions = ref([]);
-const productStore = useProductStore();
-const settingStore = useSettingsStore();
-const showDeleteConfirmModal = ref(false);
+const target = ref(0)
+const toDelete = ref({})
+const isEdit = ref(false)
+const selectedId = ref(0)
+const searchText = ref('')
+const showModal = ref(false)
+const showRowMenu = ref(false)
+const categoryOptions = ref([])
+const productStore = useProductStore()
+const settingStore = useSettingsStore()
+const showDeleteConfirmModal = ref(false)
 const filters = ref({
   added_on_from: '',
   added_on_to: '',
   stock_from: null,
   stock_to: null,
-  category: '',
-});
+  category: ''
+})
 
 /** ================================================
  * EVENTS
  ** ================================================*/
 
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 // custom event
 Event.on(EventEnum.GLOBAL_CLICK, function () {
-  showRowMenu.value = false;
-});
+  showRowMenu.value = false
+})
 
 // define product row props
-const productRowEvent = 'product-row-init-props';
+const productRowEvent = 'product-row-init-props'
 Event.on(productRowEvent, function (data) {
-  return { product: data };
-});
+  return { product: data }
+})
 
 /** ================================================
  * COMPUTED
@@ -151,16 +151,16 @@ const filteredData = computed(() => {
   return productStore.products
     .filter((product) => {
       const catId =
-        filters.value.category === '' ? null : filters.value.category;
+        filters.value.category === '' ? null : filters.value.category
 
-      return catId ? product.category_id == catId : product;
+      return catId ? product.category_id == catId : product
     })
     .filter((product) => {
       filters.value.stock_from =
-        filters.value.stock_from === '' ? null : filters.value.stock_from;
+        filters.value.stock_from === '' ? null : filters.value.stock_from
 
       filters.value.stock_to =
-        filters.value.stock_to === '' ? null : filters.value.stock_to;
+        filters.value.stock_to === '' ? null : filters.value.stock_to
 
       if (
         filters.value.stock_from !== null &&
@@ -169,70 +169,70 @@ const filteredData = computed(() => {
         return (
           product.quantity_in_stock >= filters.value.stock_from &&
           product.quantity_in_stock <= filters.value.stock_to
-        );
+        )
       } else if (
         filters.value.stock_from !== null &&
         filters.value.stock_to == null
       ) {
-        return product.quantity_in_stock >= filters.value.stock_from;
+        return product.quantity_in_stock >= filters.value.stock_from
       } else if (
         filters.value.stock_from == null &&
         filters.value.stock_to !== null
       ) {
-        return product.quantity_in_stock <= filters.value.stock_to;
+        return product.quantity_in_stock <= filters.value.stock_to
       } else {
-        return product;
+        return product
       }
     })
     .filter((product) =>
       DateHelpers.getRangeDates(
         filters.value.added_on_from,
         filters.value.added_on_to,
-        product.createdAt,
-      ),
+        product.createdAt
+      )
     )
     .filter((product) => {
       const searchCondition =
-        `${product.id} ${product.name} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase();
+        `${product.id} ${product.name} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
       return searchText.value
         ? searchCondition.includes(searchText.value.toLowerCase())
-        : product;
-    });
-});
+        : product
+    })
+})
 
 /** ================================================
  * METHODS
  ** ================================================*/
 
 const onSelectRow = (id) => {
-  top.value = event.target.offsetTop;
-  showRowMenu.value = true;
-  selectedId.value = id;
-};
+  target.value = event.target
+  showRowMenu.value = true
+  selectedId.value = id
+}
 
 const onDeleteRow = () => {
-  toDelete.value = { id: selectedId.value };
-  showDeleteConfirmModal.value = true;
-};
+  toDelete.value = { id: selectedId.value }
+  showDeleteConfirmModal.value = true
+}
 
 const onViewRow = () => {
-  isEdit.value = true;
-  showModal.value = true;
-};
+  isEdit.value = true
+  showModal.value = true
+}
 
 const onAfterDelete = async () => {
-  showDeleteConfirmModal.value = false;
-  toDelete.value = {};
-  await productStore.fetchAllProducts();
-};
+  showDeleteConfirmModal.value = false
+  toDelete.value = {}
+  await productStore.fetchAllProducts()
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 
 onMounted(async () => {
-  await productStore.fetchAllProducts();
-  categoryOptions.value = await settingStore.categoryOption();
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  await productStore.fetchAllProducts()
+  categoryOptions.value = await settingStore.categoryOption()
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 </script>

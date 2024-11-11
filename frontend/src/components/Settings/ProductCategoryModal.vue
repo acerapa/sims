@@ -1,5 +1,11 @@
 <template>
-  <ModalWrapper title="New Category" v-model="showModal" @submit="onSubmit">
+  <ModalWrapper
+    title="New Category"
+    v-model="showModal"
+    @submit="onSubmit"
+    :has-delete="props.selectedId ? true : false"
+    @delete="onDelete"
+  >
     <div class="flex mt-7">
       <CustomInput
         type="text"
@@ -10,51 +16,65 @@
       />
     </div>
   </ModalWrapper>
+  <DeleteConfirmModal
+    v-if="showConfirmModal"
+    v-model="showConfirmModal"
+    @after-delete="onAfterDelete"
+    :href="`product-category/delete/${props.selectedId}`"
+  />
 </template>
 <script setup>
-import { Method, authenticatedApi } from '@/api';
-import CustomInput from '@/components/shared/CustomInput.vue';
-import ModalWrapper from '@/components/shared/ModalWrapper.vue';
-import { useSettingsStore } from '@/stores/settings';
-import { onMounted, ref } from 'vue';
+import { Method, authenticatedApi } from '@/api'
+import DeleteConfirmModal from '../DeleteConfirmModal.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+import { useSettingsStore } from '@/stores/settings'
+import { onMounted, ref } from 'vue'
 
-const showModal = defineModel();
-const settingsStore = useSettingsStore();
+const showModal = defineModel()
+const showConfirmModal = ref(false)
+const settingsStore = useSettingsStore()
 
 const props = defineProps({
-  isEdit: {
-    type: Boolean,
-    default: false,
-  },
   selectedId: {
     type: Number,
-    required: false,
-  },
-});
+    required: false
+  }
+})
 
 const model = ref({
-  name: '',
-});
+  name: ''
+})
 
 onMounted(async () => {
-  if (props.isEdit && props.selectedId) {
+  if (props.selectedId) {
     model.value = settingsStore.productCategories.find(
-      (pc) => pc.id == props.selectedId,
-    );
+      (pc) => pc.id == props.selectedId
+    )
   }
-});
+})
 
-const apiPath = props.isEdit
+const apiPath = props.selectedId
   ? 'product-category/update'
-  : 'product-category/register';
+  : 'product-category/register'
 
 const onSubmit = async () => {
-  const res = await authenticatedApi(apiPath, Method.POST, model.value);
+  const res = await authenticatedApi(apiPath, Method.POST, model.value)
 
   if (res.status == 200) {
-    showModal.value = false;
+    showModal.value = false
   }
 
-  await settingsStore.fetchAllProductCategories();
-};
+  await settingsStore.fetchAllProductCategories()
+}
+
+const onDelete = async () => {
+  showConfirmModal.value = true
+}
+
+const onAfterDelete = async () => {
+  showModal.value = false
+  showConfirmModal.value = false
+  await settingsStore.fetchAllProductCategories()
+}
 </script>

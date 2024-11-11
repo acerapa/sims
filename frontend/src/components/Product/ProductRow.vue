@@ -54,17 +54,17 @@
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared/helpers/date';
+import { DateHelpers } from 'shared/helpers/date'
 const props = defineProps({
   product: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
-const emit = defineEmits(['openMenu']);
+const emit = defineEmits(['openMenu'])
 
 const openMenu = () => {
-  emit('openMenu', props.product.id);
-};
+  emit('openMenu', props.product.id)
+}
 </script>
