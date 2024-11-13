@@ -60,6 +60,11 @@ export default [
         route: 'rma-list',
         icon: outlineDot,
         includes_active: ['rma-form']
+      },
+      {
+        text: 'PO to Fix list',
+        route: 'fix-asset-list',
+        icon: outlineDot
       }
     ]
   },
