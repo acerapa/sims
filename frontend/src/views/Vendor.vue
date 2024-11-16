@@ -3,60 +3,50 @@
     <VendorModal
       v-if="showModal"
       v-model="showModal"
-      :is-edit="isEdit"
       :selected-id="selectedId"
-    />
-    <DeleteConfirmModal
-      v-model="showDeleteConfirmModal"
-      v-if="showDeleteConfirmModal"
-      :href="'suppliers/delete'"
-      :data="toDelete"
-      @after-delete="afterDelete"
     />
     <CustomTable
       :has-add-btn="true"
       :data="filteredData"
       :has-pagination="true"
-      v-model:is-edit="isEdit"
-      v-model:show-modal="showModal"
       :row-prop-init="vendorRowEvent"
       v-model:search-text="searchText"
       :table-row-component="VendorRow"
-      :table-header-component="VendorTableHeader"
-      @open-menu="onSelectRow"
+      @view="onView"
+      @add-new-record="
+        () => {
+          showModal = true
+          selectedId = 0
+        }
+      "
     >
-      <RowMenu
-        :top="top"
-        v-if="showRowMenu"
-        @view="onViewRow"
-        @delete="onDeleteRow"
-        class="right-24"
-      />
+      <template #table_header>
+        <div class="grid grid-cols-6 gap-3 items-center min-w-[564px]">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-3 table-header">Company Name</p>
+          <p class="col-span-2 table-header">Rep. Name</p>
+        </div>
+      </template>
     </CustomTable>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import VendorModal from '@/components/Vendor/VendorModal.vue'
 import VendorRow from '@/components/Vendor/VendorRow.vue'
 import { useVendorStore } from '@/stores/supplier'
 import CustomTable from '@/components/shared/CustomTable.vue'
-import RowMenu from '@/components/shared/RowMenu.vue'
 import Event from '@/event'
-import VendorTableHeader from '@/components/Vendor/VendorTableHeader.vue'
 import { EventEnum } from '@/data/event'
 
-const vendorStore = useVendorStore()
-const top = ref(0)
-const showModal = ref(false)
-const isEdit = ref(false)
-const toDelete = ref()
 const searchText = ref()
 const selectedId = ref(-1)
-const showRowMenu = ref(false)
-const showDeleteConfirmModal = ref(false)
+const showModal = ref(false)
+const vendorStore = useVendorStore()
 
 /** ================================================
  * EVENTS
@@ -64,11 +54,6 @@ const showDeleteConfirmModal = ref(false)
 
 // is page is loading
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
-
-// custom event
-Event.on(EventEnum.GLOBAL_CLICK, function () {
-  showRowMenu.value = false
-})
 
 // define vendor row init props
 const vendorRowEvent = 'vendor-row-props-init'
@@ -94,26 +79,9 @@ const filteredData = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
-
-const onSelectRow = (id) => {
+const onView = (id) => {
   selectedId.value = id
-  top.value = event.target.offsetTop
-  showRowMenu.value = true
-}
-
-const onViewRow = () => {
-  isEdit.value = true
   showModal.value = true
-}
-
-const onDeleteRow = async () => {
-  toDelete.value = { id: selectedId.value }
-  showDeleteConfirmModal.value = true
-}
-
-const afterDelete = async () => {
-  await vendorStore.fetchAllSuppliers()
-  showDeleteConfirmModal.value = false
 }
 
 /** ================================================

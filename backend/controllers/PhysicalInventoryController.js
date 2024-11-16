@@ -126,7 +126,7 @@ module.exports = {
     try {
       await PhysicalInventory.destroy({
         where: {
-          id: req.body.id,
+          id: req.params.id,
         },
       });
       res.sendResponse({}, "Successfully deleted!", 200);

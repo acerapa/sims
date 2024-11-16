@@ -1,5 +1,11 @@
 <template>
-  <ModalWrapper :title="title" v-model="showModal" @submit="onSubmit">
+  <ModalWrapper
+    :title="title"
+    v-model="showModal"
+    @submit="onSubmit"
+    :has-delete="true"
+    @delete="showDeleteConfirmModal = true"
+  >
     <div class="flex flex-col gap-6 my-7">
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Product Type & Reordering Point</p>
@@ -157,12 +163,19 @@
     v-if="showProductPointModal"
     v-model="showProductPointModal"
   />
+  <DeleteConfirmModal
+    v-if="showDeleteConfirmModal"
+    v-model="showDeleteConfirmModal"
+    :href="`products/delete/${props.selectedId}`"
+    @after-delete="onAfterDelete"
+  />
 </template>
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { Method, authenticatedApi } from '@/api'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
 import AccountModal from '@/components/Settings/AccountModal.vue'
 import VendorModal from '@/components/Vendor/VendorModal.vue'
@@ -175,10 +188,6 @@ import { useSettingsStore } from '@/stores/settings'
 import { useProductStore } from '@/stores/product'
 
 const props = defineProps({
-  isEdit: {
-    type: Boolean,
-    default: false
-  },
   selectedId: {
     type: Number,
     required: false
@@ -188,10 +197,11 @@ const props = defineProps({
 const emit = defineEmits(['newAccount'])
 
 const showModal = defineModel()
+const showVendorModal = ref(false)
 const showAccountModal = ref(false)
 const showCategoryModal = ref(false)
-const showVendorModal = ref(false)
 const showProductPointModal = ref(false)
+const showDeleteConfirmModal = ref(false)
 
 const model = ref({
   name: '',
@@ -211,8 +221,8 @@ const model = ref({
   product_setting_id: ''
 })
 
-const title = ref(props.isEdit ? 'Edit Product' : 'New Product')
-const apiPath = ref(props.isEdit ? 'products/update' : 'products/register')
+const title = ref(props.selectedId ? 'Edit Product' : 'New Product')
+const apiPath = ref(props.selectedId ? 'products/update' : 'products/register')
 
 const supplierStore = useVendorStore()
 const settingStore = useSettingsStore()
@@ -259,12 +269,19 @@ const categoriesOptions = computed(() => {
 })
 
 const reorderingPointOptions = computed(() => {
-  return settingStore.productReorderingPoints.map((point) => {
-    return {
-      value: point.id,
-      text: point.point
-    }
-  })
+  const opts = [
+    {
+      text: 'None',
+      value: null
+    },
+    ...settingStore.productReorderingPoints.map((point) => {
+      return {
+        value: point.id,
+        text: point.point
+      }
+    })
+  ]
+  return opts
 })
 
 const generateItemCode = async () => {
@@ -280,7 +297,7 @@ onMounted(async () => {
   await settingStore.fetchAllAccounts()
   await settingStore.fetchAllProductReorderingPoints()
 
-  if (props.isEdit && props.selectedId) {
+  if (props.selectedId) {
     model.value = (() => {
       let product = productStore.products.find(
         (product) => product.id == props.selectedId
@@ -303,10 +320,15 @@ onMounted(async () => {
     })()
   }
 
-  if (!props.isEdit) {
+  if (!props.selectedId) {
     await generateItemCode()
   }
 })
+
+const onAfterDelete = async () => {
+  showModal.value = false
+  await productStore.fetchAllProducts()
+}
 
 const onSubmit = async () => {
   await authenticatedApi(apiPath.value, Method.POST, model.value)
