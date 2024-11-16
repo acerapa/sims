@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-7 gap-3 items-center">
+  <div
+    class="grid grid-cols-6 gap-3 items-center gen-table-row"
+    @click="emit('view', props.supplier.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.supplier.id }}</p>
@@ -10,14 +13,6 @@
         `${props.supplier.annotation ? props.supplier.annotation : ''} ${props.supplier.first_name} ${props.supplier.last_name}`
       }}
     </p>
-    <div class="col-span-1 text-sm">
-      <img
-        @click.stop="openMenu(props.supplier.id)"
-        class="cursor-pointer menu-btn-trigger"
-        src="@/assets/icons/vertical-menu.svg"
-        alt=""
-      />
-    </div>
   </div>
 </template>
 <script setup>
@@ -28,9 +23,5 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['openMenu'])
-
-const openMenu = (id) => {
-  emit('openMenu', id)
-}
+const emit = defineEmits(['view'])
 </script>

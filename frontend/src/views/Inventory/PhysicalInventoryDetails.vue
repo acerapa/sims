@@ -1,4 +1,10 @@
 <template>
+  <DeleteConfirmModal
+    v-model="showConfirmModal"
+    v-if="showConfirmModal"
+    :href="`physical-inventory/delete/${physicalInventory.id}`"
+    @after-delete="onAfterDelete"
+  />
   <div class="flex flex-col gap-3" v-if="physicalInventory">
     <div class="cont flex flex-col gap-3" v-if="physicalInventory">
       <div class="flex justify-between">
@@ -28,7 +34,7 @@
       :data="filteredData"
       :has-check-box="false"
       :has-pagination="false"
-      class="[&>.table-wrapper]:sticky [&>.table-wrapper]:top-[84px] [&>.table-wrapper]:z-10 [&>.table-wrapper]:py-0"
+      class="[&>.table-wrapper]:sticky [&>.table-wrapper]:top-[84px] [&>.table-wrapper]:z-10 [&>.table-wrapper]:mb-3"
       v-model:search-text="searchText"
       :row-prop-init="physicalItemInitRow"
       :table-row-component="PhysicalInventoryItemRow"
@@ -56,6 +62,9 @@
           v-if="physicalInventory.status == PhysicalInventoryStatus.DONE"
         >
           Back
+        </button>
+        <button class="danger-btn" @click="showConfirmModal = true">
+          Delete
         </button>
       </template>
       <template v-slot:filters>
@@ -98,6 +107,7 @@ import PhysicalInventoryItemRow from '@/components/Inventory/PhysicalInventory/P
 import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
@@ -117,6 +127,7 @@ const router = useRouter()
 const showRowMenu = ref(false)
 const physicalInventory = ref()
 const isItemChecked = ref(false)
+const showConfirmModal = ref(false)
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
 const physicalInventoryStore = usePhysicalInventoryStore()
@@ -190,6 +201,12 @@ const onSubmit = async () => {
 }
 
 const onContinueLater = () => {
+  router.push({
+    name: 'physical-inventory'
+  })
+}
+
+const onAfterDelete = () => {
   router.push({
     name: 'physical-inventory'
   })
