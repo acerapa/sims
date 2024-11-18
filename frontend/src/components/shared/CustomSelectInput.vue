@@ -49,9 +49,11 @@
           v-if="props.hasAddNew"
           class="dropdown-item"
           @click="
-            emit('addNew');
-            singleDropdown.blur();
-            singleDropdownGroup.blur();
+            () => {
+              emit('addNew')
+              singleDropdown.blur()
+              singleDropdownGroup.blur()
+            }
           "
         >
           &lt;&lt;Add New&gt;&gt;
@@ -61,9 +63,11 @@
           v-for="(option, ndx) in filteredOptions"
           :key="ndx"
           @click="
-            selectOption(option.value);
-            singleDropdown.blur();
-            singleDropdownGroup.blur();
+            () => {
+              selectOption(option.value)
+              singleDropdown.blur()
+              singleDropdownGroup.blur()
+            }
           "
         >
           {{ option.text }}
@@ -76,7 +80,7 @@
         class="min-h-[38px] relative z-10"
         :class="[
           props.canSearch ? 'border px-3 py-2 rounded' : 'input',
-          props.disabled ? 'border-none pointer-events-none' : '',
+          props.disabled ? 'border-none pointer-events-none' : ''
         ]"
         v-if="props.selectMultiple"
       >
@@ -128,103 +132,103 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from 'vue'
 
-const emit = defineEmits(["addNew", "change"]);
+const emit = defineEmits(['addNew', 'change'])
 
 const props = defineProps({
   placeholder: {
     type: String,
-    required: false,
+    required: false
   },
   hasAddNew: {
     type: Boolean,
-    default: false,
+    default: false
   },
   options: {
     type: Array,
-    required: true,
+    required: true
   },
   selectMultiple: {
     type: Boolean,
-    default: false,
+    default: false
   },
   canSearch: {
     type: Boolean,
-    default: false,
+    default: false
   },
   disabled: {
     type: Boolean,
-    default: false,
-  },
-});
+    default: false
+  }
+})
 
-const search = ref("");
+const search = ref('')
 
-const singleDropdown = ref();
-const singleDropdownGroup = ref();
+const singleDropdown = ref()
+const singleDropdownGroup = ref()
 
-const selected = defineModel();
-const select = ref();
+const selected = defineModel()
+const select = ref()
 
 onMounted(() => {
   if (props.canSearch && selected.value && !props.selectMultiple) {
-    search.value = getName(selected.value);
+    search.value = getName(selected.value)
   }
-});
+})
 
 const filteredOptions = computed(() => {
   return props.options.filter((option) =>
     option.text.toLowerCase().includes(search.value.toLowerCase())
-  );
-});
+  )
+})
 
 const getName = (value) => {
-  return props.options.find((opt) => opt.value == value).text;
-};
+  return props.options.find((opt) => opt.value == value).text
+}
 
 const selectOption = (value) => {
-  selected.value = value;
-  search.value = getName(value);
-  emit("change");
-};
+  selected.value = value
+  search.value = getName(value)
+  emit('change')
+}
 
 const onSelectOpt = (value) => {
-  selected.value.push(value);
-};
+  selected.value.push(value)
+}
 
 const removeSelectedValue = (value) => {
-  selected.value = selected.value.filter((sl) => sl != value);
-};
+  selected.value = selected.value.filter((sl) => sl != value)
+}
 
 // only for the multi select options
 const multiSelectOptions = computed(() => {
-  const opts = props.canSearch ? filteredOptions.value : props.options;
+  const opts = props.canSearch ? filteredOptions.value : props.options
   return props.selectMultiple
     ? opts.filter((opt) => !selected.value.includes(opt.value))
-    : opts;
-});
+    : opts
+})
 
 const onBlurSelect = () => {
   setTimeout(() => {
     if (props.canSearch && !props.selectMultiple && !search.value) {
       // selectOption(selected.value);
-      selected.value = "";
-      emit("change");
+      selected.value = ''
+      emit('change')
     }
-  }, 500);
-};
+  }, 500)
+}
 
 watch(
   () => selected.value,
   (val) => {
-    if (val == "add-new") {
-      emit("addNew");
-      selected.value = "";
-      select.value.selectedIndex = 0;
+    if (val == 'add-new') {
+      emit('addNew')
+      selected.value = ''
+      select.value.selectedIndex = 0
     }
   }
-);
+)
 </script>
 
 <style scoped>

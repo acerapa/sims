@@ -55,10 +55,10 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      await Supplier.destroy({where: { id: req.body.id }});
+      await Supplier.destroy({ where: { id: req.params.id } });
       res.sendResponse({}, "Successfully deleted!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message);
     }
-  }
+  },
 };

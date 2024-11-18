@@ -12,7 +12,7 @@
         :class="[
           'input',
           props.inputClass,
-          props.error ? 'border-red-500' : '',
+          props.error ? 'border-red-500' : ''
         ]"
         :placeholder="props.placeholder"
         :disabled="props.disabled"
@@ -37,7 +37,7 @@
         :class="[
           'input',
           props.inputClass,
-          props.error ? 'border-red-500' : '',
+          props.error ? 'border-red-500' : ''
         ]"
         v-model="value"
         @input="emit('input')"
@@ -72,83 +72,83 @@
 </template>
 
 <script setup>
-import CustomSelectInput from "./CustomSelectInput.vue";
+import CustomSelectInput from './CustomSelectInput.vue'
 const props = defineProps({
   name: {
     type: String,
-    required: true,
+    required: true
   },
   type: {
     type: String,
-    default: "text",
+    default: 'text'
   },
   id: {
     type: String,
-    required: false,
+    required: false
   },
   inputClass: {
     type: String,
-    required: false,
+    required: false
   },
   placeholder: {
     type: String,
-    required: false,
+    required: false
   },
   hasLabel: {
     type: Boolean,
-    default: false,
+    default: false
   },
   label: {
     type: String,
-    default: "",
+    default: ''
   },
   error: {
-    type: String,
+    type: String
   },
   disabled: {
     type: Boolean,
-    default: false,
+    default: false
   },
   hasAddNew: {
     type: Boolean,
-    default: false,
+    default: false
   },
   options: {
     type: Array,
-    required: false,
+    required: false
   },
   selectMultiple: {
     type: Boolean,
-    default: false,
+    default: false
   },
   canSearch: {
     type: Boolean,
-    default: false,
+    default: false
   },
   rows: {
     type: Number,
-    default: 2,
+    default: 2
   },
   cols: {
     type: Number,
-    default: 20,
-  },
-});
+    default: 20
+  }
+})
 
 // custom props validation
-if (props.type == "select" && !props.options) {
-  console.warn("Select type CustomInput must have options props");
+if (props.type == 'select' && !props.options) {
+  console.warn('Select type CustomInput must have options props')
 }
 
-const value = defineModel();
+const value = defineModel()
 const emit = defineEmits([
-  "focus",
-  "change",
-  "input",
-  "reset",
-  "blur",
-  "addNew",
-]);
+  'focus',
+  'change',
+  'input',
+  'reset',
+  'blur',
+  'addNew'
+])
 </script>
 
 <style scoped>

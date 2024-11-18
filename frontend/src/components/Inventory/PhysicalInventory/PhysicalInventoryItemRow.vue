@@ -24,27 +24,27 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import { usePhysicalInventoryStore } from "@/stores/physical-inventory";
-import { PhysicalInventoryStatus } from "shared/enums";
+import { ref } from 'vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
+import { PhysicalInventoryStatus } from 'shared/enums'
 
 const props = defineProps({
   item: {
     type: Object,
-    default: () => ({}),
+    default: () => ({})
   },
   hasCheckBox: {
-    type: Boolean,
-  },
-});
+    type: Boolean
+  }
+})
 
 const model = ref({
-  physical_quantity: props.item.physical_quantity,
-});
+  physical_quantity: props.item.physical_quantity
+})
 
-const physicalInventoryStore = usePhysicalInventoryStore();
-const physicalInventory = physicalInventoryStore.physicalInventory;
+const physicalInventoryStore = usePhysicalInventoryStore()
+const physicalInventory = physicalInventoryStore.physicalInventory
 
 /** ================================================
  * EVENTS
@@ -55,8 +55,8 @@ const physicalInventory = physicalInventoryStore.physicalInventory;
  ** ================================================*/
 const onQuantityChange = async () => {
   if (model.value.physical_quantity != props.item.physical_quantity) {
-    await physicalInventoryStore.updateItem(props.item.id, model.value);
-    await physicalInventoryStore.getGroupedItems(physicalInventory.id);
+    await physicalInventoryStore.updateItem(props.item.id, model.value)
+    await physicalInventoryStore.getGroupedItems(physicalInventory.id)
   }
-};
+}
 </script>

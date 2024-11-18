@@ -44,34 +44,34 @@
   </div>
 </template>
 <script setup>
-import dot from "@/assets/icons/dot.svg";
-import { useAppStore } from "@/stores/app";
-import { useRoute } from "vue-router";
+import dot from '@/assets/icons/dot.svg'
+import { useAppStore } from '@/stores/app'
+import { useRoute } from 'vue-router'
 
-const appStore = useAppStore();
+const appStore = useAppStore()
 
 const props = defineProps({
   nav: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
-const emit = defineEmits(["routeClick"]);
-const route = useRoute();
+const emit = defineEmits(['routeClick'])
+const route = useRoute()
 
 const isOpenChildNav = () => {
   const parent = route.matched.find(
     (rt) => rt.children.length && props.nav.route == rt.name
-  );
-  return parent;
-};
+  )
+  return parent
+}
 
 const emitRouteClick = (nav, hasChild) => {
   setTimeout(() => {
-    emit("routeClick", nav, hasChild);
-  }, 200);
-};
+    emit('routeClick', nav, hasChild)
+  }, 200)
+}
 
 const isIncludedRoute = (rt) => {
   return (
@@ -79,8 +79,8 @@ const isIncludedRoute = (rt) => {
     appStore.currentNav.includes_active &&
     appStore.currentNav.includes_active.includes(route.name) &&
     rt.route == appStore.currentNav.route
-  );
-};
+  )
+}
 </script>
 
 <style scoped>

@@ -18,14 +18,23 @@
         <slot></slot>
       </div>
     </form>
-    <div class="flex gap-3 mt-10 mx-auto justify-center">
+    <div
+      class="flex gap-3 mt-10 mx-auto"
+      :class="props.hasDelete ? 'justify-between' : 'justify-center'"
+    >
       <button
-        class="btn-outline !border-danger !text-danger"
-        @click="showModal = false"
+        class="btn-danger-outline"
+        v-if="props.hasDelete"
+        @click="emit('delete')"
       >
-        Cancel
+        Delete
       </button>
-      <button class="btn" @click="onSave">{{ props.saveBtn }}</button>
+      <div class="flex gap-3">
+        <button class="btn-gray-outline" @click="showModal = false">
+          Cancel
+        </button>
+        <button class="btn" @click="onSave">{{ props.saveBtn }}</button>
+      </div>
     </div>
   </div>
 </template>
@@ -34,26 +43,30 @@
 const props = defineProps({
   title: {
     type: String,
-    required: true,
+    required: true
   },
   action: String,
   saveBtn: {
     type: String,
-    default: "Save",
+    default: 'Save'
   },
   modalClass: {
     type: String,
-    default: ""
+    default: ''
+  },
+  hasDelete: {
+    type: Boolean,
+    default: false
   }
-});
+})
 
-const showModal = defineModel();
+const showModal = defineModel()
 
-const emit = defineEmits(["submit"]);
+const emit = defineEmits(['submit', 'delete'])
 
 const onSave = () => {
-  emit("submit");
-};
+  emit('submit')
+}
 </script>
 
 <style scoped>

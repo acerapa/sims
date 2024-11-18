@@ -14,7 +14,7 @@
 const props = defineProps({
   hasCheckBox: {
     type: Boolean,
-    default: true,
-  },
-});
+    default: true
+  }
+})
 </script>

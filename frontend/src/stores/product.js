@@ -1,14 +1,14 @@
-import { authenticatedApi } from "@/api";
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { useVendorStore } from "./supplier";
+import { authenticatedApi } from '@/api'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { useVendorStore } from './supplier'
 
-export const useProductStore = defineStore("product", () => {
-  const supplierStore = useVendorStore();
+export const useProductStore = defineStore('product', () => {
+  const supplierStore = useVendorStore()
 
-  const products = ref([]);
+  const products = ref([])
   const supplierProducts = computed(() => {
-    if (!supplierStore.selectedSupplier) return products.value;
+    if (!supplierStore.selectedSupplier) return products.value
     return products.value.filter(
       (product) =>
         product.suppliers &&
@@ -16,29 +16,29 @@ export const useProductStore = defineStore("product", () => {
         product.suppliers
           .map((sup) => sup.id)
           .includes(supplierStore.selectedSupplier.id)
-    );
-  });
+    )
+  })
 
   const fetchAllProducts = async () => {
-    const res = await authenticatedApi("products/all");
+    const res = await authenticatedApi('products/all')
     if (res.status == 200) {
-      products.value = res.data.products;
+      products.value = res.data.products
     }
-  };
+  }
 
   const productOptions = computed(() => {
     return products.value.map((product) => {
       return {
         text: product.name,
-        value: product.id,
-      };
-    });
-  });
+        value: product.id
+      }
+    })
+  })
 
   return {
     products,
     supplierProducts,
     productOptions,
-    fetchAllProducts,
-  };
-});
+    fetchAllProducts
+  }
+})

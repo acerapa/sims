@@ -28,45 +28,45 @@
 </template>
 
 <script setup>
-import { GeneralHelpers } from "shared/helpers";
+import { GeneralHelpers } from 'shared/helpers'
 
 const props = defineProps({
   isDisabled: {
     type: Boolean,
-    default: false,
+    default: false
   },
   headerComponent: {
     type: Object,
-    required: true,
+    required: true
   },
   rowComponent: {
     type: Object,
-    required: true,
+    required: true
   },
   rowPropInit: {
     type: String,
-    required: false,
+    required: false
   },
   headerPropInit: {
     type: String,
-    required: false,
+    required: false
   },
   hasAddNewItem: {
     type: Boolean,
-    default: true,
+    default: true
   },
   format: {
     type: Object,
-    required: true,
-  },
-});
+    required: true
+  }
+})
 
-const dataInputs = defineModel();
+const dataInputs = defineModel()
 const onNewItem = () => {
-  dataInputs.value.push({ ...props.format });
-};
+  dataInputs.value.push({ ...props.format })
+}
 
 const onRemove = (ndx) => {
-  dataInputs.value = dataInputs.value.filter((item, index) => index != ndx);
-};
+  dataInputs.value = dataInputs.value.filter((item, index) => index != ndx)
+}
 </script>

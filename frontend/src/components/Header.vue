@@ -7,26 +7,26 @@
 </template>
 
 <script setup>
-import { useAppStore } from "@/stores/app";
-import { computed } from "vue";
-import { useRoute } from "vue-router";
-const appStore = useAppStore();
+import { useAppStore } from '@/stores/app'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+const appStore = useAppStore()
 
-const route = useRoute();
+const route = useRoute()
 
 const title = computed(() => {
-  let t = route.meta.title;
+  let t = route.meta.title
 
   if (!t) {
     if (appStore.currentNav && appStore.currentNav.includes_active) {
       t = appStore.currentNav.includes_active.includes(route.name)
         ? t
-        : appStore.currentNav.text;
+        : appStore.currentNav.text
     } else if (appStore.currentNav && !appStore.currentNav.includes_active) {
-      t = appStore.currentNav.text;
+      t = appStore.currentNav.text
     }
   }
 
-  return t;
-});
+  return t
+})
 </script>

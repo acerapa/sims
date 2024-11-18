@@ -17,7 +17,7 @@
         :class="[
           props.product.name.toLowerCase().includes('total')
             ? 'text-blue-500'
-            : '',
+            : ''
         ]"
       >
         {{ props.product.available }}
@@ -41,11 +41,11 @@
 </template>
 
 <script setup>
-import check from "@/assets/icons/check-mark.png";
+import check from '@/assets/icons/check-mark.png'
 const props = defineProps({
   product: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 </script>

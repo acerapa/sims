@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-6 gap-3 items-start min-w-[430px]">
+  <div
+    class="grid grid-cols-5 gap-3 items-start min-w-[430px] gen-table-row"
+    @click="emit('view', props.productReordering.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.productReordering.id }}</p>
@@ -14,14 +17,6 @@
         {{ product.name }}
       </p>
     </div>
-    <div class="col-span-1 text-sm">
-      <img
-        @click.stop="openMenu(props.productReordering.id)"
-        class="cursor-pointer menu-btn-trigger"
-        src="@/assets/icons/vertical-menu.svg"
-        alt=""
-      />
-    </div>
   </div>
 </template>
 
@@ -29,13 +24,9 @@
 const props = defineProps({
   productReordering: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
-const emit = defineEmits(["openMenu"]);
-
-const openMenu = (id) => {
-  emit("openMenu", id);
-};
+const emit = defineEmits(['view'])
 </script>

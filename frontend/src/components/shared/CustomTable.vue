@@ -1,75 +1,79 @@
 <template>
-  <div class="w-full flex flex-col gap-4">
-    <div class="table-wrapper w-full relative">
-      <!-- filter -->
-      <div ref="filter">
-        <FilterComponent
-          v-model="showFilter"
-          v-if="showFilter"
-          v-model:is-filter-used="filterUsed"
-        >
-          <template v-slot:filters>
-            <slot name="filters"></slot>
-          </template>
-        </FilterComponent>
-      </div>
-      <p v-if="props.title" class="font-bold text-sm">{{ props.title }}</p>
-      <div class="flex justify-between items-center" v-if="props.hasTools">
-        <div class="flex gap-3 items-center">
-          <div
-            class="rounded border cursor-pointer w-[64px] h-[38px] p-1 flex items-center justify-center"
-            :class="
-              filterUsed
-                ? '[&>img]:brightness-0 [&>img]:invert bg-primary border-primary '
-                : ''
-            "
-            @click.stop="showFilter = true"
-            v-if="props.hasFilter"
+  <div class="w-full relative">
+    <div class="table-wrapper w-full relative flex flex-col gap-4">
+      <div class="sticky top-0">
+        <!-- filter -->
+        <div ref="filter">
+          <FilterComponent
+            v-model="showFilter"
+            v-if="showFilter"
+            v-model:is-filter-used="filterUsed"
           >
-            <img
-              src="@/assets/icons/funnel.png"
-              class="max-w-[30px] max-h-[26px] w-full h-full object-fill"
-              alt="funnel"
-            />
-          </div>
-          <input
-            type="search"
-            name="search"
-            placeholder="Search"
-            v-model="searchText"
-            class="input w-full max-w-72"
-            :id="`search-${instance.uid}`"
-          />
-          <select
-            name="show-item"
-            id="show-item"
-            class="input"
-            v-model="showItemSelected"
-          >
-            <option
-              v-for="(val, ndx) in props.pgOptions.showItems"
-              :key="ndx"
-              :value="val"
-            >
-              {{ val }}
-            </option>
-          </select>
+            <template v-slot:filters>
+              <slot name="filters"></slot>
+            </template>
+          </FilterComponent>
         </div>
-        <div class="flex gap-3">
-          <button
-            v-if="props.hasAddBtn"
-            class="bg-primary p-2 rounded"
-            @click="onAddNew"
-          >
-            <img src="@/assets/icons/plus.svg" alt="Plus" />
-          </button>
+        <p v-if="props.title" class="font-bold text-sm">{{ props.title }}</p>
+        <div class="flex justify-between items-center" v-if="props.hasTools">
+          <div class="flex gap-3 items-center">
+            <div
+              class="rounded border cursor-pointer w-[64px] h-[38px] p-1 flex items-center justify-center"
+              :class="
+                filterUsed
+                  ? '[&>img]:brightness-0 [&>img]:invert bg-primary border-primary '
+                  : ''
+              "
+              @click.stop="showFilter = true"
+              v-if="props.hasFilter"
+            >
+              <img
+                src="@/assets/icons/funnel.png"
+                class="max-w-[30px] max-h-[26px] w-full h-full object-fill"
+                alt="funnel"
+              />
+            </div>
+            <input
+              type="search"
+              name="search"
+              placeholder="Search"
+              v-model="searchText"
+              class="input w-full max-w-72"
+              :id="`search-${instance.uid}`"
+            />
+            <select
+              name="show-item"
+              id="show-item"
+              class="input"
+              v-model="showItemSelected"
+            >
+              <option
+                v-for="(val, ndx) in props.pgOptions.showItems"
+                :key="ndx"
+                :value="val"
+              >
+                {{ val }}
+              </option>
+            </select>
+          </div>
+          <div class="flex gap-3">
+            <button
+              v-if="props.hasAddBtn"
+              class="bg-primary p-2 rounded"
+              @click="onAddNew"
+            >
+              <img src="@/assets/icons/plus.svg" alt="Plus" />
+            </button>
 
-          <!-- Custom buttons -->
-          <slot name="buttons"></slot>
+            <!-- Custom buttons -->
+            <slot name="buttons"></slot>
+          </div>
         </div>
       </div>
       <hr class="bg-gray-50 -mx-4" v-if="props.hasTools" />
-      <div class="flex flex-col gap-7 overflow-x-auto pb-5">
+      <div
+        class="flex flex-col gap-7 w-full pb-5 overflow-x-auto overflow-y-hidden"
+      >
         <!-- Default slot -->
         <slot></slot>
 
@@ -94,7 +98,12 @@
             :has-check-box="props.hasCheckBox"
             @open-menu="
               (data) => {
-                emit('open-menu', data);
+                emit('open-menu', data)
+              }
+            "
+            @view="
+              (data) => {
+                emit('view', data)
               }
             "
           />
@@ -121,122 +130,124 @@
         v-model:current-items="items"
       />
     </div>
+
     <slot v-if="props.isNested" name="tables"></slot>
   </div>
 </template>
 
 <script setup>
-import { computed, getCurrentInstance, ref, watch } from "vue";
-import Paginate from "./Paginate.vue";
-import FilterComponent from "./FilterComponent.vue";
-import Event from "@/event";
+import { getCurrentInstance, ref, watch } from 'vue'
+import Paginate from './Paginate.vue'
+import FilterComponent from './FilterComponent.vue'
+import Event from '@/event'
 
 const emit = defineEmits([
-  "update:showModal",
-  "update:isEdit",
-  "open-menu",
-  "update:searchText",
-  "addNewRecord",
-]);
+  'update:showModal',
+  'update:isEdit',
+  'open-menu',
+  'update:searchText',
+  'addNewRecord',
+  'view'
+])
 
 const props = defineProps({
   title: {
-    type: String,
+    type: String
   },
   hasPagination: {
     type: Boolean,
-    default: false,
+    default: false
   },
   hasAddBtn: {
     type: Boolean,
-    default: true,
+    default: true
   },
   hasFilter: {
     type: Boolean,
-    default: false,
+    default: false
   },
   hasTools: {
     type: Boolean,
-    default: true,
+    default: true
   },
   hasCheckBox: {
     type: Boolean,
-    default: true,
+    default: true
   },
   tableHeaderComponent: {
     type: Object,
-    required: false,
+    required: false
   },
   tableRowComponent: {
     type: Object,
-    required: false,
+    required: false
   },
   isNested: {
     type: Boolean,
-    default: false,
+    default: false
   },
   data: {
     type: Object,
-    default: [],
+    default: []
   },
   rowPropInit: {
     type: String,
-    required: false,
+    required: false
   },
   pgOptions: {
     type: Object,
     default: {
-      showItems: [5, 10, 20, 50, 100],
-    },
-  },
-});
+      showItems: [5, 10, 20, 50, 100]
+    }
+  }
+})
 
 // Custom warning for required props with condition
 if (!props.isNested) {
-  if (!props.rowPropInit) console.warn("Missing required prop: `rowPropInit`");
+  if (!props.rowPropInit) console.warn('Missing required prop: `rowPropInit`')
 }
 
-const instance = getCurrentInstance();
+const instance = getCurrentInstance()
 
-const filter = ref();
+const filter = ref()
 Event.on(
-  "global-click",
+  'global-click',
   function () {
     if (filter.value) {
       if (!filter.value.contains(event.target)) {
-        showFilter.value = false;
+        showFilter.value = false
       }
     }
   },
   true
-);
+)
 
 // vars
-const items = ref(props.data);
-const showItemSelected = ref(5);
+const items = ref(props.data)
+const showItemSelected = ref(5)
 
 // flags
-const showFilter = ref(false);
-const filterUsed = ref(false);
+const showFilter = ref(false)
+const filterUsed = ref(false)
 
 // watchers
 watch(
   () => props.data,
   (value) => (items.value = value)
-);
+)
 
 // models
-const isEdit = defineModel("isEdit");
-const showModal = defineModel("showModal");
-const searchText = defineModel("searchText");
+const isEdit = defineModel('isEdit')
+const showModal = defineModel('showModal')
+const searchText = defineModel('searchText')
 
 // methods
 const onAddNew = () => {
-  showModal.value = true;
-  isEdit.value = false;
+  showModal.value = true
+  isEdit.value = false
 
-  emit("addNewRecord");
-};
+  emit('addNewRecord')
+}
 </script>
 
 <style scoped></style>

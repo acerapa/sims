@@ -6,36 +6,29 @@
       :selected-id="selectedId"
       v-if="showModal"
     />
-    <DeleteConfirmModal
-      v-if="showDeleteConfirmationModal"
-      v-model="showDeleteConfirmationModal"
-      href="settings/accounts/delete"
-      :data="toDelete"
-      @after-delete="
-        settingsStore.fetchAllAccounts();
-        showDeleteConfirmationModal = false;
-      "
-    />
     <CustomTable
       :has-filter="true"
       :has-add-btn="true"
       :data="filteredData"
       :has-pagination="true"
       v-model:is-edit="isEdit"
-      v-model:show-modal="showModal"
       :row-prop-init="accountRowEvent"
       v-model:search-text="searchText"
       :table-row-component="AccountRow"
-      :table-header-component="AccountTableHeader"
-      @open-menu="onSelectRow"
+      @add-new-record="onNewRecord"
+      @view="onView"
     >
-      <RowMenu
-        :top="top"
-        class="right-15"
-        v-if="showRowMenu"
-        @view="onViewRow"
-        @delete="onDeleteRow"
-      />
+      <template #table_header>
+        <div class="grid grid-cols-8 gap-3">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-3 table-header">Account Name</p>
+          <p class="col-span-2 table-header">Type</p>
+          <p class="col-span-2 table-header">Date Added</p>
+        </div>
+      </template>
       <template v-slot:filters>
         <div class="flex flex-col gap-3">
           <div class="flex flex-col">
@@ -48,12 +41,12 @@
               :options="[
                 {
                   value: 'income',
-                  text: 'Income',
+                  text: 'Income'
                 },
                 {
                   value: 'expense',
-                  text: 'Expense',
-                },
+                  text: 'Expense'
+                }
               ]"
             />
           </div>
@@ -87,57 +80,45 @@
 </template>
 
 <script setup>
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import AccountModal from "@/components/Settings/AccountModal.vue";
-import AccountRow from "@/components/Settings/AccountRow.vue";
-import AccountTableHeader from "@/components/Settings/AccountTableHeader.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { useSettingsStore } from "@/stores/settings";
-import { DateHelpers } from "shared/helpers";
-import { computed, onMounted, ref } from "vue";
+import AccountModal from '@/components/Settings/AccountModal.vue'
+import AccountRow from '@/components/Settings/AccountRow.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import CustomTable from '@/components/shared/CustomTable.vue'
+import { EventEnum } from '@/data/event'
+import Event from '@/event'
+import { useSettingsStore } from '@/stores/settings'
+import { DateHelpers } from 'shared/helpers'
+import { computed, onMounted, ref } from 'vue'
 
-const top = ref(0);
-const toDelete = ref();
-const selectedId = ref(0);
-const isEdit = ref(false);
-const showModal = ref(false);
-const showRowMenu = ref(false);
-const showDeleteConfirmationModal = ref(false);
+const selectedId = ref(0)
+const isEdit = ref(false)
+const showModal = ref(false)
 
-const settingsStore = useSettingsStore();
+const settingsStore = useSettingsStore()
 
 const filter = ref({
-  type: "",
-});
+  type: ''
+})
 
-const searchText = ref();
+const searchText = ref()
 const dateAdded = ref({
-  from: "",
-  to: "",
-});
+  from: '',
+  to: ''
+})
 
 /** ================================================
  * EVENTS
  ** ================================================*/
 
 // Is page loading
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
-
-// custom event
-Event.on(EventEnum.GLOBAL_CLICK, function () {
-  showRowMenu.value = false;
-});
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 // define account row props
-const accountRowEvent = "account-row-init-props";
+const accountRowEvent = 'account-row-init-props'
 Event.on(accountRowEvent, function (data) {
   // initize the value of props here
-  return { account: data };
-});
+  return { account: data }
+})
 
 /** ================================================
  * COMPUTED
@@ -157,39 +138,32 @@ const filteredData = computed(() => {
     )
     .filter((account) => {
       const searchCondition =
-        `${account.id} ${account.type} ${account.name}`.toLowerCase();
+        `${account.id} ${account.type} ${account.name}`.toLowerCase()
       return searchText.value
         ? searchCondition.includes(searchText.value.toLowerCase())
-        : account;
-    });
-});
+        : account
+    })
+})
 
 /** ================================================
  * METHODS
  ** ================================================*/
+const onView = (id) => {
+  selectedId.value = id
+  showModal.value = true
+}
 
-const onSelectRow = (id) => {
-  selectedId.value = id;
-  top.value = event.target.offsetTop;
-  showRowMenu.value = true;
-};
-
-const onViewRow = () => {
-  isEdit.value = true;
-  showModal.value = true;
-};
-
-const onDeleteRow = () => {
-  toDelete.value = { id: selectedId.value };
-  showDeleteConfirmationModal.value = true;
-};
+const onNewRecord = () => {
+  selectedId.value = 0
+  showModal.value = true
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 
 onMounted(async () => {
-  await settingsStore.fetchAllAccounts();
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  await settingsStore.fetchAllAccounts()
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 </script>

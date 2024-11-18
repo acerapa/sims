@@ -1,100 +1,78 @@
 <template>
-  <DeleteConfirmModal
-    v-if="showDeleteModal"
-    :href="`transfer/${selectedId}`"
-    v-model="showDeleteModal"
-  />
   <div>
     <CustomTable
+      @view="onView"
       :data="filteredData"
       :has-pagination="true"
-      @open-menu="onSelectRow"
       :row-prop-init="rowPropInit"
       @add-new-record="onAddNewRecord"
       :table-row-component="StrListRow"
-      :table-header-component="StrListHeader"
     >
-      <RowMenu
-        :top="top"
-        v-if="showRowMenu"
-        @view="onViewRow"
-        @delete="onDeleteRow"
-      />
+      <template #table_header>
+        <div class="grid grid-cols-7 gap-3">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-2 table-header">From</p>
+          <p class="col-span-1 table-header">Manager</p>
+          <p class="col-span-1 table-header">Process By</p>
+          <p class="col-span-2 table-header">When</p>
+        </div>
+      </template>
     </CustomTable>
   </div>
 </template>
 
 <script setup>
-import StrListRow from "@/components/stock-transfer/str-list-row.vue";
-import StrListHeader from "@/components/stock-transfer/str-list-header.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
-import { useTransferStore } from "@/stores/transfer";
-import { TransferType } from "shared/enums";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import StrListRow from '@/components/stock-transfer/str-list-row.vue'
+import CustomTable from '@/components/shared/CustomTable.vue'
+import { EventEnum } from '@/data/event'
+import Event from '@/event'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useTransferStore } from '@/stores/transfer'
 
-const top = ref(0);
-const router = useRouter();
-const selectedId = ref(-1);
-const showRowMenu = ref(false);
-const showDeleteModal = ref(false);
-const transferStore = useTransferStore();
+const router = useRouter()
+const transferStore = useTransferStore()
 
 /** ================================================
  * EVENTS
  ** ================================================*/
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
-Event.on(EventEnum.GLOBAL_CLICK, function () {
-  showRowMenu.value = false;
-});
-
-const rowPropInit = "str-row-prop-init";
+const rowPropInit = 'str-row-prop-init'
 Event.on(rowPropInit, function (data) {
-  return { str: data };
-});
+  return { str: data }
+})
 /** ================================================
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return transferStore.strs ? transferStore.strs.filter((str) => true) : 0;
-});
+  return transferStore.strs ? transferStore.strs.filter((str) => true) : 0
+})
 
 /** ================================================
  * METHODS
  ** ================================================*/
 const onAddNewRecord = () => {
   router.push({
-    name: "str-form",
-  });
-};
+    name: 'str-form'
+  })
+}
 
-const onSelectRow = (id) => {
-  selectedId.value = id;
-  top.value = event.target.offsetTop;
-  showRowMenu.value = true;
-};
-
-const onViewRow = () => {
+const onView = (id) => {
   router.push({
-    name: "str-form",
-    query: { id: selectedId.value },
-  });
-};
-
-const onDeleteRow = () => {
-  showDeleteModal.value = true;
-};
+    name: 'str-form',
+    query: { id }
+  })
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await transferStore.fetchTransfers();
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  await transferStore.fetchTransfers()
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 </script>

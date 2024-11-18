@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format-fix": "prettier ./src --write",
+    "format-check": "prettier ./src --check"
   },
   "dependencies": {
     "autoprefixer": "^10.4.19",
@@ -19,7 +21,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "prettier": "^3.3.1",
+    "prettier": "3.3.3",
     "vite": "^5.2.0"
   }
 }

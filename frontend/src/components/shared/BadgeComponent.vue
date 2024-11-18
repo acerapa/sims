@@ -1,16 +1,18 @@
 <template>
-  <button :class="['badge', props.customClass]">{{ props.text }}</button>
+  <button type="button" :class="['badge', props.customClass]">
+    {{ props.text }}
+  </button>
 </template>
 
 <script setup>
 const props = defineProps({
   customClass: {
     type: String,
-    required: true,
+    required: true
   },
   text: {
     type: String,
-    required: true,
-  },
-});
+    required: true
+  }
+})
 </script>

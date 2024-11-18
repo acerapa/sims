@@ -1,11 +1,11 @@
-import { createRouter, createWebHistory } from "vue-router";
-import { isAuthenticated } from "@/stores/auth";
+import { createRouter, createWebHistory } from 'vue-router'
+import { isAuthenticated } from '@/stores/auth'
 
-import commonRoutes from "./common";
-import reportRoutes from "./report";
-import inventoryRoutes from "./inventory";
-import settingsRoutes from "./settings";
-import transferRoutes from "./transfer";
+import commonRoutes from './common'
+import reportRoutes from './report'
+import inventoryRoutes from './inventory'
+import settingsRoutes from './settings'
+import transferRoutes from './transfer'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -14,32 +14,32 @@ const router = createRouter({
     ...inventoryRoutes,
     ...settingsRoutes,
     ...reportRoutes,
-    ...transferRoutes,
-  ],
-});
+    ...transferRoutes
+  ]
+})
 
 router.beforeEach(async (to, from, next) => {
-  const isAuth = await isAuthenticated();
+  const isAuth = await isAuthenticated()
 
   if (to.meta.requiresAuth) {
     if (isAuth) {
-      next();
+      next()
     } else {
-      if (to.name == "login") {
-        next();
-        return;
+      if (to.name == 'login') {
+        next()
+        return
       } else {
-        next({ name: "login" });
-        return;
+        next({ name: 'login' })
+        return
       }
     }
   } else {
     if (isAuth) {
-      next(from);
+      next(from)
     } else {
-      next();
+      next()
     }
   }
-});
+})
 
-export default router;
+export default router

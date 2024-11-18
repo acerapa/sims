@@ -75,48 +75,48 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
-import CustomInput from "../shared/CustomInput.vue";
-import ProductModal from "../Product/ProductModal.vue";
-import { useProductStore } from "@/stores/product";
+import { computed, ref, watch } from 'vue'
+import CustomInput from '../shared/CustomInput.vue'
+import ProductModal from '../Product/ProductModal.vue'
+import { useProductStore } from '@/stores/product'
 
-const emit = defineEmits(["remove"]);
+const emit = defineEmits(['remove'])
 
 const props = defineProps({
   isDisabled: {
     type: Boolean,
-    default: false,
-  },
-});
-const showModal = ref(false);
-const model = defineModel();
+    default: false
+  }
+})
+const showModal = ref(false)
+const model = defineModel()
 
-const productStore = useProductStore();
+const productStore = useProductStore()
 
 const onChange = () => {
   if (model.value.product_id) {
     const product = productStore.products.find(
       (prd) => prd.id == model.value.product_id
-    );
+    )
 
     if (product) {
-      model.value.description = product.purchase_description;
-      model.value.cost = product.price;
-      model.value.quantity = 1;
+      model.value.description = product.purchase_description
+      model.value.cost = product.price
+      model.value.quantity = 1
     }
   } else {
-    model.value.name = "";
-    model.value.product_id = "";
-    model.value.description = "";
-    model.value.quantity = "";
-    model.value.cost = "";
+    model.value.name = ''
+    model.value.product_id = ''
+    model.value.description = ''
+    model.value.quantity = ''
+    model.value.cost = ''
   }
-};
+}
 
 watch(
   () => model.value.quantity,
   () => {
-    model.value.amount = model.value.cost * model.value.quantity;
+    model.value.amount = model.value.cost * model.value.quantity
   }
-);
+)
 </script>

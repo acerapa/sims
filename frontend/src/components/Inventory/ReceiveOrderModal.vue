@@ -1,11 +1,9 @@
 <template>
-	<ModalWrapper title="Receive Order" v-model="showModal">
-
-	</ModalWrapper>
+  <ModalWrapper title="Receive Order" v-model="showModal"> </ModalWrapper>
 </template>
 
 <script setup>
-import ModalWrapper from '@/components/shared/ModalWrapper.vue';
+import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 
-const showModal = defineModel();
+const showModal = defineModel()
 </script>

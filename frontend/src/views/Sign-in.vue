@@ -22,9 +22,11 @@
           label="Username"
           name="username"
           @focus="
-            credentialErrors.username = '';
-            credentialErrors.password = '';
-            credentialErrors.responseErr = '';
+            () => {
+              credentialErrors.username = ''
+              credentialErrors.password = ''
+              credentialErrors.responseErr = ''
+            }
           "
           v-model="credentials.username"
           :error="credentialErrors.username"
@@ -36,9 +38,11 @@
           label="Password"
           name="password"
           @focus="
-            credentialErrors.username = '';
-            credentialErrors.password = '';
-            credentialErrors.responseErr = '';
+            () => {
+              credentialErrors.username = ''
+              credentialErrors.password = ''
+              credentialErrors.responseErr = ''
+            }
           "
           v-model="credentials.password"
           :error="credentialErrors.password"
@@ -55,64 +59,64 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import Event from "@/event";
-import { useRouter } from "vue-router";
-import { EventEnum } from "@/data/event";
-import { useAuthStore } from "@/stores/auth";
-import { AuthSchema } from "shared/validators/auth";
-import CustomInput from "@/components/shared/CustomInput.vue";
+import { ref } from 'vue'
+import Event from '@/event'
+import { useRouter } from 'vue-router'
+import { EventEnum } from '@/data/event'
+import { useAuthStore } from '@/stores/auth'
+import { AuthSchema } from 'shared/validators/auth'
+import CustomInput from '@/components/shared/CustomInput.vue'
 
-const router = useRouter();
+const router = useRouter()
 
-const authStore = useAuthStore();
+const authStore = useAuthStore()
 
 const credentials = ref({
-  username: "",
-  password: "",
-});
+  username: '',
+  password: ''
+})
 
 const credentialErrors = ref({
-  username: "",
-  password: "",
-  responseErr: "",
-});
+  username: '',
+  password: '',
+  responseErr: ''
+})
 
 const onSubmit = async () => {
   // validate
   const { error } = AuthSchema.validate(credentials.value, {
-    abortEarly: false,
-  });
+    abortEarly: false
+  })
 
   if (error) {
     // process error details
     error.details.forEach((detail) => {
       // capture the text inside the `""`
-      const regex = /"(.*?)"/;
-      const key = detail.message.match(regex)[0].replaceAll(`"`, "");
+      const regex = /"(.*?)"/
+      const key = detail.message.match(regex)[0].replaceAll(`"`, '')
 
-      credentialErrors.value[key] = detail.message;
-    });
-    return;
+      credentialErrors.value[key] = detail.message
+    })
+    return
   }
 
-  Event.emit(EventEnum.IS_PAGE_LOADING, true);
-  const res = await authStore.authenticate(credentials.value);
+  Event.emit(EventEnum.IS_PAGE_LOADING, true)
+  const res = await authStore.authenticate(credentials.value)
   if (res.status == 200 && res.data) {
-    router.push({ name: "dashboard" });
+    router.push({ name: 'dashboard' })
   } else {
-    credentialErrors.value.responseErr = res.message;
-    credentialErrors.value.username = " ";
-    credentialErrors.value.password = " ";
+    credentialErrors.value.responseErr = res.message
+    credentialErrors.value.username = ' '
+    credentialErrors.value.password = ' '
   }
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-};
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+}
 </script>
 
 <style scoped>
 .logo {
   background-size: cover;
-  background-image: url("@/assets/logo-icon.png");
+  background-image: url('@/assets/logo-icon.png');
   @apply w-24 h-24 rounded-full mx-auto -mt-16 border-white border text-white flex items-center justify-center;
 }
 </style>

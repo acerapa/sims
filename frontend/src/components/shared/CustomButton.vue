@@ -6,11 +6,11 @@
 const props = defineProps({
   text: {
     type: String,
-    required: true,
+    required: true
   },
   btnClass: {
     type: String,
-    default: "btn",
-  },
-});
+    default: 'btn'
+  }
+})
 </script>

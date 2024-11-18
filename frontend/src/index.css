@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --danger: #F05252;
+  --danger: #f05252;
   --danger-20: rgb(240, 82, 82, 0.2);
   --danger-10: rgb(240, 82, 82, 0.1);
-  --open: #3F83F8;
-  --success: #19BE34;
-  --warning: #C27803;
+  --open: #3f83f8;
+  --success: #19be34;
+  --warning: #c27803;
   --draft: #6b7280;
 }
 
@@ -29,7 +29,7 @@
  * Input Related Styling
  ======================================================*/
 .input {
-  @apply border rounded text-sm px-3 py-2 focus:!outline-0 focus:border-black group-focus:border-black group-focus:!outline-0 ;
+  @apply border rounded text-sm px-3 py-2 focus:!outline-0 focus:border-black group-focus:border-black group-focus:!outline-0;
   @apply disabled:border-none disabled:opacity-100 disabled:bg-white;
 }
 
@@ -59,13 +59,13 @@ select.input {
 
 .gen-table-row {
   padding: 4px 0px;
+  cursor: pointer;
 }
 
 .gen-table-row:hover {
   border-radius: 2px;
   background-color: #eff6ff;
 }
-
 
 /*=====================================================
  * Button Related Styling
@@ -78,6 +78,26 @@ select.input {
   @apply px-4 py-2 rounded border border-primary text-primary font-semibold text-sm bg-white;
 }
 
+.btn-danger {
+  @apply btn !bg-danger !text-white;
+}
+
+.btn-danger-outline {
+  @apply btn-outline !border-danger !text-danger;
+}
+
+.btn-green {
+  @apply btn !bg-green-500 !text-white;
+}
+
+.btn-gray {
+  @apply btn !bg-gray-600 !text-white;
+}
+
+.btn-gray-outline {
+  @apply btn-outline !border-gray-600 !text-gray-600;
+}
+
 .status {
   @apply px-2 py-1 text-xs font-semibold rounded-md h-fit;
 }
@@ -86,7 +106,7 @@ select.input {
   @apply px-2 py-1 text-xs font-semibold rounded-md h-fit bg-opacity-20;
 }
 
-.row-menu-item  {
+.row-menu-item {
   @apply border-b text-sm last:border-none px-3 py-1 hover:bg-blue-100 first:rounded-t-lg last:rounded-b-lg;
 }
 
@@ -101,9 +121,10 @@ select.input {
   background-color: rgb(194, 120, 3, 0.2);
 }
 
-.purchase-status-completed, .done {
+.purchase-status-completed,
+.done {
   color: var(--success);
-  background-color: rgb(25, 190, 52, 0.2); 
+  background-color: rgb(25, 190, 52, 0.2);
 }
 
 .purchase-status-cancelled {
@@ -115,7 +136,6 @@ select.input {
   color: var(--draft);
   background-color: rgb(107, 114, 128, 0.2);
 }
-
 
 /*=====================================================
  * KEYFRAMES, ANIMATIONS, TRANSISTIONS

@@ -1,5 +1,11 @@
 <template>
-  <ModalWrapper title="New Employee" v-model="showModal" @submit="onSubmit">
+  <ModalWrapper
+    title="New Employee"
+    v-model="showModal"
+    @submit="onSubmit"
+    :has-delete="props.selectedId ? true : false"
+    @delete="onDelete"
+  >
     <div class="flex flex-col gap-6 mt-10">
       <div class="flex gap-3">
         <CustomInput
@@ -15,7 +21,7 @@
           type="select"
           :options="[
             { text: 'Active', value: 1 },
-            { text: 'Inactive', value: 0 },
+            { text: 'Inactive', value: 0 }
           ]"
           placeholder="Status"
           v-model="model.status"
@@ -64,88 +70,100 @@
       <div class="flex gap-3"></div>
     </div>
   </ModalWrapper>
+  <DeleteConfirmModal
+    v-if="showConfirmModal"
+    v-model="showConfirmModal"
+    :href="`users/delete/${props.selectedId}`"
+    @after-delete="onAfterDelete"
+  />
 </template>
 <script setup>
-import { Method, authenticatedApi } from "@/api";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import { useEmployeeStore } from "@/stores/employee";
-import { ObjectHelpers } from "shared";
-import { computed, onMounted, ref } from "vue";
+import { Method, authenticatedApi } from '@/api'
+import DeleteConfirmModal from '../DeleteConfirmModal.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+import { useEmployeeStore } from '@/stores/employee'
+import { ObjectHelpers } from 'shared'
+import { computed, onMounted, ref } from 'vue'
+
+const showConfirmModal = ref(false)
 
 const props = defineProps({
-  isEdit: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
   selectedId: {
     type: Number,
-    required: false,
-  },
-});
+    required: false
+  }
+})
 
-const apiPath = props.isEdit
+const apiPath = props.selectedId
   ? `users/${props.selectedId}/update`
-  : "users/register";
-const employeeStore = useEmployeeStore();
+  : 'users/register'
+const employeeStore = useEmployeeStore()
 
 const model = ref({
-  username: "",
-  status: "",
-  first_name: "",
-  middle_name: "",
-  last_name: "",
-  position: "",
-  date_started: "",
-  password: "",
-});
+  username: '',
+  status: '',
+  first_name: '',
+  middle_name: '',
+  last_name: '',
+  position: '',
+  date_started: '',
+  password: ''
+})
 
-const showModal = defineModel();
+const showModal = defineModel()
 
 /** ================================================
  * COMPUTED
  ** ================================================*/
 const positionOptions = computed(() => {
   return [
-    { text: "Admin", value: "admin" },
-    { text: "Inventory Manager", value: "inventory" },
-    { text: "Cashier", value: "cashier" },
-  ];
-});
+    { text: 'Admin', value: 'admin' },
+    { text: 'Inventory Manager', value: 'inventory' },
+    { text: 'Cashier', value: 'cashier' }
+  ]
+})
 
 /** ================================================
  * METHODS
  ** ================================================*/
 const onSubmit = async () => {
-  if (!props.isEdit) {
-    model.value.password = `${
-      model.value.username
-    }-${new Date().getFullYear()}`;
+  if (!props.selectedId) {
+    model.value.password = `${model.value.username}-${new Date().getFullYear()}`
   }
-  const res = await authenticatedApi(apiPath, Method.POST, model.value);
+  const res = await authenticatedApi(apiPath, Method.POST, model.value)
   // TODO: Show alert. Currently we have no alert component so go ahead and create it first
-  showModal.value = false;
+  showModal.value = false
   // Refetch the updated data from database via store
-  await employeeStore.fetchAllEmployees();
-};
+  await employeeStore.fetchAllEmployees()
+}
+
+const onDelete = async () => {
+  showConfirmModal.value = true
+}
+
+const onAfterDelete = async () => {
+  showModal.value = false
+  showConfirmModal.value = false
+  await employeeStore.fetchAllEmployees()
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(() => {
-  if (props.isEdit) {
+  if (props.selectedId) {
     const employee = employeeStore.employees.find(
       (emp) => emp.id == props.selectedId
-    );
+    )
     if (employee) {
-      model.value = ObjectHelpers.assignSameFields(model.value, employee);
+      model.value = ObjectHelpers.assignSameFields(model.value, employee)
 
       // update date
-      model.value.date_started = model.value.date_started.split("T")[0];
+      model.value.date_started = model.value.date_started.split('T')[0]
     }
   } else {
-    model.value = ObjectHelpers.objectReset(model.value);
+    model.value = ObjectHelpers.objectReset(model.value)
   }
-});
+})
 </script>

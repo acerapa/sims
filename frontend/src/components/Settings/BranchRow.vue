@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-10 gap-3 gen-table-row">
+  <div
+    class="grid grid-cols-9 gap-3 gen-table-row"
+    @click.stop="viewRow(props.branch.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center h-fit">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.branch.id }}</p>
@@ -16,30 +19,22 @@
         :text="props.branch.status"
       />
     </div>
-    <p class="col-span-1 text-sm">
-      <img
-        src="@/assets/icons/vertical-menu.svg"
-        alt=""
-        class="cursor-pointer menu-btn-trigger"
-        @click.stop="openMenu(props.branch.id)"
-      />
-    </p>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { BranchStatusMap } from "shared/enums";
-import BadgeComponent from "../shared/BadgeComponent.vue";
+import { computed } from 'vue'
+import { BranchStatusMap } from 'shared/enums'
+import BadgeComponent from '../shared/BadgeComponent.vue'
 
 const props = defineProps({
   branch: {
     type: Object,
-    default: () => ({}),
-  },
-});
+    default: () => ({})
+  }
+})
 
-const emit = defineEmits(["openMenu"]);
+const emit = defineEmits(['view'])
 
 /** ================================================
  * COMPUTED
@@ -47,18 +42,18 @@ const emit = defineEmits(["openMenu"]);
 const concatenatedAddress = computed(
   () =>
     `${props.branch.address.address1}, ${props.branch.address.address2}, ${props.branch.address.city}, ${props.branch.address.postal}`
-);
+)
 
 const managerName = computed(
   () => `${props.branch.manager.first_name} ${props.branch.manager.last_name}`
-);
+)
 
 /** ================================================
  * METHODS
  ** ================================================*/
-const openMenu = (id) => {
-  emit("openMenu", id);
-};
+const viewRow = (id) => {
+  emit('view', id)
+}
 </script>
 
 <style scoped>

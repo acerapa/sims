@@ -1,5 +1,11 @@
 <template>
-  <ModalWrapper :title="title" v-model="showModal" @submit="onSubmit">
+  <ModalWrapper
+    :title="title"
+    v-model="showModal"
+    @submit="onSubmit"
+    :has-delete="true"
+    @delete="showDeleteConfirmModal = true"
+  >
     <div class="flex flex-col gap-4 my-7">
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Basic Info</p>
@@ -20,7 +26,7 @@
             :options="[
               { text: 'Mr.', value: 'Mr.' },
               { text: 'Ms.', value: 'Ms.' },
-              { text: 'Mrs.', value: 'Mrs.' },
+              { text: 'Mrs.', value: 'Mrs.' }
             ]"
           />
         </div>
@@ -82,66 +88,77 @@
       </div>
     </div>
   </ModalWrapper>
+  <DeleteConfirmModal
+    v-model="showDeleteConfirmModal"
+    v-if="showDeleteConfirmModal"
+    :href="`suppliers/delete/${props.selectedId}`"
+    @after-delete="onAfterDelete"
+  />
 </template>
 
 <script setup>
-import CustomInput from "@/components/shared/CustomInput.vue";
-import { Method, authenticatedApi } from "@/api";
-import ModalWrapper from "@/components/shared/ModalWrapper.vue";
-import AddressForm from "../shared/AddressForm.vue";
-import { useVendorStore } from "@/stores/supplier";
-import { onMounted, ref } from "vue";
+import DeleteConfirmModal from '../DeleteConfirmModal.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import { Method, authenticatedApi } from '@/api'
+import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+import AddressForm from '../shared/AddressForm.vue'
+import { useVendorStore } from '@/stores/supplier'
+import { onMounted, ref } from 'vue'
 
-const showModal = defineModel();
+const showModal = defineModel()
+const showDeleteConfirmModal = ref(false)
 
 const props = defineProps({
-  isEdit: {
-    type: Boolean,
-    default: false,
-  },
   selectedId: {
     type: Number,
-    required: false,
-  },
-});
+    required: false
+  }
+})
 
-const supplierStore = useVendorStore();
+const supplierStore = useVendorStore()
 const title = ref(
-  props.isEdit ? "Edit Vendor/Supplier" : "New Vendor/Supplier"
-);
-const apiPath = ref(props.isEdit ? "suppliers/update" : "suppliers/register");
+  props.selectedIdd ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier'
+)
+const apiPath = ref(
+  props.selectedIdd ? 'suppliers/update' : 'suppliers/register'
+)
 const model = ref({
-  company_name: "",
-  first_name: "",
-  last_name: "",
-  annotation: "",
-  phone: "",
-  email: "",
-  telephone: "",
-  fax: "",
+  company_name: '',
+  first_name: '',
+  last_name: '',
+  annotation: '',
+  phone: '',
+  email: '',
+  telephone: '',
+  fax: '',
   address: {
-    address1: "",
-    address2: "",
-    city: "",
-    province: "",
-    postal: "",
-  },
-});
+    address1: '',
+    address2: '',
+    city: '',
+    province: '',
+    postal: ''
+  }
+})
 
 const onSubmit = async () => {
-  const res = await authenticatedApi(apiPath.value, Method.POST, model.value);
-  await supplierStore.fetchAllSuppliers();
+  const res = await authenticatedApi(apiPath.value, Method.POST, model.value)
+  await supplierStore.fetchAllSuppliers()
 
   if (res.status == 200) {
-    showModal.value = false;
+    showModal.value = false
   }
-};
+}
+
+const onAfterDelete = async () => {
+  showModal.value = false
+  await supplierStore.fetchAllSuppliers()
+}
 
 onMounted(() => {
-  if (props.isEdit && props.selectedId) {
+  if (props.selectedId) {
     model.value = supplierStore.suppliers.find(
       (sup) => sup.id == props.selectedId
-    );
+    )
   }
-});
+})
 </script>

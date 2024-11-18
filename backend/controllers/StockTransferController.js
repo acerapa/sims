@@ -86,6 +86,72 @@ module.exports = {
       res.sendError(e);
     }
   },
+  update: async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+      const data = req.body.validated;
+      if (data.transfer) {
+        await StockTranfer.update(data.transfer, {
+          where: {
+            id: req.params.id,
+          },
+          transaction: transaction,
+        });
+      }
+      if (data.products) {
+        const products = await ProductTransaction.findAll({
+          where: {
+            transfer_id: req.params.id,
+          },
+          attributes: ["id", "product_id"],
+        });
+
+        const currentProductIds = products.map((p) => p.product_id);
+
+        await Promise.all([
+          // determine products needs to be created
+          ...data.products
+            .filter((p) => !currentProductIds.includes(p.product_id))
+            .map((p) =>
+              ProductTransaction.create(
+                { ...p, transfer_id: req.params.id },
+                { transaction: transaction }
+              )
+            ),
+          // determine the products weither they it will be updated or deleted
+          ...products.map((product) => {
+            const dataProductIds = data.products.map((p) => p.product_id);
+
+            if (dataProductIds.includes(product.product_id)) {
+              const toUpdateFields = data.products.find(
+                (p) => p.product_id == product.product_id
+              );
+
+              return ProductTransaction.update(toUpdateFields, {
+                where: {
+                  id: product.id,
+                },
+                transaction: transaction,
+              });
+            } else {
+              return ProductTransaction.destroy({
+                where: {
+                  id: product.id,
+                },
+
+                transaction: transaction,
+              });
+            }
+          }),
+        ]);
+      }
+      await transaction.commit();
+      res.sendResponse({}, "Successfully Updated!");
+    } catch (e) {
+      await transaction.rollback();
+      res.sendError(e);
+    }
+  },
   getById: async (req, res) => {
     try {
       const transfer = await StockTranfer.findOne({
@@ -130,6 +196,10 @@ module.exports = {
             as: "products",
             attributes: ["id"],
           },
+          {
+            model: Supplier,
+            as: "supplier",
+          }
         ],
       });
 

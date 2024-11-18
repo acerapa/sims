@@ -73,44 +73,44 @@
 </template>
 
 <script setup>
-import { useProductStore } from "@/stores/product";
-import CustomInput from "../shared/CustomInput.vue";
-import { onMounted } from "vue";
+import { useProductStore } from '@/stores/product'
+import CustomInput from '../shared/CustomInput.vue'
+import { onMounted } from 'vue'
 const props = defineProps({
   isDisabled: {
     type: Boolean,
-    default: false,
-  },
-});
+    default: false
+  }
+})
 
-const emit = defineEmits(["remove"]);
-const productStore = useProductStore();
-const model = defineModel();
+const emit = defineEmits(['remove'])
+const productStore = useProductStore()
+const model = defineModel()
 
 const onChange = () => {
   if (model.value.product_id) {
     const product = productStore.products.find(
       (prd) => prd.id == model.value.product_id
-    );
+    )
 
     if (product) {
-      model.value.description = product.purchase_description;
-      model.value.cost = product.price;
-      model.value.quantity = 1;
+      model.value.description = product.purchase_description
+      model.value.cost = product.price
+      model.value.quantity = 1
     }
   } else {
-    model.value.serial_number = "";
-    model.value.problem = "";
-    model.value.product_id = "";
-    model.value.description = "";
-    model.value.quantity = "";
-    model.value.cost = "";
+    model.value.serial_number = ''
+    model.value.problem = ''
+    model.value.product_id = ''
+    model.value.description = ''
+    model.value.quantity = ''
+    model.value.cost = ''
   }
-};
+}
 
 onMounted(async () => {
   if (productStore.productOptions.length === 0) {
-    await productStore.fetchAllProducts();
+    await productStore.fetchAllProducts()
   }
-});
+})
 </script>

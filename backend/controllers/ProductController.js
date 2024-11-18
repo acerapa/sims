@@ -95,7 +95,7 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      await Product.destroy({ where: { id: req.body.id } });
+      await Product.destroy({ where: { id: req.params.id } });
       res.sendResponse({}, "Successfully deleted!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message);

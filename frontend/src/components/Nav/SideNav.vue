@@ -47,84 +47,84 @@
   </div>
 </template>
 <script setup>
-import { useAppStore } from "@/stores/app";
-import { useRoute, useRouter } from "vue-router";
-import NavRow from "./NavRow.vue";
-import navs from "@/data/nav";
-import { onMounted, ref, watch } from "vue";
-import Event from "@/event";
-import { EventEnum } from "@/data/event";
-import { useAuthStore } from "@/stores/auth";
+import { useAppStore } from '@/stores/app'
+import { useRoute, useRouter } from 'vue-router'
+import NavRow from './NavRow.vue'
+import navs from '@/data/nav'
+import { onMounted, ref, watch } from 'vue'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { useAuthStore } from '@/stores/auth'
 
-const route = useRoute();
-const router = useRouter();
-const targetRoutes = ref([]);
-const appStore = useAppStore();
-const showDropdown = ref(false);
-const authStore = useAuthStore();
+const route = useRoute()
+const router = useRouter()
+const targetRoutes = ref([])
+const appStore = useAppStore()
+const showDropdown = ref(false)
+const authStore = useAuthStore()
 
 // Custom global event
 onMounted(() => {
   Event.on(
     EventEnum.GLOBAL_CLICK,
     function () {
-      showDropdown.value = false;
+      showDropdown.value = false
     },
     true
-  );
-});
+  )
+})
 
 const onLogout = async () => {
-  await authStore.logout();
-  router.go();
-};
+  await authStore.logout()
+  router.go()
+}
 
 const onRouteClick = (name = route.name, hasChild = false) => {
   if (hasChild) {
-    name = route.matched[0].redirect.name;
+    name = route.matched[0].redirect.name
   }
-  appStore.currentNav = navs.find((r) => r.route == name);
+  appStore.currentNav = navs.find((r) => r.route == name)
   if (!appStore.currentNav) {
-    let children = [];
+    let children = []
     navs
       .filter((nav) => nav.children)
       .forEach((nav) => {
-        children = [...children, ...nav.children];
-      });
+        children = [...children, ...nav.children]
+      })
 
-    appStore.currentNav = children.find((r) => r.route == name);
+    appStore.currentNav = children.find((r) => r.route == name)
   }
-};
+}
 
 const getIncludeActiveRoutes = (rt) => {
   if (rt.includes_active) {
     rt.includes_active.forEach((iart) => {
       targetRoutes.value.push({
         parent: rt,
-        route_name: iart,
-      });
-    });
+        route_name: iart
+      })
+    })
   }
 
   if (rt.children) {
-    rt.children.forEach((r) => getIncludeActiveRoutes(r));
+    rt.children.forEach((r) => getIncludeActiveRoutes(r))
   }
-};
+}
 
 const getActiveRouteBasedIncludes = (route) => {
-  const rt = targetRoutes.value.find((r) => r.route_name == route.name);
-  if (rt) appStore.currentNav = rt.parent;
-};
+  const rt = targetRoutes.value.find((r) => r.route_name == route.name)
+  if (rt) appStore.currentNav = rt.parent
+}
 
-navs.forEach((rt) => getIncludeActiveRoutes(rt));
+navs.forEach((rt) => getIncludeActiveRoutes(rt))
 
 watch(route, (val) => {
-  getActiveRouteBasedIncludes(val);
-});
+  getActiveRouteBasedIncludes(val)
+})
 
 // run function upon loading
-onRouteClick();
-getActiveRouteBasedIncludes(route);
+onRouteClick()
+getActiveRouteBasedIncludes(route)
 </script>
 
 <style scoped>

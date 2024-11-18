@@ -17,5 +17,5 @@
   </div>
 </template>
 <script setup>
-const emit = defineEmits(["view", "delete"]);
+const emit = defineEmits(['view', 'delete'])
 </script>

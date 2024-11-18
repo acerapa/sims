@@ -1,4 +1,10 @@
 <template>
+  <DeleteConfirmModal
+    v-if="showConfirmModal"
+    v-model="showConfirmModal"
+    @after-delete="onAfterDelete"
+    :href="`stock-transfer/${route.query.id}`"
+  />
   <div class="flex flex-col gap-4">
     <AlertComponent
       v-if="!currentBranch"
@@ -70,94 +76,105 @@
           </template>
         </ProductMulitpleSelect>
       </div>
-      <div class="flex gap-3 mt-4 justify-end">
+      <div
+        class="flex gap-3 mt-4"
+        :class="route.query.id ? 'justify-between' : 'justify-end'"
+      >
         <button
-          class="btn-outline !border-danger !text-danger"
-          @click="onCancel"
+          class="btn-danger-outline"
+          @click="showConfirmModal = true"
+          v-if="route.query.id"
         >
-          Cancel
+          Delete
         </button>
-        <button
-          class="btn-outline disabled:opacity-50"
-          :disabled="!currentBranch"
-        >
-          Save and New
-        </button>
-        <button
-          class="btn disabled:opacity-50"
-          @click="onSubmit"
-          :disabled="!currentBranch"
-        >
-          Save
-        </button>
+        <div class="flex gap-3">
+          <button class="btn-gray-outline" @click="onCancel">Cancel</button>
+          <button
+            class="btn-outline disabled:opacity-50"
+            :disabled="!currentBranch"
+            v-if="!isEdit"
+          >
+            Save and New
+          </button>
+          <button
+            class="btn disabled:opacity-50"
+            @click="onSubmit"
+            :disabled="!currentBranch"
+          >
+            {{ isEdit ? 'Update' : 'Save' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import AddressForm from "@/components/shared/AddressForm.vue";
-import AlertComponent from "@/components/shared/AlertComponent.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import ProductMulitpleSelect from "@/components/shared/ProductMultiSelectTable.vue";
-import ProductSelectHeader from "@/components/stock-transfer/ProductSelectHeader.vue";
-import ProductSelectRow from "@/components/stock-transfer/ProductSelectRow.vue";
-import { EventEnum } from "@/data/event";
-import Event from "@/event";
-import { useAppStore } from "@/stores/app";
-import { useAuthStore } from "@/stores/auth";
-import { useProductStore } from "@/stores/product";
-import { useSettingsStore } from "@/stores/settings";
-import { useTransferStore } from "@/stores/transfer";
-import { TransferType } from "shared/enums";
-import { DateHelpers, ObjectHelpers } from "shared/helpers";
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { RouterLink, useRoute } from "vue-router";
-import { useRouter } from "vue-router";
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
+import AddressForm from '@/components/shared/AddressForm.vue'
+import AlertComponent from '@/components/shared/AlertComponent.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import ProductMulitpleSelect from '@/components/shared/ProductMultiSelectTable.vue'
+import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue'
+import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
+import { EventEnum } from '@/data/event'
+import Event from '@/event'
+import { useAppStore } from '@/stores/app'
+import { useAuthStore } from '@/stores/auth'
+import { useProductStore } from '@/stores/product'
+import { useSettingsStore } from '@/stores/settings'
+import { useTransferStore } from '@/stores/transfer'
+import { TransferType } from 'shared/enums'
+import { DateHelpers, ObjectHelpers } from 'shared/helpers'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
-const route = useRoute();
-const router = useRouter();
-const appStore = useAppStore();
-const authStore = useAuthStore();
-const productStore = useProductStore();
-const settingStore = useSettingsStore();
-const transferStore = useTransferStore();
+const route = useRoute()
+const router = useRouter()
+const isEdit = ref(false)
+const appStore = useAppStore()
+const authStore = useAuthStore()
+const productStore = useProductStore()
+const settingStore = useSettingsStore()
+const transferStore = useTransferStore()
 
 const productDefaultValue = {
-  product_id: "",
-  description: "",
-  quantity: "",
-  cost: "",
-  amount: "",
-};
+  product_id: '',
+  description: '',
+  quantity: '',
+  cost: '',
+  amount: ''
+}
 
 const address = ref({
-  address1: "",
-  address2: "",
-  province: "",
-  city: "",
-  postal: "",
-});
+  address1: '',
+  address2: '',
+  province: '',
+  city: '',
+  postal: ''
+})
 
 const defaultValue = {
   transfer: {
-    memo: "",
-    branch_to: "",
-    branch_from: "",
-    processed_by: "",
-    when: DateHelpers.formatDate(new Date(), "YYYY-MM-DDTHH:II-A"),
-    type: TransferType.STR,
+    memo: '',
+    branch_to: '',
+    branch_from: '',
+    processed_by: '',
+    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A'),
+    type: TransferType.STR
   },
-  products: [{ ...productDefaultValue }],
-};
+  products: [{ ...productDefaultValue }]
+}
 
-const model = ref(defaultValue);
-const currentBranch = ref();
+const currentBranch = ref()
+const model = ref(defaultValue)
+const showConfirmModal = ref(false)
 
 /** ================================================
  * EVENTS
  ** ================================================*/
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 /** ================================================
  * COMPUTED
@@ -165,21 +182,21 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true);
 const totalAmount = computed(() => {
   return model.value.products.length
     ? model.value.products.map((p) => p.amount).reduce((a, b) => a + b)
-    : 0;
-});
+    : 0
+})
 
 const branchOptions = computed(() => {
   return settingStore.branches
     .map((branch) => {
       return {
         text: branch.name,
-        value: branch.id,
-      };
+        value: branch.id
+      }
     })
     .filter((opt) =>
       currentBranch.value ? currentBranch.value.id != opt.value : true
-    );
-});
+    )
+})
 
 /** ================================================
  * METHODS
@@ -190,71 +207,81 @@ const timeInterval = setInterval(() => {
   if (route.query.id) {
     model.value.transfer.when = DateHelpers.formatDate(
       new Date(),
-      "YYYY-MM-DDTHH:II:SS-A"
-    );
+      'YYYY-MM-DDTHH:II:SS-A'
+    )
   }
-}, 1000);
+}, 1000)
 
 const populateAddress = () => {
   if (model.value.transfer.branch_to) {
     const branch = settingStore.branches.find(
       (b) => b.id == model.value.transfer.branch_to
-    );
+    )
 
     if (branch) {
       address.value = ObjectHelpers.assignSameFields(
         address.value,
         branch.address
-      );
+      )
     }
   }
-};
+}
 
 const onSubmit = async () => {
-  clearInterval(timeInterval);
+  clearInterval(timeInterval)
 
-  model.value.transfer.when = new Date();
-  await transferStore.createTransfer(model.value);
-  router.push({
-    name: "str-list",
-  });
-};
+  if (!isEdit.value) {
+    model.value.transfer.when = new Date()
+    await transferStore.createTransfer(model.value)
+    router.push({
+      name: 'str-list'
+    })
+  } else {
+    await transferStore.updateTransfer(model.value, route.query.id)
+  }
+}
 
 const onCancel = () => {
   router.push({
-    name: "str-list",
-  });
-};
+    name: 'str-list'
+  })
+}
+
+const onAfterDelete = () => {
+  router.push({
+    name: 'str-list'
+  })
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await productStore.fetchAllProducts();
-  await settingStore.fetchAllBranches();
+  await productStore.fetchAllProducts()
+  await settingStore.getBranches()
 
   // check if there is an id query param
   if (route.query.id) {
     // clear interval automatically
-    clearInterval(timeInterval);
+    clearInterval(timeInterval)
 
-    const transfer = await transferStore.getById(route.query.id);
+    const transfer = await transferStore.getById(route.query.id)
 
     if (transfer) {
       // model.value = ObjectHelpers.assignSameFields(model.value, transfer);
       model.value.transfer = ObjectHelpers.assignSameFields(
         model.value.transfer,
         transfer
-      );
+      )
 
       // custom modification
       model.value.transfer.when = DateHelpers.formatDate(
         new Date(transfer.when),
-        "YYYY-MM-DDTHH:II:SS-A"
-      );
+        'YYYY-MM-DDTHH:II:SS-A'
+      )
 
       // populate address from the receiver in the transfer
-      populateAddress();
+      populateAddress()
 
       // populate products
       model.value.products = transfer.products.map((p) => {
@@ -263,29 +290,31 @@ onMounted(async () => {
           description: p.ProductTransaction.description,
           quantity: p.ProductTransaction.quantity,
           cost: p.ProductTransaction.cost,
-          amount: p.ProductTransaction.amount,
-        };
-      });
+          amount: p.ProductTransaction.amount
+        }
+      })
     } else {
       //TODO: raise and error or alert or maybe navigate to 404 notifs
-      console.error("STR not found");
+      console.error('STR not found')
     }
+
+    isEdit.value = true
   }
 
   // set branch from
-  currentBranch.value = appStore.currentBranch;
+  currentBranch.value = appStore.currentBranch
   if (currentBranch.value) {
-    model.value.transfer.branch_from = currentBranch.value.id;
+    model.value.transfer.branch_from = currentBranch.value.id
   }
 
   // set processed by
-  model.value.transfer.processed_by = authStore.getAuthUser().id;
+  model.value.transfer.processed_by = authStore.getAuthUser().id
 
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 
 onBeforeUnmount(() => {
   // remove interval
-  clearInterval(timeInterval);
-});
+  clearInterval(timeInterval)
+})
 </script>

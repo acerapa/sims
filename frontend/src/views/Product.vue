@@ -1,30 +1,40 @@
 <template>
   <ProductModal
-    :is-edit="isEdit"
     v-model="showModal"
     v-if="showModal"
     :selected-id="selectedId"
-  />
-  <DeleteConfirmModal
-    v-if="showDeleteConfirmModal"
-    v-model="showDeleteConfirmModal"
-    href="products/delete"
-    :data="toDelete"
-    @after-delete="onAfterDelete"
   />
   <CustomTable
     :has-filter="true"
     :has-add-btn="true"
     :data="filteredData"
     :has-pagination="true"
-    v-model:is-edit="isEdit"
-    v-model:show-modal="showModal"
     v-model:search-text="searchText"
     :row-prop-init="productRowEvent"
     :table-row-component="ProductRow"
-    :table-header-component="ProductTableHeader"
-    @open-menu="onSelectRow"
+    @view="onView"
+    @add-new-record="
+      () => {
+        showModal = true
+        selectedId = 0
+      }
+    "
   >
+    <template #table_header>
+      <div class="grid grid-cols-9 gap-3 min-w-[907px]">
+        <div class="col-span-1 flex gap-3 items-center">
+          <input type="checkbox" class="input" />
+          <p class="table-header">#</p>
+        </div>
+        <p class="col-span-1 table-header">Name</p>
+        <p class="col-span-1 table-header">Item Code</p>
+        <p class="col-span-3 table-header">Description</p>
+        <p class="col-span-1 table-header">Stock</p>
+        <p class="col-span-1 table-header">Added on</p>
+        <p class="col-span-1 table-header">Status</p>
+      </div>
+    </template>
+
     <!-- filter contents -->
     <template v-slot:filters>
       <div class="flex flex-col gap-3 mt-3">
@@ -84,65 +94,46 @@
         </div>
       </div>
     </template>
-    <RowMenu
-      :top="top"
-      v-if="showRowMenu"
-      @view="onViewRow"
-      @delete="onDeleteRow"
-    />
   </CustomTable>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
-import ProductModal from "@/components/Product/ProductModal.vue";
-import ProductRow from "@/components/Product/ProductRow.vue";
-import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
-import CustomTable from "@/components/shared/CustomTable.vue";
-import CustomInput from "@/components/shared/CustomInput.vue";
-import RowMenu from "@/components/shared/RowMenu.vue";
-import { useProductStore } from "@/stores/product";
-import Event from "@/event";
-import { EventEnum } from "@/data/event";
-import ProductTableHeader from "@/components/Product/ProductTableHeader.vue";
-import { DateHelpers } from "shared/helpers";
-import { useSettingsStore } from "@/stores/settings";
+import { computed, onMounted, ref } from 'vue'
+import ProductModal from '@/components/Product/ProductModal.vue'
+import ProductRow from '@/components/Product/ProductRow.vue'
+import CustomTable from '@/components/shared/CustomTable.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import { useProductStore } from '@/stores/product'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { DateHelpers } from 'shared/helpers'
+import { useSettingsStore } from '@/stores/settings'
 
-const top = ref(0);
-const toDelete = ref({});
-const isEdit = ref(false);
-const selectedId = ref(0);
-const searchText = ref("");
-const showModal = ref(false);
-const showRowMenu = ref(false);
-const categoryOptions = ref([]);
-const productStore = useProductStore();
-const settingStore = useSettingsStore();
-const showDeleteConfirmModal = ref(false);
+const selectedId = ref(0)
+const searchText = ref('')
+const showModal = ref(false)
+const categoryOptions = ref([])
+const productStore = useProductStore()
+const settingStore = useSettingsStore()
 const filters = ref({
-  added_on_from: "",
-  added_on_to: "",
+  added_on_from: '',
+  added_on_to: '',
   stock_from: null,
   stock_to: null,
-  category: "",
-});
+  category: ''
+})
 
 /** ================================================
  * EVENTS
  ** ================================================*/
 
-Event.emit(EventEnum.IS_PAGE_LOADING, true);
-
-// custom event
-Event.on(EventEnum.GLOBAL_CLICK, function () {
-  showRowMenu.value = false;
-});
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 // define product row props
-const productRowEvent = "product-row-init-props";
+const productRowEvent = 'product-row-init-props'
 Event.on(productRowEvent, function (data) {
-  return { product: data };
-});
+  return { product: data }
+})
 
 /** ================================================
  * COMPUTED
@@ -151,16 +142,16 @@ const filteredData = computed(() => {
   return productStore.products
     .filter((product) => {
       const catId =
-        filters.value.category === "" ? null : filters.value.category;
+        filters.value.category === '' ? null : filters.value.category
 
-      return catId ? product.category_id == catId : product;
+      return catId ? product.category_id == catId : product
     })
     .filter((product) => {
       filters.value.stock_from =
-        filters.value.stock_from === "" ? null : filters.value.stock_from;
+        filters.value.stock_from === '' ? null : filters.value.stock_from
 
       filters.value.stock_to =
-        filters.value.stock_to === "" ? null : filters.value.stock_to;
+        filters.value.stock_to === '' ? null : filters.value.stock_to
 
       if (
         filters.value.stock_from !== null &&
@@ -169,19 +160,19 @@ const filteredData = computed(() => {
         return (
           product.quantity_in_stock >= filters.value.stock_from &&
           product.quantity_in_stock <= filters.value.stock_to
-        );
+        )
       } else if (
         filters.value.stock_from !== null &&
         filters.value.stock_to == null
       ) {
-        return product.quantity_in_stock >= filters.value.stock_from;
+        return product.quantity_in_stock >= filters.value.stock_from
       } else if (
         filters.value.stock_from == null &&
         filters.value.stock_to !== null
       ) {
-        return product.quantity_in_stock <= filters.value.stock_to;
+        return product.quantity_in_stock <= filters.value.stock_to
       } else {
-        return product;
+        return product
       }
     })
     .filter((product) =>
@@ -193,46 +184,28 @@ const filteredData = computed(() => {
     )
     .filter((product) => {
       const searchCondition =
-        `${product.id} ${product.name} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, "M/D/YYYY")}`.toLowerCase();
+        `${product.id} ${product.name} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
       return searchText.value
         ? searchCondition.includes(searchText.value.toLowerCase())
-        : product;
-    });
-});
+        : product
+    })
+})
 
 /** ================================================
  * METHODS
  ** ================================================*/
-
-const onSelectRow = (id) => {
-  top.value = event.target.offsetTop;
-  showRowMenu.value = true;
-  selectedId.value = id;
-};
-
-const onDeleteRow = () => {
-  toDelete.value = { id: selectedId.value };
-  showDeleteConfirmModal.value = true;
-};
-
-const onViewRow = () => {
-  isEdit.value = true;
-  showModal.value = true;
-};
-
-const onAfterDelete = async () => {
-  showDeleteConfirmModal.value = false;
-  toDelete.value = {};
-  await productStore.fetchAllProducts();
-};
+const onView = (id) => {
+  selectedId.value = id
+  showModal.value = true
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 
 onMounted(async () => {
-  await productStore.fetchAllProducts();
-  categoryOptions.value = await settingStore.categoryOption();
-  Event.emit(EventEnum.IS_PAGE_LOADING, false);
-});
+  await productStore.fetchAllProducts()
+  categoryOptions.value = await settingStore.categoryOption()
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 </script>
