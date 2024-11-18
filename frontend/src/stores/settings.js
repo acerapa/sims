@@ -72,6 +72,10 @@ export const useSettingsStore = defineStore('settings', () => {
     return branches.value
   }
 
+  const getBranches = async () => {
+    return branches.value.length ? branches.value : await fetchAllBranches()
+  }
+
   // branches methods
   const createBranch = async (model) => {
     return await authenticatedApi('branch/register', Method.POST, model)
@@ -86,6 +90,7 @@ export const useSettingsStore = defineStore('settings', () => {
     branches,
     productCategories,
     productReorderingPoints,
+    getBranches,
     createBranch,
     updateBranch,
     categoryOption,

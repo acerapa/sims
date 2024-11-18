@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-12 gap-3 min-w-[935px]">
+  <div
+    class="grid grid-cols-11 gap-3 min-w-[935px] gen-table-row"
+    @click="emit('view', props.order.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.order.id }}</p>
@@ -19,14 +22,6 @@
         :text="selectedStatus.text"
       />
     </div>
-    <div class="col-span-1 text-sm">
-      <img
-        @click.stop="emit('openMenu', props.order.id)"
-        class="cursor-pointer menu-btn-trigger"
-        src="@/assets/icons/vertical-menu.svg"
-        alt=""
-      />
-    </div>
   </div>
 </template>
 
@@ -35,7 +30,7 @@ import { DateHelpers } from 'shared/helpers/date'
 import { PurchaseStatusMap } from 'shared'
 import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 
-const emit = defineEmits(['openMenu'])
+const emit = defineEmits(['view'])
 
 const props = defineProps({
   order: {

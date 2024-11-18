@@ -78,8 +78,24 @@ select.input {
   @apply px-4 py-2 rounded border border-primary text-primary font-semibold text-sm bg-white;
 }
 
-.danger-btn {
+.btn-danger {
   @apply btn !bg-danger !text-white;
+}
+
+.btn-danger-outline {
+  @apply btn-outline !border-danger !text-danger;
+}
+
+.btn-green {
+  @apply btn !bg-green-500 !text-white;
+}
+
+.btn-gray {
+  @apply btn !bg-gray-600 !text-white;
+}
+
+.btn-gray-outline {
+  @apply btn-outline !border-gray-600 !text-gray-600;
 }
 
 .status {

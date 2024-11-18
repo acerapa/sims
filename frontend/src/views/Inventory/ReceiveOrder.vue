@@ -162,9 +162,7 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
  ** ================================================*/
 
 const onCancel = () => {
-  router.push({
-    name: 'purchase-order'
-  })
+  router.back()
 }
 
 const onReceiveOrder = async () => {

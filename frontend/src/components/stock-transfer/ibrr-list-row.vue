@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-9 gap-3 gen-table-row">
+  <div
+    class="grid grid-cols-8 gap-3 gen-table-row"
+    @click="emit('view', props.ibrr.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.ibrr.id }}</p>
@@ -11,14 +14,6 @@
     <p class="col-span-2 text-sm truncate">
       {{ DateHelpers.formatDate(props.ibrr.when, 'MM/DD/YYYY HH:II a') }}
     </p>
-    <div class="col-span-1 text-sm">
-      <img
-        @click.stop="openMenu(props.ibrr.id)"
-        class="cursor-pointer menu-btn-trigger"
-        src="@/assets/icons/vertical-menu.svg"
-        alt=""
-      />
-    </div>
   </div>
 </template>
 
@@ -26,7 +21,7 @@
 import { DateHelpers } from 'shared/helpers'
 import { computed } from 'vue'
 
-const emit = defineEmits(['openMenu'])
+const emit = defineEmits(['view'])
 
 const props = defineProps({
   ibrr: {
@@ -44,8 +39,4 @@ const processByName = computed(() => {
   const { process_by } = props.ibrr
   return `${process_by.first_name} ${process_by.last_name}`
 })
-
-const openMenu = (id) => {
-  emit('openMenu', id)
-}
 </script>

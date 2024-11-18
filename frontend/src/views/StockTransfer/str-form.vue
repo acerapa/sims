@@ -1,4 +1,10 @@
 <template>
+  <DeleteConfirmModal
+    v-if="showConfirmModal"
+    v-model="showConfirmModal"
+    @after-delete="onAfterDelete"
+    :href="`stock-transfer/${route.query.id}`"
+  />
   <div class="flex flex-col gap-4">
     <AlertComponent
       v-if="!currentBranch"
@@ -70,33 +76,41 @@
           </template>
         </ProductMulitpleSelect>
       </div>
-      <div class="flex gap-3 mt-4 justify-end">
+      <div
+        class="flex gap-3 mt-4"
+        :class="route.query.id ? 'justify-between' : 'justify-end'"
+      >
         <button
-          class="btn-outline !border-danger !text-danger"
-          @click="onCancel"
+          class="btn-danger-outline"
+          @click="showConfirmModal = true"
+          v-if="route.query.id"
         >
-          Cancel
+          Delete
         </button>
-        <button
-          class="btn-outline disabled:opacity-50"
-          :disabled="!currentBranch"
-          v-if="!isEdit"
-        >
-          Save and New
-        </button>
-        <button
-          class="btn disabled:opacity-50"
-          @click="onSubmit"
-          :disabled="!currentBranch"
-        >
-          {{ isEdit ? 'Update' : 'Save' }}
-        </button>
+        <div class="flex gap-3">
+          <button class="btn-gray-outline" @click="onCancel">Cancel</button>
+          <button
+            class="btn-outline disabled:opacity-50"
+            :disabled="!currentBranch"
+            v-if="!isEdit"
+          >
+            Save and New
+          </button>
+          <button
+            class="btn disabled:opacity-50"
+            @click="onSubmit"
+            :disabled="!currentBranch"
+          >
+            {{ isEdit ? 'Update' : 'Save' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
@@ -153,8 +167,9 @@ const defaultValue = {
   products: [{ ...productDefaultValue }]
 }
 
-const model = ref(defaultValue)
 const currentBranch = ref()
+const model = ref(defaultValue)
+const showConfirmModal = ref(false)
 
 /** ================================================
  * EVENTS
@@ -232,12 +247,18 @@ const onCancel = () => {
   })
 }
 
+const onAfterDelete = () => {
+  router.push({
+    name: 'str-list'
+  })
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
   await productStore.fetchAllProducts()
-  await settingStore.fetchAllBranches()
+  await settingStore.getBranches()
 
   // check if there is an id query param
   if (route.query.id) {
