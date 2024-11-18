@@ -1,4 +1,10 @@
 <template>
+  <DeleteConfirmModal
+    v-if="showConfirmModal && route.query.id"
+    v-model="showConfirmModal"
+    :href="`stock-transfer/${route.query.id}`"
+    @after-delete="onAfterDelete"
+  />
   <div class="cont flex flex-col gap-6">
     <div class="flex gap-6">
       <div class="flex-1">
@@ -51,27 +57,34 @@
       >
       </ProductMultiSelectTable>
 
-      <div class="flex gap-3 mt-4 justify-end">
+      <div
+        class="flex gap-3 mt-4"
+        :class="route.query.id ? 'justify-between' : 'justify-end'"
+      >
         <button
-          class="btn-outline !border-danger !text-danger"
-          @click="onCancel"
+          class="btn-danger-outline"
+          @click="showConfirmModal = true"
+          v-if="route.query.id"
         >
-          Cancel
+          Delete
         </button>
-        <button
-          class="btn-outline disabled:opacity-50"
-          :disabled="false"
-          v-if="!isEdit"
-        >
-          Save and New
-        </button>
-        <button
-          class="btn disabled:opacity-50"
-          @click="onSubmit"
-          :disabled="false"
-        >
-          {{ isEdit ? 'Update' : 'Save' }}
-        </button>
+        <div class="flex gap-3">
+          <button class="btn-gray-outline" @click="onCancel">Cancel</button>
+          <button
+            class="btn-outline disabled:opacity-50"
+            :disabled="false"
+            v-if="!isEdit"
+          >
+            Save and New
+          </button>
+          <button
+            class="btn disabled:opacity-50"
+            @click="onSubmit"
+            :disabled="false"
+          >
+            {{ isEdit ? 'Update' : 'Save' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -80,11 +93,12 @@
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import RmaProductSelectRow from '@/components/stock-transfer/RmaProductSelectRow.vue'
 import RmaProductSelectHeader from '@/components/stock-transfer/RmaProductSelectHeader.vue'
 import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue'
 import { useVendorStore } from '@/stores/supplier'
-import { computed, isVNode, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { TransferType } from 'shared/enums'
 import { useRoute, useRouter } from 'vue-router'
@@ -102,6 +116,7 @@ const isEdit = ref(false)
 const router = useRouter()
 const appStore = useAppStore()
 const authStore = useAuthStore() // this is temporary
+const showConfirmModal = ref(false)
 const transferStore = useTransferStore()
 const settingsStore = useSettingsStore() // this is temporaru
 
@@ -187,12 +202,18 @@ const onCancel = () => {
   router.back()
 }
 
+const onAfterDelete = () => {
+  router.push({
+    name: 'rma-list'
+  })
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
   await vendorStore.fetchAllSuppliers()
-  await settingsStore.fetchAllBranches()
+  await settingsStore.getBranches()
   currentBranch.value = appStore.currentBranch
 
   model.value.transfer.branch_from = currentBranch.value.id

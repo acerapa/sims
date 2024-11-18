@@ -63,7 +63,7 @@
         >
           Back
         </button>
-        <button class="danger-btn" @click="showConfirmModal = true">
+        <button class="btn-danger" @click="showConfirmModal = true">
           Delete
         </button>
       </template>

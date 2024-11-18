@@ -23,17 +23,14 @@
       :class="props.hasDelete ? 'justify-between' : 'justify-center'"
     >
       <button
-        class="btn-outline !border-red-500 !text-red-500"
+        class="btn-danger-outline"
         v-if="props.hasDelete"
         @click="emit('delete')"
       >
         Delete
       </button>
       <div class="flex gap-3">
-        <button
-          class="btn-outline !border-gray-600 !text-gray-600"
-          @click="showModal = false"
-        >
+        <button class="btn-gray-outline" @click="showModal = false">
           Cancel
         </button>
         <button class="btn" @click="onSave">{{ props.saveBtn }}</button>
