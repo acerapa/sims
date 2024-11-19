@@ -12,9 +12,9 @@
       :text="'Please select current branch'"
     >
       Please refer
-      <RouterLink class="text-blue-400 underline" :to="{ name: 'branches' }"
-        >here!</RouterLink
-      >
+      <RouterLink class="text-blue-400 underline" :to="{ name: 'branches' }">
+        here!
+      </RouterLink>
     </AlertComponent>
     <div class="cont">
       <div class="flex gap-4 max-lg:flex-col">
@@ -114,9 +114,9 @@ import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
+import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import ProductMulitpleSelect from '@/components/shared/ProductMultiSelectTable.vue'
 import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue'
-import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { useAppStore } from '@/stores/app'

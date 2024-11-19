@@ -30,6 +30,10 @@ StockTranfer.init(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    po_no: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     branch_to: {
       type: DataTypes.INTEGER,
       allowNull: true,

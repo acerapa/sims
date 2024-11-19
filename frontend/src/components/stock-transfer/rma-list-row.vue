@@ -20,6 +20,7 @@
 </template>
 
 <script setup>
+import { TransferType } from 'shared/enums'
 import { DateHelpers } from 'shared/helpers'
 import { computed } from 'vue'
 
