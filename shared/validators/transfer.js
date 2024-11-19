@@ -25,6 +25,11 @@ const BranchUpdateSchema = Joi.object({
 });
 
 const StockTransferSchema = Joi.object({
+  po_no: Joi.alternatives(Joi.string(), Joi.number()).when("t ype", {
+    is: TransferType.FIX,
+    then: Joi.required(),
+    otherwise: Joi.allow(null, "").optional(),
+  }),
   memo: Joi.string().allow(null, ""),
   type: Joi.valid(...Object.values(TransferType)).required(),
   when: Joi.date().required(),
@@ -33,7 +38,11 @@ const StockTransferSchema = Joi.object({
     then: Joi.allow(null, "").optional(),
     otherwise: Joi.required(),
   }),
-  branch_from: Joi.number().required(),
+  branch_from: Joi.number().when("type", {
+    is: TransferType.FIX,
+    then: Joi.allow(null, "").optional(),
+    otherwise: Joi.required(),
+  }),
   processed_by: Joi.number().required(),
   str_id: Joi.number().when("type", {
     is: TransferType.IBRR,

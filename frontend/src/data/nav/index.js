@@ -64,7 +64,8 @@ export default [
       {
         text: 'PO to Fix list',
         route: 'fix-asset-list',
-        icon: outlineDot
+        icon: outlineDot,
+        includes_active: ['fix-asset-form']
       }
     ]
   },

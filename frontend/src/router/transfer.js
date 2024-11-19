@@ -69,6 +69,15 @@ export default [
           title: 'PO to Fixed Asset List',
           requiresAuth: true
         }
+      },
+      {
+        path: 'fix-asset-form',
+        name: 'fix-asset-form',
+        component: () => import('@/views/StockTransfer/fix-asset-form.vue'),
+        meta: {
+          title: 'Fixed Asset Form',
+          requiresAuth: true
+        }
       }
     ]
   }

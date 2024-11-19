@@ -75,7 +75,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import CustomInput from '../shared/CustomInput.vue'
 import ProductModal from '../Product/ProductModal.vue'
 import { useProductStore } from '@/stores/product'
@@ -93,6 +93,10 @@ const model = defineModel()
 
 const productStore = useProductStore()
 
+onMounted(async () => {
+  await productStore.getProducts()
+})
+
 const onChange = () => {
   if (model.value.product_id) {
     const product = productStore.products.find(
@@ -105,7 +109,6 @@ const onChange = () => {
       model.value.quantity = 1
     }
   } else {
-    model.value.name = ''
     model.value.product_id = ''
     model.value.description = ''
     model.value.quantity = ''

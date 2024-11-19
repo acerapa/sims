@@ -106,7 +106,8 @@ const BranchStatusMap = Object.freeze({
 const TransferType = Object.freeze({
   IBRR: "ibrr",
   STR: "str",
-  RMA: "rma"
+  RMA: "rma",
+  FIX: "fix",
 });
 
 const ProductTransferStatus = Object.freeze({

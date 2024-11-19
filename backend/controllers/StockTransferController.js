@@ -1,5 +1,4 @@
 const { sequelize } = require("../models");
-const ProductTransfer = require("../models/product-transfer");
 const Branch = require("../models/branch");
 const User = require("../models/user");
 const Product = require("../models/product");
@@ -46,7 +45,7 @@ module.exports = {
           },
           {
             model: Product,
-            through: ProductTransfer,
+            through: ProductTransaction,
             as: "products",
             attributes: ["id"],
           },
@@ -192,14 +191,14 @@ module.exports = {
           },
           {
             model: Product,
-            through: ProductTransfer,
+            through: ProductTransaction,
             as: "products",
             attributes: ["id"],
           },
           {
             model: Supplier,
             as: "supplier",
-          }
+          },
         ],
       });
 

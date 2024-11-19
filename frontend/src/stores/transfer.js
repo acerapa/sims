@@ -19,12 +19,24 @@ export const useTransferStore = defineStore('tranfer', function () {
     return transfers.value.filter((t) => t.type === TransferType.RMA)
   })
 
-  const fetchTransfers = async (type) => {
+  const fix = computed(() => {
+    return transfers.value.filter((t) => t.type === TransferType.FIX)
+  })
+
+  const fetchTransfers = async () => {
     const res = await authenticatedApi(`stock-transfer`)
 
     if (res.status == 200) {
       transfers.value = res.data.transfers
     }
+  }
+
+  const getTransfers = async () => {
+    if (!transfers.value.length) {
+      await fetchTransfers()
+    }
+
+    return transfers.value
   }
 
   const createTransfer = async (model) => {
@@ -55,10 +67,12 @@ export const useTransferStore = defineStore('tranfer', function () {
   }
 
   return {
+    fix,
     rmas,
     strs,
     ibrrs,
     getById,
+    getTransfers,
     fetchTransfers,
     updateTransfer,
     createTransfer
