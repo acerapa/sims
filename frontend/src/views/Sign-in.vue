@@ -22,9 +22,11 @@
           label="Username"
           name="username"
           @focus="
-            credentialErrors.username = ''
-            credentialErrors.password = ''
-            credentialErrors.responseErr = ''
+            () => {
+              credentialErrors.username = ''
+              credentialErrors.password = ''
+              credentialErrors.responseErr = ''
+            }
           "
           v-model="credentials.username"
           :error="credentialErrors.username"
@@ -36,9 +38,11 @@
           label="Password"
           name="password"
           @focus="
-            credentialErrors.username = ''
-            credentialErrors.password = ''
-            credentialErrors.responseErr = ''
+            () => {
+              credentialErrors.username = ''
+              credentialErrors.password = ''
+              credentialErrors.responseErr = ''
+            }
           "
           v-model="credentials.password"
           :error="credentialErrors.password"

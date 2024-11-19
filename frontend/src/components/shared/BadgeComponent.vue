@@ -1,5 +1,7 @@
 <template>
-  <button :class="['badge', props.customClass]">{{ props.text }}</button>
+  <button type="button" :class="['badge', props.customClass]">
+    {{ props.text }}
+  </button>
 </template>
 
 <script setup>

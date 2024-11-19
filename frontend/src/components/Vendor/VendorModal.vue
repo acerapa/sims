@@ -1,5 +1,11 @@
 <template>
-  <ModalWrapper :title="title" v-model="showModal" @submit="onSubmit">
+  <ModalWrapper
+    :title="title"
+    v-model="showModal"
+    @submit="onSubmit"
+    :has-delete="true"
+    @delete="showDeleteConfirmModal = true"
+  >
     <div class="flex flex-col gap-4 my-7">
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Basic Info</p>
@@ -82,9 +88,16 @@
       </div>
     </div>
   </ModalWrapper>
+  <DeleteConfirmModal
+    v-model="showDeleteConfirmModal"
+    v-if="showDeleteConfirmModal"
+    :href="`suppliers/delete/${props.selectedId}`"
+    @after-delete="onAfterDelete"
+  />
 </template>
 
 <script setup>
+import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { Method, authenticatedApi } from '@/api'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
@@ -93,12 +106,9 @@ import { useVendorStore } from '@/stores/supplier'
 import { onMounted, ref } from 'vue'
 
 const showModal = defineModel()
+const showDeleteConfirmModal = ref(false)
 
 const props = defineProps({
-  isEdit: {
-    type: Boolean,
-    default: false
-  },
   selectedId: {
     type: Number,
     required: false
@@ -106,8 +116,12 @@ const props = defineProps({
 })
 
 const supplierStore = useVendorStore()
-const title = ref(props.isEdit ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier')
-const apiPath = ref(props.isEdit ? 'suppliers/update' : 'suppliers/register')
+const title = ref(
+  props.selectedIdd ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier'
+)
+const apiPath = ref(
+  props.selectedIdd ? 'suppliers/update' : 'suppliers/register'
+)
 const model = ref({
   company_name: '',
   first_name: '',
@@ -135,8 +149,13 @@ const onSubmit = async () => {
   }
 }
 
+const onAfterDelete = async () => {
+  showModal.value = false
+  await supplierStore.fetchAllSuppliers()
+}
+
 onMounted(() => {
-  if (props.isEdit && props.selectedId) {
+  if (props.selectedId) {
     model.value = supplierStore.suppliers.find(
       (sup) => sup.id == props.selectedId
     )

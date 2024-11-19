@@ -1,4 +1,10 @@
 <template>
+  <DeleteConfirmModal
+    v-if="showConfirmModal"
+    v-model="showConfirmModal"
+    :href="`stock-transfer/${route.query.id}`"
+    @after-delete="onAfterDelete"
+  />
   <div class="flex flex-col gap-4">
     <AlertComponent
       v-if="!currentBranch"
@@ -71,33 +77,41 @@
           :format="productDefaultValue"
         />
       </div>
-      <div class="flex gap-3 mt-4 justify-end">
+      <div
+        class="flex gap-3 mt-4"
+        :class="route.query.id ? 'justify-between' : 'justify-end'"
+      >
         <button
-          class="btn-outline !border-danger !text-danger"
-          @click="onCancel"
+          class="btn-danger-outline"
+          v-if="route.query.id"
+          @click="showConfirmModal = true"
         >
-          Cancel
+          Delete
         </button>
-        <button
-          class="btn-outline disabled:opacity-50"
-          :disabled="!currentBranch"
-          v-if="!isEdit"
-        >
-          Save and New
-        </button>
-        <button
-          class="btn disabled:opacity-50"
-          @click="onSubmit"
-          :disabled="!currentBranch"
-        >
-          {{ isEdit ? 'Update' : 'Save' }}
-        </button>
+        <div class="flex gap-3">
+          <button class="btn-gray-outline" @click="onCancel">Cancel</button>
+          <button
+            class="btn-outline disabled:opacity-50"
+            :disabled="!currentBranch"
+            v-if="!isEdit"
+          >
+            Save and New
+          </button>
+          <button
+            class="btn disabled:opacity-50"
+            @click="onSubmit"
+            :disabled="!currentBranch"
+          >
+            {{ isEdit ? 'Update' : 'Save' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
@@ -122,6 +136,7 @@ const router = useRouter()
 const currentBranch = ref()
 const appStore = useAppStore()
 const authStore = useAuthStore()
+const showConfirmModal = ref(false)
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
 const transferStore = useTransferStore()
@@ -210,7 +225,12 @@ const onSubmit = async () => {
     await transferStore.updateTransfer(model.value, route.query.id)
   }
 }
+
 const onCancel = () => {
+  router.push({ name: 'ibrr-list' })
+}
+
+const onAfterDelete = () => {
   router.push({ name: 'ibrr-list' })
 }
 
@@ -218,7 +238,7 @@ const onCancel = () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await settingStore.fetchAllBranches()
+  await settingStore.getBranches()
   await productStore.fetchAllProducts()
 
   // check if route has transfer id

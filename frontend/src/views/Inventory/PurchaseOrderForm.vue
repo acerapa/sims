@@ -1,8 +1,45 @@
 <template>
+  <ModalWrapper
+    title="Update order status"
+    v-if="statusModal"
+    v-model="statusModal"
+    :save-btn="'Done'"
+    @submit="statusModal = false"
+  >
+    <form action="" method="post" class="mt-7">
+      <fieldset class="flex gap-4 justify-center">
+        <label
+          class="flex gap-3 items-center"
+          v-for="(st, ndx) in Object.values(PurchaseStatusMap).filter(
+            (s) => s.text !== 'Completed'
+          )"
+          :key="ndx"
+          :for="st.text"
+        >
+          <input
+            type="radio"
+            name="status"
+            :id="st.text"
+            class="cursor-pointer"
+            v-model="model.order.status"
+            :value="st.text.toLowerCase()"
+            @change="
+              () => {
+                selectedStatus = PurchaseStatusMap[model.order.status]
+                onUpdate()
+              }
+            "
+          />
+          <BadgeComponent :custom-class="st.class" :text="st.text" />
+        </label>
+      </fieldset>
+    </form>
+  </ModalWrapper>
+
   <VendorModal v-model="showVendorModal" v-if="showVendorModal" />
   <div class="flex flex-col gap-4">
     <div class="bg-white rounded-2xl p-4 shadow flex flex-col gap-3">
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center mb-4">
         <p
           class="text-base font-semibold text-success"
           v-if="status == PurchaseOrderStatus.COMPLETED"
@@ -12,11 +49,28 @@
         <p v-else class="text-base font-semibold">
           {{ isEdit ? 'Edit' : 'New' }} Purchase Order
         </p>
-        <BadgeComponent
-          v-if="isEdit && selectedStatus"
-          :custom-class="selectedStatus.class"
-          :text="selectedStatus.text"
-        />
+
+        <div class="flex gap-3">
+          <BadgeComponent
+            v-if="isEdit && selectedStatus"
+            :custom-class="selectedStatus.class"
+            :text="selectedStatus.text"
+            title="Click to set status"
+            @click="
+              statusModal =
+                model.order.status != PurchaseOrderStatus.CANCELLED &&
+                model.order.status != PurchaseOrderStatus.COMPLETED &&
+                model.order.status != PurchaseOrderStatus.CONFIRMED
+            "
+          />
+          <button
+            class="btn-green"
+            v-if="model.order.status == PurchaseOrderStatus.CONFIRMED"
+            @click="onReceiveOrder"
+          >
+            Receive Order
+          </button>
+        </div>
       </div>
       <div class="flex flex-col gap-3">
         <div class="flex gap-3 max-[1180px]:flex-col">
@@ -169,39 +223,43 @@
       </div>
 
       <!-- buttons -->
-      <div class="flex gap-3 justify-end mt-6">
-        <RouterLink
-          :to="{ name: 'purchase-order' }"
-          class="btn-outline !border-danger !text-danger"
-        >
-          {{ isDisabled ? 'Back' : 'Cancel' }}
-        </RouterLink>
-        <button
-          type="button"
-          class="btn-outline"
-          @click="onSubmit(true)"
-          v-if="!isEdit"
-        >
-          Save and New
-        </button>
-        <button type="button" class="btn" @click="onSubmit()" v-if="!isEdit">
-          Save
-        </button>
+      <div
+        class="flex gap-3 mt-6"
+        :class="route.query.id ? 'justify-between' : 'justify-end'"
+      >
+        <button class="btn-danger-outline" v-if="route.query.id">Delete</button>
+        <div class="flex gap-3">
+          <RouterLink :to="{ name: 'purchase-order' }" class="btn-gray-outline">
+            {{ isDisabled ? 'Back' : 'Cancel' }}
+          </RouterLink>
+          <button
+            type="button"
+            class="btn-outline"
+            @click="onSubmit(true)"
+            v-if="!isEdit"
+          >
+            Save and New
+          </button>
+          <button type="button" class="btn" @click="onSubmit()" v-if="!isEdit">
+            Save
+          </button>
 
-        <!-- edit page save button -->
-        <button
-          type="button"
-          class="btn"
-          v-if="isEdit && !isDisabled"
-          @click="onUpdate"
-        >
-          Update
-        </button>
+          <!-- edit page save button -->
+          <button
+            type="button"
+            class="btn"
+            v-if="isEdit && !isDisabled"
+            @click="onUpdate"
+          >
+            Update
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script setup>
+import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { Method, authenticatedApi } from '@/api'
 import PurchaseOrderFormRow from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormRow.vue'
 import PurchaseOrderFormHeader from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormHeader.vue'
@@ -224,17 +282,22 @@ import {
 import { ObjectHelpers } from 'shared/helpers/object'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAppStore } from '@/stores/app'
+import { useSettingsStore } from '@/stores/settings'
 
 const route = useRoute()
 const isEdit = ref(false)
 const router = useRouter()
 const selectedStatus = ref()
+const statusModal = ref(false)
 const showVendorModal = ref(false)
 const status = ref(PurchaseOrderStatus.OPEN)
 
+const appStore = useAppStore()
 const supplierStore = useVendorStore()
-const purchaseOrderStore = usePurchaseOrderStore()
 const productStore = useProductStore()
+const settingStore = useSettingsStore()
+const purchaseOrderStore = usePurchaseOrderStore()
 
 const modelDefualtValue = {
   order: {
@@ -245,12 +308,14 @@ const modelDefualtValue = {
     type: PurchaseOrderType.COD,
     memo: '',
     amount: 0,
-    term_start: ''
+    term_start: '',
+    status: PurchaseOrderStatus.OPEN
   },
   address: {
     address1: '',
     address2: '',
     city: '',
+    province: '',
     postal: ''
   },
   products: [
@@ -333,13 +398,13 @@ const onSubmit = async (isAddNew = false) => {
     model.value
   )
 
-  // reset model
-  model.value.products = []
-  model.value.order = { ...modelDefualtValue.order }
-  model.value.address = { ...modelDefualtValue.address }
-  addNewProduct()
-
   if (res.status == 200) {
+    // reset model
+    model.value.products = []
+    model.value.order = { ...modelDefualtValue.order }
+    model.value.address = { ...modelDefualtValue.address }
+    addNewProduct()
+
     if (!isAddNew) {
       router.push({
         name: 'purchase-order'
@@ -364,12 +429,22 @@ const onUpdate = async () => {
   }
 }
 
+const onReceiveOrder = () => {
+  router.push({
+    name: 'purchase-receive-order',
+    params: {
+      id: route.query.id
+    }
+  })
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
   await supplierStore.fetchAllSuppliers()
   await productStore.fetchAllProducts()
+  await settingStore.getBranches()
   if (route.query.id) {
     isEdit.value = true
     await purchaseOrderStore.fetchPurchaseOrderById(route.query.id)
@@ -388,7 +463,8 @@ onMounted(async () => {
       date: DateHelpers.formatDate(order.date, 'YYYY-MM-DD'),
       memo: order.memo,
       ref_no: order.ref_no,
-      type: order.type
+      type: order.type,
+      status: order.status
     }
     model.value.products = [
       ...order.products.map((product) => {
@@ -410,9 +486,18 @@ onMounted(async () => {
     ]
   }
 
+  // get current branch address
+  model.value.address = ObjectHelpers.assignSameFields(
+    model.value.address,
+    appStore.currentBranch.address
+  )
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
 watch(
   () => model.value.order.supplier_id,
   (val) => {

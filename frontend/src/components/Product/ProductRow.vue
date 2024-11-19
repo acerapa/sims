@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-10 gap-3 min-w-[907px]">
+  <div
+    class="grid grid-cols-9 gap-3 min-w-[907px] gen-table-row"
+    @click="emit('view', props.product.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.product.id }}</p>
@@ -42,14 +45,6 @@
         Out of Stock
       </button>
     </div>
-    <div class="col-span-1">
-      <img
-        src="@/assets/icons/vertical-menu.svg"
-        alt=""
-        class="cursor-pointer menu-btn-trigger"
-        @click.stop="openMenu(props.product.id)"
-      />
-    </div>
   </div>
 </template>
 
@@ -62,9 +57,5 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['openMenu'])
-
-const openMenu = () => {
-  emit('openMenu', props.product.id)
-}
+const emit = defineEmits(['view'])
 </script>

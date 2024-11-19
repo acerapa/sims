@@ -1,11 +1,4 @@
 <template>
-  <DeleteConfirmModal
-    v-model="showDeleteConfirmModal"
-    v-if="showDeleteConfirmModal"
-    href="physical-inventory/delete"
-    :data="toDelete"
-    @after-delete="afterDelete"
-  />
   <div class="flex flex-col gap-6">
     <button class="btn w-fit" @click="onStartPhysicalInventory">
       Start Physical Inventory
@@ -13,27 +6,29 @@
     <CustomTable
       :has-add-btn="false"
       :data="filteredData"
+      :has-pagination="true"
       :row-prop-init="eventRowInit"
       :table-row-component="PhysicalInventoryRow"
-      :table-header-component="PhysicalInventoryTableHeader"
-      @open-menu="onSelectRow"
+      @view="onView"
     >
-      <RowMenu
-        v-if="showRowMenu"
-        :top="top"
-        @view="onView"
-        @delete="onDelete"
-      />
+      <template #table_header>
+        <div class="grid grid-cols-4 gap-3 min-w-[935px]">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-1 table-header">Date Started</p>
+          <p class="col-span-1 table-header">Status</p>
+          <p class="col-span-1 table-header">Date Ended</p>
+        </div>
+      </template>
     </CustomTable>
   </div>
 </template>
 
 <script setup>
-import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import PhysicalInventoryRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryRow.vue'
-import PhysicalInventoryTableHeader from '@/components/Inventory/PhysicalInventory/PhysicalInventoryTableHeader.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
-import RowMenu from '@/components/shared/RowMenu.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { useAuthStore } from '@/stores/auth'
@@ -43,24 +38,15 @@ import { PhysicalInventoryStatus } from 'shared/enums'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const top = ref(0)
-const toDelete = ref()
-const selectedId = ref(0)
 const router = useRouter()
-const showRowMenu = ref(false)
 const authStore = useAuthStore()
 const productStore = useProductStore()
-const showDeleteConfirmModal = ref(false)
 const physicalInventoryStore = usePhysicalInventoryStore()
 
 /** ================================================
  * EVENTS
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
-
-Event.on(EventEnum.GLOBAL_CLICK, function () {
-  showRowMenu.value = false
-})
 
 const eventRowInit = 'event-initialize-row'
 Event.on(eventRowInit, function (data) {
@@ -112,32 +98,13 @@ const onStartPhysicalInventory = async () => {
   }
 }
 
-const onSelectRow = (id) => {
-  top.value = event.target.offsetTop
-  showRowMenu.value = true
-  selectedId.value = id
-}
-
-const onView = () => {
+const onView = (id) => {
   router.push({
     name: 'physical-inventory-details',
-    params: {
-      id: selectedId.value
-    }
+    params: { id }
   })
 }
 
-const onDelete = () => {
-  toDelete.value = {
-    id: selectedId.value
-  }
-  showDeleteConfirmModal.value = true
-}
-
-const afterDelete = async () => {
-  showDeleteConfirmModal.value = false
-  await physicalInventoryStore.fetchAllPhysicalInventories()
-}
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/

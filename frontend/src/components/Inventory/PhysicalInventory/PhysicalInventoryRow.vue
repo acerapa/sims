@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-5 gap-3 min-w-[935px] gen-table-row">
+  <div
+    class="grid grid-cols-4 gap-3 min-w-[935px] gen-table-row"
+    @click="emit('view', props.inventory.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.inventory.id }}</p>
@@ -20,14 +23,6 @@
           : '-'
       }}
     </p>
-    <div class="col-span-1 text-sm">
-      <img
-        @click.stop="openMenu(props.inventory.id)"
-        class="cursor-pointer menu-btn-trigger"
-        src="@/assets/icons/vertical-menu.svg"
-        alt=""
-      />
-    </div>
   </div>
 </template>
 
@@ -43,9 +38,5 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['openMenu'])
-
-const openMenu = () => {
-  emit('openMenu', props.inventory.id)
-}
+const emit = defineEmits(['view'])
 </script>
