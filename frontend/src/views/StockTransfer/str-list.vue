@@ -5,6 +5,7 @@
       :data="filteredData"
       :has-pagination="true"
       :row-prop-init="rowPropInit"
+      v-model:search-text="searchText"
       @add-new-record="onAddNewRecord"
       :table-row-component="StrListRow"
     >
@@ -32,7 +33,9 @@ import Event from '@/event'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
+import { DateHelpers } from 'shared/helpers'
 
+const searchText = ref()
 const router = useRouter()
 const transferStore = useTransferStore()
 
@@ -49,7 +52,16 @@ Event.on(rowPropInit, function (data) {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return transferStore.strs ? transferStore.strs.filter((str) => true) : 0
+  return transferStore.strs
+    ? transferStore.strs.filter((str) => {
+        const searchCondition = `${str.receiver.name} ${str.receiver.manager.first_name} ${str.receiver.manager.last_name} ${str.process_by.first_name} ${str.process_by.last_name} ${DateHelpers.formatDate(str.when, 'MM/DD/YYYY HH:II a')}`
+        return searchText.value
+          ? searchCondition
+              .toLowerCase()
+              .includes(searchText.value.toLowerCase())
+          : true
+      })
+    : 0
 })
 
 /** ================================================
