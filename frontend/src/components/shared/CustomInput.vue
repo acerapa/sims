@@ -23,7 +23,7 @@
         @change="emit('change')"
         @reset="emit('reset')"
       />
-      <small class="error" v-if="props.error">{{ props.error }}</small>
+      <small class="error" v-if="props.errorNoText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'textarea'">
       <small v-if="props.hasLabel">{{ props.label }}</small>
@@ -46,7 +46,7 @@
         @change="emit('change')"
         @reset="emit('reset')"
       ></textarea>
-      <small class="error" v-if="props.error">{{ props.error }}</small>
+      <small class="error" v-if="props.errorNoText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'select'">
       <small v-if="props.hasLabel">{{ props.label }}</small>
@@ -59,6 +59,7 @@
         :placeholder="props.placeholder"
         :id="props.id ? props.id : props.name"
         :select-multiple="props.selectMultiple"
+        :class="props.error ? '[&>div>*]:border [&>div>*]:border-red-500' : ''"
         v-model="value"
         @input="emit('input')"
         @focus="emit('focus')"
@@ -67,6 +68,7 @@
         @reset="emit('reset')"
         @add-new="emit('addNew')"
       />
+      <small class="error" v-if="props.errorNoText">{{ props.error }}</small>
     </div>
   </div>
 </template>
@@ -104,6 +106,10 @@ const props = defineProps({
   },
   error: {
     type: String
+  },
+  errorNoText: {
+    type: Boolean,
+    default: false
   },
   disabled: {
     type: Boolean,
