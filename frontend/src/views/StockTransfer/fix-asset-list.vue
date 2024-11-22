@@ -6,6 +6,7 @@
       :has-pagination="true"
       :row-prop-init="rowPropInit"
       @add-new-record="onAddNewRecord"
+      v-model:search-text="searchText"
       :table-row-component="FixAssetRow"
       @view="onView"
     >
@@ -29,11 +30,13 @@ import { useRouter } from 'vue-router'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import FixAssetRow from '@/components/stock-transfer/fix-asset-row.vue'
 import { useTransferStore } from '@/stores/transfer'
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import Event from '@/event'
 import { EventEnum } from '../../data/event/index'
+import { DateHelpers } from 'shared/helpers'
 
 const router = useRouter()
+const searchText = ref('')
 const transferStore = useTransferStore()
 
 Event.emit(EventEnum.IS_PAGE_LOADING)
@@ -46,7 +49,13 @@ Event.on(rowPropInit, (data) => {
 })
 
 const filteredData = computed(() => {
-  return transferStore.fix.filter((t) => t)
+  return transferStore.fix.filter((t) => {
+    const searchCondition = `${t.id} ${t.po_no} ${t.process_by.first_name} ${t.process_by.last_name} ${DateHelpers.formatDate(t.when, 'YYYY/MM/DD')}`
+
+    return searchText.value
+      ? searchCondition.toLowerCase().includes(searchText.value.toLowerCase())
+      : true
+  })
 })
 
 const onAddNewRecord = () => {
