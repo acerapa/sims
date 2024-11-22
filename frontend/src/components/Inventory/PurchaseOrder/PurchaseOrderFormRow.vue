@@ -21,6 +21,7 @@
         :has-add-new="true"
         @add-new="showModal = true"
         v-model="product.product_id"
+        :error="props.errors.product_id"
         :key="product.product_id"
         :can-search="true"
         :disabled="props.isDisabled"
@@ -33,6 +34,7 @@
       placeholder="Description"
       :disabled="props.isDisabled"
       v-model="product.description"
+      :error="props.errors.description"
     />
     <CustomInput
       type="number"
@@ -41,6 +43,7 @@
       placeholder="quantity"
       v-model="product.quantity"
       :disabled="props.isDisabled"
+      :error="props.errors.quantity"
     />
     <CustomInput
       name="cost"
@@ -49,6 +52,7 @@
       placeholder="Cost"
       v-model="product.cost"
       :disabled="props.isDisabled"
+      :error="props.errors.cost"
     />
     <CustomInput
       type="number"
@@ -57,6 +61,7 @@
       placeholder="Amount"
       v-model="product.amount"
       :disabled="props.isDisabled"
+      :error="props.errors.amount"
     />
     <p
       class="col-span-1 text-sm pl-3 mt-[10px]"
@@ -90,6 +95,11 @@ const props = defineProps({
   },
   sup_id: {
     type: String
+  },
+  errors: {
+    type: Object,
+    default: () => ({}),
+    required: false
   }
 })
 

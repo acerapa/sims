@@ -30,7 +30,6 @@
       v-model:search-text="searchText"
       :row-prop-init="purchaseOrderRowEvent"
       :table-row-component="PurchaseOrderRow"
-      @open-menu="onSelectRow"
       @view="onView"
     >
       <template #table_header>
