@@ -6,6 +6,7 @@
       :has-pagination="true"
       :row-prop-init="rowInitProp"
       @add-new-record="onNewRecord"
+      v-model:search-text="searchText"
       :table-row-component="RmaListRow"
       @view="onView"
     >
@@ -28,11 +29,12 @@
 import RmaListRow from '@/components/stock-transfer/rma-list-row.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import { useRouter } from 'vue-router'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useTransferStore } from '@/stores/transfer'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 
+const searchText = ref('')
 const router = useRouter()
 const transferStore = useTransferStore()
 
@@ -52,7 +54,13 @@ Event.on(rowInitProp, (data) => {
  * COMPUTED
  ** ================================================*/
 const filterData = computed(() => {
-  return transferStore.rmas
+  return transferStore.rmas.filter((rma) => {
+    const searchCondition = `${rma.id} ${rma.supplier.company_name} ${rma.process_by.first_name} ${rma.process_by.last_name} ${rma.when}`
+
+    return searchText.value
+      ? searchCondition.toLowerCase().includes(searchText.value.toLowerCase())
+      : true
+  })
 })
 
 /** ================================================
@@ -62,10 +70,6 @@ const onNewRecord = () => {
   router.push({
     name: 'rma-form'
   })
-}
-
-const onAfterDelete = async () => {
-  await transferStore.fetchTransfers()
 }
 
 const onView = (id) => {

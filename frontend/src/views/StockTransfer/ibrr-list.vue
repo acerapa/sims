@@ -5,6 +5,7 @@
     :data="filteredData"
     :has-pagination="true"
     :row-prop-init="rowPropInit"
+    v-model:search-text="searchText"
     @add-new-record="onAddNewRecord"
     :table-row-component="IbrrListRow"
   >
@@ -34,6 +35,7 @@ import { useTransferStore } from '@/stores/transfer'
 import IbrrListRow from '@/components/stock-transfer/ibrr-list-row.vue'
 
 const router = useRouter()
+const searchText = ref('')
 const transferStore = useTransferStore()
 /** ================================================
  * EVENTS
@@ -51,7 +53,13 @@ Event.on(rowPropInit, (data) => {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return transferStore.ibrrs
+  return transferStore.ibrrs.filter((transfer) => {
+    const searchCondition = `${transfer.id} ${transfer.sender.manager.first_name} ${transfer.sender.manager.last_name} ${transfer.process_by.first_name} ${transfer.process_by.last_name}`
+
+    return searchText.value
+      ? searchCondition.toLowerCase().includes(searchText.value.toLowerCase())
+      : true
+  })
 })
 
 /** ================================================
