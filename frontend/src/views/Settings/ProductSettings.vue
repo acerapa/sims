@@ -66,7 +66,6 @@ import ProductReorderingPointRow from '@/components/Settings/ProductReorderingPo
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 
-const top = ref(0)
 const selectedId = ref(-1)
 const showModal = ref(false)
 const selectedReorderingId = ref(-1)
@@ -94,12 +93,6 @@ Event.on(productReorderingRowEvent, function (item) {
 /** ================================================
  * METHODS
  ** ================================================*/
-
-const onSelectRow = (id) => {
-  selectedId.value = id
-  top.value = event.target.offsetTop
-}
-
 const onViewCategory = (id) => {
   selectedId.value = id
   showModal.value = true
