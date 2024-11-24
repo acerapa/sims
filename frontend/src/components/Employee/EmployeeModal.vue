@@ -1,6 +1,6 @@
 <template>
   <ModalWrapper
-    title="New Employee"
+    :title="props.selectedId ? 'Edit Employee' : 'Add Employee'"
     v-model="showModal"
     @submit="onSubmit"
     :has-delete="props.selectedId ? true : false"
@@ -14,6 +14,10 @@
           class="flex-1"
           v-model="model.username"
           placeholder="Username"
+          :error="modelErrors.username"
+          :error-no-text="true"
+          label="Username"
+          :has-label="true"
         />
         <CustomInput
           class="flex-1"
@@ -25,6 +29,10 @@
           ]"
           placeholder="Status"
           v-model="model.status"
+          :error="modelErrors.status"
+          :error-no-text="true"
+          label="Status"
+          :has-label="true"
         />
       </div>
       <div class="grid grid-cols-3 gap-3">
@@ -34,6 +42,10 @@
           name="first_name"
           placeholder="First Name"
           v-model="model.first_name"
+          :error="modelErrors.first_name"
+          :error-no-text="true"
+          label="First Name"
+          :has-label="true"
         />
         <CustomInput
           type="text"
@@ -41,6 +53,10 @@
           class="flex-1"
           placeholder="Middle Name"
           v-model="model.middle_name"
+          :error="modelErrors.middle_name"
+          :error-no-text="true"
+          label="Middle Name"
+          :has-label="true"
         />
         <CustomInput
           name="last_name"
@@ -48,6 +64,10 @@
           class="flex-1"
           placeholder="Last Name"
           v-model="model.last_name"
+          :error="modelErrors.last_name"
+          :error-no-text="true"
+          label="Last Name"
+          :has-label="true"
         />
       </div>
       <div class="flex gap-3">
@@ -58,6 +78,10 @@
           placeholder="Select Position"
           v-model="model.position"
           :options="positionOptions"
+          :error="modelErrors.position"
+          :error-no-text="true"
+          label="Position"
+          :has-label="true"
         />
         <CustomInput
           type="date"
@@ -65,6 +89,10 @@
           name="date_started"
           placeholder="Date Started"
           v-model="model.date_started"
+          :error="modelErrors.date_started"
+          :error-no-text="true"
+          label="Date Started"
+          :has-label="true"
         />
       </div>
       <div class="flex gap-3"></div>
@@ -85,6 +113,7 @@ import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { useEmployeeStore } from '@/stores/employee'
 import { ObjectHelpers } from 'shared'
 import { computed, onMounted, ref } from 'vue'
+import { UserSchema } from 'shared/validators/user'
 
 const showConfirmModal = ref(false)
 
@@ -111,6 +140,8 @@ const model = ref({
   password: ''
 })
 
+const modelErrors = ref({})
+
 const showModal = defineModel()
 
 /** ================================================
@@ -128,8 +159,20 @@ const positionOptions = computed(() => {
  * METHODS
  ** ================================================*/
 const onSubmit = async () => {
+  // validator
+  const { error } = UserSchema.validate(model.value, {
+    abortEarly: false
+  })
+
   if (!props.selectedId) {
     model.value.password = `${model.value.username}-${new Date().getFullYear()}`
+  }
+
+  if (error) {
+    error.details.forEach((err) => {
+      modelErrors.value[err.context.key] = err.message
+    })
+    return
   }
   const res = await authenticatedApi(apiPath, Method.POST, model.value)
   // TODO: Show alert. Currently we have no alert component so go ahead and create it first

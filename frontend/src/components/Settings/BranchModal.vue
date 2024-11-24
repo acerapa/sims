@@ -17,6 +17,8 @@
           label="Branch Name"
           v-model="model.branch.name"
           placeholder="Ex. Masili Branch"
+          :error="modelErrors.name"
+          :error-no-text="true"
         />
         <CustomInput
           type="select"
@@ -29,6 +31,8 @@
           placeholder="Select Branch Manager"
           v-model="model.branch.branch_manager"
           @add-new="showEmployeeModal = true"
+          :error="modelErrors.branch_manager"
+          :error-no-text="true"
         />
       </div>
 
@@ -41,6 +45,8 @@
         placeholder="Select status"
         v-model="model.branch.status"
         class="w-[calc(50%_-_0.5rem)]"
+        :error="modelErrors.status"
+        :error-no-text="true"
       />
       <CustomInput
         class="[&>div]:flex [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:gap-3 mt-3"
@@ -58,6 +64,7 @@
         :key="model.address"
         v-model="model.address"
         :address="model.address"
+        :address-errors="modelErrors"
       />
     </div>
   </ModalWrapper>
@@ -82,6 +89,7 @@ import AddressForm from '@/components/shared/AddressForm.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { ObjectHelpers } from 'shared/helpers'
 import { useAppStore } from '@/stores/app'
+import { BranchCreateSchema } from 'shared/validators/transfer'
 
 const props = defineProps({
   selectedId: {
@@ -111,11 +119,26 @@ const model = ref({
     address1: '',
     address2: '',
     city: '',
+    province: '',
     postal: ''
   }
 })
 
+const modelErrors = ref({})
+
 const onSubmit = async () => {
+  // validations
+  const { error } = BranchCreateSchema.validate(model.value, {
+    abortEarly: false
+  })
+
+  if (error) {
+    error.details.forEach((err) => {
+      modelErrors.value[err.context.key] = err.message
+    })
+    return
+  }
+
   let res = null
   if (!props.selectedId) {
     res = await settingStore.createBranch(model.value)

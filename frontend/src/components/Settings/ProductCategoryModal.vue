@@ -3,16 +3,18 @@
     title="New Category"
     v-model="showModal"
     @submit="onSubmit"
-    :has-delete="props.selectedId ? true : false"
     @delete="onDelete"
+    :has-delete="props.selectedId ? true : false"
   >
-    <div class="flex mt-7">
+    <div class="flex mt-7 pb-5">
       <CustomInput
         type="text"
         name="category"
         v-model="model.name"
         class="flex-1"
         placeholder="Category Name"
+        :error="modelError.name"
+        :error-no-text="true"
       />
     </div>
   </ModalWrapper>
@@ -30,6 +32,7 @@ import CustomInput from '@/components/shared/CustomInput.vue'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { onMounted, ref } from 'vue'
+import { CategorySchema } from 'shared/validators/product'
 
 const showModal = defineModel()
 const showConfirmModal = ref(false)
@@ -46,6 +49,8 @@ const model = ref({
   name: ''
 })
 
+const modelError = ref({})
+
 onMounted(async () => {
   if (props.selectedId) {
     model.value = settingsStore.productCategories.find(
@@ -59,6 +64,16 @@ const apiPath = props.selectedId
   : 'product-category/register'
 
 const onSubmit = async () => {
+  // validations
+  const { error } = CategorySchema.validate(model.value)
+
+  if (error) {
+    error.details.forEach((err) => {
+      modelError.value[err.context.key] = err.message
+    })
+    return
+  }
+
   const res = await authenticatedApi(apiPath, Method.POST, model.value)
 
   if (res.status == 200) {

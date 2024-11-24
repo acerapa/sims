@@ -2,7 +2,6 @@
   <div>
     <AccountModal
       v-model="showModal"
-      :is-edit="isEdit"
       :selected-id="selectedId"
       v-if="showModal"
     />

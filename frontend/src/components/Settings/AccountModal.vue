@@ -7,18 +7,41 @@
     @delete="onDelete"
   >
     <div class="flex gap-3 my-7">
-      <input
+      <CustomInput
         type="text"
-        class="input flex-1"
+        name="name"
         placeholder="Name"
         v-model="model.name"
+        class="flex-1"
+        :has-label="true"
+        label="Name"
+        :error="modelErrors.name"
+        :error-no-text="true"
       />
-      <select name="" id="" class="input flex-1" v-model="model.type">
-        <option value="">Select Account Type</option>
-        <option value="income">Income Account</option>
-        <option value="expense">Expense Account</option>
-        <option value="asset">Asset Account</option>
-      </select>
+      <CustomInput
+        type="select"
+        name="select_account"
+        v-model="model.type"
+        class="flex-1"
+        :has-label="true"
+        label="Type"
+        :options="[
+          {
+            text: 'Income Account',
+            value: 'income'
+          },
+          {
+            text: 'Expense Account',
+            value: 'expense'
+          },
+          {
+            text: 'Asset Account',
+            value: 'asset'
+          }
+        ]"
+        :error="modelErrors.type"
+        :error-no-text="true"
+      />
     </div>
   </ModalWrapper>
   <DeleteConfirmModal
@@ -35,6 +58,8 @@ import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { onMounted, ref } from 'vue'
+import CustomInput from '../shared/CustomInput.vue'
+import { AccountSchema } from 'shared/validators/account'
 
 const showConfirmModal = ref(false)
 const settingsStore = useSettingsStore()
@@ -42,6 +67,8 @@ const model = ref({
   name: '',
   type: ''
 })
+
+const modelErrors = ref({})
 
 const props = defineProps({
   selectedId: {
@@ -64,6 +91,16 @@ onMounted(() => {
 })
 
 const onSubmit = async () => {
+  // validation
+  const { error } = AccountSchema.validate(model.value, { abortEarly: false })
+  if (error) {
+    error.details.forEach((err) => {
+      modelErrors.value[err.context.key] = err.message
+    })
+
+    return
+  }
+
   const res = await authenticatedApi(apiPath, Method.POST, model.value)
   showModal.value = false
 

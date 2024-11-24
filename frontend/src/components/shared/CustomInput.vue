@@ -59,7 +59,11 @@
         :placeholder="props.placeholder"
         :id="props.id ? props.id : props.name"
         :select-multiple="props.selectMultiple"
-        :class="props.error ? '[&>div>*]:border [&>div>*]:border-red-500' : ''"
+        :class="
+          props.error
+            ? '[&>div>*]:border [&>div>*]:border-red-500 [&>select]:border [&>select]:border-red-500'
+            : ''
+        "
         v-model="value"
         @input="emit('input')"
         @focus="emit('focus')"
