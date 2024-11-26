@@ -91,7 +91,7 @@
                   @add-new="showVendorModal = true"
                   :disabled="isEdit || isDisabled"
                   :error="modelErrors.supplier_id"
-                  :error-no-text="true"
+                  :error-has-text="true"
                 />
                 <CustomInput
                   type="select"
@@ -113,7 +113,7 @@
                   ]"
                   :disabled="isDisabled"
                   :error="modelErrors.type"
-                  :error-no-text="true"
+                  :error-has-text="true"
                 />
               </div>
               <div class="flex gap-3">
@@ -127,7 +127,7 @@
                   :disabled="isDisabled"
                   :error="modelErrors.ref_no"
                   v-model="model.order.ref_no"
-                  :error-no-text="true"
+                  :error-has-text="true"
                 />
                 <CustomInput
                   type="date"
@@ -139,7 +139,7 @@
                   placeholder="Term Start"
                   v-model="model.order.term_start"
                   :error="modelErrors.term_start"
-                  :error-no-text="true"
+                  :error-has-text="true"
                   v-if="model.order.type == PurchaseOrderType.TERM"
                 />
               </div>
@@ -153,7 +153,7 @@
                   placeholder="Date"
                   v-model="model.order.date"
                   :disabled="isDisabled"
-                  :error-no-text="true"
+                  :error-has-text="true"
                   :error="modelErrors.date"
                 />
                 <CustomInput
@@ -165,7 +165,7 @@
                   placeholder="Bill Due"
                   v-model="model.order.bill_due"
                   :error="modelErrors.bill_due"
-                  :error-no-text="true"
+                  :error-has-text="true"
                   :disabled="isDisabled"
                 />
               </div>
@@ -191,7 +191,7 @@
           input-class="resize-none"
           v-model="model.order.memo"
           :error="modelErrors.memo"
-          :error-no-text="true"
+          :error-has-text="true"
         />
       </div>
 

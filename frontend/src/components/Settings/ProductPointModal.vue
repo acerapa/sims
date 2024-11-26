@@ -17,7 +17,7 @@
         placeholder="Re-ordering Points"
         v-model="model.point"
         :error="modelErrors.point"
-        :error-no-text="true"
+        :error-has-text="true"
       />
       <CustomInput
         type="select"
@@ -32,7 +32,7 @@
         :can-search="true"
         :select-multiple="true"
         :error="modelErrors.products"
-        :error-no-text="true"
+        :error-has-text="true"
       />
     </div>
   </ModalWrapper>

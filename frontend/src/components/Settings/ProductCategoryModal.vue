@@ -14,7 +14,7 @@
         class="flex-1"
         placeholder="Category Name"
         :error="modelError.name"
-        :error-no-text="true"
+        :error-has-text="true"
       />
     </div>
   </ModalWrapper>
