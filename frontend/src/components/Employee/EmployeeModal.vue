@@ -15,7 +15,7 @@
           v-model="model.username"
           placeholder="Username"
           :error="modelErrors.username"
-          :error-no-text="true"
+          :error-has-text="true"
           label="Username"
           :has-label="true"
         />
@@ -30,7 +30,7 @@
           placeholder="Status"
           v-model="model.status"
           :error="modelErrors.status"
-          :error-no-text="true"
+          :error-has-text="true"
           label="Status"
           :has-label="true"
         />
@@ -43,7 +43,7 @@
           placeholder="First Name"
           v-model="model.first_name"
           :error="modelErrors.first_name"
-          :error-no-text="true"
+          :error-has-text="true"
           label="First Name"
           :has-label="true"
         />
@@ -54,7 +54,7 @@
           placeholder="Middle Name"
           v-model="model.middle_name"
           :error="modelErrors.middle_name"
-          :error-no-text="true"
+          :error-has-text="true"
           label="Middle Name"
           :has-label="true"
         />
@@ -65,7 +65,7 @@
           placeholder="Last Name"
           v-model="model.last_name"
           :error="modelErrors.last_name"
-          :error-no-text="true"
+          :error-has-text="true"
           label="Last Name"
           :has-label="true"
         />
@@ -79,7 +79,7 @@
           v-model="model.position"
           :options="positionOptions"
           :error="modelErrors.position"
-          :error-no-text="true"
+          :error-has-text="true"
           label="Position"
           :has-label="true"
         />
@@ -90,7 +90,7 @@
           placeholder="Date Started"
           v-model="model.date_started"
           :error="modelErrors.date_started"
-          :error-no-text="true"
+          :error-has-text="true"
           label="Date Started"
           :has-label="true"
         />

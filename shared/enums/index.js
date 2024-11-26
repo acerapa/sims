@@ -117,11 +117,23 @@ const ProductTransferStatus = Object.freeze({
   NOT_RECEIVED: "not-received",
 });
 
+const ProductType = Object.freeze({
+  INVENTORY: "inventory",
+  NON_INVENTORY: "non-inventory",
+});
+
+const ProductStatus = Object.freeze({
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+});
+
 module.exports = {
   UserType,
+  ProductType,
   AccountTypes,
   BranchStatus,
   TransferType,
+  ProductStatus,
   BranchStatusMap,
   LocalStorageKeys,
   PurchaseOrderType,

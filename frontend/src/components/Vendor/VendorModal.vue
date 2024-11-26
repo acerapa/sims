@@ -15,13 +15,21 @@
             class="flex-1"
             name="company_name"
             placeholder="Company Name"
-            v-model="model.company_name"
+            :has-label="true"
+            label="Company Name"
+            :error-has-text="true"
+            :error="modelErrors.company_name"
+            v-model="model.vendor.company_name"
           />
           <CustomInput
             type="select"
             class="flex-1"
             name="annotation"
-            v-model="model.annotation"
+            :has-label="true"
+            label="Annotation"
+            :error-has-text="true"
+            v-model="model.vendor.annotation"
+            :error="modelErrors.annotation"
             placeholder="Select annotation"
             :options="[
               { text: 'Mr.', value: 'Mr.' },
@@ -35,21 +43,33 @@
             type="text"
             class="flex-1"
             name="first_name"
+            :has-label="true"
+            label="First Name"
+            :error-has-text="true"
             placeholder="First Name"
-            v-model="model.first_name"
+            :error="modelErrors.first_name"
+            v-model="model.vendor.first_name"
           />
           <CustomInput
             type="text"
             class="flex-1"
             name="last_name"
+            :has-label="true"
+            label="Last Name"
+            :error-has-text="true"
             placeholder="Last Name"
-            v-model="model.last_name"
+            :error="modelErrors.last_name"
+            v-model="model.vendor.last_name"
           />
         </div>
       </div>
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Address Info</p>
-        <AddressForm :has-label="true" v-model="model.address" />
+        <AddressForm
+          :has-label="true"
+          v-model="model.address"
+          :address-errors="modelErrors"
+        />
       </div>
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Contact Info</p>
@@ -58,15 +78,23 @@
             type="text"
             name="phone"
             class="flex-1"
+            label="Phone"
+            :has-label="true"
+            :error-has-text="true"
+            :error="modelErrors.phone"
             placeholder="Mobile Number"
-            v-model="model.phone"
+            v-model="model.vendor.phone"
           />
           <CustomInput
             type="text"
             class="flex-1"
             name="telephone"
+            label="Telephone"
+            :has-label="true"
+            :error-has-text="true"
             placeholder="Telephone Number"
-            v-model="model.telephone"
+            :error="modelErrors.telephone"
+            v-model="model.vendor.telephone"
           />
         </div>
         <div class="flex gap-6">
@@ -74,15 +102,23 @@
             type="text"
             name="email"
             class="flex-1"
+            label="Email"
+            :has-label="true"
             placeholder="Email"
-            v-model="model.email"
+            :error-has-text="true"
+            :error="modelErrors.email"
+            v-model="model.vendor.email"
           />
           <CustomInput
             name="fax"
             type="text"
             class="flex-1"
+            label="Fax"
+            :has-label="true"
             placeholder="Fax"
-            v-model="model.fax"
+            :error-has-text="true"
+            :error="modelErrors.fax"
+            v-model="model.vendor.fax"
           />
         </div>
       </div>
@@ -104,6 +140,7 @@ import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import AddressForm from '../shared/AddressForm.vue'
 import { useVendorStore } from '@/stores/supplier'
 import { onMounted, ref } from 'vue'
+import { VendorCreateSchema } from 'shared/validators/vendor'
 
 const showModal = defineModel()
 const showDeleteConfirmModal = ref(false)
@@ -117,20 +154,22 @@ const props = defineProps({
 
 const supplierStore = useVendorStore()
 const title = ref(
-  props.selectedIdd ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier'
+  props.selectedId ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier'
 )
 const apiPath = ref(
-  props.selectedIdd ? 'suppliers/update' : 'suppliers/register'
+  props.selectedId ? 'suppliers/update' : 'suppliers/register'
 )
 const model = ref({
-  company_name: '',
-  first_name: '',
-  last_name: '',
-  annotation: '',
-  phone: '',
-  email: '',
-  telephone: '',
-  fax: '',
+  vendor: {
+    company_name: '',
+    first_name: '',
+    last_name: '',
+    annotation: '',
+    phone: '',
+    email: '',
+    telephone: '',
+    fax: ''
+  },
   address: {
     address1: '',
     address2: '',
@@ -140,7 +179,21 @@ const model = ref({
   }
 })
 
+const modelErrors = ref({})
+
 const onSubmit = async () => {
+  // validation
+  const { error } = VendorCreateSchema.validate(model.value, {
+    abortEarly: false
+  })
+
+  if (error) {
+    error.details.forEach((err) => {
+      modelErrors.value[err.context.key] = err.message
+    })
+    return
+  }
+
   const res = await authenticatedApi(apiPath.value, Method.POST, model.value)
   await supplierStore.fetchAllSuppliers()
 

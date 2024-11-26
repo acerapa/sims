@@ -11,7 +11,7 @@
         :disabled="props.disabled"
         :has-label="props.hasLabel"
         :error="props.addressErrors.address1"
-        :error-no-text="true"
+        :error-has-text="true"
       />
       <CustomInput
         type="text"
@@ -23,7 +23,7 @@
         :disabled="props.disabled"
         :has-label="props.hasLabel"
         :error="props.addressErrors.address2"
-        :error-no-text="true"
+        :error-has-text="true"
       />
     </div>
     <div class="grid grid-cols-3 gap-6 max-lg:grid-cols-1 max-lg:gap-3">
@@ -37,7 +37,7 @@
         :disabled="props.disabled"
         :has-label="props.hasLabel"
         :error="props.addressErrors.city"
-        :error-no-text="true"
+        :error-has-text="true"
       />
       <CustomInput
         type="text"
@@ -49,7 +49,7 @@
         :disabled="props.disabled"
         :has-label="props.hasLabel"
         :error="props.addressErrors.province"
-        :error-no-text="true"
+        :error-has-text="true"
       />
       <CustomInput
         type="text"
@@ -61,7 +61,7 @@
         :disabled="props.disabled"
         :has-label="props.hasLabel"
         :error="props.addressErrors.postal"
-        :error-no-text="true"
+        :error-has-text="true"
       />
     </div>
   </div>

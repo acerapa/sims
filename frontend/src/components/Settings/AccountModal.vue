@@ -16,7 +16,7 @@
         :has-label="true"
         label="Name"
         :error="modelErrors.name"
-        :error-no-text="true"
+        :error-has-text="true"
       />
       <CustomInput
         type="select"
@@ -40,7 +40,7 @@
           }
         ]"
         :error="modelErrors.type"
-        :error-no-text="true"
+        :error-has-text="true"
       />
     </div>
   </ModalWrapper>

@@ -16,20 +16,28 @@
             v-model="model.type"
             class="flex-1"
             placeholder="Select Type"
+            label="Type"
+            :has-label="true"
             :options="[
-              { text: 'inventory', value: 'Inventory' },
-              { text: 'non-inventory', value: 'Non Inventory' }
+              { text: 'inventory', value: ProductType.INVENTORY },
+              { text: 'non-inventory', value: ProductType.NON_INVENTORY }
             ]"
+            :error="modelErrors.type"
+            :error-has-text="true"
           />
           <CustomInput
             type="select"
             class="flex-1"
+            :has-label="true"
             name="reordering"
             :has-add-new="true"
+            label="Reordering Point"
             :options="reorderingPointOptions"
             v-model="model.product_setting_id"
             placeholder="*Select Reordering Point"
             @add-new="showProductPointModal = true"
+            :error="modelErrors.product_setting_id"
+            :error-has-text="true"
           />
         </div>
       </div>
@@ -43,6 +51,10 @@
               class="flex-1"
               placeholder="*Name"
               v-model="model.name"
+              :error="modelErrors.name"
+              :error-has-text="true"
+              label="Name"
+              :has-label="true"
             />
             <CustomInput
               type="text"
@@ -50,6 +62,10 @@
               class="flex-1"
               placeholder="*Brand"
               v-model="model.brand"
+              label="Brand"
+              :has-label="true"
+              :error="modelErrors.brand"
+              :error-has-text="true"
             />
           </div>
           <div class="flex gap-3 items-start">
@@ -63,6 +79,10 @@
               :options="supplierOptions"
               placeholder="*Select Suppliers"
               @add-new="showVendorModal = true"
+              label="Suppliers"
+              :has-label="true"
+              :error="modelErrors.suppliers"
+              :error-has-text="true"
             />
             <CustomInput
               type="select"
@@ -73,6 +93,10 @@
               :options="categoriesOptions"
               @add-new="showCategoryModal = true"
               v-model="model.category_id"
+              label="Category"
+              :has-label="true"
+              :error="modelErrors.category_id"
+              :error-has-text="true"
             />
           </div>
         </div>
@@ -87,6 +111,10 @@
               class="flex-1"
               placeholder="Cost Price"
               v-model="model.cost"
+              label="Cost Price"
+              :has-label="true"
+              :error="modelErrors.cost"
+              :error-has-text="true"
             />
             <CustomInput
               name="sale"
@@ -94,6 +122,10 @@
               class="flex-1"
               placeholder="Sale Price"
               v-model="model.price"
+              label="Sale Price"
+              :has-label="true"
+              :error="modelErrors.price"
+              :error-has-text="true"
             />
           </div>
           <div class="flex gap-3 items-start">
@@ -106,6 +138,10 @@
               v-model="model.income_account"
               @add-new="showAccountModal = true"
               placeholder="*Select Income Account"
+              label="Income Account"
+              :has-label="true"
+              :error="modelErrors.income_account"
+              :error-has-text="true"
             />
             <CustomInput
               type="select"
@@ -116,6 +152,10 @@
               v-model="model.expense_account"
               @add-new="showAccountModal = true"
               placeholder="*Select Expense Account"
+              label="Expense Account"
+              :has-label="true"
+              :error="modelErrors.expense_account"
+              :error-has-text="true"
             />
           </div>
           <div class="flex gap-3">
@@ -125,6 +165,10 @@
               name="quantity_in_stock"
               placeholder="Quantity in stock"
               v-model="model.quantity_in_stock"
+              label="Quantity in stock"
+              :has-label="true"
+              :error="modelErrors.quantity_in_stock"
+              :error-has-text="true"
             />
             <CustomInput
               type="text"
@@ -132,6 +176,10 @@
               name="item_code"
               placeholder="Item Code"
               v-model="model.item_code"
+              label="Item Code"
+              :has-label="true"
+              :error="modelErrors.item_code"
+              :error-has-text="true"
             />
           </div>
           <div class="flex gap-3 items-start">
@@ -142,6 +190,10 @@
               name="purchase_description"
               placeholder="Purchase Description"
               v-model="model.purchase_description"
+              label="Purchase Description"
+              :has-label="true"
+              :error="modelErrors.purchase_description"
+              :error-has-text="true"
             />
             <CustomInput
               :rows="5"
@@ -150,6 +202,10 @@
               name="sale_description"
               placeholder="Sales Description"
               v-model="model.sale_description"
+              label="Sales Description"
+              :has-label="true"
+              :error="modelErrors.sale_description"
+              :error-has-text="true"
             />
           </div>
         </div>
@@ -181,7 +237,8 @@ import AccountModal from '@/components/Settings/AccountModal.vue'
 import VendorModal from '@/components/Vendor/VendorModal.vue'
 import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import { computed, onMounted, ref } from 'vue'
-import { AccountTypes } from 'shared'
+import { AccountTypes, ProductType } from 'shared'
+import { ProductSchema } from 'shared/validators/product'
 
 import { useVendorStore } from '@/stores/supplier'
 import { useSettingsStore } from '@/stores/settings'
@@ -220,6 +277,8 @@ const model = ref({
   expense_account: '',
   product_setting_id: ''
 })
+
+const modelErrors = ref({})
 
 const title = ref(props.selectedId ? 'Edit Product' : 'New Product')
 const apiPath = ref(props.selectedId ? 'products/update' : 'products/register')
@@ -331,6 +390,16 @@ const onAfterDelete = async () => {
 }
 
 const onSubmit = async () => {
+  // validation
+  const { error } = ProductSchema.validate(model.value, { abortEarly: false })
+
+  if (error) {
+    error.details.forEach((err) => {
+      modelErrors.value[err.context.key] = err.message
+    })
+    return
+  }
+
   await authenticatedApi(apiPath.value, Method.POST, model.value)
   await productStore.fetchAllProducts()
   showModal.value = false

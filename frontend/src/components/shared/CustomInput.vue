@@ -23,7 +23,7 @@
         @change="emit('change')"
         @reset="emit('reset')"
       />
-      <small class="error" v-if="props.errorNoText">{{ props.error }}</small>
+      <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'textarea'">
       <small v-if="props.hasLabel">{{ props.label }}</small>
@@ -46,7 +46,7 @@
         @change="emit('change')"
         @reset="emit('reset')"
       ></textarea>
-      <small class="error" v-if="props.errorNoText">{{ props.error }}</small>
+      <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'select'">
       <small v-if="props.hasLabel">{{ props.label }}</small>
@@ -72,7 +72,7 @@
         @reset="emit('reset')"
         @add-new="emit('addNew')"
       />
-      <small class="error" v-if="props.errorNoText">{{ props.error }}</small>
+      <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
   </div>
 </template>
@@ -111,7 +111,7 @@ const props = defineProps({
   error: {
     type: String
   },
-  errorNoText: {
+  errorHasText: {
     type: Boolean,
     default: false
   },

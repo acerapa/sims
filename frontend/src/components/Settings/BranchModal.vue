@@ -18,7 +18,7 @@
           v-model="model.branch.name"
           placeholder="Ex. Masili Branch"
           :error="modelErrors.name"
-          :error-no-text="true"
+          :error-has-text="true"
         />
         <CustomInput
           type="select"
@@ -32,7 +32,7 @@
           v-model="model.branch.branch_manager"
           @add-new="showEmployeeModal = true"
           :error="modelErrors.branch_manager"
-          :error-no-text="true"
+          :error-has-text="true"
         />
       </div>
 
@@ -46,7 +46,7 @@
         v-model="model.branch.status"
         class="w-[calc(50%_-_0.5rem)]"
         :error="modelErrors.status"
-        :error-no-text="true"
+        :error-has-text="true"
       />
       <CustomInput
         class="[&>div]:flex [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:gap-3 mt-3"

@@ -1,8 +1,6 @@
 const Address = require("../models/address");
 const Supplier = require("../models/supplier");
-
-// validators
-const { VendorSchema } = require("shared");
+const sequelize = require("sequelize");
 
 module.exports = {
   all: async (req, res) => {
@@ -21,21 +19,22 @@ module.exports = {
   },
 
   register: async (req, res) => {
-    const { error } = VendorSchema.validate(req.body);
-    if (!error) {
-      try {
-        await Supplier.create(req.body, {
-          include: {
-            model: Address,
-            as: "address",
-          },
-        });
-        res.sendResponse({}, "Successfully registered!", 200);
-      } catch (e) {
-        res.sendError(e, "Somenthing wen't wrong => " + e.message, 400);
-      }
-    } else {
-      res.sendError(error, "Somenthing wen't wrong!", 400);
+    try {
+      const transaction = await sequelize.transaction();
+      const data = req.validated;
+
+      const address = await Address.create(data.address, { transaction });
+      await Supplier.create(
+        {
+          ...data.vendor,
+          address_id: address.id,
+        },
+        { transaction }
+      );
+
+      res.sendResponse({}, "Successfully registered!", 200);
+    } catch (e) {
+      res.sendError(e, "Somenthing wen't wrong => " + e.message, 400);
     }
   },
 
