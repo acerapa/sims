@@ -1,6 +1,8 @@
 <template>
   <div>
     <h1>Your all set 🎉!</h1>
+
+    <!-- TODO: Implement charts fo visualization. For charts can refer to this link: https://vue-chartjs.org/guide/ -->
   </div>
 </template>
 
