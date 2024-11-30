@@ -9,30 +9,32 @@
     <div class="flex flex-col gap-3">
       <div class="mt-3 flex gap-3">
         <CustomInput
-          name="po_no"
-          placeholder="Ex. 123"
-          :has-label="true"
-          label="PO no."
           type="text"
+          name="po_no"
+          label="PO no."
+          :has-label="true"
+          placeholder="Ex. 123"
+          :error-has-text="true"
+          :error="modelErrors.po_no"
           v-model="model.transfer.po_no"
         />
         <CustomInput
           name="when"
-          :has-label="true"
           label="When"
+          :disabled="true"
+          :has-label="true"
           type="datetime-local"
           v-model="model.transfer.when"
-          :disabled="true"
         />
       </div>
       <CustomInput
-        type="textarea"
         name="memo"
-        :has-label="true"
         label="Memo"
-        placeholder="Ex. This is a descriptions"
+        type="textarea"
+        :has-label="true"
         class="w-[calc(50%_-_6px)]"
         v-model="model.transfer.memo"
+        placeholder="Ex. This is a descriptions"
       />
     </div>
 
@@ -43,6 +45,7 @@
         :format="productDefaultValue"
         :row-component="ProductSelectRow"
         :header-component="ProductSelectHeader"
+        :row-event-name="rowEventName"
       >
       </ProductMultiSelectTable>
 
@@ -80,6 +83,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSettingsStore } from '@/stores/settings'
 import { useAppStore } from '@/stores/app'
+import { StockTransferCreateSchema } from 'shared'
+import Event from '@/event'
+
+const rowEventName = 'fix-asset-row-event'
 
 const productDefaultValue = {
   product_id: '',
@@ -113,6 +120,7 @@ const purchaseOrderStore = usePurchaseOrderStore()
 const authUser = ref()
 const router = useRouter()
 const model = ref({ ...defaultValue })
+const modelErrors = ref({})
 
 onMounted(async () => {
   await purchaseOrderStore.fetchPurchaseOrders()
@@ -146,8 +154,46 @@ onMounted(async () => {
 
 const onSubmit = async (isAddNew = false) => {
   if (!route.query.id && authUser.value) {
+    // additional settings
     model.value.transfer.processed_by = authUser.value.id
     model.value.transfer.branch_to = currentBranch.value
+
+    // validate model
+    const { error } = StockTransferCreateSchema.validate(model.value, {
+      abortEarly: false
+    })
+    if (error) {
+      console.log(error.details)
+      modelErrors.value.products = []
+
+      error.details.forEach((err) => {
+        if (err.path.includes('products')) {
+          modelErrors.value.products.push(err)
+        } else {
+          modelErrors.value[err.context.key] = err.message
+        }
+      })
+
+      modelErrors.value.products = Object.groupBy(
+        modelErrors.value.products,
+        (err) => err.path[1]
+      )
+
+      const keys = Object.keys(modelErrors.value.products)
+      keys.forEach((key) => {
+        let prdErr = {}
+        modelErrors.value.products[key].forEach((item) => {
+          prdErr[item.context.key] = item.message
+        })
+
+        modelErrors.value.products[key] = prdErr
+      })
+
+      // trigger event to show errors
+      Event.emit(rowEventName, modelErrors.value.products)
+
+      return
+    }
 
     await transferStore.createTransfer(model.value)
   } else {

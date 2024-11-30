@@ -28,7 +28,7 @@ const BranchUpdateSchema = Joi.object({
 });
 
 const StockTransferSchema = Joi.object({
-  po_no: Joi.alternatives(Joi.string(), Joi.number()).when("t ype", {
+  po_no: Joi.alternatives(Joi.string(), Joi.number()).when("type", {
     is: TransferType.FIX,
     then: Joi.required(),
     otherwise: Joi.allow(null, "").optional(),
