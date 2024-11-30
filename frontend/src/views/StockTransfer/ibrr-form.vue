@@ -39,6 +39,8 @@
               :has-label="true"
               label="Str #"
               placeholder="Ex. 01"
+              :error-has-text="true"
+              :error="modelErrors.str_id"
               v-model="model.transfer.str_id"
             />
             <CustomInput
@@ -47,10 +49,12 @@
               class="flex-1"
               :has-label="true"
               label="From Branch"
+              :error-has-text="true"
               :options="branchOptions"
-              placeholder="Select Branch"
-              v-model="model.transfer.branch_from"
               @change="populateAddress"
+              placeholder="Select Branch"
+              :error="modelErrors.branch_from"
+              v-model="model.transfer.branch_from"
             />
           </div>
           <CustomInput
@@ -75,6 +79,7 @@
           :header-component="IbrrSelectHeader"
           :row-component="ProductSelectRow"
           :format="productDefaultValue"
+          :row-event-name="ibrrEventName"
         />
       </div>
       <div
@@ -127,8 +132,11 @@ import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
 import { TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
+import { StockTransferCreateSchema } from 'shared/validators/transfer'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+const ibrrEventName = 'ibrr-product-row'
 
 const route = useRoute()
 const isEdit = ref(false)
@@ -161,6 +169,8 @@ const model = ref({
   },
   products: [{ ...productDefaultValue }]
 })
+
+const modelErrors = ref({})
 
 const address = ref({
   address1: '',
@@ -217,6 +227,42 @@ const populateAddress = () => {
 
 const onSubmit = async () => {
   clearInterval(timeInterval)
+
+  // validate model
+  const { error } = StockTransferCreateSchema.validate(model.value, {
+    abortEarly: false
+  })
+
+  if (error) {
+    modelErrors.value.products = []
+
+    error.details.forEach((err) => {
+      if (err.path.includes('products')) {
+        modelErrors.value.products.push(err)
+      } else {
+        modelErrors.value[err.context.key] = err.message
+      }
+    })
+
+    modelErrors.value.products = Object.groupBy(
+      modelErrors.value.products,
+      (err) => err.path[1]
+    )
+
+    const keys = Object.keys(modelErrors.value.products)
+    keys.forEach((key) => {
+      let prdErr = {}
+      modelErrors.value.products[key].forEach((item) => {
+        prdErr[item.context.key] = item.message
+      })
+
+      modelErrors.value.products[key] = prdErr
+    })
+
+    // trigger event to show error
+    Event.emit(ibrrEventName, modelErrors.value.products)
+    return
+  }
 
   if (!isEdit.value) {
     await transferStore.createTransfer(model.value)
