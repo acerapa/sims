@@ -277,7 +277,6 @@ const onSubmit = async () => {
 
     // trigger event to show errors
     Event.emit(rowEventName, modelErrors.value.products)
-    console.log(modelErrors.value.products)
     return
   }
 

@@ -115,11 +115,15 @@ const productStore = useProductStore()
 /** ================================================
  * EVENTS
  ** ================================================*/
-Event.on(props.eventName, (data) => {
-  if (typeof props.ndx != 'undefined') {
-    modelErrors.value = data[props.ndx] ? data[props.ndx] : {}
-  }
-})
+Event.on(
+  props.eventName,
+  (data) => {
+    if (typeof props.ndx != 'undefined') {
+      modelErrors.value = data[props.ndx] ? data[props.ndx] : {}
+    }
+  },
+  true
+)
 
 onMounted(async () => {
   await productStore.getProducts()
