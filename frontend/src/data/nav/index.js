@@ -8,12 +8,25 @@ import employees from '@/assets/icons/employees.svg'
 import settings from '@/assets/icons/settings.svg'
 import outlineDot from '@/assets/icons/outline-dot.svg'
 import transfer from '@/assets/icons/transfer.png'
+import sales from '@/assets/icons/sales.png'
 
 export default [
   {
     text: 'Dashboard',
     route: 'dashboard',
     icon: dashboard
+  },
+  {
+    text: 'Sales',
+    route: 'sales',
+    icon: sales,
+    children: [
+      {
+        text: 'Item Details',
+        route: 'item-details',
+        icon: outlineDot
+      }
+    ]
   },
   {
     text: 'Inventory',
