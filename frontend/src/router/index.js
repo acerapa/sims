@@ -6,6 +6,7 @@ import reportRoutes from './report'
 import inventoryRoutes from './inventory'
 import settingsRoutes from './settings'
 import transferRoutes from './transfer'
+import salesRoutes from './sales'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -14,7 +15,8 @@ const router = createRouter({
     ...inventoryRoutes,
     ...settingsRoutes,
     ...reportRoutes,
-    ...transferRoutes
+    ...transferRoutes,
+    ...salesRoutes
   ]
 })
 
