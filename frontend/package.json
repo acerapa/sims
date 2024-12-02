@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "autoprefixer": "^10.4.19",
+    "chart.js": "^4.4.7",
     "pinia": "^2.1.7",
     "postcss": "^8.4.38",
     "shared": "file:../shared",
