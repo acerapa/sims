@@ -1,6 +1,25 @@
 <template>
   <div class="flex flex-col gap-6">
-    <CustomTable :has-add-btn="false" :is-nested="true">
+    <CustomTable
+      :has-add-btn="false"
+      :is-nested="true"
+      :has-filter="true"
+      class="[&>div.table-wrapper]:sticky [&>div.table-wrapper]:top-[80px] [&>div.table-wrapper]:z-50"
+    >
+      <template #filters>
+        <CustomInput
+          type="date"
+          :has-label="true"
+          label="From"
+          placeholder="From"
+        />
+        <CustomInput
+          type="date"
+          :has-label="true"
+          label="To"
+          placeholder="To"
+        />
+      </template>
       <template #table_header>
         <div class="grid grid-cols-12 gap-3">
           <p class="table-header col-span-3 pl-3">Item Description</p>
@@ -31,6 +50,7 @@
 
 <script setup>
 import CustomTable from '@/components/shared/CustomTable.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
 import ItemDetailsRow from '@/components/sales/ItemDetailsRow.vue'
 import Event from '@/event'
 
