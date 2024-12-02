@@ -56,15 +56,13 @@
               </option>
             </select>
           </div>
-          <div class="flex gap-3">
-            <button
-              v-if="props.hasAddBtn"
-              class="bg-primary p-2 rounded"
-              @click="onAddNew"
-            >
+          <div>
+            <slot name="tools"></slot>
+          </div>
+          <div class="flex gap-3" v-if="props.hasAddBtn">
+            <button class="bg-primary p-2 rounded" @click="onAddNew">
               <img src="@/assets/icons/plus.svg" alt="Plus" />
             </button>
-
             <!-- Custom buttons -->
             <slot name="buttons"></slot>
           </div>

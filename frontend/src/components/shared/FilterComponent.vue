@@ -60,6 +60,7 @@ const onClear = () => {
   position: absolute;
   top: 60px;
   left: 12px;
+  z-index: 60;
   @apply p-4 shadow bg-white rounded-xl border-2 flex flex-col gap-4;
 }
 </style>
