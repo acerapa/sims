@@ -58,4 +58,18 @@ module.exports = {
       res.sendError({}, "Something wen't wrong! => " + e.message, 400);
     }
   },
+
+  getUserById: async (req, res) => {
+    try {
+      const user = await User.findByPk(req.params.id, {
+        attributes: {
+          exclude: ["password"],
+        },
+      });
+
+      res.sendResponse({ user }, "Successfully fetched!", 200);
+    } catch (error) {
+      res.sendError(error, "Something wen't wrong!", 400);
+    }
+  },
 };
