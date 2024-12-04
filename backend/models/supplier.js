@@ -43,6 +43,10 @@ Supplier.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    fb_profile: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     address_id: {
       type: DataTypes.INTEGER,
       references: {

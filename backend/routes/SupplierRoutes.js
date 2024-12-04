@@ -1,10 +1,18 @@
 const router = require("express").Router();
 const SupplierController = require("../controllers/SupplierController");
-const { VendorCreateSchema } = require("shared/validators/vendor");
+const {
+  VendorCreateSchema,
+  VendorUpdateSchema,
+} = require("shared/validators/vendor");
 const { validateBody } = require("../middleware/request-validator");
 
 router.get("/all", SupplierController.all);
-router.post("/update", SupplierController.update);
+router.get("/:id", SupplierController.getById);
+router.post(
+  "/:id/update",
+  validateBody(VendorUpdateSchema),
+  SupplierController.update
+);
 router.post(
   "/register",
   validateBody(VendorCreateSchema),

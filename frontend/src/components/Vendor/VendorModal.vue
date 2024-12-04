@@ -5,6 +5,7 @@
     @submit="onSubmit"
     :has-delete="true"
     @delete="showDeleteConfirmModal = true"
+    :save-btn="props.selectedId ? 'Update' : 'Save'"
   >
     <div class="flex flex-col gap-4 my-7">
       <div class="flex flex-col gap-3">
@@ -63,14 +64,7 @@
           />
         </div>
       </div>
-      <div class="flex flex-col gap-3">
-        <p class="text-base font-semibold">Address Info</p>
-        <AddressForm
-          :has-label="true"
-          v-model="model.address"
-          :address-errors="modelErrors"
-        />
-      </div>
+
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Contact Info</p>
         <div class="flex gap-6">
@@ -122,6 +116,15 @@
           />
         </div>
       </div>
+
+      <div class="flex flex-col gap-3">
+        <p class="text-base font-semibold">Address Info</p>
+        <AddressForm
+          :has-label="true"
+          v-model="model.address"
+          :address-errors="modelErrors"
+        />
+      </div>
     </div>
   </ModalWrapper>
   <DeleteConfirmModal
@@ -141,6 +144,7 @@ import AddressForm from '../shared/AddressForm.vue'
 import { useVendorStore } from '@/stores/supplier'
 import { onMounted, ref } from 'vue'
 import { VendorCreateSchema } from 'shared/validators/vendor'
+import { ObjectHelpers } from 'shared'
 
 const showModal = defineModel()
 const showDeleteConfirmModal = ref(false)
@@ -157,7 +161,9 @@ const title = ref(
   props.selectedId ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier'
 )
 const apiPath = ref(
-  props.selectedId ? 'suppliers/update' : 'suppliers/register'
+  props.selectedId
+    ? `suppliers/${props.selectedId}/update`
+    : 'suppliers/register'
 )
 const model = ref({
   vendor: {
@@ -197,6 +203,10 @@ const onSubmit = async () => {
   const res = await authenticatedApi(apiPath.value, Method.POST, model.value)
   await supplierStore.fetchAllSuppliers()
 
+  if (props.selectedId) {
+    await supplierStore.fetchSupplierById(props.selectedId)
+  }
+
   if (res.status == 200) {
     showModal.value = false
   }
@@ -207,11 +217,20 @@ const onAfterDelete = async () => {
   await supplierStore.fetchAllSuppliers()
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (props.selectedId) {
-    model.value = supplierStore.suppliers.find(
-      (sup) => sup.id == props.selectedId
-    )
+    const supplier = await supplierStore.getSupplierById(props.selectedId)
+
+    if (supplier) {
+      model.value.vendor = ObjectHelpers.assignSameFields(
+        model.value.vendor,
+        supplier
+      )
+      model.value.address = ObjectHelpers.assignSameFields(
+        model.value.address,
+        supplier.address
+      )
+    }
   }
 })
 </script>
