@@ -10,7 +10,7 @@ const { validateBody } = require("../middleware/request-validator");
 const {
   StockTransferCreateSchema,
   StockTransferUpdateSchema,
-} = require("shared/validators/transfer");
+} = require("shared");
 
 router.get("/", all);
 router.get("/:id", getById);

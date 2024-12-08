@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { AuthSchema } = require("shared/validators/auth");
+const { AuthSchema } = require("shared");
 const AuthController = require("../controllers/AuthController");
 const { validateBody } = require("../middleware/request-validator");
 

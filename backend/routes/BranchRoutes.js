@@ -6,10 +6,7 @@ const {
   update,
   destroy,
 } = require("../controllers/BranchController");
-const {
-  BranchCreateSchema,
-  BranchUpdateSchema,
-} = require("shared/validators/transfer");
+const { BranchCreateSchema, BranchUpdateSchema } = require("shared");
 const { validateBody } = require("../middleware/request-validator");
 
 router.get("/all", all);

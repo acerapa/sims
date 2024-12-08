@@ -1,9 +1,6 @@
 const router = require("express").Router();
 const SupplierController = require("../controllers/SupplierController");
-const {
-  VendorCreateSchema,
-  VendorUpdateSchema,
-} = require("shared/validators/vendor");
+const { VendorCreateSchema, VendorUpdateSchema } = require("shared");
 const { validateBody } = require("../middleware/request-validator");
 
 router.get("/all", SupplierController.all);
