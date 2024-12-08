@@ -53,7 +53,7 @@ import { useProductStore } from '@/stores/product'
 import ProductModal from '@/components/Product/ProductModal.vue'
 import { authenticatedApi, Method } from '@/api'
 import { useSettingsStore } from '@/stores/settings'
-import { ProductReorderSchema } from 'shared/validators/product'
+import { ProductReorderSchema } from 'shared'
 
 const props = defineProps({
   selectedId: {

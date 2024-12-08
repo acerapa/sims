@@ -89,7 +89,7 @@ import AddressForm from '@/components/shared/AddressForm.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { ObjectHelpers } from 'shared/helpers'
 import { useAppStore } from '@/stores/app'
-import { BranchCreateSchema } from 'shared/validators/transfer'
+import { BranchCreateSchema } from 'shared/validators'
 
 const props = defineProps({
   selectedId: {

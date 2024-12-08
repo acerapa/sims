@@ -1,7 +1,10 @@
 const Joi = require("joi");
 const { AddressSchema } = require("./user");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
-const { ProductOrderedStatus, PhysicalInventoryStatus } = require("./../enums");
+const {
+  ProductOrderedStatus,
+  PhysicalInventoryStatus,
+} = require("shared/enums");
 
 const PurchaseOrderSchema = Joi.object({
   ref_no: Joi.string().required(),

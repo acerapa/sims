@@ -1,5 +1,5 @@
-import { LocalStorageKeys } from 'shared/enums'
-import { FunctionCooldownManager } from 'shared/helpers/fn-cooldown-manager'
+import { LocalStorageKeys } from 'shared'
+import { FunctionCooldownManager } from 'shared'
 
 const apiConfig = {
   serverUrls: {

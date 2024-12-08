@@ -15,13 +15,13 @@ export default defineConfig({
       usePolling: true,
       interval: 100,
       ignored: [
-        '**/node_modules/**',   // Exclude node_modules
-        '**/.git/**',           // Exclude .git
-        '**/dist/**',           // Exclude dist
-        '**/build/**',          // Exclude build
-        '**/.cache/**',         // Exclude .cache
-        '**/.tmp/**'            // Exclude .tmp
-      ],
+        '**/node_modules/**', // Exclude node_modules
+        '**/.git/**', // Exclude .git
+        '**/dist/**', // Exclude dist
+        '**/build/**', // Exclude build
+        '**/.cache/**', // Exclude .cache
+        '**/.tmp/**' // Exclude .tmp
+      ]
     }
   }
 })

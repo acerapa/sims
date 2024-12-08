@@ -143,7 +143,7 @@ import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import AddressForm from '../shared/AddressForm.vue'
 import { useVendorStore } from '@/stores/supplier'
 import { onMounted, ref } from 'vue'
-import { VendorCreateSchema } from 'shared/validators/vendor'
+import { VendorCreateSchema } from 'shared'
 import { ObjectHelpers } from 'shared'
 
 const showModal = defineModel()

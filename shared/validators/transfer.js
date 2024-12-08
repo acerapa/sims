@@ -3,7 +3,7 @@ const {
   BranchStatus,
   TransferType,
   ProductTransferStatus,
-} = require("../enums");
+} = require("shared/enums");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
 const { AddressSchema } = require("./user");
 

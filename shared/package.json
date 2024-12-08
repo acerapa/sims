@@ -9,7 +9,7 @@
     "joi": "^17.13.3"
   },
   "exports": {
-    "import": "./index.js",
-    "require": "./index.js"
+    ".": "./index.js",
+    "./lib": "/**/*.js"
   }
 }

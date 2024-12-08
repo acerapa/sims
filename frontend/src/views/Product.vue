@@ -106,7 +106,7 @@ import CustomInput from '@/components/shared/CustomInput.vue'
 import { useProductStore } from '@/stores/product'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
-import { DateHelpers } from 'shared/helpers'
+import { DateHelpers } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
 
 const selectedId = ref(0)

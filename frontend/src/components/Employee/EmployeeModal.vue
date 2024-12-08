@@ -113,7 +113,7 @@ import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { useEmployeeStore } from '@/stores/employee'
 import { ObjectHelpers } from 'shared'
 import { computed, onMounted, ref } from 'vue'
-import { UserSchema } from 'shared/validators/user'
+import { UserSchema } from 'shared'
 
 const showConfirmModal = ref(false)
 
