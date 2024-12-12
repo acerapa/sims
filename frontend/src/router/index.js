@@ -9,7 +9,7 @@ import transferRoutes from './transfer'
 import salesRoutes from './sales'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     ...commonRoutes,
     ...inventoryRoutes,
