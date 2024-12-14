@@ -121,7 +121,7 @@ import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import { useVendorStore } from '@/stores/supplier'
-import { DateHelpers } from 'shared/helpers/date'
+import { DateHelpers } from 'shared'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 

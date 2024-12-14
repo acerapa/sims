@@ -132,7 +132,7 @@ import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
 import { TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
-import { StockTransferCreateSchema } from 'shared/validators/transfer'
+import { StockTransferCreateSchema } from 'shared/validators'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 

@@ -59,7 +59,7 @@ import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { onMounted, ref } from 'vue'
 import CustomInput from '../shared/CustomInput.vue'
-import { AccountSchema } from 'shared/validators/account'
+import { AccountSchema } from 'shared/validators'
 
 const showConfirmModal = ref(false)
 const settingsStore = useSettingsStore()

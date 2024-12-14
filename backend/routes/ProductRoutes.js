@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const ProductController = require("../controllers/ProductController");
-const { ProductSchema } = require("shared/validators/product");
+const { ProductSchema } = require("shared");
 const { validateBody } = require("../middleware/request-validator");
 
 router.get("/all", ProductController.all);

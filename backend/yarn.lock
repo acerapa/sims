@@ -954,17 +954,6 @@ joi@^17.13.1:
     "@sideway/formula" "^3.0.1"
     "@sideway/pinpoint" "^2.0.0"
 
-joi@^17.13.3:
-  version "17.13.3"
-  resolved "https://registry.yarnpkg.com/joi/-/joi-17.13.3.tgz#0f5cc1169c999b30d344366d384b12d92558bcec"
-  integrity sha512-otDA4ldcIx+ZXsKHWmp0YizCweVRZG96J10b0FevjfuncLO1oX59THoAmHkNubYJ+9gWsYsp5k8v4ib6oDv1fA==
-  dependencies:
-    "@hapi/hoek" "^9.3.0"
-    "@hapi/topo" "^5.1.0"
-    "@sideway/address" "^4.1.5"
-    "@sideway/formula" "^3.0.1"
-    "@sideway/pinpoint" "^2.0.0"
-
 js-beautify@^1.14.5:
   version "1.15.1"
   resolved "https://registry.yarnpkg.com/js-beautify/-/js-beautify-1.15.1.tgz#4695afb508c324e1084ee0b952a102023fc65b64"
@@ -1618,11 +1607,6 @@ setprototypeof@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.2.0.tgz#66c9a24a73f9fc28cbe66b09fed3d33dcaf1b424"
   integrity sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==
-
-"shared@file:../shared":
-  version "1.0.0"
-  dependencies:
-    joi "^17.13.3"
 
 shebang-command@^2.0.0:
   version "2.0.0"

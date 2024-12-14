@@ -3,7 +3,7 @@ const {
   PhysicalInventoryCreateSchema,
   PhysicalInventoryUpdateSchema,
   PhysicalInventoryItemUpdateSchema,
-} = require("shared/validators/purchase-order");
+} = require("shared");
 const { validateBody } = require("../middleware/request-validator");
 const {
   all,

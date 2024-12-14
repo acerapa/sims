@@ -89,7 +89,7 @@ import AddressForm from '@/components/shared/AddressForm.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { ObjectHelpers } from 'shared/helpers'
 import { useAppStore } from '@/stores/app'
-import { BranchCreateSchema } from 'shared/validators/transfer'
+import { BranchCreateSchema } from 'shared/validators'
 
 const props = defineProps({
   selectedId: {
@@ -148,13 +148,13 @@ const onSubmit = async () => {
 
   if (model.value.branch.is_current) {
     if (props.selectedId != currentBranch.value.id) {
-      await settingStore.updateBranch(currentBranch.value.id, {
+      res = await settingStore.updateBranch(currentBranch.value.id, {
         branch: { is_current: false }
       })
     }
   }
 
-  if (res.status == 200) {
+  if (res.status < 400) {
     await settingStore.fetchAllBranches()
     showModal.value = false
   }

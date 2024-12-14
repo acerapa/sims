@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "remove-dist": "rm -r dist",
     "format-fix": "prettier ./src --write",
     "format-check": "prettier ./src --check"
   },
@@ -15,7 +16,6 @@
     "chart.js": "^4.4.7",
     "pinia": "^2.1.7",
     "postcss": "^8.4.38",
-    "shared": "file:../shared",
     "tailwindcss": "^3.4.3",
     "vue": "^3.4.21",
     "vue-router": "^4.3.2"

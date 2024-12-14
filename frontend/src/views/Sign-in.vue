@@ -64,7 +64,7 @@ import Event from '@/event'
 import { useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import { useAuthStore } from '@/stores/auth'
-import { AuthSchema } from 'shared/validators/auth'
+import { AuthSchema } from 'shared'
 import CustomInput from '@/components/shared/CustomInput.vue'
 
 const router = useRouter()

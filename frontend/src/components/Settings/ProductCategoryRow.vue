@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared/helpers/date'
+import { DateHelpers } from 'shared'
 
 const props = defineProps({
   productCategory: {

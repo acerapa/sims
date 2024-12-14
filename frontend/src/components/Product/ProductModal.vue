@@ -238,7 +238,7 @@ import VendorModal from '@/components/Vendor/VendorModal.vue'
 import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import { computed, onMounted, ref } from 'vue'
 import { AccountTypes, ProductType } from 'shared'
-import { ProductSchema } from 'shared/validators/product'
+import { ProductSchema } from 'shared'
 
 import { useVendorStore } from '@/stores/supplier'
 import { useSettingsStore } from '@/stores/settings'

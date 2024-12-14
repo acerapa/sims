@@ -297,8 +297,8 @@ import {
   PurchaseOrderType,
   PurchaseStatusMap
 } from 'shared/enums'
-import { PurchaseOrderCreationSchema } from 'shared/validators/purchase-order'
-import { ObjectHelpers } from 'shared/helpers/object'
+import { PurchaseOrderCreationSchema } from 'shared'
+import { ObjectHelpers } from 'shared/helpers'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'

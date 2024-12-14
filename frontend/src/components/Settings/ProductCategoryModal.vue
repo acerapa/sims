@@ -32,7 +32,7 @@ import CustomInput from '@/components/shared/CustomInput.vue'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { onMounted, ref } from 'vue'
-import { CategorySchema } from 'shared/validators/product'
+import { CategorySchema } from 'shared'
 
 const showModal = defineModel()
 const showConfirmModal = ref(false)

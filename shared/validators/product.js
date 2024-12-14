@@ -1,4 +1,4 @@
-const { ProductType, ProductStatus } = require("../enums");
+const { ProductType, ProductStatus } = require("shared/enums");
 
 const Joi = require("joi");
 
