@@ -10,7 +10,8 @@
     "remove-dist": "rm -r dist",
     "format-fix": "prettier ./src --write",
     "format-check": "prettier ./src --check",
-    "install-shared": "yarn add file:../shared"
+    "install-shared": "yarn add file:../shared",
+    "uninstall-shared": "yarn remove shared"
   },
   "dependencies": {
     "autoprefixer": "^10.4.19",

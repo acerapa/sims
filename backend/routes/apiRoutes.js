@@ -32,6 +32,9 @@ router.use("/branch", branchesRoutes);
 
 const stockTransferRoutes = require("./StockTransferRoutes");
 router.use("/stock-transfer", stockTransferRoutes);
+
+const customerRoutes = require("./CustomerRoutes");
+router.use("/customers", customerRoutes);
 // end use routes
 
 module.exports = router;
