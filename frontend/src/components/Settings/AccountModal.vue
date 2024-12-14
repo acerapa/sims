@@ -1,6 +1,6 @@
 <template>
   <ModalWrapper
-    title="New Account"
+    :title="props.selectedId ? 'Edit Account' : 'New Account'"
     @submit="onSubmit"
     v-model="showModal"
     :has-delete="props.selectedId ? true : false"
@@ -92,12 +92,15 @@ onMounted(() => {
 
 const onSubmit = async () => {
   // validation
-  const { error } = AccountSchema.validate(model.value, { abortEarly: false })
+  const { error } = AccountSchema.options({ allowUnknown: true }).validate(
+    model.value,
+    { abortEarly: false }
+  )
   if (error) {
     error.details.forEach((err) => {
       modelErrors.value[err.context.key] = err.message
     })
-
+    console.log(error.details)
     return
   }
 

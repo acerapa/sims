@@ -105,7 +105,9 @@ onMounted(async () => {
 
 const onSubmit = async () => {
   // validations
-  const { error } = ProductReorderSchema.validate(model.value)
+  const { error } = ProductReorderSchema.options({
+    allowUnknown: true
+  }).validate(model.value)
   if (error) {
     error.details.forEach((err) => {
       modelErrors.value[err.context.key] = err.message

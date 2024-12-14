@@ -7,9 +7,5 @@
   "license": "MIT",
   "dependencies": {
     "joi": "^17.13.3"
-  },
-  "exports": {
-    ".": "./index.js",
-    "./lib": "/**/*.js"
   }
 }

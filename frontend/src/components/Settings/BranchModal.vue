@@ -54,6 +54,7 @@
         name="is_current"
         label="Is current"
         :has-label="true"
+        :disabled="model.branch.status === BranchStatus.INACTIVE"
         v-model="model.branch.is_current"
       />
     </div>
@@ -90,6 +91,7 @@ import { useSettingsStore } from '@/stores/settings'
 import { ObjectHelpers } from 'shared/helpers'
 import { useAppStore } from '@/stores/app'
 import { BranchCreateSchema } from 'shared/validators'
+import { BranchStatus } from 'shared'
 
 const props = defineProps({
   selectedId: {
@@ -111,7 +113,7 @@ const title = props.selectedId ? 'Edit Branch' : 'New Branch'
 const model = ref({
   branch: {
     name: '',
-    status: '',
+    status: BranchStatus.ACTIVE,
     is_current: false,
     branch_manager: ''
   },

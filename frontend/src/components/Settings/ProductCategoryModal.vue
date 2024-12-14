@@ -65,7 +65,9 @@ const apiPath = props.selectedId
 
 const onSubmit = async () => {
   // validations
-  const { error } = CategorySchema.validate(model.value)
+  const { error } = CategorySchema.options({ allowUnknown: true }).validate(
+    model.value
+  )
 
   if (error) {
     error.details.forEach((err) => {
