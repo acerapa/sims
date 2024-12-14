@@ -23,6 +23,7 @@ const VendorSchema = Joi.object({
     .optional(),
   telephone: Joi.string().allow(null, "").optional(),
   fax: Joi.string().allow(null, "").optional(),
+  fb_profile: Joi.string().allow(null, "").optional(),
 }).options({
   allowUnknown: true,
 });

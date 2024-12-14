@@ -4,6 +4,7 @@ const Address = require("./address");
 const Account = require("./account");
 const Product = require("./product");
 const Supplier = require("./supplier");
+const Customer = require("./customer");
 const BranchMember = require("./branch-member");
 const StockTransfer = require("./stock-transfer");
 const PurchaseOrder = require("./purchase-order");
@@ -13,6 +14,16 @@ const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
 const ProductTransaction = require("./product-transaction");
 const PhysicalInventoryItem = require("./physical-inventory-item");
+
+Address.hasMany(Customer, {
+  foreignKey: "address_id",
+  as: "customers",
+});
+
+Customer.belongsTo(Address, {
+  foreignKey: "address_id",
+  as: "address",
+});
 
 Address.hasMany(Supplier, {
   foreignKey: "address_id",

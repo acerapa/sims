@@ -115,6 +115,17 @@
             v-model="model.vendor.fax"
           />
         </div>
+        <CustomInput
+          type="text"
+          :has-label="true"
+          name="fb_profile"
+          class="w-[50%-12px]"
+          :error-has-text="true"
+          :error="modelErrors.fb_profile"
+          v-model="model.vendor.fb_profile"
+          label="Facebook\Messenger Profile"
+          placeholder="Facebook/Messenger Profile"
+        />
       </div>
 
       <div class="flex flex-col gap-3">
@@ -174,7 +185,8 @@ const model = ref({
     phone: '',
     email: '',
     telephone: '',
-    fax: ''
+    fax: '',
+    fb_profile: ''
   },
   address: {
     address1: '',
