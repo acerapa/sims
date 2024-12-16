@@ -13,7 +13,7 @@
         @click="showModal = false"
       />
     </div>
-    <form :action="props.action">
+    <form :action="props.action" @submit.prevent>
       <div class="max-h-[calc(100vh-241.33px)] h-auto overflow-y-auto w-full">
         <slot></slot>
       </div>
