@@ -100,7 +100,6 @@ const onSubmit = async () => {
     error.details.forEach((err) => {
       modelErrors.value[err.context.key] = err.message
     })
-    console.log(error.details)
     return
   }
 

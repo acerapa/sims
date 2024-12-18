@@ -163,7 +163,6 @@ const onSubmit = async (isAddNew = false) => {
       abortEarly: false
     })
     if (error) {
-      console.log(error.details)
       modelErrors.value.products = []
 
       error.details.forEach((err) => {

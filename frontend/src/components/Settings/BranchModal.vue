@@ -148,7 +148,7 @@ const onSubmit = async () => {
     res = await settingStore.updateBranch(props.selectedId, model.value)
   }
 
-  if (model.value.branch.is_current) {
+  if (model.value.branch.is_current && currentBranch.value) {
     if (props.selectedId != currentBranch.value.id) {
       res = await settingStore.updateBranch(currentBranch.value.id, {
         branch: { is_current: false }

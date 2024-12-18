@@ -1,11 +1,11 @@
 <template>
   <ModalWrapper
-    :title="props.selectedId ? 'Edit Customer' : 'New Customer'"
-    v-model="showModal"
-    :has-delete="true"
     @submit="onSubmit"
+    v-model="showModal"
     @delete="showDeleteConfirmModal = true"
+    :has-delete="props.selectedId ? true : false"
     :save-btn="props.selectedId ? 'Update' : 'Save'"
+    :title="props.selectedId ? 'Edit Customer' : 'New Customer'"
   >
     <div class="my-7">
       <p class="font-semibold">Personal Information</p>

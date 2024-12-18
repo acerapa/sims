@@ -69,7 +69,6 @@ module.exports = {
 
       res.sendError({}, "Successfully updated!", 200);
     } catch (error) {
-      console.log(error);
       res.sendError(error, "Something went wrong!", 400);
     }
   },

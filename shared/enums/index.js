@@ -127,6 +127,11 @@ const ProductStatus = Object.freeze({
   INACTIVE: "inactive",
 });
 
+const OrderSchemaType = Object.freeze({
+  CASH: "cash",
+  INSTALLMENT: "installment",
+});
+
 module.exports = {
   UserType,
   ProductType,
@@ -135,6 +140,7 @@ module.exports = {
   TransferType,
   ProductStatus,
   BranchStatusMap,
+  OrderSchemaType,
   LocalStorageKeys,
   PurchaseOrderType,
   PurchaseStatusMap,
