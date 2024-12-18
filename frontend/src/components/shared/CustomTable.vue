@@ -14,7 +14,9 @@
             </template>
           </FilterComponent>
         </div>
-        <p v-if="props.title" class="font-bold text-sm">{{ props.title }}</p>
+        <p v-if="props.title" class="font-bold text-sm mb-3">
+          {{ props.title }}
+        </p>
         <div class="flex justify-between items-center" v-if="props.hasTools">
           <div class="flex gap-3 items-center">
             <div

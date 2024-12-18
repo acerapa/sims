@@ -4,7 +4,7 @@ export default [
     path: '/sales',
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
-      name: 'item-details'
+      name: 'sales-order'
     },
     children: [
       {
@@ -13,6 +13,24 @@ export default [
         component: () => import('@/views/sales/ItemDatails.vue'),
         meta: {
           title: 'Item Details',
+          requiresAuth: true
+        }
+      },
+      {
+        name: 'sales-order-form',
+        path: '/sales-order-form',
+        component: () => import('@/views/sales/SalesOrderForm.vue'),
+        meta: {
+          title: 'Sales Order Form',
+          requiresAuth: true
+        }
+      },
+      {
+        name: 'sales-order',
+        path: '/sales-order',
+        component: () => import('@/views/sales/SalesOrder.vue'),
+        meta: {
+          title: 'Sales Order',
           requiresAuth: true
         }
       }

@@ -22,6 +22,12 @@ export default [
     icon: sales,
     children: [
       {
+        text: 'Sales Order',
+        route: 'sales-order',
+        icon: outlineDot,
+        includes_active: ['sales-order-form']
+      },
+      {
         text: 'Item Details',
         route: 'item-details',
         icon: outlineDot
