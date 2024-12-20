@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 
 export const useVendorStore = defineStore('supplier', () => {
   const suppliers = ref([])
+  const supplier = ref()
 
   const selectedSupplier = ref()
 
@@ -23,10 +24,30 @@ export const useVendorStore = defineStore('supplier', () => {
     }
   }
 
+  const fetchSupplierById = async (id) => {
+    const res = await authenticatedApi(`suppliers/${id}`)
+    if (res.status == 200) {
+      supplier.value = res.data.supplier
+    }
+  }
+
+  const getSupplierById = async (id) => {
+    if (!supplier.value || supplier.value.id != id) {
+      await fetchSupplierById(id)
+    }
+
+    return supplier.value
+  }
+
   return {
+    supplier,
     suppliers,
     supplierOptions,
     selectedSupplier,
+
+    // methods
+    getSupplierById,
+    fetchSupplierById,
     fetchAllSuppliers
   }
 })

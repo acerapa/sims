@@ -60,6 +60,24 @@ export default [
           title: 'Return Merchandise Authority Form',
           requiresAuth: true
         }
+      },
+      {
+        path: 'fix-asset',
+        name: 'fix-asset-list',
+        component: () => import('@/views/StockTransfer/fix-asset-list.vue'),
+        meta: {
+          title: 'PO to Fixed Asset List',
+          requiresAuth: true
+        }
+      },
+      {
+        path: 'fix-asset-form',
+        name: 'fix-asset-form',
+        component: () => import('@/views/StockTransfer/fix-asset-form.vue'),
+        meta: {
+          title: 'Fixed Asset Form',
+          requiresAuth: true
+        }
       }
     ]
   }

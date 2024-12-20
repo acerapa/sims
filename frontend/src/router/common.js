@@ -43,6 +43,14 @@ export default [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/demo',
+        name: 'demo',
+        component: () => import('@/views/demo.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   },

@@ -37,7 +37,6 @@ import Event from '@/event'
 import { useSettingsStore } from '@/stores/settings'
 import { computed, onMounted, ref } from 'vue'
 
-const branches = ref([])
 const selectedId = ref(0)
 const searchText = ref('')
 const showModal = ref(false)
@@ -48,7 +47,7 @@ const settingsStore = useSettingsStore()
  * COMPUTED
  ** ================================================*/
 const filterData = computed(() => {
-  return branches.value.filter((branch) => {
+  return settingsStore.branches.filter((branch) => {
     const searchCondition = `${branch.id} ${branch.name} ${branch.status} ${branch.address.address1} ${branch.address.address2} ${branch.address.city} ${branch.address.postal} ${branch.manager.first_name} ${branch.manager.last_name}`
 
     return searchText.value
@@ -92,7 +91,7 @@ const onNewRecord = () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  branches.value = await settingsStore.getBranches()
+  await settingsStore.getBranches()
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })

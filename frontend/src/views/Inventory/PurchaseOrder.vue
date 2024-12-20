@@ -30,7 +30,6 @@
       v-model:search-text="searchText"
       :row-prop-init="purchaseOrderRowEvent"
       :table-row-component="PurchaseOrderRow"
-      @open-menu="onSelectRow"
       @view="onView"
     >
       <template #table_header>
@@ -122,7 +121,7 @@ import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import { useVendorStore } from '@/stores/supplier'
-import { DateHelpers } from 'shared/helpers/date'
+import { DateHelpers } from 'shared'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 

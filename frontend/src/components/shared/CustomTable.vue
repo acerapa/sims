@@ -14,7 +14,9 @@
             </template>
           </FilterComponent>
         </div>
-        <p v-if="props.title" class="font-bold text-sm">{{ props.title }}</p>
+        <p v-if="props.title" class="font-bold text-sm mb-3">
+          {{ props.title }}
+        </p>
         <div class="flex justify-between items-center" v-if="props.hasTools">
           <div class="flex gap-3 items-center">
             <div
@@ -56,15 +58,13 @@
               </option>
             </select>
           </div>
-          <div class="flex gap-3">
-            <button
-              v-if="props.hasAddBtn"
-              class="bg-primary p-2 rounded"
-              @click="onAddNew"
-            >
+          <div>
+            <slot name="tools"></slot>
+          </div>
+          <div class="flex gap-3" v-if="props.hasAddBtn">
+            <button class="bg-primary p-2 rounded" @click="onAddNew">
               <img src="@/assets/icons/plus.svg" alt="Plus" />
             </button>
-
             <!-- Custom buttons -->
             <slot name="buttons"></slot>
           </div>

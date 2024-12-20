@@ -12,6 +12,7 @@
             : dataInputs[ndx]
         "
         v-model="dataInputs[ndx]"
+        v-bind="{ eventName: props.rowEventName, ndx: ndx }"
         @remove="onRemove(ndx)"
       ></component>
       <div class="flex flex-col gap-4" v-if="!dataInputs.length">
@@ -58,6 +59,10 @@ const props = defineProps({
   format: {
     type: Object,
     required: true
+  },
+  rowEventName: {
+    type: String,
+    required: false
   }
 })
 

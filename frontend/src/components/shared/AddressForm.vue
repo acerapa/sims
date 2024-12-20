@@ -10,6 +10,8 @@
         v-model="formModel.address1"
         :disabled="props.disabled"
         :has-label="props.hasLabel"
+        :error="props.addressErrors.address1"
+        :error-has-text="true"
       />
       <CustomInput
         type="text"
@@ -20,6 +22,8 @@
         v-model="formModel.address2"
         :disabled="props.disabled"
         :has-label="props.hasLabel"
+        :error="props.addressErrors.address2"
+        :error-has-text="true"
       />
     </div>
     <div class="grid grid-cols-3 gap-6 max-lg:grid-cols-1 max-lg:gap-3">
@@ -32,6 +36,8 @@
         v-model="formModel.city"
         :disabled="props.disabled"
         :has-label="props.hasLabel"
+        :error="props.addressErrors.city"
+        :error-has-text="true"
       />
       <CustomInput
         type="text"
@@ -42,6 +48,8 @@
         v-model="formModel.province"
         :disabled="props.disabled"
         :has-label="props.hasLabel"
+        :error="props.addressErrors.province"
+        :error-has-text="true"
       />
       <CustomInput
         type="text"
@@ -52,6 +60,8 @@
         v-model="formModel.postal"
         :disabled="props.disabled"
         :has-label="props.hasLabel"
+        :error="props.addressErrors.postal"
+        :error-has-text="true"
       />
     </div>
   </div>
@@ -67,8 +77,14 @@ const props = defineProps({
   hasLabel: {
     type: Boolean,
     default: false
+  },
+  addressErrors: {
+    type: Object,
+    default: () => ({})
   }
 })
+
+// TODO: Need to find way to fit the error message in the input fields for Address Form Component
 
 const formModel = defineModel()
 </script>

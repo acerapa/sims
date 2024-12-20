@@ -43,7 +43,7 @@ const handler = (eventType, filename) => {
       console.log(
         `\n${colors.yellow}Changes detected in ${colors.yellow} ${colors.blue}${filename}${colors.yellow} file.${colors.reset}`
       );
-      handleCommand("refresh-shared");
+      handleCommand("re-install-shared");
     }, 100);
   }
 };

@@ -7,7 +7,7 @@
     @submit="onSubmit"
     @delete="onDelete"
   >
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-5">
       <CustomInput
         name="points"
         type="number"
@@ -16,6 +16,8 @@
         label="Reordering Point"
         placeholder="Re-ordering Points"
         v-model="model.point"
+        :error="modelErrors.point"
+        :error-has-text="true"
       />
       <CustomInput
         type="select"
@@ -29,6 +31,8 @@
         :has-add-new="true"
         :can-search="true"
         :select-multiple="true"
+        :error="modelErrors.products"
+        :error-has-text="true"
       />
     </div>
   </ModalWrapper>
@@ -49,6 +53,7 @@ import { useProductStore } from '@/stores/product'
 import ProductModal from '@/components/Product/ProductModal.vue'
 import { authenticatedApi, Method } from '@/api'
 import { useSettingsStore } from '@/stores/settings'
+import { ProductReorderSchema } from 'shared'
 
 const props = defineProps({
   selectedId: {
@@ -82,6 +87,8 @@ const model = ref({
   products: []
 })
 
+const modelErrors = ref({})
+
 onMounted(async () => {
   await productStore.fetchAllProducts()
   if (props.selectedId) {
@@ -97,6 +104,18 @@ onMounted(async () => {
 })
 
 const onSubmit = async () => {
+  // validations
+  const { error } = ProductReorderSchema.options({
+    allowUnknown: true
+  }).validate(model.value)
+  if (error) {
+    error.details.forEach((err) => {
+      modelErrors.value[err.context.key] = err.message
+    })
+
+    return
+  }
+
   const res = await authenticatedApi(href.value, Method.POST, model.value)
   if (res.status == 200) {
     await settingStore.fetchAllProductReorderingPoints()

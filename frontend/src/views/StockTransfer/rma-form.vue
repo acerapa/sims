@@ -17,11 +17,13 @@
             class="flex-1"
             name="supplier"
             :has-label="true"
+            :error-has-text="true"
             label="Select supplier"
+            @change="populateAddress"
             :options="supplierOptions"
             placeholder="Select supplier"
+            :error="modelErrors.supplier_id"
             v-model="model.transfer.supplier_id"
-            @change="populateAddress"
           />
           <CustomInput
             name="when"
@@ -54,6 +56,7 @@
         :header-component="RmaProductSelectHeader"
         :row-component="RmaProductSelectRow"
         :format="productDefaultValue"
+        :row-event-name="rowEventName"
       >
       </ProductMultiSelectTable>
 
@@ -108,13 +111,19 @@ import { useSettingsStore } from '@/stores/settings'
 import { useAuthStore } from '@/stores/auth'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
+import {
+  StockTransferCreateSchema,
+  Joi,
+  ProductTransferSchema
+} from 'shared/validators'
 
-const currentBranch = ref(null)
+const rowEventName = 'rma-product-event'
 
 const route = useRoute()
 const isEdit = ref(false)
 const router = useRouter()
 const appStore = useAppStore()
+const currentBranch = ref(null)
 const authStore = useAuthStore() // this is temporary
 const showConfirmModal = ref(false)
 const transferStore = useTransferStore()
@@ -133,6 +142,8 @@ const productDefaultValue = {
   product_id: '',
   description: '',
   quantity: '',
+  serial_number: '',
+  problem: '',
   cost: '',
   amount: ''
 }
@@ -142,7 +153,7 @@ const vendorStore = useVendorStore()
 const defualtValue = {
   transfer: {
     supplier_id: '',
-    when: '',
+    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A'),
     memo: '',
     branch_from: '',
     processed_by: '',
@@ -152,6 +163,7 @@ const defualtValue = {
 }
 
 const model = ref({ ...defualtValue })
+const modelErrors = ref({})
 
 /** ================================================
  * EVENTS
@@ -185,6 +197,51 @@ const populateAddress = () => {
 }
 
 const onSubmit = async () => {
+  // validate model
+  // modify validation schema
+  const RMAProductSchema = ProductTransferSchema.keys({
+    serial_number: Joi.string().required(),
+    problem: Joi.string().required()
+  })
+  const StockTransferSchema = StockTransferCreateSchema.keys({
+    products: Joi.array().items(RMAProductSchema).required()
+  })
+
+  const { error } = StockTransferSchema.validate(model.value, {
+    abortEarly: false
+  })
+
+  if (error) {
+    modelErrors.value.products = []
+
+    error.details.forEach((err) => {
+      if (err.path.includes('products')) {
+        modelErrors.value.products.push(err)
+      } else {
+        modelErrors.value[err.context.key] = err.message
+      }
+    })
+
+    modelErrors.value.products = Object.groupBy(
+      modelErrors.value.products,
+      (err) => err.path[1]
+    )
+
+    const keys = Object.keys(modelErrors.value.products)
+    keys.forEach((key) => {
+      let prdErr = {}
+      modelErrors.value.products[key].forEach((item) => {
+        prdErr[item.context.key] = item.message
+      })
+
+      modelErrors.value.products[key] = prdErr
+    })
+
+    // trigger event to show errors
+    Event.emit(rowEventName, modelErrors.value.products)
+    return
+  }
+
   if (!isEdit.value) {
     model.value.transfer.when = new Date()
     const res = await transferStore.createTransfer(model.value)

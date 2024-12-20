@@ -52,4 +52,4 @@ class FunctionCooldownManager {
   }
 }
 
-module.exports = { FunctionCooldownManager };
+module.exports = FunctionCooldownManager;

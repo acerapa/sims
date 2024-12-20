@@ -23,6 +23,8 @@
           :can-search="true"
           :disabled="props.isDisabled"
           @change="onChange"
+          :error-has-text="false"
+          :error="modelErrors.product_id"
         />
       </div>
       <CustomInput
@@ -32,6 +34,8 @@
         placeholder="Serial number"
         :disabled="props.isDisabled"
         v-model="model.serial_number"
+        :error-has-text="false"
+        :error="modelErrors.serial_number"
       />
       <CustomInput
         class="col-span-3"
@@ -40,6 +44,8 @@
         v-model="model.problem"
         :disabled="props.isDisabled"
         placeholder="Problem"
+        :error-has-text="false"
+        :error="modelErrors.problem"
       />
       <CustomInput
         class="col-span-1"
@@ -48,6 +54,8 @@
         placeholder="Quantity"
         :disabled="props.isDisabled"
         v-model="model.quantity"
+        :error-has-text="false"
+        :error="modelErrors.quantity"
       />
       <CustomInput
         class="col-span-1"
@@ -56,6 +64,8 @@
         placeholder="Amount"
         :disabled="props.isDisabled"
         v-model="model.amount"
+        :error-has-text="false"
+        :error="modelErrors.amount"
       />
       <p
         class="col-span-1 text-sm pl-3 mt-[10px]"
@@ -75,17 +85,37 @@
 <script setup>
 import { useProductStore } from '@/stores/product'
 import CustomInput from '../shared/CustomInput.vue'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+import Event from '@/event'
 const props = defineProps({
+  ndx: {
+    type: Number,
+    required: true
+  },
   isDisabled: {
     type: Boolean,
     default: false
+  },
+  eventName: {
+    type: String,
+    required: false
   }
 })
 
 const emit = defineEmits(['remove'])
 const productStore = useProductStore()
 const model = defineModel()
+const modelErrors = ref({})
+
+Event.on(
+  props.eventName,
+  (data) => {
+    if (typeof props.ndx != 'undefined') {
+      modelErrors.value = data[props.ndx] ? data[props.ndx] : {}
+    }
+  },
+  true
+)
 
 const onChange = () => {
   if (model.value.product_id) {

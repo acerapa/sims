@@ -39,7 +39,7 @@ import CustomTable from '@/components/shared/CustomTable.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { useEmployeeStore } from '@/stores/employee'
-import { DateHelpers } from 'shared/helpers/date'
+import { DateHelpers } from 'shared'
 import { computed, onMounted, ref } from 'vue'
 
 const target = ref(null)

@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared/helpers/date'
+import { DateHelpers } from 'shared'
 import { PurchaseStatusMap } from 'shared'
 import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 

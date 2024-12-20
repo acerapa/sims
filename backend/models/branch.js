@@ -1,7 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
 const User = require("./user");
-const { BranchStatus } = require("shared/enums");
+const { BranchStatus } = require("shared");
 const Address = require("./address");
 
 class Branch extends Model {}

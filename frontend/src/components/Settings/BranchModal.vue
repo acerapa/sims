@@ -17,6 +17,8 @@
           label="Branch Name"
           v-model="model.branch.name"
           placeholder="Ex. Masili Branch"
+          :error="modelErrors.name"
+          :error-has-text="true"
         />
         <CustomInput
           type="select"
@@ -29,6 +31,8 @@
           placeholder="Select Branch Manager"
           v-model="model.branch.branch_manager"
           @add-new="showEmployeeModal = true"
+          :error="modelErrors.branch_manager"
+          :error-has-text="true"
         />
       </div>
 
@@ -41,6 +45,8 @@
         placeholder="Select status"
         v-model="model.branch.status"
         class="w-[calc(50%_-_0.5rem)]"
+        :error="modelErrors.status"
+        :error-has-text="true"
       />
       <CustomInput
         class="[&>div]:flex [&>div]:flex-row-reverse [&>div]:justify-end [&>div]:gap-3 mt-3"
@@ -48,6 +54,7 @@
         name="is_current"
         label="Is current"
         :has-label="true"
+        :disabled="model.branch.status === BranchStatus.INACTIVE"
         v-model="model.branch.is_current"
       />
     </div>
@@ -58,6 +65,7 @@
         :key="model.address"
         v-model="model.address"
         :address="model.address"
+        :address-errors="modelErrors"
       />
     </div>
   </ModalWrapper>
@@ -82,6 +90,8 @@ import AddressForm from '@/components/shared/AddressForm.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { ObjectHelpers } from 'shared/helpers'
 import { useAppStore } from '@/stores/app'
+import { BranchCreateSchema } from 'shared/validators'
+import { BranchStatus } from 'shared'
 
 const props = defineProps({
   selectedId: {
@@ -103,7 +113,7 @@ const title = props.selectedId ? 'Edit Branch' : 'New Branch'
 const model = ref({
   branch: {
     name: '',
-    status: '',
+    status: BranchStatus.ACTIVE,
     is_current: false,
     branch_manager: ''
   },
@@ -111,11 +121,26 @@ const model = ref({
     address1: '',
     address2: '',
     city: '',
+    province: '',
     postal: ''
   }
 })
 
+const modelErrors = ref({})
+
 const onSubmit = async () => {
+  // validations
+  const { error } = BranchCreateSchema.validate(model.value, {
+    abortEarly: false
+  })
+
+  if (error) {
+    error.details.forEach((err) => {
+      modelErrors.value[err.context.key] = err.message
+    })
+    return
+  }
+
   let res = null
   if (!props.selectedId) {
     res = await settingStore.createBranch(model.value)
@@ -123,15 +148,15 @@ const onSubmit = async () => {
     res = await settingStore.updateBranch(props.selectedId, model.value)
   }
 
-  if (model.value.branch.is_current) {
+  if (model.value.branch.is_current && currentBranch.value) {
     if (props.selectedId != currentBranch.value.id) {
-      await settingStore.updateBranch(currentBranch.value.id, {
+      res = await settingStore.updateBranch(currentBranch.value.id, {
         branch: { is_current: false }
       })
     }
   }
 
-  if (res.status == 200) {
+  if (res.status < 400) {
     await settingStore.fetchAllBranches()
     showModal.value = false
   }

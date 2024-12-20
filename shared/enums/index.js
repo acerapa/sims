@@ -106,7 +106,8 @@ const BranchStatusMap = Object.freeze({
 const TransferType = Object.freeze({
   IBRR: "ibrr",
   STR: "str",
-  RMA: "rma"
+  RMA: "rma",
+  FIX: "fix",
 });
 
 const ProductTransferStatus = Object.freeze({
@@ -116,11 +117,29 @@ const ProductTransferStatus = Object.freeze({
   NOT_RECEIVED: "not-received",
 });
 
+const ProductType = Object.freeze({
+  INVENTORY: "inventory",
+  NON_INVENTORY: "non-inventory",
+});
+
+const ProductStatus = Object.freeze({
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+});
+
+const SalesOrderType = Object.freeze({
+  CASH: "cash",
+  INSTALLMENT: "installment",
+});
+
 module.exports = {
   UserType,
+  ProductType,
   AccountTypes,
   BranchStatus,
   TransferType,
+  ProductStatus,
+  SalesOrderType,
   BranchStatusMap,
   LocalStorageKeys,
   PurchaseOrderType,

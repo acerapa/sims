@@ -24,6 +24,8 @@
           v-model="model.product_id"
           :can-search="true"
           :disabled="props.isDisabled"
+          :error="modelErrors.product_id"
+          :error-has-text="false"
           @change="onChange"
         />
       </div>
@@ -31,9 +33,11 @@
         type="text"
         class="col-span-3"
         name="description"
+        :error-has-text="false"
         placeholder="Description"
         :disabled="props.isDisabled"
         v-model="model.description"
+        :error="modelErrors.description"
       />
       <CustomInput
         type="number"
@@ -41,7 +45,9 @@
         class="col-span-1"
         placeholder="quantity"
         v-model="model.quantity"
+        :error-has-text="false"
         :disabled="props.isDisabled"
+        :error="modelErrors.quantity"
       />
       <CustomInput
         name="cost"
@@ -49,6 +55,8 @@
         class="col-span-1"
         placeholder="Cost"
         v-model="model.cost"
+        :error-has-text="false"
+        :error="modelErrors.cost"
         :disabled="props.isDisabled"
       />
       <CustomInput
@@ -57,6 +65,8 @@
         class="col-span-1"
         placeholder="Amount"
         v-model="model.amount"
+        :error-has-text="false"
+        :error="modelErrors.amount"
         :disabled="props.isDisabled"
       />
       <p
@@ -75,23 +85,49 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import CustomInput from '../shared/CustomInput.vue'
 import ProductModal from '../Product/ProductModal.vue'
 import { useProductStore } from '@/stores/product'
+import Event from '@/event'
 
 const emit = defineEmits(['remove'])
 
 const props = defineProps({
+  ndx: {
+    type: Number
+  },
   isDisabled: {
     type: Boolean,
     default: false
+  },
+  eventName: {
+    type: String,
+    required: false
   }
 })
 const showModal = ref(false)
 const model = defineModel()
+const modelErrors = ref({})
 
 const productStore = useProductStore()
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+Event.on(
+  props.eventName,
+  (data) => {
+    if (typeof props.ndx != 'undefined') {
+      modelErrors.value = data[props.ndx] ? data[props.ndx] : {}
+    }
+  },
+  true
+)
+
+onMounted(async () => {
+  await productStore.getProducts()
+})
 
 const onChange = () => {
   if (model.value.product_id) {
@@ -105,7 +141,6 @@ const onChange = () => {
       model.value.quantity = 1
     }
   } else {
-    model.value.name = ''
     model.value.product_id = ''
     model.value.description = ''
     model.value.quantity = ''

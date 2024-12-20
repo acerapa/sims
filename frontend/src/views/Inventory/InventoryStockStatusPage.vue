@@ -5,9 +5,10 @@
       :has-add-btn="false"
       :has-pagination="false"
       :table-header-component="StockStatusHeader"
+      class="[&>div.table-wrapper]:sticky [&>div.table-wrapper]:top-[80px] [&>div.table-wrapper]:z-50"
     >
       <template v-slot:tables>
-        <div v-for="(cat, ndx) in sampleData" :key="ndx">
+        <div v-for="(cat, ndx) in sampleData" :key="ndx" class="mt-5">
           <CustomTable
             :has-tools="false"
             :has-add-btn="false"

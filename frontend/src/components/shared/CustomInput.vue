@@ -2,7 +2,11 @@
   <div>
     <div
       class="flex flex-col gap-1 relative"
-      v-if="props.type != 'textarea' && props.type != 'select'"
+      v-if="
+        props.type != 'textarea' &&
+        props.type != 'select' &&
+        props.type != 'multi-string'
+      "
     >
       <small v-if="props.hasLabel">{{ props.label }}</small>
       <input
@@ -23,7 +27,7 @@
         @change="emit('change')"
         @reset="emit('reset')"
       />
-      <small class="error" v-if="props.error">{{ props.error }}</small>
+      <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'textarea'">
       <small v-if="props.hasLabel">{{ props.label }}</small>
@@ -46,7 +50,7 @@
         @change="emit('change')"
         @reset="emit('reset')"
       ></textarea>
-      <small class="error" v-if="props.error">{{ props.error }}</small>
+      <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'select'">
       <small v-if="props.hasLabel">{{ props.label }}</small>
@@ -59,6 +63,11 @@
         :placeholder="props.placeholder"
         :id="props.id ? props.id : props.name"
         :select-multiple="props.selectMultiple"
+        :class="
+          props.error
+            ? '[&>div>*]:border [&>div>*]:border-red-500 [&>select]:border [&>select]:border-red-500'
+            : ''
+        "
         v-model="value"
         @input="emit('input')"
         @focus="emit('focus')"
@@ -67,11 +76,37 @@
         @reset="emit('reset')"
         @add-new="emit('addNew')"
       />
+      <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
+    </div>
+    <div
+      class="flex flex-col gap-1 relative"
+      v-if="props.type == 'multi-string'"
+    >
+      <small v-if="props.hasLabel">{{ props.label }}</small>
+      <MultiStringInput
+        :name="props.name"
+        :disabled="props.disabled"
+        :placeholder="props.placeholder"
+        :id="props.id ? props.id : props.name"
+        :class="
+          props.error
+            ? '[&>div>*]:border [&>div>*]:border-red-500 [&>select]:border [&>select]:border-red-500'
+            : ''
+        "
+        v-model="value"
+        @input="emit('input')"
+        @focus="emit('focus')"
+        @change="emit('change')"
+        @blur="emit('blur')"
+        @reset="emit('reset')"
+      />
+      <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
   </div>
 </template>
 
 <script setup>
+import MultiStringInput from './MultiStringInput.vue'
 import CustomSelectInput from './CustomSelectInput.vue'
 const props = defineProps({
   name: {
@@ -104,6 +139,10 @@ const props = defineProps({
   },
   error: {
     type: String
+  },
+  errorHasText: {
+    type: Boolean,
+    default: false
   },
   disabled: {
     type: Boolean,

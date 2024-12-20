@@ -3,12 +3,15 @@ const {
   BranchStatus,
   TransferType,
   ProductTransferStatus,
-} = require("../enums");
+} = require("shared/enums");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
 const { AddressSchema } = require("./user");
 
 const BranchSchema = Joi.object({
-  name: Joi.string().required(),
+  name: Joi.string().required().messages({
+    "string.empty": "Branch name is required",
+    "any.required": "Branch name is required",
+  }),
   branch_manager: Joi.number().required(),
   is_current: Joi.boolean().optional(),
   status: Joi.string().valid(...Object.values(BranchStatus)),
@@ -25,6 +28,11 @@ const BranchUpdateSchema = Joi.object({
 });
 
 const StockTransferSchema = Joi.object({
+  po_no: Joi.alternatives(Joi.string(), Joi.number()).when("type", {
+    is: TransferType.FIX,
+    then: Joi.required(),
+    otherwise: Joi.allow(null, "").optional(),
+  }),
   memo: Joi.string().allow(null, ""),
   type: Joi.valid(...Object.values(TransferType)).required(),
   when: Joi.date().required(),
@@ -33,7 +41,11 @@ const StockTransferSchema = Joi.object({
     then: Joi.allow(null, "").optional(),
     otherwise: Joi.required(),
   }),
-  branch_from: Joi.number().required(),
+  branch_from: Joi.number().when("type", {
+    is: TransferType.FIX,
+    then: Joi.allow(null, "").optional(),
+    otherwise: Joi.required(),
+  }),
   processed_by: Joi.number().required(),
   str_id: Joi.number().when("type", {
     is: TransferType.IBRR,

@@ -12,9 +12,9 @@
       :text="'Please select current branch'"
     >
       Please refer
-      <RouterLink class="text-blue-400 underline" :to="{ name: 'branches' }"
-        >here!</RouterLink
-      >
+      <RouterLink class="text-blue-400 underline" :to="{ name: 'branches' }">
+        here!
+      </RouterLink>
     </AlertComponent>
     <div class="cont">
       <div class="flex gap-4 max-lg:flex-col">
@@ -31,6 +31,8 @@
               placeholder="Select Branch"
               v-model="model.transfer.branch_to"
               @change="populateAddress"
+              :error="modelErrors.branch_to"
+              :error-has-text="true"
             />
             <CustomInput
               type="datetime-local"
@@ -50,12 +52,19 @@
             name="memo"
             v-model="model.transfer.memo"
             placeholder="Write Something"
+            :error="modelErrors.memo"
+            :error-has-text="true"
           />
         </div>
 
         <div class="flex flex-col gap-3 flex-1">
           <p class="text-base font-semibold">Address Info</p>
-          <AddressForm v-model="address" :has-label="true" :disabled="true" />
+          <AddressForm
+            v-model="address"
+            :has-label="true"
+            :disabled="true"
+            :address-errors="modelErrors"
+          />
         </div>
       </div>
       <div class="flex flex-col gap-3 mt-5">
@@ -65,6 +74,7 @@
           :header-component="ProductSelectHeader"
           :row-component="ProductSelectRow"
           :format="productDefaultValue"
+          :row-event-name="rowEventName"
         >
           <template v-slot:aggregate>
             <div>
@@ -114,9 +124,9 @@ import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
+import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import ProductMulitpleSelect from '@/components/shared/ProductMultiSelectTable.vue'
 import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue'
-import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { useAppStore } from '@/stores/app'
@@ -125,10 +135,13 @@ import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
 import { TransferType } from 'shared/enums'
-import { DateHelpers, ObjectHelpers } from 'shared/helpers'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { DateHelpers, GeneralHelpers, ObjectHelpers } from 'shared/helpers'
+import { StockTransferCreateSchema } from 'shared'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
+
+const rowEventName = 'str-product-row'
 
 const route = useRoute()
 const router = useRouter()
@@ -168,6 +181,7 @@ const defaultValue = {
 }
 
 const currentBranch = ref()
+const modelErrors = ref({ products: [] })
 const model = ref(defaultValue)
 const showConfirmModal = ref(false)
 
@@ -229,6 +243,42 @@ const populateAddress = () => {
 
 const onSubmit = async () => {
   clearInterval(timeInterval)
+
+  // validate model
+  const { error } = StockTransferCreateSchema.validate(model.value, {
+    abortEarly: false
+  })
+
+  if (error) {
+    modelErrors.value.products = []
+
+    error.details.forEach((err) => {
+      if (err.path.includes('products')) {
+        modelErrors.value.products.push(err)
+      } else {
+        modelErrors.value[err.context.key] = err.message
+      }
+    })
+
+    modelErrors.value.products = Object.groupBy(
+      modelErrors.value.products,
+      (err) => err.path[1]
+    )
+
+    const keys = Object.keys(modelErrors.value.products)
+    keys.forEach((key) => {
+      let prdErr = {}
+      modelErrors.value.products[key].forEach((item) => {
+        prdErr[item.context.key] = item.message
+      })
+
+      modelErrors.value.products[key] = prdErr
+    })
+
+    // trigger event to show errors
+    Event.emit(rowEventName, modelErrors.value.products)
+    return
+  }
 
   if (!isEdit.value) {
     model.value.transfer.when = new Date()

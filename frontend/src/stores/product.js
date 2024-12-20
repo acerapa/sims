@@ -35,10 +35,19 @@ export const useProductStore = defineStore('product', () => {
     })
   })
 
+  const getProducts = async () => {
+    if (!products.value.length) {
+      await fetchAllProducts()
+    }
+
+    return products.value
+  }
+
   return {
     products,
     supplierProducts,
     productOptions,
+    getProducts,
     fetchAllProducts
   }
 })

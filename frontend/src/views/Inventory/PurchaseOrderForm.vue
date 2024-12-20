@@ -73,10 +73,10 @@
         </div>
       </div>
       <div class="flex flex-col gap-3">
-        <div class="flex gap-3 max-[1180px]:flex-col">
+        <div class="flex gap-6 max-[1180px]:flex-col">
           <div class="flex-1 flex flex-col gap-2">
             <p class="text-sm font-semibold">Order Info</p>
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-6">
               <div class="flex gap-3">
                 <CustomInput
                   type="select"
@@ -90,6 +90,8 @@
                   v-model="model.order.supplier_id"
                   @add-new="showVendorModal = true"
                   :disabled="isEdit || isDisabled"
+                  :error="modelErrors.supplier_id"
+                  :error-has-text="true"
                 />
                 <CustomInput
                   type="select"
@@ -110,6 +112,8 @@
                     }
                   ]"
                   :disabled="isDisabled"
+                  :error="modelErrors.type"
+                  :error-has-text="true"
                 />
               </div>
               <div class="flex gap-3">
@@ -121,7 +125,9 @@
                   label="Reference No."
                   placeholder="Ref. No."
                   :disabled="isDisabled"
+                  :error="modelErrors.ref_no"
                   v-model="model.order.ref_no"
+                  :error-has-text="true"
                 />
                 <CustomInput
                   type="date"
@@ -132,6 +138,8 @@
                   :disabled="isDisabled"
                   placeholder="Term Start"
                   v-model="model.order.term_start"
+                  :error="modelErrors.term_start"
+                  :error-has-text="true"
                   v-if="model.order.type == PurchaseOrderType.TERM"
                 />
               </div>
@@ -145,6 +153,8 @@
                   placeholder="Date"
                   v-model="model.order.date"
                   :disabled="isDisabled"
+                  :error-has-text="true"
+                  :error="modelErrors.date"
                 />
                 <CustomInput
                   type="date"
@@ -154,6 +164,8 @@
                   label="Bill due"
                   placeholder="Bill Due"
                   v-model="model.order.bill_due"
+                  :error="modelErrors.bill_due"
+                  :error-has-text="true"
                   :disabled="isDisabled"
                 />
               </div>
@@ -165,6 +177,7 @@
               v-model="model.address"
               :has-label="true"
               :disabled="isDisabled"
+              class="!gap-6 [&>div]:gap-6"
             />
           </div>
         </div>
@@ -177,6 +190,8 @@
           :disabled="isDisabled"
           input-class="resize-none"
           v-model="model.order.memo"
+          :error="modelErrors.memo"
+          :error-has-text="true"
         />
       </div>
 
@@ -192,6 +207,9 @@
               v-for="(product, ndx) in model.products"
               v-model="model.products[ndx]"
               :key="ndx"
+              :errors="
+                modelErrors.products[ndx] ? modelErrors.products[ndx] : {}
+              "
               @remove="removeProduct(ndx)"
               :selected-products="model.products"
               :is-disabled="isDisabled"
@@ -279,7 +297,8 @@ import {
   PurchaseOrderType,
   PurchaseStatusMap
 } from 'shared/enums'
-import { ObjectHelpers } from 'shared/helpers/object'
+import { PurchaseOrderCreationSchema } from 'shared'
+import { ObjectHelpers } from 'shared/helpers'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
@@ -291,6 +310,7 @@ const router = useRouter()
 const selectedStatus = ref()
 const statusModal = ref(false)
 const showVendorModal = ref(false)
+const modelErrors = ref({ products: [] })
 const status = ref(PurchaseOrderStatus.OPEN)
 
 const appStore = useAppStore()
@@ -392,6 +412,39 @@ const onSubmit = async (isAddNew = false) => {
     delete model.value.order.term_start
   }
 
+  // validation
+  const { error } = PurchaseOrderCreationSchema.validate(model.value, {
+    abortEarly: false
+  })
+  if (error) {
+    modelErrors.value.products = Object.groupBy(
+      error.details.filter((item) => {
+        return item.path.includes('products')
+      }),
+      (err) => {
+        return err.path[1]
+      }
+    )
+
+    const keys = Object.keys(modelErrors.value.products)
+    keys.forEach((key) => {
+      let prdErr = {}
+      modelErrors.value.products[key].forEach((item) => {
+        prdErr[item.context.key] = item.message
+      })
+
+      modelErrors.value.products[key] = prdErr
+    })
+
+    error.details.forEach((item) => {
+      if (!item.path.includes('products')) {
+        modelErrors.value[item.context.key] = item.message
+      }
+    })
+
+    return
+  }
+
   const res = await authenticatedApi(
     'purchase-order/register',
     Method.POST,
@@ -402,7 +455,11 @@ const onSubmit = async (isAddNew = false) => {
     // reset model
     model.value.products = []
     model.value.order = { ...modelDefualtValue.order }
-    model.value.address = { ...modelDefualtValue.address }
+    // get current branch address
+    model.value.address = ObjectHelpers.assignSameFields(
+      model.value.address,
+      appStore.currentBranch.address
+    )
     addNewProduct()
 
     if (!isAddNew) {
