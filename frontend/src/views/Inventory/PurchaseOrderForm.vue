@@ -51,24 +51,29 @@
         </p>
 
         <div class="flex gap-3">
-          <BadgeComponent
-            v-if="isEdit && selectedStatus"
-            :custom-class="selectedStatus.class"
-            :text="selectedStatus.text"
-            title="Click to set status"
-            @click="
-              statusModal =
-                model.order.status != PurchaseOrderStatus.CANCELLED &&
-                model.order.status != PurchaseOrderStatus.COMPLETED &&
-                model.order.status != PurchaseOrderStatus.CONFIRMED
-            "
-          />
-          <button
-            class="btn-green"
-            v-if="model.order.status == PurchaseOrderStatus.CONFIRMED"
-            @click="onReceiveOrder"
-          >
-            Receive Order
+          <div class="flex gap-3">
+            <BadgeComponent
+              v-if="isEdit && selectedStatus"
+              :custom-class="selectedStatus.class"
+              :text="selectedStatus.text"
+              title="Click to set status"
+              @click="
+                statusModal =
+                  model.order.status != PurchaseOrderStatus.CANCELLED &&
+                  model.order.status != PurchaseOrderStatus.COMPLETED &&
+                  model.order.status != PurchaseOrderStatus.CONFIRMED
+              "
+            />
+            <button
+              class="btn-green"
+              v-if="model.order.status == PurchaseOrderStatus.CONFIRMED"
+              @click="onReceiveOrder"
+            >
+              Receive Order
+            </button>
+          </div>
+          <button type="button" class="btn float-right" @click="startPrint">
+            &#128438; Print
           </button>
         </div>
       </div>
@@ -303,6 +308,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useSettingsStore } from '@/stores/settings'
+import { usePrint } from '@/use/usePrint'
 
 const route = useRoute()
 const isEdit = ref(false)
@@ -314,6 +320,7 @@ const modelErrors = ref({ products: [] })
 const status = ref(PurchaseOrderStatus.OPEN)
 
 const appStore = useAppStore()
+const { startPrint } = usePrint()
 const supplierStore = useVendorStore()
 const productStore = useProductStore()
 const settingStore = useSettingsStore()

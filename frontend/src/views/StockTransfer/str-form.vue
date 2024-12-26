@@ -17,9 +17,14 @@
       </RouterLink>
     </AlertComponent>
     <div class="cont">
+      <button type="button" class="btn float-right" @click="startPrint">
+        &#128438; Print
+      </button>
       <div class="flex gap-4 max-lg:flex-col">
         <div class="flex flex-col gap-3 flex-1">
-          <p class="text-base font-semibold">Transfer Information</p>
+          <div class="flex justify-between">
+            <p class="text-base font-semibold">Transfer Information</p>
+          </div>
           <div class="flex gap-3">
             <CustomInput
               type="select"
@@ -140,6 +145,7 @@ import { StockTransferCreateSchema } from 'shared'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
+import { usePrint } from '@/use/usePrint'
 
 const rowEventName = 'str-product-row'
 
@@ -148,6 +154,7 @@ const router = useRouter()
 const isEdit = ref(false)
 const appStore = useAppStore()
 const authStore = useAuthStore()
+const { startPrint } = usePrint()
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
 const transferStore = useTransferStore()

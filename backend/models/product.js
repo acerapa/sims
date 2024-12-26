@@ -85,9 +85,13 @@ Product.init(
       allowNull: true,
       references: {
         model: ProductSetting,
-        key: "id"
-      }
-    }
+        key: "id",
+      },
+    },
+    model: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     sequelize,
