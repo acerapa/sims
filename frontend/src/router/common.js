@@ -45,6 +45,14 @@ export default [
         }
       },
       {
+        path: '/product-list',
+        name: 'product-list',
+        component: () => import('@/views/public/ProductList.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/demo',
         name: 'demo',
         component: () => import('@/views/demo.vue'),
@@ -53,6 +61,14 @@ export default [
         }
       }
     ]
+  },
+  {
+    path: '/product-list',
+    name: 'product-list',
+    component: () => import('@/views/public/ProductList.vue'),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/login',
