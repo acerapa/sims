@@ -1,13 +1,9 @@
 "use strict";
-const { areColumnsExistInTable } = require("../models");
+const { areColumnsExistInTable, isColumnExistInTable } = require("../models");
 const ProductCategory = require("../models/product-category");
 const tableName = ProductCategory.getTableName();
 const attributes = ProductCategory.getAttributes();
-
-const columns = Object.freeze({
-  is_sub: "is_sub",
-  general_cat: "general_cat",
-});
+const column = "general_cat";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -19,25 +15,10 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
 
-    const areColumnExist = await areColumnsExistInTable(
-      tableName,
-      Object.values(columns)
-    );
+    const isExist = await isColumnExistInTable(tableName, column);
 
-    if (!areColumnExist[columns.is_sub]) {
-      await queryInterface.addColumn(
-        tableName,
-        columns.is_sub,
-        attributes[columns.is_sub]
-      );
-    }
-
-    if (!areColumnExist[columns.general_cat]) {
-      await queryInterface.addColumn(
-        tableName,
-        columns.general_cat,
-        attributes[columns.general_cat]
-      );
+    if (!isExist) {
+      await queryInterface.addColumn(tableName, column, attributes[column]);
     }
   },
 
@@ -49,17 +30,10 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
 
-    const areColumnExist = await areColumnsExistInTable(
-      tableName,
-      Object.values(columns)
-    );
+    const isExist = await isColumnExistInTable(tableName, column);
 
-    if (!areColumnExist[columns.is_sub]) {
-      await queryInterface.removeColumn(tableName);
-    }
-
-    if (!areColumnExist[columns.general_cat]) {
-      await queryInterface.removeColumn(tableName);
+    if (isExist) {
+      await queryInterface.removeColumn(tableName, column);
     }
   },
 };

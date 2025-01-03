@@ -28,15 +28,37 @@
     <div class="mx-auto max-w-screen-xl p-5">
       <h1 class="text-2xl">Products</h1>
       <nav class="product-category-header">
-        <ul class="flex gap-3 items-center py-2">
-          <li v-for="cat in sampleCategories" :key="cat">
-            <RouterLink>
-              <p>{{ cat }}</p>
-              <img class="w-3" :src="ArrowDown" alt="" />
+        <ul class="flex gap-1 items-center">
+          <li class="relative group" v-for="cat in sampleCategories" :key="cat">
+            <RouterLink class="peer py-2 px-3 group-hover:bg-blue-100">
+              <p class="whitespace-nowrap">{{ cat.name ? cat.name : cat }}</p>
+              <img v-if="cat.items" class="w-3" :src="ArrowDown" alt="" />
             </RouterLink>
+
+            <div
+              v-if="cat.items"
+              class="header-nav-dropdown cont group-hover:block"
+            >
+              <nav>
+                <ul class="flex flex-col">
+                  <li v-for="item in cat.items" :key="item" class="group">
+                    <RouterLink
+                      to="#"
+                      class="p-2 whitespace-nowrap border-b hover:bg-blue-100 hover:border-b-white group-last:border-b-0"
+                    >
+                      {{ item }}
+                    </RouterLink>
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </li>
         </ul>
       </nav>
+
+      <div class="mt-3 px-3">
+        <p class="text-lg font-medium">Categories</p>
+      </div>
     </div>
   </div>
 </template>
@@ -45,8 +67,14 @@
 import ArrowDown from '@/assets/icons/arrow-down.svg'
 
 const sampleCategories = [
-  'Computers',
-  'Mobiles',
+  {
+    name: 'Computers',
+    items: ['Testing', 'Test']
+  },
+  {
+    name: 'Mobiles',
+    items: ['Testing long navigation', 'Yep!']
+  },
   'Gadgets',
   'Storage',
   'PC Components',
@@ -59,8 +87,16 @@ const sampleCategories = [
 </script>
 
 <style scoped>
+.header-nav-dropdown {
+  @apply hidden min-w-40 !p-0 !rounded-none absolute text-sm;
+}
+
+.product-category-header {
+  @apply py-2;
+}
+
 .product-category-header li a {
-  @apply flex gap-1 items-center text-sm;
+  @apply flex gap-2 items-center text-sm;
 }
 
 .main-header {

@@ -15,11 +15,6 @@ ProductCategory.init(
       allowNull: false,
       unique: true,
     },
-    is_sub: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      defaultValue: true,
-    },
     general_cat: {
       type: DataTypes.INTEGER,
       references: {
