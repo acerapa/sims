@@ -15,6 +15,16 @@ const PhysicalInventory = require("./physical-inventory");
 const ProductTransaction = require("./product-transaction");
 const PhysicalInventoryItem = require("./physical-inventory-item");
 
+ProductCategory.hasMany(ProductCategory, {
+  foreignKey: "general_cat",
+  as: "sub_categories",
+});
+
+ProductCategory.belongsTo(ProductCategory, {
+  foreignKey: "general_cat",
+  as: "general_category",
+});
+
 Address.hasMany(Customer, {
   foreignKey: "address_id",
   as: "customers",

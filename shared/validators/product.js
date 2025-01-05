@@ -8,6 +8,7 @@ const CategorySchema = Joi.object({
     "string.empty": "name is required",
     "any.required": "name is required",
   }),
+  general_cat: Joi.number().allow(null, "").optional(),
 });
 
 const ProductReorderSchema = Joi.object({

@@ -35,6 +35,7 @@
         :has-add-btn="true"
         :has-pagination="true"
         @view="onViewCategory"
+        :has-check-box="false"
         @add-new-record="onNewProductCategory"
         title="Product Categories"
         :data="settingsStore.productCategories"
@@ -42,12 +43,13 @@
         :table-row-component="ProductCategoryRow"
       >
         <template #table_header>
-          <div class="grid gap-3 grid-cols-6 min-w-[550px]">
+          <div class="grid gap-3 grid-cols-7 min-w-[550px] px-3">
             <div class="col-span-1 flex gap-3 items-center">
-              <input type="checkbox" class="input" />
+              <!-- <input type="checkbox" class="input" /> -->
               <p class="table-header">#</p>
             </div>
             <p class="col-span-3 table-header">Name</p>
+            <p class="col-span-1 table-header">Sub Cats</p>
             <p class="col-span-2 table-header">Date Added</p>
           </div>
         </template>

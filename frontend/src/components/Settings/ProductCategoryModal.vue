@@ -1,20 +1,22 @@
 <template>
   <ModalWrapper
-    title="New Category"
-    v-model="showModal"
-    @submit="onSubmit"
+    :title="title"
     @delete="onDelete"
+    @submit="onSubmit"
+    v-model="showModal"
     :has-delete="props.selectedId ? true : false"
   >
     <div class="flex mt-7 pb-5">
       <CustomInput
         type="text"
-        name="category"
-        v-model="model.name"
         class="flex-1"
-        placeholder="Category Name"
-        :error="modelError.name"
+        name="category"
+        :has-label="true"
+        v-model="model.name"
+        label="Category Name"
         :error-has-text="true"
+        :error="modelError.name"
+        placeholder="Category Name"
       />
     </div>
   </ModalWrapper>
@@ -42,13 +44,23 @@ const props = defineProps({
   selectedId: {
     type: Number,
     required: false
+  },
+  general_cat: {
+    type: Number,
+    required: false
   }
 })
 
-const model = ref({
-  name: ''
-})
+const title = props.general_cat
+  ? 'New Sub Category'
+  : props.selectedId
+    ? 'Edit Category'
+    : 'New Category'
 
+const model = ref({
+  name: '',
+  general_cat: props.general_cat
+})
 const modelError = ref({})
 
 onMounted(async () => {

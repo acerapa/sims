@@ -20,6 +20,8 @@
       }
     "
   >
+    <template #buttons> Tools </template>
+
     <template #table_header>
       <div class="grid grid-cols-9 gap-3 min-w-[907px]">
         <div class="col-span-1 flex gap-3 items-center">
