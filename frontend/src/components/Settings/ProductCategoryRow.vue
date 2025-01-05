@@ -1,16 +1,20 @@
 <template>
-  <div class="group">
+  <div class="group px-3 py-2" :class="isExpand ? 'bg-blue-50 rounded' : ''">
     <div
       class="grid grid-cols-7 gap-3 min-w-[550px] gen-table-row"
       @click="emit('view', props.productCategory.id)"
     >
       <div class="col-span-1 flex gap-3 items-center">
-        <input type="checkbox" class="input" />
+        <input v-if="props.hasCheckBox" type="checkbox" class="input" />
         <p class="text-sm">{{ props.productCategory.id }}</p>
       </div>
       <p class="col-span-3 text-sm">{{ props.productCategory.name }}</p>
       <p class="col-span-1">
-        {{ props.productCategory.sub_categories.length }}
+        {{
+          props.productCategory.sub_categories
+            ? props.productCategory.sub_categories.length
+            : 0
+        }}
       </p>
       <div class="col-span-2 flex items-center gap-5">
         <p class="text-sm">
@@ -30,8 +34,29 @@
     </div>
 
     <div class="text-sm" v-if="isExpand">
-      <button type="btn" class="btn" @click="showModal = true">
-        &plus; Add
+      <div class="mx-3 px-3 rounded flex flex-col gap-3 bg-white py-2">
+        <ProductCategoryRow
+          v-for="sub_cat in props.productCategory.sub_categories"
+          :key="sub_cat.id"
+          :productCategory="sub_cat"
+        />
+        <p
+          class="text-center font-thin text-gray-800 italic"
+          v-if="
+            !props.productCategory.sub_categories ||
+            props.productCategory.sub_categories.length === 0
+          "
+        >
+          No Sub Categories
+        </p>
+      </div>
+
+      <button
+        type="btn"
+        class="btn mt-3 block ml-auto mr-0"
+        @click="showModal = true"
+      >
+        &plus; Add Sub Cat
       </button>
     </div>
   </div>
@@ -54,8 +79,15 @@ const props = defineProps({
   productCategory: {
     type: Object,
     default: () => ({})
+  },
+  hasCheckBox: {
+    type: Boolean,
+    required: false
   }
 })
 
-const emit = defineEmits(['view'])
+const emit = defineEmits([
+  'view',
+  'openMenu' /* openMenu is temporary and will be remove in the future */
+])
 </script>
