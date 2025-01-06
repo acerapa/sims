@@ -52,14 +52,6 @@ Product.init(
       allowNull: false,
       defaultValue: "active",
     },
-    category_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: ProductCategories,
-        key: "id",
-      },
-    },
     cost: {
       type: DataTypes.INTEGER,
       allowNull: true,

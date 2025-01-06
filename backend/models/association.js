@@ -14,6 +14,7 @@ const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
 const ProductTransaction = require("./product-transaction");
 const PhysicalInventoryItem = require("./physical-inventory-item");
+const ProductToCategories = require("./junction/product-to-categories");
 
 ProductCategory.hasMany(ProductCategory, {
   foreignKey: "general_cat",
@@ -259,4 +260,19 @@ StockTransfer.belongsTo(User, {
 StockTransfer.belongsTo(Supplier, {
   foreignKey: "supplier_id",
   as: "supplier",
+});
+
+// Product and ProductCategory relationships
+Product.belongsToMany(ProductCategory, {
+  through: ProductToCategories,
+  foreignKey: "product_id",
+  otherKey: "category_id",
+  as: "product_categories",
+});
+
+ProductCategory.belongsToMany(Product, {
+  through: ProductToCategories,
+  foreignKey: "category_id",
+  otherKey: "product_id",
+  as: "category_products",
 });
