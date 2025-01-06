@@ -36,9 +36,9 @@
         :has-pagination="true"
         @view="onViewCategory"
         :has-check-box="false"
-        @add-new-record="onNewProductCategory"
         title="Product Categories"
-        :data="settingsStore.productCategories"
+        :data="filteredProductCategories"
+        @add-new-record="onNewProductCategory"
         :row-prop-init="productCategoryRowEvent"
         :table-row-component="ProductCategoryRow"
       >
@@ -58,7 +58,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
 import ProductCategoryRow from '@/components/Settings/ProductCategoryRow.vue'
@@ -90,6 +90,15 @@ Event.on(productCategoryRowEvent, function (item) {
 const productReorderingRowEvent = 'product-reordering-row-props-init'
 Event.on(productReorderingRowEvent, function (item) {
   return { productReordering: item }
+})
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const filteredProductCategories = computed(() => {
+  return settingsStore.productCategories.filter(
+    (category) => !category.general_cat
+  )
 })
 
 /** ================================================

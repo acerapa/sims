@@ -1,19 +1,18 @@
 const ProductCategory = require("../models/product-category");
+const { groupCategories } = require("../services/ProductService");
 
 module.exports = {
   all: async (req, res) => {
     try {
       const categories = await ProductCategory.findAll({
         order: [["createdAt", "DESC"]],
-        include: {
-          model: ProductCategory,
-          as: "sub_categories",
-        },
-        where: {
-          general_cat: null,
-        },
       });
-      res.sendResponse({ categories }, "Successfully fetched!", 200);
+
+      res.sendResponse(
+        { categories, grouped: groupCategories(categories) },
+        "Successfully fetched!",
+        200
+      );
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message, 400);
     }

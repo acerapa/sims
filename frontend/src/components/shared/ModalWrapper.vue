@@ -40,6 +40,8 @@
 </template>
 
 <script setup>
+import { onBeforeUnmount, onMounted } from 'vue'
+
 const props = defineProps({
   title: {
     type: String,
@@ -58,6 +60,22 @@ const props = defineProps({
     type: Boolean,
     default: false
   }
+})
+
+onMounted(() => {
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      showModal.value = false
+    }
+  })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      showModal.value = false
+    }
+  })
 })
 
 const showModal = defineModel()
