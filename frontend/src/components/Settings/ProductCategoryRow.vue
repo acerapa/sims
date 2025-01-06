@@ -1,7 +1,7 @@
 <template>
-  <div class="group px-3 py-2" :class="isExpand ? 'bg-blue-50 rounded' : ''">
+  <div class="group pr-3 py-1" :class="[isExpand ? 'bg-blue-50 rounded' : '']">
     <div
-      class="grid grid-cols-7 gap-3 min-w-[550px] gen-table-row"
+      class="grid grid-cols-7 ml-3 gap-3 min-w-[550px] gen-table-row items-center"
       @click="emit('view', props.productCategory.id)"
     >
       <div class="col-span-1 flex gap-3 items-center">
@@ -25,20 +25,31 @@
 
         <button
           @click.stop="isExpand = !isExpand"
-          class="bg-gray-500 text-white w-6 h-6 flex text-center items-center justify-center rounded-full"
+          class="bg-gray-500 min-w-6 text-white w-6 h-6 flex text-center items-center justify-center rounded-full"
         >
           <span v-if="!isExpand" class="border-0">&plus;</span>
           <span v-if="isExpand" class="border-0">&minus;</span>
+        </button>
+
+        <button
+          type="btn"
+          v-if="isExpand"
+          @click.stop="showModal = true"
+          class="btn ml-auto mr-0 text-sm"
+        >
+          &plus; Add Sub
         </button>
       </div>
     </div>
 
     <div class="text-sm" v-if="isExpand">
-      <div class="mx-3 px-3 rounded flex flex-col gap-3 bg-white py-2">
+      <div class="p-1 ml-3 rounded flex flex-col gap-3 bg-white">
         <ProductCategoryRow
           v-for="sub_cat in props.productCategory.sub_categories"
           :key="sub_cat.id"
+          :is_sub="true"
           :productCategory="sub_cat"
+          @view="emit('view', sub_cat.id)"
         />
         <p
           class="text-center font-thin text-gray-800 italic"
@@ -50,20 +61,12 @@
           No Sub Categories
         </p>
       </div>
-
-      <button
-        type="btn"
-        class="btn mt-3 block ml-auto mr-0"
-        @click="showModal = true"
-      >
-        &plus; Add Sub Cat
-      </button>
     </div>
   </div>
   <ProductCategoryModal
-    :general_cat="props.productCategory.id"
     v-if="showModal"
     v-model="showModal"
+    :general_cat="props.productCategory.id"
   />
 </template>
 
@@ -82,6 +85,11 @@ const props = defineProps({
   },
   hasCheckBox: {
     type: Boolean,
+    required: false
+  },
+  is_sub: {
+    type: Boolean,
+    default: false,
     required: false
   }
 })

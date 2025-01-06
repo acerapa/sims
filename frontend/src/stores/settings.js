@@ -47,6 +47,14 @@ export const useSettingsStore = defineStore('settings', () => {
     })
   }
 
+  const getProductCategories = async () => {
+    if (!productCategories.value.length) {
+      await fetchAllProductCategories()
+    }
+
+    return productCategories.value
+  }
+
   const getProductCategoryByIdSync = (id) => {
     return productCategories.value.find((cat) => cat.id == id)
   }
@@ -96,6 +104,7 @@ export const useSettingsStore = defineStore('settings', () => {
     categoryOption,
     fetchAllAccounts,
     fetchAllBranches,
+    getProductCategories,
     fetchAllProductCategories,
     getProductCategoryByIdSync,
     getProductCategoryByIdAsync,

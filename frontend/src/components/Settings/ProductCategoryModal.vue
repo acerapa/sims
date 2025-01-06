@@ -51,11 +51,13 @@ const props = defineProps({
   }
 })
 
-const title = props.general_cat
-  ? 'New Sub Category'
-  : props.selectedId
-    ? 'Edit Category'
-    : 'New Category'
+const title = ref(
+  props.general_cat
+    ? `New Sub Category`
+    : props.selectedId
+      ? 'Edit Category'
+      : 'New Category'
+)
 
 const model = ref({
   name: '',
@@ -68,6 +70,17 @@ onMounted(async () => {
     model.value = settingsStore.productCategories.find(
       (pc) => pc.id == props.selectedId
     )
+  }
+
+  if (props.general_cat) {
+    await settingsStore.getProductCategories()
+    const parentCat = settingsStore.getProductCategoryByIdSync(
+      props.general_cat
+    )
+
+    if (parentCat) {
+      title.value = `New Sub Category for ${parentCat.name}`
+    }
   }
 })
 
