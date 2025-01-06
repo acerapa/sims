@@ -34,7 +34,7 @@ const ProductSchema = Joi.object({
   status: Joi.string()
     .valid(...Object.values(ProductStatus))
     .optional(),
-  category_id: Joi.number().required(),
+  categories: Joi.number().required(),
   cost: Joi.number().optional(),
   income_account: Joi.number().required(),
   expense_account: Joi.number().required(),
