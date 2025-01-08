@@ -1,10 +1,10 @@
 <template>
   <ModalWrapper
     :title="title"
-    v-model="showModal"
     @submit="onSubmit"
-    :has-delete="true"
+    v-model="showModal"
     @delete="showDeleteConfirmModal = true"
+    :has-delete="props.selectedId ? true : false"
   >
     <div class="flex flex-col gap-6 my-7">
       <div class="flex flex-col gap-3">
@@ -247,7 +247,7 @@ import AccountModal from '@/components/Settings/AccountModal.vue'
 import VendorModal from '@/components/Vendor/VendorModal.vue'
 import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import { computed, onMounted, ref } from 'vue'
-import { AccountTypes, ObjectHelpers, ProductType } from 'shared'
+import { AccountTypes, ObjectHelpers, ProductStatus, ProductType } from 'shared'
 import { ProductSchema } from 'shared'
 
 import { useVendorStore } from '@/stores/supplier'
@@ -279,7 +279,7 @@ const model = ref({
   item_code: '',
   brand: '',
   quantity_in_stock: '',
-  status: '',
+  status: ProductStatus.ACTIVE,
   type: '',
   categories: [],
   suppliers: [],
@@ -291,7 +291,9 @@ const model = ref({
 const modelErrors = ref({})
 
 const title = ref(props.selectedId ? 'Edit Product' : 'New Product')
-const apiPath = ref(props.selectedId ? 'products/update' : 'products/register')
+const apiPath = ref(
+  props.selectedId ? `products/update/${props.selectedId}` : 'products/register'
+)
 
 const supplierStore = useVendorStore()
 const settingStore = useSettingsStore()
@@ -390,6 +392,8 @@ onMounted(async () => {
       }
       model.value.expense_account = product.expense.id
       model.value.income_account = product.income.id
+
+      model.value.categories = product.product_categories.map((pc) => pc.id)
     }
   }
 
