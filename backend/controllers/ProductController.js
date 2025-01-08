@@ -5,6 +5,7 @@ const Account = require("../models/account");
 const { Op } = require("sequelize");
 const ProductSettings = require("../models/product-setting");
 const ProductCategory = require("../models/product-category");
+const ProductToCategories = require("../models/junction/product-to-categories");
 
 module.exports = {
   all: async (req, res) => {
@@ -57,8 +58,15 @@ module.exports = {
         });
       }
 
-      for (let category of req.body.categories) {
-        await product.addProductCategory(category);
+      if (req.body.categories) {
+        await Promise.all([
+          ...req.body.categories.map((category) => {
+            return ProductToCategories.create({
+              product_id: product.id,
+              category_id: category,
+            });
+          }),
+        ]);
       }
 
       res.sendResponse({}, "Successfully Registered!");
@@ -71,11 +79,11 @@ module.exports = {
     try {
       await Product.update(req.body, {
         where: {
-          id: req.body.id,
+          id: req.params.id,
         },
       });
 
-      const product = await Product.findByPk(req.body.id);
+      const product = await Product.findByPk(req.params.id);
       const suppliers = await Supplier.findAll({
         where: {
           id: {
@@ -94,6 +102,33 @@ module.exports = {
             cost: req.body.cost,
           },
         });
+      }
+
+      if (req.body.categories) {
+        const currentCategorys = await ProductToCategories.findAll({
+          where: { product_id: req.params.id },
+          attributes: ["id", "category_id"],
+        });
+
+        const toRemove = currentCategorys.filter(
+          (c) => !req.body.categories.includes(c.category_id)
+        );
+
+        const toAdd = req.body.categories.filter(
+          (c) => !currentCategorys.map((pc) => pc.category_id).includes(c)
+        );
+
+        await Promise.all([
+          ...toRemove.map((c) =>
+            ProductToCategories.destroy({ where: { id: c.id } })
+          ),
+          ...toAdd.map((c) =>
+            ProductToCategories.create({
+              product_id: req.params.id,
+              category_id: c,
+            })
+          ),
+        ]);
       }
 
       res.sendResponse({}, "Successfully updated!");

@@ -4,7 +4,7 @@ const { ProductSchema } = require("shared");
 const { validateBody } = require("../middleware/request-validator");
 
 router.get("/all", ProductController.all);
-router.post("/update", ProductController.update);
+router.post("/update/:id", ProductController.update);
 router.post(
   "/register",
   validateBody(ProductSchema, false),
