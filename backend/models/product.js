@@ -1,6 +1,5 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
-const ProductCategories = require("./product-category");
 const Account = require("./account");
 const ProductSetting = require("./product-setting");
 

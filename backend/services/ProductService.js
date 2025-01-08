@@ -1,6 +1,5 @@
 const groupCategories = (cts) => {
   const categories = [...cts];
-  console.log("values: ", categories.map((c) => c.id).join(", "));
   categories.forEach((category, ndx) => {
     if (category.dataValues.general_cat) {
       parentCategoryIndex = categories.findIndex(

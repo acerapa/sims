@@ -86,16 +86,18 @@
             />
             <CustomInput
               type="select"
-              name="category_id"
-              placeholder="*Select Category"
+              name="categories"
+              placeholder="*Select Categories"
               class="flex-1"
+              :can-search="true"
               :has-add-new="true"
+              :select-multiple="true"
               :options="categoriesOptions"
               @add-new="showCategoryModal = true"
-              v-model="model.category_id"
-              label="Category"
+              v-model="model.categories"
+              label="Categories"
               :has-label="true"
-              :error="modelErrors.category_id"
+              :error="modelErrors.categories"
               :error-has-text="true"
             />
           </div>
@@ -214,7 +216,15 @@
   </ModalWrapper>
   <VendorModal v-if="showVendorModal" v-model="showVendorModal" />
   <AccountModal v-if="showAccountModal" v-model="showAccountModal" />
-  <ProductCategoryModal v-if="showCategoryModal" v-model="showCategoryModal" />
+  <ProductCategoryModal
+    v-if="showCategoryModal"
+    v-model="showCategoryModal"
+    :general_cat="
+      model.categories.length
+        ? model.categories[model.categories.length - 1]
+        : ''
+    "
+  />
   <ProductPointModal
     v-if="showProductPointModal"
     v-model="showProductPointModal"
@@ -237,7 +247,7 @@ import AccountModal from '@/components/Settings/AccountModal.vue'
 import VendorModal from '@/components/Vendor/VendorModal.vue'
 import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import { computed, onMounted, ref } from 'vue'
-import { AccountTypes, ProductType } from 'shared'
+import { AccountTypes, ObjectHelpers, ProductType } from 'shared'
 import { ProductSchema } from 'shared'
 
 import { useVendorStore } from '@/stores/supplier'
@@ -271,7 +281,7 @@ const model = ref({
   quantity_in_stock: '',
   status: '',
   type: '',
-  category_id: '',
+  categories: [],
   suppliers: [],
   income_account: '',
   expense_account: '',
@@ -320,9 +330,20 @@ const supplierOptions = computed(() => {
 
 const categoriesOptions = computed(() => {
   return settingStore.productCategories.map((category) => {
+    let isHidden = false
+
+    if (model.value.categories.length) {
+      isHidden =
+        category.general_cat !=
+        model.value.categories[model.value.categories.length - 1]
+    } else {
+      isHidden = category.general_cat ? true : false
+    }
+
     return {
       value: category.id,
-      text: category.name
+      text: category.name,
+      hidden: isHidden
     }
   })
 })
@@ -357,26 +378,19 @@ onMounted(async () => {
   await settingStore.fetchAllProductReorderingPoints()
 
   if (props.selectedId) {
-    model.value = (() => {
-      let product = productStore.products.find(
-        (product) => product.id == props.selectedId
-      )
+    const product = productStore.products.find(
+      (product) => product.id == props.selectedId
+    )
 
-      // remove pass by reference
-      product = { ...product }
-
-      if (product) {
-        if (product.suppliers.length) {
-          product.cost = product.suppliers[0].ProductSupplier.cost
-          product.suppliers = product.suppliers.map((supplier) => supplier.id)
-        }
-
-        product.expense_account = product.expense.id
-        product.income_account = product.income.id
+    if (product) {
+      model.value = ObjectHelpers.assignSameFields(model.value, product)
+      if (product.suppliers.length) {
+        model.value.cost = product.suppliers[0].ProductSupplier.cost
+        model.value.suppliers = product.suppliers.map((supplier) => supplier.id)
       }
-
-      return product ? product : model.value
-    })()
+      model.value.expense_account = product.expense.id
+      model.value.income_account = product.income.id
+    }
   }
 
   if (!props.selectedId) {

@@ -71,20 +71,6 @@ Supplier.belongsToMany(Product, {
   otherKey: "product_id",
 });
 
-Product.belongsTo(ProductCategory, {
-  foreignKey: "category_id",
-  as: "category",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-
-ProductCategory.hasMany(Product, {
-  foreignKey: "category_id",
-  as: "products",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-
 Product.belongsToMany(PurchaseOrder, {
   through: ProductTransaction,
   foreignKey: "product_id",

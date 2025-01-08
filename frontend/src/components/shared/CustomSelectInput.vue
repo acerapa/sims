@@ -21,6 +21,7 @@
         v-for="(option, ndx) in props.options"
         :key="ndx"
         :value="option.value"
+        :hidden="option.hidden"
       >
         {{ option.text }}
       </option>
@@ -69,6 +70,7 @@
               singleDropdownGroup.blur()
             }
           "
+          :class="option.hidden ? 'hidden' : ''"
         >
           {{ option.text }}
         </p>
@@ -103,10 +105,10 @@
             v-for="(sl, ndx) in selected"
             :key="ndx"
           >
-            <span class="text-xs">{{ getName(sl) }}</span>
+            <span class="text-xs py-0.5">{{ getName(sl) }}</span>
             <button
               type="button"
-              class="text-danger"
+              class="text-danger hidden group-focus:block group-focus-within:block"
               @click="removeSelectedValue(sl)"
             >
               &times;
@@ -123,6 +125,7 @@
           v-for="(opt, ndx) in multiSelectOptions"
           :key="ndx"
           @click="onSelectOpt(opt.value)"
+          :class="opt.hidden ? 'hidden' : ''"
         >
           {{ opt.text }}
         </p>

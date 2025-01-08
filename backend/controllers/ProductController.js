@@ -29,6 +29,11 @@ module.exports = {
             attributes: ["id"],
           },
           {
+            model: ProductCategory,
+            as: "product_categories",
+            attributes: ["id", "name"],
+          },
+          {
             model: ProductSettings,
             as: "product_setting",
             attributes: ["id", "point"],
@@ -50,6 +55,10 @@ module.exports = {
             cost: req.body.cost,
           },
         });
+      }
+
+      for (let category of req.body.categories) {
+        await product.addProductCategory(category);
       }
 
       res.sendResponse({}, "Successfully Registered!");
