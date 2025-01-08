@@ -253,12 +253,12 @@ Product.belongsToMany(ProductCategory, {
   through: ProductToCategories,
   foreignKey: "product_id",
   otherKey: "category_id",
-  as: "product_categories",
+  as: "categories",
 });
 
 ProductCategory.belongsToMany(Product, {
   through: ProductToCategories,
   foreignKey: "category_id",
   otherKey: "product_id",
-  as: "category_products",
+  as: "products",
 });

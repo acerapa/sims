@@ -4,8 +4,23 @@
     v-if="showModal"
     :selected-id="selectedId"
   />
+  <div class="cont mb-4">
+    <p>Filters</p>
+    <div class="flex">
+      <CustomInput
+        type="select"
+        name="Category"
+        :has-label="true"
+        label="Select Category"
+        v-model="filters.category"
+        :options="categoryOptions"
+        placeholder="Select Category"
+        @reset="filters.category = null"
+      />
+    </div>
+  </div>
   <CustomTable
-    :has-filter="true"
+    :has-filter="false"
     :has-add-btn="true"
     :data="filteredData"
     :has-pagination="true"
@@ -20,8 +35,6 @@
       }
     "
   >
-    <template #buttons> Tools </template>
-
     <template #table_header>
       <div class="grid grid-cols-9 gap-3 min-w-[907px]">
         <div class="col-span-1 flex gap-3 items-center">
