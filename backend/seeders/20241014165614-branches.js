@@ -2,50 +2,43 @@
 
 const { basename } = require("path");
 const branchData = require("./dummy/branches");
-const Branch = require("../models/branch");
+const { Branch } = require("../models/association");
 const Address = require("../models/address");
-const User = require("../models/user");
 const {
   checkIfSeederExecuted,
   registerSeederExecution,
   getSeederExecution,
   removeSeederExecution,
 } = require("./misc/SeederHelpers");
+const { Op } = require("sequelize");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    /**
-     * Add seed commands here.
-     *
-     * Example:
-     * await queryInterface.bulkInsert('People', [{
-     *   name: 'John Doe',
-     *   isBetaMember: false
-     * }], {});
-     */
-
     const isExecuted = await checkIfSeederExecuted(basename(__filename));
     if (!isExecuted) {
-      const res = await Branch.bulkCreate(
-        await branchData.generateBranchDummy(),
-        {
-          include: [
-            {
-              model: Address,
-              as: "address",
-            },
-            {
-              model: User,
-              as: "manager",
-            },
-          ],
-        }
+      const data = await branchData.generateBranchDummy();
+      const res = await Branch.bulkCreate(data, {
+        include: [
+          {
+            model: Address,
+            as: "address",
+          },
+        ],
+      });
+
+      await Promise.all(
+        res.map((b, ndx) => {
+          return b.update({ branch_manager: data[ndx].manager });
+        })
       );
 
       await registerSeederExecution(
         basename(__filename),
-        res.map((r) => r.id),
+        {
+          branch_ids: res.map((r) => r.id),
+          address_ids: res.map((r) => r.address_id),
+        },
         true
       );
     }
@@ -57,7 +50,16 @@ module.exports = {
       await Branch.destroy({
         where: {
           id: {
-            [Op.in]: seeder.data,
+            [Op.in]: seeder.data.branch_ids,
+          },
+        },
+      });
+
+      // this will be temporary
+      await Address.destroy({
+        where: {
+          id: {
+            [Op.in]: seeder.data.address_ids,
           },
         },
       });

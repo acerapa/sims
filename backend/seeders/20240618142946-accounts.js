@@ -68,6 +68,7 @@ module.exports = {
     ];
 
     const isExecuted = await checkIfSeederExecuted(basename(__filename));
+    console.log("isExecuted", isExecuted);
     if (!isExecuted) {
       const res = await Account.bulkCreate(fields);
 
