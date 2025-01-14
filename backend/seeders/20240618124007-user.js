@@ -7,6 +7,7 @@ const {
   checkIfSeederExecuted,
   registerSeederExecution,
   getSeederExecution,
+  removeSeederExecution,
 } = require("./misc/SeederHelpers");
 const { Op } = require("sequelize");
 
@@ -50,6 +51,42 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          username: "audrey",
+          first_name: "Audrey",
+          last_name: "Haitlie",
+          password: await bcryptJS.hash("manager23", 10),
+          middle_name: "",
+          date_started: new Date(),
+          position: "manager",
+          status: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          username: "miles",
+          first_name: "Miles",
+          last_name: "Camp",
+          middle_name: "",
+          password: await bcryptJS.hash("manager23", 10),
+          date_started: new Date(),
+          position: "manager",
+          status: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          username: "mark",
+          first_name: "Mark",
+          last_name: "Clip",
+          middle_name: "",
+          password: await bcryptJS.hash("manager23", 10),
+          date_started: new Date(),
+          position: "manager",
+          status: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ];
       const res = await User.bulkCreate(fields);
 
@@ -78,6 +115,8 @@ module.exports = {
           },
         },
       });
+
+      await removeSeederExecution(basename(__filename));
     }
   },
 };

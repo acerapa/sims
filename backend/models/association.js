@@ -264,4 +264,5 @@ ProductCategory.belongsToMany(Product, {
 module.exports = {
   ProductCategory,
   Supplier,
+  Branch,
 };

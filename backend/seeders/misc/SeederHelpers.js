@@ -68,7 +68,7 @@ const removeSeederExecution = async (seeder_name) => {
     // if the seeder has been executed
     // we will remove the seeder
     const seeder = await Seeder.findOne({ where: { name: seeder_name } });
-    await seeder.destroy();
+    if (seeder) await seeder.destroy();
 
     // update the cache
     const cache = extractCache();
