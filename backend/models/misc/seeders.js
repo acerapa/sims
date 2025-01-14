@@ -1,9 +1,9 @@
-const { DataTypes, Model } = require("sequelize");
-const { sequelize } = require(".");
+const { Model, DataTypes } = require("sequelize");
+const { sequelize } = require("../index");
 
-class Account extends Model {}
+class Seeder extends Model {}
 
-Account.init(
+Seeder.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -14,8 +14,8 @@ Account.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    type: {
-      type: DataTypes.STRING,
+    data: {
+      type: DataTypes.JSON,
       allowNull: false,
     },
   },
@@ -25,4 +25,4 @@ Account.init(
   }
 );
 
-module.exports = Account;
+module.exports = Seeder;
