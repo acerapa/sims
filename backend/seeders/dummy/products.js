@@ -53,7 +53,7 @@ module.exports = {
         status: "active",
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
-        category_id: laptops,
+        categories: [laptops],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
         item_code: "qwertyui",
@@ -74,7 +74,7 @@ module.exports = {
         price: 25000,
         quantity_in_stock: 60,
         status: "active",
-        category_id: mouses,
+        category_id: [mouses],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -97,7 +97,7 @@ module.exports = {
         price: 25000,
         quantity_in_stock: 60,
         status: "active",
-        category_id: monitor,
+        category_id: [monitor],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -120,7 +120,7 @@ module.exports = {
         price: 25000,
         quantity_in_stock: 60,
         status: "inactive",
-        category_id: monitor,
+        category_id: [monitor],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -143,7 +143,7 @@ module.exports = {
         price: 60,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [rj45Cable],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -166,7 +166,7 @@ module.exports = {
         price: 80,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [rj45Cable],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -189,7 +189,7 @@ module.exports = {
         price: 120,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [rj45Cable],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -212,7 +212,7 @@ module.exports = {
         price: 180,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [rj45Cable],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -235,7 +235,7 @@ module.exports = {
         price: 300,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [rj45Cable],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
