@@ -37,6 +37,14 @@ export default [
         }
       },
       {
+        path: '/services',
+        name: 'services',
+        component: () => import('@/views/Services.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/employees',
         name: 'employees',
         component: () => import('@/views/Employee.vue'),

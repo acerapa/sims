@@ -14,9 +14,17 @@
     <p class="col-span-3 text-sm line-clamp-2">
       {{ props.product.purchase_description }}
     </p>
-    <p class="col-span-1 text-sm">{{ props.product.quantity_in_stock }}</p>
+    <p class="col-span-1 text-sm text-end pr-2">
+      {{ props.product.quantity_in_stock }}
+    </p>
     <p class="col-span-1 text-sm">
-      {{ DateHelpers.formatDate(props.product.createdAt, 'M/D/YYYY') }}
+      {{
+        new Date(props.product.createdAt).toLocaleString('default', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        })
+      }}
     </p>
     <div class="col-span-1 text-sm flex">
       <button
@@ -49,7 +57,6 @@
 </template>
 
 <script setup>
-import { DateHelpers } from 'shared'
 const props = defineProps({
   product: {
     type: Object,
