@@ -4,8 +4,9 @@
     v-if="showModal"
     :selected-id="selectedId"
   />
+
   <CustomTable
-    :has-filter="true"
+    :has-filter="false"
     :has-add-btn="true"
     :data="filteredData"
     :has-pagination="true"
@@ -20,8 +21,6 @@
       }
     "
   >
-    <template #buttons> Tools </template>
-
     <template #table_header>
       <div class="grid grid-cols-9 gap-3 min-w-[907px]">
         <div class="col-span-1 flex gap-3 items-center">
@@ -31,7 +30,7 @@
         <p class="col-span-1 table-header">Name</p>
         <p class="col-span-1 table-header">Item Code</p>
         <p class="col-span-3 table-header">Description</p>
-        <p class="col-span-1 table-header">Stock</p>
+        <p class="col-span-1 table-header text-end pr-2">Stock</p>
         <p class="col-span-1 table-header">Added on</p>
         <p class="col-span-1 table-header">Status</p>
       </div>
@@ -115,8 +114,6 @@ const selectedId = ref(0)
 const searchText = ref('')
 const showModal = ref(false)
 const categoryOptions = ref([])
-const productStore = useProductStore()
-const settingStore = useSettingsStore()
 const filters = ref({
   added_on_from: '',
   added_on_to: '',
@@ -124,6 +121,9 @@ const filters = ref({
   stock_to: null,
   category: ''
 })
+
+const productStore = useProductStore()
+const settingStore = useSettingsStore()
 
 /** ================================================
  * EVENTS

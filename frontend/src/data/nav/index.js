@@ -104,6 +104,11 @@ export default [
     icon: products
   },
   {
+    text: 'Services',
+    route: 'services',
+    icon: products
+  },
+  {
     text: 'Reports',
     route: 'reports',
     icon: reports,

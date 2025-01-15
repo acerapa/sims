@@ -31,7 +31,7 @@ module.exports = {
           },
           {
             model: ProductCategory,
-            as: "product_categories",
+            as: "categories",
             attributes: ["id", "name"],
           },
           {
