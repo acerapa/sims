@@ -19,6 +19,8 @@ const ProductToCategories = require("./junction/product-to-categories");
 ProductCategory.hasMany(ProductCategory, {
   foreignKey: "general_cat",
   as: "sub_categories",
+  onDelete: "CASCADE",
+  hooks: true,
 });
 
 ProductCategory.belongsTo(ProductCategory, {
@@ -130,10 +132,6 @@ PhysicalInventoryItem.belongsTo(PhysicalInventory, {
   foreignKey: "physical_inventory_id",
   as: "physical_inventory",
 });
-
-module.exports = {
-  Supplier,
-};
 
 // PhysicalInventory to User
 User.hasMany(PhysicalInventory, {
@@ -262,3 +260,9 @@ ProductCategory.belongsToMany(Product, {
   otherKey: "product_id",
   as: "products",
 });
+
+module.exports = {
+  ProductCategory,
+  Supplier,
+  Branch,
+};

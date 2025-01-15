@@ -10,10 +10,9 @@ module.exports = {
     };
 
     const categories = await ProductCategory.findAll();
-    const laptops = categories.find((cat) => cat.name == "Laptops").id;
-    const mouses = categories.find((cat) => cat.name == "Mouses").id;
-    const monitor = categories.find((cat) => cat.name == "Monitors").id;
-    const rj45Cable = categories.find((cat) => cat.name == "RJ45 Cables").id;
+    const computers = categories.find((cat) => cat.name == "Computers").id;
+    const peripherals = categories.find((cat) => cat.name == "Peripherals").id;
+    const networking = categories.find((cat) => cat.name == "Networking").id;
 
     const product_settings = (
       await ProductSetting.findAll({
@@ -53,7 +52,7 @@ module.exports = {
         status: "active",
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
-        category_id: laptops,
+        categories: [computers],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
         item_code: "qwertyui",
@@ -74,7 +73,7 @@ module.exports = {
         price: 25000,
         quantity_in_stock: 60,
         status: "active",
-        category_id: mouses,
+        category_id: [peripherals],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -97,7 +96,7 @@ module.exports = {
         price: 25000,
         quantity_in_stock: 60,
         status: "active",
-        category_id: monitor,
+        category_id: [peripherals],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -120,7 +119,7 @@ module.exports = {
         price: 25000,
         quantity_in_stock: 60,
         status: "inactive",
-        category_id: monitor,
+        category_id: [peripherals],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -143,7 +142,7 @@ module.exports = {
         price: 60,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [networking],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -166,7 +165,7 @@ module.exports = {
         price: 80,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [networking],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -189,7 +188,7 @@ module.exports = {
         price: 120,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [networking],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -212,7 +211,7 @@ module.exports = {
         price: 180,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [networking],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
@@ -235,7 +234,7 @@ module.exports = {
         price: 300,
         quantity_in_stock: 100,
         status: "active",
-        category_id: rj45Cable,
+        category_id: [networking],
         product_setting_id:
           product_settings[getRandomDigitBetween(0, product_settings.length)],
         expense_account: expense[getRandomDigitBetween(0, expense.length)],

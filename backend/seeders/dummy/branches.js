@@ -1,7 +1,12 @@
-const { BranchStatus } = require("shared/enums");
-const bcryptJS = require("bcryptjs");
+const { BranchStatus, UserType } = require("shared/enums");
+const User = require("../../models/user");
 
 const generateBranchDummy = async () => {
+  const getRandomDigitBetween = (min, max) => {
+    return Math.floor(Math.random() * (max - min) + min);
+  };
+
+  const users = await User.findAll({ where: { position: UserType.MANAGER } });
   return [
     {
       name: "Branch 1",
@@ -14,19 +19,8 @@ const generateBranchDummy = async () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      manager: users[getRandomDigitBetween(0, users.length - 1)].id,
       status: BranchStatus.ACTIVE,
-      manager: {
-        username: "audrey",
-        first_name: "Audrey",
-        last_name: "Haitlie",
-        password: await bcryptJS.hash("manager23", 10),
-        middle_name: "",
-        date_started: new Date(),
-        position: "manager",
-        status: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -41,19 +35,8 @@ const generateBranchDummy = async () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      manager: users[getRandomDigitBetween(0, users.length - 1)].id,
       status: BranchStatus.ACTIVE,
-      manager: {
-        username: "miles",
-        first_name: "Miles",
-        last_name: "Camp",
-        middle_name: "",
-        password: await bcryptJS.hash("manager23", 10),
-        date_started: new Date(),
-        position: "manager",
-        status: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -68,19 +51,8 @@ const generateBranchDummy = async () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      manager: users[getRandomDigitBetween(0, users.length - 1)].id,
       status: BranchStatus.ACTIVE,
-      manager: {
-        username: "mark",
-        first_name: "Mark",
-        last_name: "Clip",
-        middle_name: "",
-        password: await bcryptJS.hash("manager23", 10),
-        date_started: new Date(),
-        position: "manager",
-        status: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
       createdAt: new Date(),
       updatedAt: new Date(),
     },
