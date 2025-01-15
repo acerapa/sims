@@ -6,9 +6,48 @@ const { Op } = require("sequelize");
 const ProductSettings = require("../models/product-setting");
 const ProductCategory = require("../models/product-category");
 const ProductToCategories = require("../models/junction/product-to-categories");
+const { ProductType } = require("shared");
 
 module.exports = {
   all: async (req, res) => {
+    try {
+      const items = await Product.findAll({
+        order: [["updatedAt", "DESC"]],
+        include: [
+          {
+            model: Supplier,
+            as: "suppliers",
+            attributes: ["id"],
+            through: { attributes: ["cost"] },
+          },
+          {
+            model: Account,
+            as: "income",
+            attributes: ["id"],
+          },
+          {
+            model: Account,
+            as: "expense",
+            attributes: ["id"],
+          },
+          {
+            model: ProductCategory,
+            as: "categories",
+            attributes: ["id", "name"],
+          },
+          {
+            model: ProductSettings,
+            as: "product_setting",
+            attributes: ["id", "point"],
+          },
+        ],
+      });
+      res.sendResponse({ items }, "Successfully fetched!");
+    } catch (e) {
+      res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
+    }
+  },
+  getProducts: async (req, res) => {
     try {
       const products = await Product.findAll({
         order: [["updatedAt", "DESC"]],
@@ -40,13 +79,28 @@ module.exports = {
             attributes: ["id", "point"],
           },
         ],
+        where: {
+          type: ProductType.INVENTORY,
+        },
       });
       res.sendResponse({ products }, "Successfully fetched!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
     }
   },
+  getServices: async (req, res) => {
+    try {
+      const services = await Product.findAll({
+        where: {
+          type: ProductType.NON_INVENTORY,
+        },
+      });
 
+      res.sendResponse({ services }, "Successfully fetched!");
+    } catch (e) {
+      res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
+    }
+  },
   register: async (req, res) => {
     try {
       const product = await Product.create(req.body);

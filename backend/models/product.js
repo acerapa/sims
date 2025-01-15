@@ -2,6 +2,7 @@ const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
 const Account = require("./account");
 const ProductSetting = require("./product-setting");
+const Item = require("./item");
 
 class Product extends Model {}
 
@@ -12,15 +13,6 @@ Product.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      values: ["inventory", "non-inventory"],
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     purchase_description: {
       type: DataTypes.TEXT,
       allowNull: true,
@@ -29,20 +21,12 @@ Product.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    price: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
     item_code: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true,
     },
-    brand: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    quantity_in_stock: {
+    stock: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
@@ -50,26 +34,6 @@ Product.init(
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: "active",
-    },
-    cost: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    income_account: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Account,
-        key: "id",
-      },
-    },
-    expense_account: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Account,
-        key: "id",
-      },
     },
     product_setting_id: {
       type: DataTypes.INTEGER,
@@ -79,9 +43,13 @@ Product.init(
         key: "id",
       },
     },
-    model: {
-      type: DataTypes.STRING,
-      allowNull: true,
+    item_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Item,
+        key: "id",
+      },
     },
   },
   {
