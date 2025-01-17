@@ -6,7 +6,9 @@ import { useVendorStore } from './supplier'
 export const useProductStore = defineStore('product', () => {
   const supplierStore = useVendorStore()
 
+  const items = ref([])
   const products = ref([])
+  const services = ref([])
   const supplierProducts = computed(() => {
     if (!supplierStore.selectedSupplier) return products.value
     return products.value.filter(
@@ -19,10 +21,24 @@ export const useProductStore = defineStore('product', () => {
     )
   })
 
+  const fetchAllItems = async () => {
+    const res = await authenticatedApi('items/all')
+    if (res.status == 200) {
+      items.value = res.data.producs
+    }
+  }
+
   const fetchAllProducts = async () => {
-    const res = await authenticatedApi('products/all')
+    const res = await authenticatedApi('items/products')
     if (res.status == 200) {
       products.value = res.data.products
+    }
+  }
+
+  const fetchAllServices = async () => {
+    const res = await authenticatedApi('items/services')
+    if (res.status == 200) {
+      services.value = res.data.services
     }
   }
 
@@ -43,11 +59,25 @@ export const useProductStore = defineStore('product', () => {
     return products.value
   }
 
+  const getServices = async () => {
+    if (!services.value.length) {
+      await fetchAllServices()
+    }
+
+    return services.value
+  }
+
   return {
+    items,
     products,
+    services,
     supplierProducts,
     productOptions,
+
     getProducts,
-    fetchAllProducts
+    getServices,
+    fetchAllItems,
+    fetchAllProducts,
+    fetchAllServices
   }
 })

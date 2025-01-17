@@ -5,6 +5,8 @@ const { validateBody } = require("../middleware/request-validator");
 
 router.get("/all", ProductController.all);
 router.post("/update/:id", ProductController.update);
+router.get("/products", ProductController.getProducts);
+router.get("/services", ProductController.getServices);
 router.post(
   "/register",
   validateBody(ProductSchema, false),

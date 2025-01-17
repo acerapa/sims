@@ -1,5 +1,6 @@
 const ProductSettings = require("../models/product-setting");
 const Product = require("../models/product");
+const Item = require("../models/product-details");
 
 module.exports = {
   all: async (req, res) => {
@@ -10,7 +11,11 @@ module.exports = {
           {
             model: Product,
             as: "products",
-            attributes: ["id", "name"],
+            attributes: ["id"],
+            include: {
+              model: Item,
+              as: "item",
+            },
           },
         ],
       });
@@ -21,7 +26,7 @@ module.exports = {
         200
       );
     } catch (e) {
-      res.sendError(e, "Something wen't wrong! => ".e.message, 400);
+      res.sendError(e, "Something wen't wrong! => " + e.message, 400);
     }
   },
 

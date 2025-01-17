@@ -6,7 +6,7 @@
   />
 
   <CustomTable
-    :has-filter="false"
+    :has-filter="true"
     :has-add-btn="true"
     :data="filteredData"
     :has-pagination="true"

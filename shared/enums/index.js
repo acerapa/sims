@@ -122,6 +122,11 @@ const ProductType = Object.freeze({
   NON_INVENTORY: "non-inventory",
 });
 
+const ItemType = Object.freeze({
+  INVENTORY: "inventory",
+  NON_INVENTORY: "non-inventory",
+});
+
 const ProductStatus = Object.freeze({
   ACTIVE: "active",
   INACTIVE: "inactive",
@@ -134,6 +139,7 @@ const SalesOrderType = Object.freeze({
 
 module.exports = {
   UserType,
+  ItemType,
   ProductType,
   AccountTypes,
   BranchStatus,
