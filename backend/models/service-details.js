@@ -1,21 +1,21 @@
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require(".");
-const Item = require("./item");
+const Product = require("./product");
 
-class Service extends Model {}
+class ServiceDetails extends Model {}
 
-Service.init(
+ServiceDetails.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    item_id: {
+    product_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Item,
+        model: Product,
         key: "id",
       },
     },
@@ -29,4 +29,4 @@ Service.init(
   }
 );
 
-module.exports = Service;
+module.exports = ServiceDetails;

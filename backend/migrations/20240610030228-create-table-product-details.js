@@ -1,6 +1,6 @@
 "use strict";
 
-const Item = require("../models/item");
+const ProductDetails = require("../models/product-details");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -12,7 +12,10 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
 
-    await queryInterface.createTable(Item.getTableName(), Item.getAttributes());
+    await queryInterface.createTable(
+      ProductDetails.getTableName(),
+      ProductDetails.getAttributes()
+    );
   },
 
   async down(queryInterface, Sequelize) {
@@ -23,6 +26,6 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
 
-    await queryInterface.dropTable(Item.getTableName());
+    await queryInterface.dropTable(ProductDetails.getTableName());
   },
 };

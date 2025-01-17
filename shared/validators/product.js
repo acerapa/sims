@@ -1,4 +1,4 @@
-const { ProductType, ProductStatus } = require("shared/enums");
+const { ProductType, ProductStatus, ItemType } = require("shared/enums");
 
 const Joi = require("joi");
 
@@ -20,30 +20,43 @@ const ProductReorderSchema = Joi.object({
   products: Joi.array().items(Joi.number()).optional(),
 });
 
-const ProductSchema = Joi.object({
-  type: Joi.string()
-    .valid(...Object.values(ProductType))
-    .required(),
-  name: Joi.string().required(),
+const ProductDetailsSchema = Joi.object({
   purchase_description: Joi.string().optional(),
   sale_description: Joi.string().optional(),
-  price: Joi.number().required(),
   item_code: Joi.string().required(),
-  brand: Joi.string().optional(),
-  quantity_in_stock: Joi.number().optional(),
-  status: Joi.string()
-    .valid(...Object.values(ProductStatus))
-    .optional(),
-  categories: Joi.array().items(Joi.number()).min(1).required(),
-  cost: Joi.number().optional(),
-  income_account: Joi.number().required(),
-  expense_account: Joi.number().required(),
-  product_setting_id: Joi.number().optional(),
-  suppliers: Joi.when("type", {
-    is: ProductType.NON_INVENTORY,
-    then: Joi.array().optional(),
-    otherwise: Joi.array().items(Joi.number()).min(1).required(),
-  }),
+  stock: Joi.number().required(),
+  status: Joi.valid(...Object.values(ProductStatus)).required(),
+  product_setting_id: Joi.number().required(),
+  product_id: Joi.number().required(),
 });
 
-module.exports = { CategorySchema, ProductReorderSchema, ProductSchema };
+const ServiceDetailsSchema = Joi.object({
+  product_id: Joi.number().required(),
+  description: Joi.string().required(),
+});
+
+const ProductSchema = Joi.object({
+  name: Joi.string().required(),
+  price: Joi.number().required(),
+  type: Joi.valid(...Object.values(ItemType)).required(),
+  income_account: Joi.number().required(),
+  expense_account: Joi.number().required(),
+});
+
+const ProductItemSchema = Joi.object({
+  product: ProductSchema,
+  details: ProductDetailsSchema,
+});
+
+const ServiceItemSchema = Joi.object({
+  service: ProductSchema,
+  service: ServiceDetailsSchema,
+});
+
+module.exports = {
+  ProductSchema,
+  CategorySchema,
+  ProductItemSchema,
+  ServiceItemSchema,
+  ProductReorderSchema,
+};

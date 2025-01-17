@@ -1,6 +1,6 @@
 "use strict";
 
-const Service = require("../models/service");
+const ServiceDetails = require("../models/service-details");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -13,8 +13,8 @@ module.exports = {
      */
 
     await queryInterface.createTable(
-      Service.getTableName(),
-      Service.getAttributes()
+      ServiceDetails.getTableName(),
+      ServiceDetails.getAttributes()
     );
   },
 
@@ -26,6 +26,6 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
 
-    await queryInterface.dropTable(Service.getTableName());
+    await queryInterface.dropTable(ServiceDetails.getTableName());
   },
 };

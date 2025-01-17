@@ -15,6 +15,8 @@ const PhysicalInventory = require("./physical-inventory");
 const ProductTransaction = require("./product-transaction");
 const PhysicalInventoryItem = require("./physical-inventory-item");
 const ProductToCategories = require("./junction/product-to-categories");
+const ProductDetails = require("./product-details");
+const ServiceDetails = require("./service-details");
 
 ProductCategory.hasMany(ProductCategory, {
   foreignKey: "general_cat",
@@ -259,6 +261,27 @@ ProductCategory.belongsToMany(Product, {
   foreignKey: "category_id",
   otherKey: "product_id",
   as: "products",
+});
+
+// Item, Product and Service relationships
+Product.hasOne(ProductDetails, {
+  foreignKey: "product_id",
+  as: "product_details",
+});
+
+Product.hasOne(ServiceDetails, {
+  foreignKey: "product_id",
+  as: "service_details",
+});
+
+ProductDetails.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+ServiceDetails.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
 });
 
 module.exports = {

@@ -1,8 +1,7 @@
-const { DataTypes, Model } = require("sequelize");
+const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require(".");
+const { ItemType } = require("shared");
 const Account = require("./account");
-const ProductSetting = require("./product-setting");
-const Item = require("./item");
 
 class Product extends Model {}
 
@@ -13,49 +12,38 @@ Product.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    purchase_description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    sale_description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    item_code: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      unique: true,
-    },
-    stock: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    status: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "active",
     },
-    product_setting_id: {
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    type: {
+      type: DataTypes.ENUM,
+      values: Object.values(ItemType),
+      allowNull: false,
+    },
+    income_account: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
-        model: ProductSetting,
+        model: Account,
         key: "id",
       },
     },
-    item_id: {
+    expense_account: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Item,
+        model: Account,
         key: "id",
       },
     },
   },
   {
     sequelize,
-    timestamps: true,
-    paranoid: false,
   }
 );
 
