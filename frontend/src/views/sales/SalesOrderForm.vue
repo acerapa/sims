@@ -75,12 +75,12 @@
     </div>
 
     <p class="font-semibold">Select Products</p>
-    <ProductMultiSelectTable
+    <MultiSelectTable
       :header-component="SalesOrderFormHeader"
       :row-component="SalesOrderFormRow"
       v-model="model.products"
       :format="{ ...productTransferModal }"
-    ></ProductMultiSelectTable>
+    ></MultiSelectTable>
   </div>
   <CustomerModal v-if="showCustomerModel" v-model="showCustomerModel" />
 </template>
@@ -95,7 +95,7 @@ import AddressForm from '@/components/shared/AddressForm.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
 import SalesOrderFormRow from '@/components/sales/SalesOrderFormRow.vue'
-import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue'
+import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
 
 const route = useRoute()

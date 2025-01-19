@@ -74,7 +74,7 @@
       </div>
       <div class="flex flex-col gap-3">
         <p class="font-semibold">Select Product</p>
-        <ProductMultiSelectTable
+        <MultiSelectTable
           v-model="model.products"
           :header-component="IbrrSelectHeader"
           :row-component="ProductSelectRow"
@@ -120,7 +120,7 @@ import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue'
+import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import IbrrSelectHeader from '@/components/stock-transfer/ibrr-select-header.vue'
 import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import { EventEnum } from '@/data/event'

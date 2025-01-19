@@ -1,6 +1,7 @@
 const ProductSettings = require("../models/product-setting");
 const Product = require("../models/product");
 const Item = require("../models/product-details");
+const ProductDetails = require("../models/product-details");
 
 module.exports = {
   all: async (req, res) => {
@@ -9,12 +10,12 @@ module.exports = {
         order: [["updatedAt", "DESC"]],
         include: [
           {
-            model: Product,
-            as: "products",
+            model: ProductDetails,
+            as: "product_details",
             attributes: ["id"],
             include: {
-              model: Item,
-              as: "item",
+              model: Product,
+              as: "product",
             },
           },
         ],

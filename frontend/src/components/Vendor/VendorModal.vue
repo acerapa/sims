@@ -3,8 +3,8 @@
     :title="title"
     v-model="showModal"
     @submit="onSubmit"
-    :has-delete="true"
     @delete="showDeleteConfirmModal = true"
+    :has-delete="props.selectedId ? true : false"
     :save-btn="props.selectedId ? 'Update' : 'Save'"
   >
     <div class="flex flex-col gap-4 my-7">

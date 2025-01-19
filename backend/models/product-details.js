@@ -34,6 +34,10 @@ ProductDetails.init(
       allowNull: false,
       defaultValue: "active",
     },
+    cost: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
     product_setting_id: {
       type: DataTypes.INTEGER,
       allowNull: true,

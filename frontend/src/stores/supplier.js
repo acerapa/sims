@@ -39,6 +39,14 @@ export const useVendorStore = defineStore('supplier', () => {
     return supplier.value
   }
 
+  const getSuppliers = async () => {
+    if (!suppliers.value.length) {
+      await fetchAllSuppliers()
+    }
+
+    return suppliers.value
+  }
+
   return {
     supplier,
     suppliers,
@@ -46,6 +54,7 @@ export const useVendorStore = defineStore('supplier', () => {
     selectedSupplier,
 
     // methods
+    getSuppliers,
     getSupplierById,
     fetchSupplierById,
     fetchAllSuppliers

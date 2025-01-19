@@ -7,6 +7,7 @@ const ProductSettings = require("../models/product-setting");
 const ProductCategory = require("../models/product-category");
 const ProductToCategories = require("../models/junction/product-to-categories");
 const { ProductType } = require("shared");
+const ProductDetails = require("../models/product-details");
 
 module.exports = {
   all: async (req, res) => {
@@ -74,9 +75,12 @@ module.exports = {
             attributes: ["id", "name"],
           },
           {
-            model: ProductSettings,
-            as: "product_setting",
-            attributes: ["id", "point"],
+            model: ProductDetails,
+            as: "product_details",
+            include: {
+              model: ProductSettings,
+              as: "product_setting",
+            },
           },
         ],
         where: {
