@@ -51,14 +51,14 @@
     </div>
     <div class="flex flex-col gap-3">
       <p class="font-bold">Select Products</p>
-      <ProductMultiSelectTable
+      <MultiSelectTable
         v-model="model.products"
         :header-component="RmaProductSelectHeader"
         :row-component="RmaProductSelectRow"
         :format="productDefaultValue"
         :row-event-name="rowEventName"
       >
-      </ProductMultiSelectTable>
+      </MultiSelectTable>
 
       <div
         class="flex gap-3 mt-4"
@@ -99,7 +99,7 @@ import AddressForm from '@/components/shared/AddressForm.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import RmaProductSelectRow from '@/components/stock-transfer/RmaProductSelectRow.vue'
 import RmaProductSelectHeader from '@/components/stock-transfer/RmaProductSelectHeader.vue'
-import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue'
+import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { useVendorStore } from '@/stores/supplier'
 import { computed, onMounted, ref } from 'vue'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'

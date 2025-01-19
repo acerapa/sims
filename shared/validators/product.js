@@ -25,6 +25,7 @@ const ProductDetailsSchema = Joi.object({
   sale_description: Joi.string().optional(),
   item_code: Joi.string().required(),
   stock: Joi.number().required(),
+  cost: Joi.number().optional(),
   status: Joi.valid(...Object.values(ProductStatus)).required(),
   product_setting_id: Joi.number().required(),
   product_id: Joi.number().required(),

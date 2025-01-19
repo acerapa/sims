@@ -37,6 +37,14 @@ export default [
         }
       },
       {
+        path: '/product/form',
+        name: 'product-form',
+        component: () => import('@/views/product/product-form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/services',
         name: 'services',
         component: () => import('@/views/Services.vue'),

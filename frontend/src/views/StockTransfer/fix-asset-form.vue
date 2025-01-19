@@ -40,14 +40,14 @@
 
     <div class="flex flex-col gap-3 mt-8">
       <p class="text-base font-semibold">Select Product</p>
-      <ProductMultiSelectTable
+      <MultiSelectTable
         v-model="model.products"
         :format="productDefaultValue"
         :row-component="ProductSelectRow"
         :header-component="ProductSelectHeader"
         :row-event-name="rowEventName"
       >
-      </ProductMultiSelectTable>
+      </MultiSelectTable>
 
       <div
         class="flex gap-3"
@@ -73,7 +73,7 @@ import CustomInput from '@/components/shared/CustomInput.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue'
-import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue'
+import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import { TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'

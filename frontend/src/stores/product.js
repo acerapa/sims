@@ -67,6 +67,15 @@ export const useProductStore = defineStore('product', () => {
     return services.value
   }
 
+  const getProductItemCode = async () => {
+    let itemCode = ''
+    const res = await authenticatedApi('items/products/item-code')
+    if (res.status == 200) {
+      itemCode = res.data.item_code
+    }
+    return itemCode
+  }
+
   return {
     items,
     products,
@@ -78,6 +87,7 @@ export const useProductStore = defineStore('product', () => {
     getServices,
     fetchAllItems,
     fetchAllProducts,
-    fetchAllServices
+    fetchAllServices,
+    getProductItemCode
   }
 })

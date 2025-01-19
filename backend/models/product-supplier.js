@@ -1,5 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
+const Supplier = require("./supplier");
+const Product = require("./product");
 
 class ProductSupplier extends Model {}
 
@@ -12,16 +14,24 @@ ProductSupplier.init(
     },
     product_id: {
       type: DataTypes.INTEGER,
-			allowNull: false
+      allowNull: false,
+      references: {
+        model: Product,
+        key: "id",
+      },
     },
-		supplier_id: {
+    supplier_id: {
       type: DataTypes.INTEGER,
-			allowNull: false
+      allowNull: false,
+      references: {
+        model: Supplier,
+        key: "id",
+      },
     },
     cost: {
       type: DataTypes.INTEGER,
-      allowNull: false
-    }
+      allowNull: false,
+    },
   },
   {
     sequelize,

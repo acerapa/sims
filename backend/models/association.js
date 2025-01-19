@@ -100,13 +100,13 @@ PurchaseOrder.belongsTo(Supplier, {
   onDelete: "CASCADE",
 });
 
-ProductSettings.hasMany(Product, {
+ProductSettings.hasMany(ProductDetails, {
   foreignKey: "product_setting_id",
-  as: "products",
+  as: "product_details",
   onDelete: "SET NULL",
 });
 
-Product.belongsTo(ProductSettings, {
+ProductDetails.belongsTo(ProductSettings, {
   foreignKey: "product_setting_id",
   as: "product_setting",
   onDelete: "NO ACTION",

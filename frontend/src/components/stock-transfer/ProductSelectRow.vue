@@ -87,7 +87,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import CustomInput from '../shared/CustomInput.vue'
-import ProductModal from '../Product/ProductModal.vue'
+import ProductModal from '../product/ProductModal.vue'
 import { useProductStore } from '@/stores/product'
 import Event from '@/event'
 

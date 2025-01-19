@@ -47,6 +47,14 @@ export const useSettingsStore = defineStore('settings', () => {
     })
   }
 
+  const getAccounts = async () => {
+    if (!accounts.value.length) {
+      await fetchAllAccounts()
+    }
+
+    return accounts.value
+  }
+
   const getProductCategories = async () => {
     if (!productCategories.value.length) {
       await fetchAllProductCategories()
@@ -102,6 +110,7 @@ export const useSettingsStore = defineStore('settings', () => {
     createBranch,
     updateBranch,
     categoryOption,
+    getAccounts,
     fetchAllAccounts,
     fetchAllBranches,
     getProductCategories,

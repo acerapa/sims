@@ -14,12 +14,7 @@
     :row-prop-init="productRowEvent"
     :table-row-component="ProductRow"
     @view="onView"
-    @add-new-record="
-      () => {
-        showModal = true
-        selectedId = 0
-      }
-    "
+    @add-new-record="router.push({ name: 'product-form' })"
   >
     <template #table_header>
       <div class="grid grid-cols-9 gap-3 min-w-[907px]">
@@ -100,8 +95,8 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import ProductModal from '@/components/Product/ProductModal.vue'
-import ProductRow from '@/components/Product/ProductRow.vue'
+import ProductModal from '@/components/product/ProductModal.vue'
+import ProductRow from '@/components/product/ProductRow.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { useProductStore } from '@/stores/product'
@@ -109,6 +104,7 @@ import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { DateHelpers } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
+import router from '@/router'
 
 const selectedId = ref(0)
 const searchText = ref('')
