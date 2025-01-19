@@ -14,23 +14,35 @@
             label="Name"
             :has-label="true"
           />
-          <CustomInput
-            type="select"
-            name="categories"
-            placeholder="*Select Categories"
-            class="flex-1"
-            :can-search="true"
-            :has-add-new="true"
-            :select-multiple="true"
-            :options="categoriesOptions"
-            @add-new="showCategoryModal = true"
-            v-model="model.categories"
-            label="Categories"
-            :has-label="true"
-            :error="modelErrors.categories"
-            :error-has-text="true"
-          />
-
+          <div class="flex gap-3">
+            <CustomInput
+              type="select"
+              name="categories"
+              placeholder="*Select Categories"
+              class="flex-1"
+              :can-search="true"
+              :has-add-new="true"
+              :select-multiple="true"
+              :options="categoriesOptions"
+              @add-new="showCategoryModal = true"
+              v-model="model.categories"
+              label="Categories"
+              :has-label="true"
+              :error="modelErrors.categories"
+              :error-has-text="true"
+            />
+            <CustomInput
+              type="select"
+              class="flex-1"
+              name="reordering"
+              :has-label="true"
+              :has-add-new="true"
+              label="Reordering Point"
+              :options="reorderingPointsOptions"
+              placeholder="Select re-ordering point"
+              v-model="model.details.product_setting_id"
+            />
+          </div>
           <div class="flex gap-3">
             <CustomInput
               type="select"
@@ -153,6 +165,14 @@
       </div>
     </form>
   </div>
+  <ProductCategoryModal
+    v-model="showCategoryModal"
+    v-if="showCategoryModal"
+    :general_cat="
+      model.categories.length ? model.categories[model.categories - 1] : ''
+    "
+  />
+  <AccountModal v-model="showAccountModal" v-if="showAccountModal" />
 </template>
 
 <script setup>
@@ -162,6 +182,8 @@ import { EventEnum } from '@/data/event'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { AccountTypes, ProductType } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
+import AccountModal from '@/components/Settings/AccountModal.vue'
+import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SupplierSelectRow from '@/components/product/SupplierSelectRow.vue'
 import SupplierSelectHeader from '@/components/product/SupplierSelectHeader.vue'
@@ -169,6 +191,9 @@ import { useProductStore } from '@/stores/product'
 
 const settingStore = useSettingsStore()
 const productStore = useProductStore()
+
+const showCategoryModal = ref(false)
+const showAccountModal = ref(false)
 
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
@@ -246,8 +271,18 @@ const categoriesOptions = computed(() => {
   })
 })
 
+const reorderingPointsOptions = computed(() => {
+  return settingStore.productReorderingPoints.map((point) => {
+    return {
+      text: point.point,
+      value: point.id
+    }
+  })
+})
+
 onMounted(async () => {
   await settingStore.getAccounts()
+  await settingStore.getReorderingPoints()
   await settingStore.getProductCategories()
 
   model.value.details.item_code = await productStore.getProductItemCode()

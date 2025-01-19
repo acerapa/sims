@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white shadow h-15 pl-5 flex items-center sticky top-0 z-10">
+  <div class="bg-white shadow h-15 pl-5 flex items-center sticky top-0 z-20">
     <p class="text-xl font-bold">Ram Tech Ventures</p>
   </div>
 </template>

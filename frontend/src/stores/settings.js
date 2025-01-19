@@ -47,6 +47,14 @@ export const useSettingsStore = defineStore('settings', () => {
     })
   }
 
+  const getReorderingPoints = async () => {
+    if (!productReorderingPoints.value.length) {
+      await fetchAllProductReorderingPoints()
+    }
+
+    return productReorderingPoints.value
+  }
+
   const getAccounts = async () => {
     if (!accounts.value.length) {
       await fetchAllAccounts()
@@ -113,6 +121,7 @@ export const useSettingsStore = defineStore('settings', () => {
     getAccounts,
     fetchAllAccounts,
     fetchAllBranches,
+    getReorderingPoints,
     getProductCategories,
     fetchAllProductCategories,
     getProductCategoryByIdSync,
