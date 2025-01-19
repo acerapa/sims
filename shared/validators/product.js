@@ -20,15 +20,19 @@ const ProductReorderSchema = Joi.object({
   products: Joi.array().items(Joi.number()).optional(),
 });
 
+const ProductSupplierSchema = Joi.object({
+  supplier_id: Joi.number().required(),
+  cost: Joi.number().required(),
+});
+
 const ProductDetailsSchema = Joi.object({
   purchase_description: Joi.string().optional(),
-  sale_description: Joi.string().optional(),
+  sales_description: Joi.string().optional(),
   item_code: Joi.string().required(),
   stock: Joi.number().required(),
   cost: Joi.number().optional(),
   status: Joi.valid(...Object.values(ProductStatus)).required(),
-  product_setting_id: Joi.number().required(),
-  product_id: Joi.number().required(),
+  product_setting_id: Joi.number().allow(null, 0, "").optional(),
 });
 
 const ServiceDetailsSchema = Joi.object({
@@ -47,6 +51,8 @@ const ProductSchema = Joi.object({
 const ProductItemSchema = Joi.object({
   product: ProductSchema,
   details: ProductDetailsSchema,
+  suppliers: Joi.array().items(ProductSupplierSchema).min(1),
+  categories: Joi.array().items(Joi.number()).min(1),
 });
 
 const ServiceItemSchema = Joi.object({

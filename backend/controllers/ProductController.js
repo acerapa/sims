@@ -107,24 +107,25 @@ module.exports = {
   },
   register: async (req, res) => {
     try {
-      const product = await Product.create(req.body);
-      for (let ndx = 0; ndx < req.body.suppliers.length; ndx++) {
-        await product.addSupplier(req.body.suppliers[ndx], {
-          through: {
-            cost: req.body.cost,
-          },
-        });
-      }
+      // format data
+      const data = {
+        ...req.body.validated.product,
+        product_details: req.body.validated.details,
+      };
+      const product = await Product.create(data, {
+        include: {
+          model: ProductDetails,
+          as: "product_details",
+        },
+      });
 
-      if (req.body.categories) {
-        await Promise.all([
-          ...req.body.categories.map((category) => {
-            return ProductToCategories.create({
-              product_id: product.id,
-              category_id: category,
-            });
-          }),
-        ]);
+      if (req.body.validated.categories) {
+        const categories = req.body.validated.categories;
+        await Promise.all(
+          categories.map((category) => {
+            return product.addCategory(category);
+          })
+        );
       }
 
       res.sendResponse({}, "Successfully Registered!");
@@ -195,7 +196,7 @@ module.exports = {
     }
   },
 
-  delete: async (req, res) => {
+  destroy: async (req, res) => {
     try {
       await Product.destroy({ where: { id: req.params.id } });
       res.sendResponse({}, "Successfully deleted!");
