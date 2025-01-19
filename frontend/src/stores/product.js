@@ -1,4 +1,4 @@
-import { authenticatedApi } from '@/api'
+import { authenticatedApi, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useVendorStore } from './supplier'
@@ -20,6 +20,16 @@ export const useProductStore = defineStore('product', () => {
           .includes(supplierStore.selectedSupplier.id)
     )
   })
+
+  const registerProduct = async (product) => {
+    const res = await authenticatedApi(
+      'items/products/register',
+      Method.POST,
+      product
+    )
+
+    return res.status < 400
+  }
 
   const fetchAllItems = async () => {
     const res = await authenticatedApi('items/all')
@@ -86,6 +96,7 @@ export const useProductStore = defineStore('product', () => {
     getProducts,
     getServices,
     fetchAllItems,
+    registerProduct,
     fetchAllProducts,
     fetchAllServices,
     getProductItemCode

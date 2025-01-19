@@ -1,6 +1,6 @@
 <template>
   <div class="cont">
-    <form @submit.prevent class="flex flex-col gap-3">
+    <form @submit.prevent="onSubmit" class="flex flex-col gap-3">
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Basic Informations</p>
         <div class="flex flex-col gap-2">
@@ -94,7 +94,7 @@
               class="flex-1"
               :has-label="true"
               label="Sale Price"
-              v-model="model.price"
+              v-model="model.product.price"
               :error-has-text="true"
               placeholder="Sale Price"
               :error="modelErrors.price"
@@ -134,7 +134,7 @@
               name="purchase_description"
               label="Purchase Description"
               placeholder="Purchase Description"
-              v-model="model.purchase_description"
+              v-model="model.details.purchase_description"
               :error="modelErrors.purchase_description"
             />
             <CustomInput
@@ -145,7 +145,7 @@
               name="sale_description"
               label="Sales Description"
               placeholder="Sales Description"
-              v-model="model.sale_description"
+              v-model="model.details.sales_description"
               :error="modelErrors.sale_description"
               :error-has-text="true"
             />
@@ -162,6 +162,20 @@
             v-model="model.suppliers"
           />
         </div>
+      </div>
+
+      <div class="flex gap-3">
+        <div class="flex-1">
+          <button
+            type="button"
+            class="btn-danger-outline"
+            v-if="route.query.id"
+          >
+            Delete
+          </button>
+        </div>
+        <button type="button" class="btn-gray-outline">Cancel</button>
+        <button type="submit" class="btn">Save</button>
       </div>
     </form>
   </div>
@@ -180,7 +194,7 @@ import Event from '@/event'
 import { computed, onMounted, ref } from 'vue'
 import { EventEnum } from '@/data/event'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { AccountTypes, ProductType } from 'shared'
+import { AccountTypes, ProductStatus, ProductType } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
 import AccountModal from '@/components/Settings/AccountModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
@@ -188,7 +202,9 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SupplierSelectRow from '@/components/product/SupplierSelectRow.vue'
 import SupplierSelectHeader from '@/components/product/SupplierSelectHeader.vue'
 import { useProductStore } from '@/stores/product'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const settingStore = useSettingsStore()
 const productStore = useProductStore()
 
@@ -215,10 +231,9 @@ const model = ref({
     sales_description: '',
     item_code: '',
     stock: '',
-    status: '',
+    status: ProductStatus.ACTIVE,
     cost: '',
-    product_setting_id: '',
-    product_id: ''
+    product_setting_id: ''
   },
   suppliers: [{ ...productSupplier }],
   categories: []
@@ -279,6 +294,21 @@ const reorderingPointsOptions = computed(() => {
     }
   })
 })
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const onSubmit = async () => {
+  Event.emit(EventEnum.IS_PAGE_LOADING, true)
+  const data = { ...model.value }
+  if (!data.details.product_setting_id) {
+    data.details.product_setting_id = null
+  }
+  const isSuccess = await productStore.registerProduct(data)
+
+  console.log(isSuccess)
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+}
 
 onMounted(async () => {
   await settingStore.getAccounts()

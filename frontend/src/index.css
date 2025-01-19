@@ -83,7 +83,7 @@ select.input {
 }
 
 .btn-danger-outline {
-  @apply btn-outline !border-danger !text-danger;
+  @apply btn-outline !border-danger !text-danger hover:!bg-danger hover:!text-white;
 }
 
 .btn-green {

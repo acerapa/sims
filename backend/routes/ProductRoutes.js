@@ -1,25 +1,31 @@
 const Router = require("express").Router;
-const ProductController = require("../controllers/ProductController");
-const { ProductSchema } = require("shared");
+const {
+  register,
+  all,
+  update,
+  getProducts,
+  getServices,
+  destroy,
+  inventoryStockStatus,
+  productItemCode,
+} = require("../controllers/ProductController");
+const { ProductItemSchema } = require("shared");
 const { validateBody } = require("../middleware/request-validator");
 
 const router = Router();
 const productRoute = Router();
 const serviceRoute = Router();
 
-router.get("/all", ProductController.all);
-router.post("/update/:id", ProductController.update);
-router.get("/products", ProductController.getProducts);
-router.get("/services", ProductController.getServices);
-router.post(
-  "/register",
-  validateBody(ProductSchema, false),
-  ProductController.register
-);
-router.delete("/delete/:id", ProductController.delete);
-router.get("/stock-status", ProductController.inventoryStockStatus);
+router.get("/all", all);
+router.post("/update/:id", update);
+router.get("/products", getProducts);
+router.get("/services", getServices);
 
-productRoute.get("/item-code", ProductController.productItemCode);
+router.delete("/delete/:id", destroy);
+router.get("/stock-status", inventoryStockStatus);
+
+productRoute.post("/register", validateBody(ProductItemSchema), register);
+productRoute.get("/item-code", productItemCode);
 
 router.use("/products", productRoute);
 router.use("/services", serviceRoute);
