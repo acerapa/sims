@@ -208,7 +208,12 @@ module.exports = {
     let itemCode = crypto.randomBytes(4).toString("hex");
     try {
       let itemCodes = await Product.findAll({
-        attributes: ["item_code"],
+        attributes: ["id"],
+        include: {
+          model: ProductDetails,
+          as: "product_details",
+          attributes: ["item_code"],
+        },
       });
 
       while (itemCodes.map((p) => p.item_code).includes(itemCode)) {

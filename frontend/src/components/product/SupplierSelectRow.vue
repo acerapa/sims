@@ -72,7 +72,7 @@ const modelErrors = ref({})
 const supplierOptions = computed(() => {
   return supplierStore.suppliers.map((supplier) => {
     return {
-      text: supplier.name,
+      text: supplier.company_name,
       value: supplier.id
     }
   })
