@@ -16,7 +16,7 @@ ProductDetails.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    sale_description: {
+    sales_description: {
       type: DataTypes.TEXT,
       allowNull: true,
     },

@@ -101,7 +101,8 @@ export default [
   {
     text: 'Products',
     route: 'products',
-    icon: products
+    icon: products,
+    includes_active: ['product-form']
   },
   {
     text: 'Services',
