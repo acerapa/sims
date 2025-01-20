@@ -164,17 +164,20 @@
         </div>
       </div>
 
-      <div class="flex gap-3">
+      <div class="flex gap-3 mt-4">
         <div class="flex-1">
           <button
             type="button"
-            class="btn-danger-outline"
             v-if="route.query.id"
+            class="btn-danger-outline"
+            @click="showConfirmationModal = true"
           >
             Delete
           </button>
         </div>
-        <button type="button" class="btn-gray-outline">Cancel</button>
+        <button type="button" class="btn-gray-outline" @click="onCancel">
+          Cancel
+        </button>
         <button type="submit" class="btn">Save</button>
       </div>
     </form>
@@ -187,6 +190,11 @@
     "
   />
   <AccountModal v-model="showAccountModal" v-if="showAccountModal" />
+  <DeleteConfirmModal
+    :href="`items/delete/${route.query.id}`"
+    v-model="showConfirmationModal"
+    v-if="showConfirmationModal"
+  />
 </template>
 
 <script setup>
@@ -194,8 +202,9 @@ import Event from '@/event'
 import { computed, onMounted, ref } from 'vue'
 import { EventEnum } from '@/data/event'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { AccountTypes, ProductStatus, ProductType } from 'shared'
+import { AccountTypes, ObjectHelpers, ProductStatus, ProductType } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AccountModal from '@/components/Settings/AccountModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
@@ -203,13 +212,15 @@ import SupplierSelectRow from '@/components/product/SupplierSelectRow.vue'
 import SupplierSelectHeader from '@/components/product/SupplierSelectHeader.vue'
 import { useProductStore } from '@/stores/product'
 import { useRoute } from 'vue-router'
+import router from '@/router'
 
 const route = useRoute()
 const settingStore = useSettingsStore()
 const productStore = useProductStore()
 
-const showCategoryModal = ref(false)
 const showAccountModal = ref(false)
+const showCategoryModal = ref(false)
+const showConfirmationModal = ref(false)
 
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
@@ -305,15 +316,47 @@ const onSubmit = async () => {
     data.details.product_setting_id = null
   }
   const isSuccess = await productStore.registerProduct(data)
+  // TODO: Add toast here
+  // If success redirect back to the product list
 
-  console.log(isSuccess)
+  // temporary redirect back if success is true
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
+  if (isSuccess) {
+    router.push({
+      name: 'products'
+    })
+  }
 }
+
+const onCancel = () => router.push({ name: 'products' })
 
 onMounted(async () => {
   await settingStore.getAccounts()
   await settingStore.getReorderingPoints()
   await settingStore.getProductCategories()
+
+  // check for query params
+  if (route.query.id) {
+    const product = await productStore.getProduct(route.query.id)
+    if (product) {
+      model.value.product = ObjectHelpers.assignSameFields(
+        model.value.product,
+        product
+      )
+      model.value.details = ObjectHelpers.assignSameFields(
+        model.value.details,
+        product.product_details
+      )
+
+      model.value.categories = product.categories.map((cat) => cat.id)
+      model.value.suppliers = product.suppliers.map((supplier) => {
+        return {
+          supplier_id: supplier.id,
+          cost: supplier.ProductSupplier.cost
+        }
+      })
+    }
+  }
 
   model.value.details.item_code = await productStore.getProductItemCode()
 

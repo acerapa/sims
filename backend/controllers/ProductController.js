@@ -8,6 +8,7 @@ const ProductCategory = require("../models/product-category");
 const ProductToCategories = require("../models/junction/product-to-categories");
 const { ProductType } = require("shared");
 const ProductDetails = require("../models/product-details");
+const { sequelize } = require("../models/index");
 
 module.exports = {
   all: async (req, res) => {
@@ -92,6 +93,50 @@ module.exports = {
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
     }
   },
+  getProduct: async (req, res) => {
+    try {
+      const product = await Product.findByPk(req.params.id, {
+        include: [
+          {
+            model: Supplier,
+            as: "suppliers",
+            attributes: ["id"],
+            through: { attributes: ["cost"] },
+          },
+          {
+            model: Account,
+            as: "income",
+            attributes: ["id"],
+          },
+          {
+            model: Account,
+            as: "expense",
+            attributes: ["id"],
+          },
+          {
+            model: ProductCategory,
+            as: "categories",
+            attributes: ["id", "name"],
+          },
+          {
+            model: ProductDetails,
+            as: "product_details",
+            include: {
+              model: ProductSettings,
+              as: "product_setting",
+            },
+          },
+        ],
+        where: {
+          type: ProductType.INVENTORY,
+        },
+      });
+
+      res.sendResponse({ product }, "Successfully fetched!");
+    } catch (error) {
+      res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
+    }
+  },
   getServices: async (req, res) => {
     try {
       const services = await Product.findAll({
@@ -106,6 +151,7 @@ module.exports = {
     }
   },
   register: async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
       // format data
       const data = {
@@ -117,19 +163,36 @@ module.exports = {
           model: ProductDetails,
           as: "product_details",
         },
+        transaction,
       });
 
       if (req.body.validated.categories) {
         const categories = req.body.validated.categories;
         await Promise.all(
           categories.map((category) => {
-            return product.addCategory(category);
+            return product.addCategory(category, { transaction });
           })
         );
       }
 
+      if (req.body.validated.suppliers) {
+        const suppliers = req.body.validated.suppliers;
+        await Promise.all(
+          suppliers.map((supplier) => {
+            return product.addSupplier(supplier.supplier_id, {
+              transaction,
+              through: {
+                cost: supplier.cost,
+              },
+            });
+          })
+        );
+      }
+
+      await transaction.commit();
       res.sendResponse({}, "Successfully Registered!");
     } catch (e) {
+      await transaction.rollback();
       res.sendError(e, "Something wen't wrong! => " + e.message);
     }
   },

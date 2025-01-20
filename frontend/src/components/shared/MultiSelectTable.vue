@@ -21,7 +21,12 @@
     </div>
   </div>
   <div class="flex justify-between mt-4 items-center">
-    <button v-if="props.hasAddNewItem" @click="onNewItem" class="btn">
+    <button
+      type="button"
+      v-if="props.hasAddNewItem"
+      @click="onNewItem"
+      class="btn"
+    >
       Add new item
     </button>
     <slot name="aggregate"></slot>

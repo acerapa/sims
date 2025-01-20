@@ -4,6 +4,7 @@
       class="px-5 py-3 flex gap-3 items-center"
       :to="{ name: props.nav.route }"
       active-class="bg-dark-blue font-bold"
+      :class="isIncludedRoute(nav) ? 'bg-dark-blue font-bold exact-active' : ''"
       @click="emitRouteClick(props.nav.route, props.nav.children)"
     >
       <div class="flex-1 flex gap-3">

@@ -9,6 +9,8 @@ export const useProductStore = defineStore('product', () => {
   const items = ref([])
   const products = ref([])
   const services = ref([])
+  const product = ref(null)
+
   const supplierProducts = computed(() => {
     if (!supplierStore.selectedSupplier) return products.value
     return products.value.filter(
@@ -45,6 +47,13 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  const fetchProduct = async (id) => {
+    const res = await authenticatedApi(`items/products/${id}`)
+    if (res.status < 400) {
+      product.value = res.data.product
+    }
+  }
+
   const fetchAllServices = async () => {
     const res = await authenticatedApi('items/services')
     if (res.status == 200) {
@@ -67,6 +76,18 @@ export const useProductStore = defineStore('product', () => {
     }
 
     return products.value
+  }
+
+  const getProduct = async (id) => {
+    if (!product.value || product.value.id != id) {
+      product.value = products.value.find((product) => product.id == id)
+
+      if (!product.value) {
+        await fetchProduct(id)
+      }
+    }
+
+    return product.value
   }
 
   const getServices = async () => {
@@ -93,6 +114,7 @@ export const useProductStore = defineStore('product', () => {
     supplierProducts,
     productOptions,
 
+    getProduct,
     getProducts,
     getServices,
     fetchAllItems,
