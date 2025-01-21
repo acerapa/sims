@@ -46,9 +46,12 @@ export const useProductStore = defineStore('product', () => {
       if (products.value.length) {
         const index = products.value.findIndex((product) => product.id == id)
         await fetchProduct(id)
+
         if (index > -1 && product.value) {
           products.value[index] = product.value
         }
+
+        product.value = null
       } else {
         await fetchAllProducts()
       }
@@ -142,6 +145,7 @@ export const useProductStore = defineStore('product', () => {
 
   return {
     items,
+    product,
     products,
     services,
     supplierProducts,

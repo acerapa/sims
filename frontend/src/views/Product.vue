@@ -210,7 +210,7 @@ const onView = (id) => {
  ** ================================================*/
 
 onMounted(async () => {
-  await productStore.fetchAllProducts()
+  await productStore.getProducts()
   categoryOptions.value = await settingStore.categoryOption()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })

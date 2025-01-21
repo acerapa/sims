@@ -38,6 +38,10 @@ ProductDetails.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
+    is_manually_set_cost: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     product_setting_id: {
       type: DataTypes.INTEGER,
       allowNull: true,

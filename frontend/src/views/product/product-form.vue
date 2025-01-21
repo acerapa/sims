@@ -87,7 +87,7 @@
                 placeholder="Cost Price"
                 :error="modelErrors.cost"
                 v-model="model.details.cost"
-                :disabled="!isManuallySetCost"
+                :disabled="!model.details.is_manually_set_cost"
                 input-class="disabled:bg-gray-50 disabled:ring-1 disabled:ring-gray-200"
               />
               <CustomInput
@@ -95,7 +95,7 @@
                 name="manually_set_cost"
                 label="Manually set cost"
                 :has-label="true"
-                v-model="isManuallySetCost"
+                v-model="model.details.is_manually_set_cost"
                 class="[&>div]:flex-row-reverse [&>div]:justify-end"
               />
             </div>
@@ -232,7 +232,6 @@ const productStore = useProductStore()
 
 const showAccountModal = ref(false)
 const showCategoryModal = ref(false)
-const isManuallySetCost = ref(false)
 const showConfirmationModal = ref(false)
 
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
@@ -257,6 +256,7 @@ const model = ref({
     stock: '',
     status: ProductStatus.ACTIVE,
     cost: '',
+    is_manually_set_cost: false,
     product_setting_id: ''
   },
   suppliers: [{ ...productSupplier }],
@@ -395,12 +395,29 @@ onMounted(async () => {
 watch(
   () => model.value.suppliers,
   () => {
-    model.value.details.cost = Math.max(
-      ...model.value.suppliers.map((sup) => sup.cost)
-    )
+    if (!model.value.details.is_manually_set_cost) {
+      model.value.details.cost = Math.max(
+        ...model.value.suppliers.map((sup) => sup.cost)
+      )
+    }
   },
   {
     deep: true
+  }
+)
+
+watch(
+  () => model.value.details.is_manually_set_cost,
+  (val) => {
+    if (!val) {
+      model.value.details.cost = Math.max(
+        ...model.value.suppliers.map((sup) => sup.cost)
+      )
+    } else {
+      if (route.query.id && productStore.product) {
+        model.value.details.cost = productStore.product.product_details.cost
+      }
+    }
   }
 )
 </script>
