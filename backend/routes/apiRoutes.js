@@ -16,7 +16,10 @@ const supplierRoutes = require("./SupplierRoutes");
 router.use("/suppliers", supplierRoutes);
 
 const productRoutes = require("./ProductRoutes");
-router.use("/items", productRoutes);
+router.use("/products", productRoutes);
+
+const serviceRoutes = require("./ServiceRoutes");
+router.use("/services", serviceRoutes);
 
 const purchaseOrderRoutes = require("./PurchaseOrderRoutes");
 router.use("/purchase-order", purchaseOrderRoutes);

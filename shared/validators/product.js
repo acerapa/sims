@@ -37,7 +37,6 @@ const ProductDetailsSchema = Joi.object({
 });
 
 const ServiceDetailsSchema = Joi.object({
-  product_id: Joi.number().required(),
   description: Joi.string().required(),
 });
 
@@ -58,7 +57,7 @@ const ProductItemSchema = Joi.object({
 
 const ServiceItemSchema = Joi.object({
   service: ProductSchema,
-  service: ServiceDetailsSchema,
+  details: ServiceDetailsSchema,
 });
 
 module.exports = {

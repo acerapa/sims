@@ -1,16 +1,16 @@
 const crypto = require("crypto");
-const Product = require("../models/product");
-const Supplier = require("../models/supplier");
-const Account = require("../models/account");
-const ProductSettings = require("../models/product-setting");
-const ProductCategory = require("../models/product-category");
-const ProductToCategories = require("../models/junction/product-to-categories");
-const ProductDetails = require("../models/product-details");
-const ProductSupplier = require("../models/product-supplier");
+const Product = require("../../models/product");
+const Supplier = require("../../models/supplier");
+const Account = require("../../models/account");
+const ProductSettings = require("../../models/product-setting");
+const ProductCategory = require("../../models/product-category");
+const ProductToCategories = require("../../models/junction/product-to-categories");
+const ProductDetails = require("../../models/product-details");
+const ProductSupplier = require("../../models/product-supplier");
 
 const { Op } = require("sequelize");
 const { ProductType } = require("shared");
-const { sequelize } = require("../models/index");
+const { sequelize } = require("../../models/index");
 
 module.exports = {
   all: async (req, res) => {
@@ -135,19 +135,6 @@ module.exports = {
       });
 
       res.sendResponse({ product }, "Successfully fetched!");
-    } catch (e) {
-      res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
-    }
-  },
-  getServices: async (req, res) => {
-    try {
-      const services = await Product.findAll({
-        where: {
-          type: ProductType.NON_INVENTORY,
-        },
-      });
-
-      res.sendResponse({ services }, "Successfully fetched!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
     }
