@@ -197,6 +197,21 @@ module.exports = {
     }
   },
 
+  updateProduct: async (req, res) => {
+    try {
+      const data = req.body.validated;
+      await Product.update(data.product, {
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      res.sendResponse({}, "Successfully updated!");
+    } catch (e) {
+      res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
+    }
+  },
+
   update: async (req, res) => {
     try {
       await Product.update(req.body, {

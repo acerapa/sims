@@ -551,10 +551,13 @@ onMounted(async () => {
   }
 
   // get current branch address
-  model.value.address = ObjectHelpers.assignSameFields(
-    model.value.address,
-    appStore.currentBranch.address
-  )
+
+  if (appStore.currentBranch) {
+    model.value.address = ObjectHelpers.assignSameFields(
+      model.value.address,
+      appStore.currentBranch.address
+    )
+  }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })

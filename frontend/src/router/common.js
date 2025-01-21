@@ -1,3 +1,4 @@
+import Product from '@/views/Product.vue'
 export default [
   {
     path: '/',
@@ -31,7 +32,7 @@ export default [
       {
         path: '/products',
         name: 'products',
-        component: () => import('@/views/Product.vue'),
+        component: Product,
         meta: {
           requiresAuth: true
         }
