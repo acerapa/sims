@@ -31,6 +31,7 @@ const ProductDetailsSchema = Joi.object({
   item_code: Joi.string().required(),
   stock: Joi.number().required(),
   cost: Joi.number().optional(),
+  is_manually_set_cost: Joi.boolean().optional(),
   status: Joi.valid(...Object.values(ProductStatus)).required(),
   product_setting_id: Joi.number().allow(null, 0, "").optional(),
 });

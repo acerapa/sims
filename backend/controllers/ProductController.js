@@ -2,12 +2,14 @@ const crypto = require("crypto");
 const Product = require("../models/product");
 const Supplier = require("../models/supplier");
 const Account = require("../models/account");
-const { Op } = require("sequelize");
 const ProductSettings = require("../models/product-setting");
 const ProductCategory = require("../models/product-category");
 const ProductToCategories = require("../models/junction/product-to-categories");
-const { ProductType } = require("shared");
 const ProductDetails = require("../models/product-details");
+const ProductSupplier = require("../models/product-supplier");
+
+const { Op } = require("sequelize");
+const { ProductType } = require("shared");
 const { sequelize } = require("../models/index");
 
 module.exports = {
@@ -133,7 +135,7 @@ module.exports = {
       });
 
       res.sendResponse({ product }, "Successfully fetched!");
-    } catch (error) {
+    } catch (e) {
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
     }
   },
@@ -198,16 +200,138 @@ module.exports = {
   },
 
   updateProduct: async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
       await Product.update(data.product, {
         where: {
           id: req.params.id,
         },
+        transaction,
       });
 
+      await ProductDetails.update(data.details, {
+        where: {
+          product_id: req.params.id,
+        },
+        transaction,
+      });
+
+      if (data.categories) {
+        const productToCategories = await ProductToCategories.findAll({
+          where: {
+            product_id: req.params.id,
+          },
+        });
+
+        // get categories to remove and to add
+        const categoriesToRemove = productToCategories.filter(
+          (ptc) => !data.categories.includes(ptc.category_id)
+        );
+        const categoriesToAdd = data.categories.filter(
+          (category) =>
+            !productToCategories
+              .map((ptc) => ptc.category_id)
+              .includes(category)
+        );
+
+        await Promise.all([
+          ...categoriesToRemove.map((cat) => {
+            return ProductToCategories.destroy({
+              where: {
+                id: cat.id,
+              },
+              transaction,
+            });
+          }),
+          ...categoriesToAdd.map((category_id) => {
+            return ProductToCategories.create(
+              {
+                product_id: req.params.id,
+                category_id,
+              },
+              {
+                transaction,
+              }
+            );
+          }),
+        ]);
+      }
+
+      if (data.suppliers) {
+        const productToSuppliers = await ProductSupplier.findAll({
+          where: {
+            product_id: req.params.id,
+          },
+        });
+
+        // get suppliers to remove, add  and update
+        const suppliersToRemove = productToSuppliers.filter(
+          (ptc) =>
+            !data.suppliers
+              .map((sup) => sup.supplier_id)
+              .includes(ptc.supplier_id)
+        );
+
+        const suppliersToAdd = data.suppliers.filter(
+          (sup) =>
+            !productToSuppliers
+              .map((ptc) => ptc.supplier_id)
+              .includes(sup.supplier_id)
+        );
+
+        const suppliersToUpdate = data.suppliers.filter((sup) => {
+          const isExist = productToSuppliers
+            .map((ptc) => ptc.supplier_id)
+            .includes(sup.supplier_id);
+
+          const ptc = productToSuppliers.find(
+            (ptc) => ptc.supplier_id === sup.supplier_id
+          );
+
+          return isExist && ptc.cost !== sup.cost;
+        });
+
+        await Promise.all([
+          ...suppliersToRemove.map((sup) => {
+            return ProductSupplier.destroy({
+              where: {
+                id: sup.id,
+              },
+              transaction,
+            });
+          }),
+          ...suppliersToAdd.map((sup) => {
+            return ProductSupplier.create(
+              {
+                product_id: req.params.id,
+                supplier_id: sup.supplier_id,
+                cost: sup.cost,
+              },
+              { transaction }
+            );
+          }),
+          ...suppliersToUpdate.map((sup) => {
+            return ProductSupplier.update(
+              {
+                cost: sup.cost,
+              },
+              {
+                where: {
+                  product_id: req.params.id,
+                  supplier_id: sup.supplier_id,
+                },
+                transaction,
+              }
+            );
+          }),
+        ]);
+      }
+
+      await transaction.commit();
       res.sendResponse({}, "Successfully updated!");
     } catch (e) {
+      await transaction.rollback();
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
     }
   },
