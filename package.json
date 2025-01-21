@@ -11,6 +11,7 @@
     "migrate": "yarn workspace backend sequelize db:migrate",
     "migrate-undo": "yarn workspace backend sequelize db:migrate:undo",
     "migrate-undo-all": "yarn workspace backend sequelize db:migrate:undo:all",
+    "specific-seed": "yarn workspace backend sequelize db:seed",
     "seed-all": "yarn workspace backend sequelize db:seed:all",
     "seed-undo-all": "yarn workspace backend sequelize db:seed:undo:all",
     "sequelize": "yarn workspace backend sequelize"

@@ -1,3 +1,4 @@
+import Product from '@/views/Product.vue'
 export default [
   {
     path: '/',
@@ -31,7 +32,23 @@ export default [
       {
         path: '/products',
         name: 'products',
-        component: () => import('@/views/Product.vue'),
+        component: Product,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/product/form',
+        name: 'product-form',
+        component: () => import('@/views/product/product-form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/services',
+        name: 'services',
+        component: () => import('@/views/Services.vue'),
         meta: {
           requiresAuth: true
         }

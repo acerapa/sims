@@ -393,7 +393,7 @@ onMounted(async () => {
       model.value.expense_account = product.expense.id
       model.value.income_account = product.income.id
 
-      model.value.categories = product.product_categories.map((pc) => pc.id)
+      model.value.categories = product.categories.map((pc) => pc.id)
     }
   }
 

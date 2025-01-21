@@ -1,10 +1,10 @@
 "use strict";
 
 const { isColumnExistInTable } = require("../models");
-const Product = require("../models/product");
-const tableName = Product.getTableName();
-const attributes = Product.getAttributes();
-const column = "model";
+const ProductDetails = require("../models/product-details");
+
+const column = "is_manually_set_cost";
+const table = ProductDetails.getTableName();
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -15,11 +15,13 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-
-    const isExist = await isColumnExistInTable(tableName, column);
-
+    const isExist = await isColumnExistInTable(table, column);
     if (!isExist) {
-      await queryInterface.addColumn(tableName, column, attributes[column]);
+      await queryInterface.addColumn(
+        table,
+        column,
+        ProductDetails.getAttributes()[column]
+      );
     }
   },
 
@@ -31,10 +33,9 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
 
-    const isExist = await isColumnExistInTable(tableName, column);
-
+    const isExist = await isColumnExistInTable(table, column);
     if (isExist) {
-      await queryInterface.removeColumn(tableName, column);
+      await queryInterface.removeColumn(table, column);
     }
   },
 };

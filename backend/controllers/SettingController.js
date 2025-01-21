@@ -1,5 +1,7 @@
 const ProductSettings = require("../models/product-setting");
 const Product = require("../models/product");
+const Item = require("../models/product-details");
+const ProductDetails = require("../models/product-details");
 
 module.exports = {
   all: async (req, res) => {
@@ -8,9 +10,13 @@ module.exports = {
         order: [["updatedAt", "DESC"]],
         include: [
           {
-            model: Product,
-            as: "products",
-            attributes: ["id", "name"],
+            model: ProductDetails,
+            as: "product_details",
+            attributes: ["id"],
+            include: {
+              model: Product,
+              as: "product",
+            },
           },
         ],
       });
@@ -21,7 +27,7 @@ module.exports = {
         200
       );
     } catch (e) {
-      res.sendError(e, "Something wen't wrong! => ".e.message, 400);
+      res.sendError(e, "Something wen't wrong! => " + e.message, 400);
     }
   },
 

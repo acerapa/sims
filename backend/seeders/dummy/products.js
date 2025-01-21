@@ -2,6 +2,7 @@ const ProductCategory = require("../../models/product-category");
 const Supplier = require("../../models/supplier");
 const Account = require("../../models/account");
 const ProductSetting = require("../../models/product-setting");
+const { ProductType, ProductStatus } = require("shared");
 
 module.exports = {
   getProducts: async () => {
@@ -11,8 +12,6 @@ module.exports = {
 
     const categories = await ProductCategory.findAll();
     const computers = categories.find((cat) => cat.name == "Computers").id;
-    const peripherals = categories.find((cat) => cat.name == "Peripherals").id;
-    const networking = categories.find((cat) => cat.name == "Networking").id;
 
     const product_settings = (
       await ProductSetting.findAll({
@@ -33,215 +32,31 @@ module.exports = {
       .filter((acc) => acc.type == "expense")
       .map((acc) => acc.id);
 
-    const types = ["inventory", "non-inventory"];
-
     return [
       {
         name: "Dell Latitude 5320",
-        brand: "Dell",
-        type: types[getRandomDigitBetween(0, 1)],
-        suppliers: suppliers.map((sup) => {
-          return {
-            id: sup.id,
-            cost: 20000,
-          };
-        }),
-        // purchase_price: 20000,
+        type: ProductType.INVENTORY,
         price: 25000,
-        quantity_in_stock: 60,
-        status: "active",
-        product_setting_id:
-          product_settings[getRandomDigitBetween(0, product_settings.length)],
+        expense_account: expense[getRandomDigitBetween(0, expense.length)],
+        income_account: income[getRandomDigitBetween(0, income.length)],
+        product_details: {
+          stock: 60,
+          purchase_description: "This is a sample description",
+          sales_description: "This is a sample description",
+          status: ProductStatus.ACTIVE,
+          is_manually_set_cost: true,
+          cost: 20000,
+          item_code: "qwertyui",
+          product_setting_id:
+            product_settings[getRandomDigitBetween(0, product_settings.length)],
+        },
         categories: [computers],
-        expense_account: expense[getRandomDigitBetween(0, expense.length)],
-        income_account: income[getRandomDigitBetween(0, income.length)],
-        item_code: "qwertyui",
-        purchase_description: "This is a sample description",
-        sale_description: "This is a sample description",
-      },
-      {
-        name: "Logi Mouse",
-        brand: "Logi",
-        type: types[getRandomDigitBetween(0, 1)],
         suppliers: suppliers.map((sup) => {
           return {
             id: sup.id,
             cost: 20000,
           };
         }),
-        // purchase_price: 20000,
-        price: 25000,
-        quantity_in_stock: 60,
-        status: "active",
-        category_id: [peripherals],
-        product_setting_id:
-          product_settings[getRandomDigitBetween(0, product_settings.length)],
-        expense_account: expense[getRandomDigitBetween(0, expense.length)],
-        income_account: income[getRandomDigitBetween(0, income.length)],
-        item_code: "qwertyui12",
-        purchase_description: "This is a sample description",
-        sale_description: "This is a sample description",
-      },
-      {
-        name: "Monitor",
-        brand: "Acer",
-        type: types[getRandomDigitBetween(0, 1)],
-        suppliers: suppliers.map((sup) => {
-          return {
-            id: sup.id,
-            cost: 20000,
-          };
-        }),
-        // purchase_price: 20000,
-        price: 25000,
-        quantity_in_stock: 60,
-        status: "active",
-        category_id: [peripherals],
-        product_setting_id:
-          product_settings[getRandomDigitBetween(0, product_settings.length)],
-        expense_account: expense[getRandomDigitBetween(0, expense.length)],
-        income_account: income[getRandomDigitBetween(0, income.length)],
-        item_code: "qwertyui3",
-        purchase_description: "This is a sample description",
-        sale_description: "This is a sample description",
-      },
-      {
-        name: "Battery",
-        brand: "Motorola",
-        type: types[getRandomDigitBetween(0, 1)],
-        suppliers: suppliers.map((sup) => {
-          return {
-            id: sup.id,
-            cost: 20000,
-          };
-        }),
-        // purchase_price: 20000,
-        price: 25000,
-        quantity_in_stock: 60,
-        status: "inactive",
-        category_id: [peripherals],
-        product_setting_id:
-          product_settings[getRandomDigitBetween(0, product_settings.length)],
-        expense_account: expense[getRandomDigitBetween(0, expense.length)],
-        income_account: income[getRandomDigitBetween(0, income.length)],
-        item_code: "qwertyui4",
-        purchase_description: "This is a sample description",
-        sale_description: "This is a sample description",
-      },
-      {
-        name: "RJ45 Category 5e (Cat5e) Ethernet Cable",
-        brand: "Jadaol",
-        type: types[getRandomDigitBetween(0, 1)],
-        suppliers: suppliers.map((sup) => {
-          return {
-            id: sup.id,
-            cost: 60,
-          };
-        }),
-        // purchase_price: 20000,
-        price: 60,
-        quantity_in_stock: 100,
-        status: "active",
-        category_id: [networking],
-        product_setting_id:
-          product_settings[getRandomDigitBetween(0, product_settings.length)],
-        expense_account: expense[getRandomDigitBetween(0, expense.length)],
-        income_account: income[getRandomDigitBetween(0, income.length)],
-        item_code: "qwertyui5",
-        purchase_description: "This is a sample description",
-        sale_description: "This is a sample description",
-      },
-      {
-        name: "RJ45 Category 6 (Cat6) Ethernet Cable",
-        brand: "Jadaol",
-        type: types[getRandomDigitBetween(0, 1)],
-        suppliers: suppliers.map((sup) => {
-          return {
-            id: sup.id,
-            cost: 80,
-          };
-        }),
-        // purchase_price: 20000,
-        price: 80,
-        quantity_in_stock: 100,
-        status: "active",
-        category_id: [networking],
-        product_setting_id:
-          product_settings[getRandomDigitBetween(0, product_settings.length)],
-        expense_account: expense[getRandomDigitBetween(0, expense.length)],
-        income_account: income[getRandomDigitBetween(0, income.length)],
-        item_code: "qwertyui6",
-        purchase_description: "This is a sample description",
-        sale_description: "This is a sample description",
-      },
-      {
-        name: "RJ45 Category 6a (Cat6a) Ethernet Cable",
-        brand: "Jadaol",
-        type: types[getRandomDigitBetween(0, 1)],
-        suppliers: suppliers.map((sup) => {
-          return {
-            id: sup.id,
-            cost: 120,
-          };
-        }),
-        // purchase_price: 20000,
-        price: 120,
-        quantity_in_stock: 100,
-        status: "active",
-        category_id: [networking],
-        product_setting_id:
-          product_settings[getRandomDigitBetween(0, product_settings.length)],
-        expense_account: expense[getRandomDigitBetween(0, expense.length)],
-        income_account: income[getRandomDigitBetween(0, income.length)],
-        item_code: "qwertyui7",
-        purchase_description: "This is a sample description",
-        sale_description: "This is a sample description",
-      },
-      {
-        name: "RJ45 Category 7 (Cat7) Ethernet Cable",
-        brand: "Jadaol",
-        type: types[getRandomDigitBetween(0, 1)],
-        suppliers: suppliers.map((sup) => {
-          return {
-            id: sup.id,
-            cost: 180,
-          };
-        }),
-        // purchase_price: 20000,
-        price: 180,
-        quantity_in_stock: 100,
-        status: "active",
-        category_id: [networking],
-        product_setting_id:
-          product_settings[getRandomDigitBetween(0, product_settings.length)],
-        expense_account: expense[getRandomDigitBetween(0, expense.length)],
-        income_account: income[getRandomDigitBetween(0, income.length)],
-        item_code: "qwertyui8",
-        purchase_description: "This is a sample description",
-        sale_description: "This is a sample description",
-      },
-      {
-        name: "RJ45 Category 8 (Cat8) Ethernet Cable",
-        brand: "Jadaol",
-        type: types[getRandomDigitBetween(0, 1)],
-        suppliers: suppliers.map((sup) => {
-          return {
-            id: sup.id,
-            cost: 300,
-          };
-        }),
-        // purchase_price: 20000,
-        price: 300,
-        quantity_in_stock: 100,
-        status: "active",
-        category_id: [networking],
-        product_setting_id:
-          product_settings[getRandomDigitBetween(0, product_settings.length)],
-        expense_account: expense[getRandomDigitBetween(0, expense.length)],
-        income_account: income[getRandomDigitBetween(0, income.length)],
-        item_code: "qwertyui9",
-        purchase_description: "This is a sample description",
-        sale_description: "This is a sample description",
       },
     ];
   },

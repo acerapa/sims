@@ -15,6 +15,8 @@ const PhysicalInventory = require("./physical-inventory");
 const ProductTransaction = require("./product-transaction");
 const PhysicalInventoryItem = require("./physical-inventory-item");
 const ProductToCategories = require("./junction/product-to-categories");
+const ProductDetails = require("./product-details");
+const ServiceDetails = require("./service-details");
 
 ProductCategory.hasMany(ProductCategory, {
   foreignKey: "general_cat",
@@ -98,13 +100,13 @@ PurchaseOrder.belongsTo(Supplier, {
   onDelete: "CASCADE",
 });
 
-ProductSettings.hasMany(Product, {
+ProductSettings.hasMany(ProductDetails, {
   foreignKey: "product_setting_id",
-  as: "products",
+  as: "product_details",
   onDelete: "SET NULL",
 });
 
-Product.belongsTo(ProductSettings, {
+ProductDetails.belongsTo(ProductSettings, {
   foreignKey: "product_setting_id",
   as: "product_setting",
   onDelete: "NO ACTION",
@@ -251,14 +253,35 @@ Product.belongsToMany(ProductCategory, {
   through: ProductToCategories,
   foreignKey: "product_id",
   otherKey: "category_id",
-  as: "product_categories",
+  as: "categories",
 });
 
 ProductCategory.belongsToMany(Product, {
   through: ProductToCategories,
   foreignKey: "category_id",
   otherKey: "product_id",
-  as: "category_products",
+  as: "products",
+});
+
+// Item, Product and Service relationships
+Product.hasOne(ProductDetails, {
+  foreignKey: "product_id",
+  as: "product_details",
+});
+
+Product.hasOne(ServiceDetails, {
+  foreignKey: "product_id",
+  as: "service_details",
+});
+
+ProductDetails.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+ServiceDetails.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
 });
 
 module.exports = {

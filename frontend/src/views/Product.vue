@@ -4,6 +4,7 @@
     v-if="showModal"
     :selected-id="selectedId"
   />
+
   <CustomTable
     :has-filter="true"
     :has-add-btn="true"
@@ -13,25 +14,18 @@
     :row-prop-init="productRowEvent"
     :table-row-component="ProductRow"
     @view="onView"
-    @add-new-record="
-      () => {
-        showModal = true
-        selectedId = 0
-      }
-    "
+    @add-new-record="onNewRecord"
   >
-    <template #buttons> Tools </template>
-
     <template #table_header>
       <div class="grid grid-cols-9 gap-3 min-w-[907px]">
         <div class="col-span-1 flex gap-3 items-center">
           <input type="checkbox" class="input" />
           <p class="table-header">#</p>
         </div>
-        <p class="col-span-1 table-header">Name</p>
+        <p class="col-span-3 table-header">Name</p>
         <p class="col-span-1 table-header">Item Code</p>
-        <p class="col-span-3 table-header">Description</p>
-        <p class="col-span-1 table-header">Stock</p>
+        <p class="col-span-1 table-header text-end">Price</p>
+        <p class="col-span-1 table-header text-end pr-2">Stock</p>
         <p class="col-span-1 table-header">Added on</p>
         <p class="col-span-1 table-header">Status</p>
       </div>
@@ -101,8 +95,8 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import ProductModal from '@/components/Product/ProductModal.vue'
-import ProductRow from '@/components/Product/ProductRow.vue'
+import ProductModal from '@/components/product/ProductModal.vue'
+import ProductRow from '@/components/product/ProductRow.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { useProductStore } from '@/stores/product'
@@ -110,13 +104,12 @@ import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { DateHelpers } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
+import router from '@/router'
 
 const selectedId = ref(0)
 const searchText = ref('')
 const showModal = ref(false)
 const categoryOptions = ref([])
-const productStore = useProductStore()
-const settingStore = useSettingsStore()
 const filters = ref({
   added_on_from: '',
   added_on_to: '',
@@ -124,6 +117,9 @@ const filters = ref({
   stock_to: null,
   category: ''
 })
+
+const productStore = useProductStore()
+const settingStore = useSettingsStore()
 
 /** ================================================
  * EVENTS
@@ -196,9 +192,17 @@ const filteredData = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
+const onNewRecord = () => {
+  router.push({
+    name: 'product-form'
+  })
+}
+
 const onView = (id) => {
-  selectedId.value = id
-  showModal.value = true
+  router.push({
+    name: 'product-form',
+    query: { id }
+  })
 }
 
 /** ================================================
@@ -206,7 +210,7 @@ const onView = (id) => {
  ** ================================================*/
 
 onMounted(async () => {
-  await productStore.fetchAllProducts()
+  await productStore.getProducts()
   categoryOptions.value = await settingStore.categoryOption()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })

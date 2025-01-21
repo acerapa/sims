@@ -69,8 +69,25 @@
             <slot name="buttons"></slot>
           </div>
         </div>
+
+        <!-- TODO: This part is currently hidden because this part will be worked on later with filters -->
+        <div class="flex flex-wrap gap-3 py-3 hidden">
+          <div
+            class="py-1 pl-3 pr-1 text-sm rounded-full border text-gray-600 flex gap-3 items-center"
+          >
+            <span>Test sgsdsksgk</span>
+            <button class="px-1.5 w-6 h-6 text-lg border relative rounded-full">
+              <span
+                class="absolute top-[44.1%] left-1/2 -translate-x-1/2 -translate-y-1/2"
+              >
+                &times;
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <hr class="bg-gray-50 -mx-4 mt-3" v-if="props.hasTools" />
       </div>
-      <hr class="bg-gray-50 -mx-4" v-if="props.hasTools" />
       <div
         class="flex flex-col gap-7 w-full pb-5 overflow-x-auto overflow-y-hidden"
       >

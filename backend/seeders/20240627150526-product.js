@@ -11,6 +11,7 @@ const base_path = path.dirname(__dirname);
 
 const Product = require("../models/product");
 const { Op } = require("sequelize");
+const ProductDetails = require("../models/product-details");
 const { getProducts } = require(base_path + "/seeders/dummy/products");
 
 /** @type {import('sequelize-cli').Migration} */
@@ -23,17 +24,25 @@ module.exports = {
 
       await Promise.all(
         products.map(async (product, ndx) => {
-          const prd = await Product.create(product);
+          const prd = await Product.create(product, {
+            include: {
+              model: ProductDetails,
+              as: "product_details",
+            },
+          });
           product_ids.push(prd.id);
-          return Promise.all(
-            products[ndx].suppliers.map((s) =>
+          return Promise.all([
+            ...products[ndx].suppliers.map((s) =>
               prd.addSupplier(s.id, {
                 through: {
                   cost: s.cost,
                 },
               })
-            )
-          );
+            ),
+            ...products[ndx].categories.map((c) => {
+              return prd.addCategory(c);
+            }),
+          ]);
         })
       );
 
