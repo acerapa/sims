@@ -9,6 +9,7 @@ const {
   inventoryStockStatus,
   productItemCode,
   getProduct,
+  updateProduct,
 } = require("../controllers/ProductController");
 const { ProductItemSchema } = require("shared");
 const { validateBody } = require("../middleware/request-validator");
@@ -19,7 +20,6 @@ const serviceRoute = Router();
 
 router.get("/all", all);
 router.post("/update/:id", update);
-router.get("/products", getProducts);
 router.get("/services", getServices);
 
 router.delete("/delete/:id", destroy);
@@ -27,7 +27,13 @@ router.get("/stock-status", inventoryStockStatus);
 
 productRoute.post("/register", validateBody(ProductItemSchema), register);
 productRoute.get("/item-code", productItemCode);
+productRoute.put(
+  "/:id",
+  validateBody(ProductItemSchema.optional()),
+  updateProduct
+);
 productRoute.get("/:id", getProduct);
+productRoute.get("/", getProducts);
 
 router.use("/products", productRoute);
 router.use("/services", serviceRoute);

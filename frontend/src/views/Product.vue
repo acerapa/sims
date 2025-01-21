@@ -17,13 +17,14 @@
     @add-new-record="onNewRecord"
   >
     <template #table_header>
-      <div class="grid grid-cols-8 gap-3 min-w-[907px]">
+      <div class="grid grid-cols-9 gap-3 min-w-[907px]">
         <div class="col-span-1 flex gap-3 items-center">
           <input type="checkbox" class="input" />
           <p class="table-header">#</p>
         </div>
         <p class="col-span-3 table-header">Name</p>
         <p class="col-span-1 table-header">Item Code</p>
+        <p class="col-span-1 table-header text-end">Price</p>
         <p class="col-span-1 table-header text-end pr-2">Stock</p>
         <p class="col-span-1 table-header">Added on</p>
         <p class="col-span-1 table-header">Status</p>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-8 gap-3 min-w-[907px] gen-table-row"
+    class="grid grid-cols-9 gap-3 min-w-[907px] gen-table-row"
     @click="emit('view', props.product.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
@@ -10,9 +10,14 @@
     <p class="col-span-3 text-sm truncate" :title="props.product.name">
       {{ props.product.name }}
     </p>
-    <p class="col-span-1 text-sm">{{ props.product.item_code }}</p>
+    <p class="col-span-1 text-sm">
+      {{ props.product.product_details.item_code }}
+    </p>
+    <p class="col-span-1 text-sm text-end">
+      {{ props.product.price }}
+    </p>
     <p class="col-span-1 text-sm text-end pr-2">
-      {{ props.product.quantity_in_stock }}
+      {{ props.product.product_details.stock }}
     </p>
     <p class="col-span-1 text-sm">
       {{
@@ -26,8 +31,9 @@
     <div class="col-span-1 text-sm flex">
       <button
         v-if="
-          props.product.product_setting &&
-          props.product.quantity_in_stock > props.product.product_setting.point
+          props.product.product_details.product_setting &&
+          props.product.product_details.stock >
+            props.product.product_details.product_setting.point
         "
         class="status text-sm bg-opacity-20 text-success bg-success flex-shrink-0"
       >
@@ -35,16 +41,17 @@
       </button>
       <button
         v-if="
-          props.product.quantity_in_stock &&
-          props.product.product_setting &&
-          props.product.quantity_in_stock < props.product.product_setting.point
+          props.product.product_details.stock &&
+          props.product.product_details.product_setting &&
+          props.product.product_details.stock <
+            props.product.product_details.product_setting.point
         "
         class="status text-sm bg-opacity-20 text-yellow-500 bg-yellow-500 flex-shrink-0"
       >
         Low Stock
       </button>
       <button
-        v-if="props.product.quantity_in_stock <= 0"
+        v-if="props.product.product_details.stock <= 0"
         class="status text-sm bg-opacity-20 text-red-500 bg-red-500 flex-shrink-0"
       >
         Out of Stock

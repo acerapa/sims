@@ -77,17 +77,28 @@
         <div class="flex flex-col gap-3">
           <p class="text-base font-semibold">Inventory and Sales information</p>
           <div class="flex gap-3">
-            <CustomInput
-              type="number"
-              name="cost"
-              class="flex-1"
-              :has-label="true"
-              label="Cost Price"
-              :error-has-text="true"
-              placeholder="Cost Price"
-              :error="modelErrors.cost"
-              v-model="model.details.cost"
-            />
+            <div class="flex flex-col gap-2 flex-1">
+              <CustomInput
+                type="number"
+                name="cost"
+                :has-label="true"
+                label="Cost Price"
+                :error-has-text="true"
+                placeholder="Cost Price"
+                :error="modelErrors.cost"
+                v-model="model.details.cost"
+                :disabled="!isManuallySetCost"
+                input-class="disabled:bg-gray-50 disabled:ring-1 disabled:ring-gray-200"
+              />
+              <CustomInput
+                type="checkbox"
+                name="manually_set_cost"
+                label="Manually set cost"
+                :has-label="true"
+                v-model="isManuallySetCost"
+                class="[&>div]:flex-row-reverse [&>div]:justify-end"
+              />
+            </div>
             <CustomInput
               name="sale"
               type="number"
@@ -194,12 +205,13 @@
     :href="`items/delete/${route.query.id}`"
     v-model="showConfirmationModal"
     v-if="showConfirmationModal"
+    @after-delete="onAfterDelete"
   />
 </template>
 
 <script setup>
 import Event from '@/event'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { EventEnum } from '@/data/event'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { AccountTypes, ObjectHelpers, ProductStatus, ProductType } from 'shared'
@@ -220,6 +232,7 @@ const productStore = useProductStore()
 
 const showAccountModal = ref(false)
 const showCategoryModal = ref(false)
+const isManuallySetCost = ref(false)
 const showConfirmationModal = ref(false)
 
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
@@ -315,17 +328,30 @@ const onSubmit = async () => {
   if (!data.details.product_setting_id) {
     data.details.product_setting_id = null
   }
-  const isSuccess = await productStore.registerProduct(data)
+  let isSuccess = false
+
+  if (route.query.id) {
+    isSuccess = await productStore.updateProduct(route.query.id, data)
+  } else {
+    isSuccess = await productStore.registerProduct(data)
+  }
+
   // TODO: Add toast here
   // If success redirect back to the product list
 
   // temporary redirect back if success is true
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
+
   if (isSuccess) {
     router.push({
       name: 'products'
     })
   }
+}
+
+const onAfterDelete = async () => {
+  await productStore.removeProduct(route.query.id)
+  router.push({ name: 'products' })
 }
 
 const onCancel = () => router.push({ name: 'products' })
@@ -362,4 +388,19 @@ onMounted(async () => {
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value.suppliers,
+  () => {
+    model.value.details.cost = Math.max(
+      ...model.value.suppliers.map((sup) => sup.cost)
+    )
+  },
+  {
+    deep: true
+  }
+)
 </script>

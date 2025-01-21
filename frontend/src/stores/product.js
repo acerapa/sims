@@ -33,6 +33,30 @@ export const useProductStore = defineStore('product', () => {
     return res.status < 400
   }
 
+  const updateProduct = async (id, product) => {
+    const res = await authenticatedApi(
+      `items/products/${id}`,
+      Method.PUT,
+      product
+    )
+
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (products.value.length) {
+        const index = products.value.findIndex((product) => product.id == id)
+        await fetchProduct(id)
+        if (index > -1 && product.value) {
+          products.value[index] = product.value
+        }
+      } else {
+        await fetchAllProducts()
+      }
+    }
+
+    return isSuccess
+  }
+
   const fetchAllItems = async () => {
     const res = await authenticatedApi('items/all')
     if (res.status == 200) {
@@ -107,6 +131,15 @@ export const useProductStore = defineStore('product', () => {
     return itemCode
   }
 
+  const removeProduct = async (id) => {
+    if (products.value.length) {
+      const index = products.value.findIndex((product) => product.id == id)
+      products.value.splice(index, 1)
+    } else {
+      await fetchAllProducts()
+    }
+  }
+
   return {
     items,
     products,
@@ -118,6 +151,8 @@ export const useProductStore = defineStore('product', () => {
     getProducts,
     getServices,
     fetchAllItems,
+    updateProduct,
+    removeProduct,
     registerProduct,
     fetchAllProducts,
     fetchAllServices,
