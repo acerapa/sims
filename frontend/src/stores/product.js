@@ -31,8 +31,8 @@ export const useProductStore = defineStore('product', () => {
     return res.status < 400
   }
 
-  const updateProduct = async (id, product) => {
-    const res = await authenticatedApi(`products/${id}`, Method.PUT, product)
+  const updateProduct = async (id, data) => {
+    const res = await authenticatedApi(`products/${id}`, Method.PUT, data)
 
     const isSuccess = res.status < 400
 
@@ -42,7 +42,9 @@ export const useProductStore = defineStore('product', () => {
         await fetchProduct(id)
 
         if (index > -1 && product.value) {
-          products.value[index] = product.value
+          const p = [...products.value]
+          p[index] = product.value
+          products.value = p
         }
 
         product.value = null

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-9 gap-3 min-w-[907px] gen-table-row"
+    class="grid grid-cols-10 gap-3 min-w-[907px] gen-table-row"
     @click="emit('view', props.service.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
@@ -13,8 +13,10 @@
     <p class="col-span-4 text-sm">
       {{ props.service.service_details.description }}
     </p>
-    <p class="col-span-1">{{ props.service.price }}</p>
-    <p class="col-span-1">
+    <p class="col-span-1 text-end pr-3">
+      {{ parseFloat(props.service.price).toFixed(2) }}
+    </p>
+    <p class="col-span-2 text-center">
       {{
         new Date(props.service.createdAt).toLocaleString('default', {
           day: '2-digit',
@@ -33,8 +35,6 @@ const props = defineProps({
     default: () => ({})
   }
 })
-
-console.log(props.service)
 
 const emit = defineEmits(['view'])
 </script>

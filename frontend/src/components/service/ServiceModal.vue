@@ -1,5 +1,11 @@
 <template>
-  <ModalWrapper :title="title" v-model="showModal" @submit="onSubmit">
+  <ModalWrapper
+    :title="title"
+    v-model="showModal"
+    @submit="onSubmit"
+    @delete="showDeleteModal = true"
+    :has-delete="(props, selectedId ? true : false)"
+  >
     <div class="flex flex-col py-6 gap-4">
       <div class="flex gap-3">
         <CustomInput
@@ -56,15 +62,24 @@
       />
     </div>
   </ModalWrapper>
+  <DeleteConfirmModal
+    v-model="showDeleteModal"
+    :href="`services/${props.selectedId}`"
+    v-if="showDeleteModal && props.selectedId"
+    @after-delete="onAfterDelete"
+  />
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import CustomInput from '../shared/CustomInput.vue'
 import ModalWrapper from '../shared/ModalWrapper.vue'
-import { AccountTypes, ProductType } from 'shared'
+import DeleteConfirmModal from '../DeleteConfirmModal.vue'
+import { AccountTypes, ObjectHelpers, ProductType } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
 import { useServiceStore } from '@/stores/services'
+
+const showDeleteModal = ref(false)
 
 const settingStore = useSettingsStore()
 const serviceStore = useServiceStore()
@@ -123,14 +138,37 @@ const expenseAccountOptions = computed(() => {
  * METHODS
  ** ================================================*/
 const onSubmit = async () => {
-  const isSuccess = await serviceStore.registerService(model.value)
+  let isSuccess = false
+  if (props.selectedId) {
+    isSuccess = await serviceStore.updateService(props.selectedId, model.value)
+  } else {
+    isSuccess = await serviceStore.registerService(model.value)
+  }
 
   if (isSuccess) {
     showModal.value = false
   }
 }
 
+const onAfterDelete = async () => {
+  await serviceStore.removeService(props.selectedId)
+  showDeleteModal.value = false
+  showModal.value = false
+}
+
 onMounted(async () => {
   await settingStore.getAccounts()
+
+  if (props.selectedId) {
+    const service = await serviceStore.getService(props.selectedId)
+    model.value.service = ObjectHelpers.assignSameFields(
+      model.value.service,
+      service
+    )
+    model.value.details = ObjectHelpers.assignSameFields(
+      model.value.details,
+      service.service_details
+    )
+  }
 })
 </script>

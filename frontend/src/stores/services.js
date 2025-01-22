@@ -28,6 +28,14 @@ export const useServiceStore = defineStore('service', () => {
     return services.value
   }
 
+  const getService = async (id) => {
+    if (!service.value || service.value.id != id) {
+      await fetchService(id)
+    }
+
+    return service.value
+  }
+
   const registerService = async (service) => {
     const res = await authenticatedApi(
       'services/register',
@@ -41,19 +49,55 @@ export const useServiceStore = defineStore('service', () => {
       if (!services.value.length) {
         await fetchServices()
       } else {
-        services.value.unshift(res.data.service)
+        services.value = [res.data.service, ...services.value]
       }
     }
 
     return isSuccess
   }
 
+  const updateService = async (id, data) => {
+    const res = await authenticatedApi(`services/${id}`, Method.PUT, data)
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (services.value.length) {
+        const index = services.value.findIndex((s) => s.id == id)
+        const s = [...services.value]
+        await fetchService(id)
+
+        if (index > -1 && service.value) {
+          s[index] = service.value
+          services.value = s
+        }
+      } else {
+        await fetchServices()
+      }
+    }
+
+    return isSuccess
+  }
+
+  const removeService = async (id) => {
+    if (!services.value.length) {
+      await fetchServices()
+    } else {
+      services.value = services.value.filter((s) => s.id !== id)
+    }
+  }
+
   return {
+    service,
     services,
 
+    fetchService,
     fetchServices,
     registerService,
 
-    getServices
+    getService,
+    getServices,
+
+    updateService,
+    removeService
   }
 })

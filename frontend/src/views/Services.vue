@@ -3,20 +3,22 @@
     :has-filter="true"
     :data="filteredData"
     :has-pagination="true"
+    v-model:search-text="searchText"
     :row-prop-init="serviceRowPropInit"
     :table-row-component="ServiceRow"
     @add-new-record="onNewRecord"
+    @view="onView"
   >
     <template #table_header>
-      <div class="grid grid-cols-9 gap-3">
+      <div class="grid grid-cols-10 gap-3">
         <div class="col-span-1 flex gap-3 items-center">
           <input type="checkbox" class="input" />
           <p class="table-header">#</p>
         </div>
         <p class="col-span-2 table-header">Name</p>
         <p class="col-span-4 table-header">Description</p>
-        <p class="col-span-1 table-header">Price</p>
-        <p class="col-span-1 table-header">Added on</p>
+        <p class="col-span-1 table-header text-end pr-3">Price</p>
+        <p class="col-span-2 table-header text-center">Added on</p>
       </div>
     </template>
   </CustomTable>
@@ -39,6 +41,7 @@ import { useServiceStore } from '@/stores/services'
 
 const serviceStore = useServiceStore()
 
+const searchText = ref('')
 const showServiceModal = ref(false)
 const selectedId = ref(0)
 
@@ -56,13 +59,26 @@ Event.on(serviceRowPropInit, (data) => {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return serviceStore.services
+  return serviceStore.services.filter((service) => {
+    const searchCondition =
+      `${service.id} ${service.name} ${service.price} ${service.service_details.description} ${service.createdAt}`.toLowerCase()
+
+    return searchText.value
+      ? searchCondition.includes(searchText.value.toLowerCase())
+      : true
+  })
 })
 
 /** ================================================
  * METHODS
  ** ================================================*/
 const onNewRecord = () => {
+  selectedId.value = 0
+  showServiceModal.value = true
+}
+
+const onView = (id) => {
+  selectedId.value = id
   showServiceModal.value = true
 }
 
