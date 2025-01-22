@@ -60,8 +60,44 @@ const getService = async (req, res) => {
   }
 };
 
+const updateService = async (req, res) => {
+  try {
+    await Product.update(req.body.validated.service, {
+      where: { id: req.params.id },
+    });
+
+    if (req.body.validated.details) {
+      await ServiceDetails.update(req.body.validated.details, {
+        where: {
+          product_id: req.params.id,
+        },
+      });
+    }
+
+    res.sendResponse({}, "Successfully updated!");
+  } catch (error) {
+    res.sendError(error, "Something wen't wrong! =>" + error.message, 400);
+  }
+};
+
+const destroy = async (req, res) => {
+  try {
+    await Product.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    res.sendResponse({}, "Successfully deleted!");
+  } catch (error) {
+    res.sendError(error, "Something wen't wrong! =>" + error.message, 400);
+  }
+};
+
 module.exports = {
   register,
   getService,
   getServices,
+  updateService,
+  destroy,
 };
