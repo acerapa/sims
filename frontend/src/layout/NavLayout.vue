@@ -8,6 +8,7 @@
         <RouterView />
       </div>
     </div>
+    <ToastComponent />
   </div>
 </template>
 
@@ -15,4 +16,5 @@
 import Header from '@/components/Header.vue'
 import SideNav from '@/components/Nav/SideNav.vue'
 import Breadcrumbs from '@/components/shared/Breadcrumbs.vue'
+import ToastComponent from '@/components/shared/ToastComponent.vue'
 </script>

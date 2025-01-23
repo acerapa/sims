@@ -78,6 +78,9 @@ import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import { AccountTypes, ObjectHelpers, ProductType } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
 import { useServiceStore } from '@/stores/services'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 
 const showDeleteModal = ref(false)
 
@@ -146,7 +149,18 @@ const onSubmit = async () => {
   }
 
   if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.SUCCESS,
+      message: 'Successfully created service!',
+      duration: 4000
+    })
     showModal.value = false
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Failed to create service!',
+      duration: 4000
+    })
   }
 }
 

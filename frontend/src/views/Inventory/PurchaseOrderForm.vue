@@ -37,6 +37,17 @@
   </ModalWrapper>
 
   <VendorModal v-model="showVendorModal" v-if="showVendorModal" />
+
+  <AlertComponent
+    v-if="!appStore.currentBranch"
+    type="danger"
+    :text="'Please select current branch'"
+  >
+    Please refer
+    <RouterLink class="text-blue-400 underline" :to="{ name: 'branches' }">
+      here!
+    </RouterLink>
+  </AlertComponent>
   <div class="flex flex-col gap-4">
     <div class="bg-white rounded-2xl p-4 shadow flex flex-col gap-3">
       <div class="flex justify-between items-center mb-4">
@@ -290,6 +301,7 @@ import AddressForm from '@/components/shared/AddressForm.vue'
 import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import VendorModal from '@/components/Vendor/VendorModal.vue'
+import AlertComponent from '@/components/shared/AlertComponent.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { getCost } from '@/helper'
@@ -509,6 +521,7 @@ onMounted(async () => {
   await supplierStore.fetchAllSuppliers()
   await productStore.fetchAllProducts()
   await settingStore.getBranches()
+
   if (route.query.id) {
     isEdit.value = true
     await purchaseOrderStore.fetchPurchaseOrderById(route.query.id)
