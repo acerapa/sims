@@ -151,14 +151,14 @@ const onSubmit = async () => {
   if (isSuccess) {
     Event.emit(EventEnum.TOAST_MESSAGE, {
       type: ToastTypes.SUCCESS,
-      message: 'Successfully created service!',
-      duration: 4000
+      message: `Successfully ${props.selectedId ? 'updated' : 'created'} service!`,
+      duration: 5000
     })
     showModal.value = false
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
       type: ToastTypes.ERROR,
-      message: 'Failed to create service!',
+      message: `Failed to ${props.selectedId ? 'updated' : 'created'} service!`,
       duration: 4000
     })
   }

@@ -1,0 +1,27 @@
+<svg id="eEjYQ5mhM6O1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	viewBox="0 0 300 300" shape-rendering="geometricPrecision" text-rendering="geometricPrecision"
+	project-id="fac7bdab0b284c98977524748ee22c30" export-id="121bc610080843ae94353fc5bea94af8"
+	cached="false" width="300" height="300">
+	<g transform="matrix(.503966 0.863724-.863724 0.503966 258.046957-60.068108)">
+		<rect width="30" height="24" rx="0" ry="0" transform="matrix(6.660057 0 0 1 50.099145 135)"
+			fill="#facc15" stroke-width="0" />
+		<ellipse rx="15" ry="15" transform="translate(50.099145 150)" fill="#facc15" stroke-width="0" />
+		<ellipse rx="15" ry="15" transform="translate(249.900855 150)" fill="#facc15" stroke-width="0" />
+	</g>
+	<g transform="matrix(.86088 0.508808-.508808 0.86088 47.289419-59.547791)">
+		<rect width="24" height="30" rx="0" ry="0" transform="matrix(1 0 0 6.663088 135 50.05368)"
+			fill="#facc15" stroke-width="0" />
+		<ellipse rx="15" ry="15" transform="translate(150 50.05368)" fill="#facc15" stroke-width="0" />
+		<ellipse rx="15" ry="15" transform="translate(150 249.94632)" fill="#facc15" stroke-width="0" />
+	</g>
+	<g transform="matrix(.999999 0.00131-.00131 0.999999 3.196635 83.875348)">
+		<rect width="30" height="24" rx="0" ry="0"
+			transform="matrix(6.660057 0 0 1 50.107005 140.999994)" fill="#facc15" stroke-width="0" />
+		<ellipse rx="15" ry="15" transform="translate(50.099145 150)" fill="#facc15" stroke-width="0" />
+		<ellipse rx="15" ry="15" transform="translate(249.900855 150)" fill="#facc15" stroke-width="0" />
+	</g>
+	<rect width="24" height="30" rx="0" ry="0" transform="matrix(1 0 0 2.569875 140.86689 111.830873)"
+		fill="#facc15" stroke-width="0" />
+	<ellipse rx="12" ry="12" transform="translate(152.953691 207.22225)" fill="#facc15"
+		stroke-width="0" />
+</svg>

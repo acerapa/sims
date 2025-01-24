@@ -1,0 +1,19 @@
+<svg id="emAURoYJScq1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	viewBox="0 0 300 300" shape-rendering="geometricPrecision" text-rendering="geometricPrecision"
+	project-id="03a404d2585142cc89f59abcf456ce5a" export-id="1522895b7a8240acab7c371c5abdacfb"
+	cached="false" width="300" height="300">
+	<g transform="matrix(.707107 0.707107-.707107 0.707107 149.999998-62.132029)">
+		<g>
+			<rect width="30" height="30" rx="0" ry="0" transform="matrix(6.660057 0 0 1 50.099145 135)"
+				fill="#f87171" stroke-width="0" />
+			<ellipse rx="15" ry="15" transform="translate(50.099145 150)" fill="#f87171" stroke-width="0" />
+			<ellipse rx="15" ry="15" transform="translate(249.900855 150)" fill="#f87171" stroke-width="0" />
+		</g>
+		<g>
+			<rect width="30" height="30" rx="0" ry="0" transform="matrix(1 0 0 6.663088 135 50.05368)"
+				fill="#f87171" stroke-width="0" />
+			<ellipse rx="15" ry="15" transform="translate(150 50.05368)" fill="#f87171" stroke-width="0" />
+			<ellipse rx="15" ry="15" transform="translate(150 249.94632)" fill="#f87171" stroke-width="0" />
+		</g>
+	</g>
+</svg>
