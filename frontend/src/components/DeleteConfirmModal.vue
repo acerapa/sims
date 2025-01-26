@@ -20,6 +20,9 @@
 <script setup>
 import { Method, authenticatedApi } from '@/api'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
+import Event from '@/event'
 const showModal = defineModel()
 
 const props = defineProps({
@@ -36,7 +39,22 @@ const props = defineProps({
 const emit = defineEmits(['afterDelete'])
 
 const submit = async () => {
-  await authenticatedApi(props.href, Method.DELETE, props.data)
+  const res = await authenticatedApi(props.href, Method.DELETE, props.data)
+
+  if (res.status < 400) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.SUCCESS,
+      message: 'Successfully deleted',
+      duration: 2000
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Failed to delete',
+      duration: 2000
+    })
+  }
+
   showModal.value = false
   emit('afterDelete')
 }
