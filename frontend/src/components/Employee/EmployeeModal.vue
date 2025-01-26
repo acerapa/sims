@@ -106,14 +106,16 @@
   />
 </template>
 <script setup>
-import { Method, authenticatedApi } from '@/api'
 import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { useEmployeeStore } from '@/stores/employee'
-import { ObjectHelpers } from 'shared'
+import { ObjectHelpers, ValidatorHelpers } from 'shared'
 import { computed, onMounted, ref } from 'vue'
 import { UserSchema } from 'shared'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 
 const showConfirmModal = ref(false)
 
@@ -124,9 +126,6 @@ const props = defineProps({
   }
 })
 
-const apiPath = props.selectedId
-  ? `users/${props.selectedId}/update`
-  : 'users/register'
 const employeeStore = useEmployeeStore()
 
 const model = ref({
@@ -160,7 +159,10 @@ const positionOptions = computed(() => {
  ** ================================================*/
 const onSubmit = async () => {
   // validator
-  const { error } = UserSchema.validate(model.value, {
+  const schema = props.selectedId
+    ? ValidatorHelpers.makeSchemaFieldOptional(UserSchema)
+    : UserSchema
+  const { error } = schema.validate(model.value, {
     abortEarly: false
   })
 
@@ -174,11 +176,33 @@ const onSubmit = async () => {
     })
     return
   }
-  const res = await authenticatedApi(apiPath, Method.POST, model.value)
-  // TODO: Show alert. Currently we have no alert component so go ahead and create it first
-  showModal.value = false
-  // Refetch the updated data from database via store
-  await employeeStore.fetchAllEmployees()
+
+  let isSuccess = false
+  if (props.selectedId) {
+    isSuccess = await employeeStore.updateEmployee(
+      props.selectedId,
+      model.value
+    )
+  } else {
+    isSuccess = await employeeStore.registerEmployee(model.value)
+  }
+
+  if (isSuccess) {
+    showModal.value = false
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.SUCCESS,
+      message: `Employee ${
+        props.selectedId ? 'updated' : 'created'
+      } successfully`,
+      duration: 2000
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: `Failed to ${props.selectedId ? 'update' : 'created'} employee`,
+      duration: 2000
+    })
+  }
 }
 
 const onDelete = async () => {
@@ -186,9 +210,10 @@ const onDelete = async () => {
 }
 
 const onAfterDelete = async () => {
+  await employeeStore.removeEmployee(props.selectedId)
+
   showModal.value = false
   showConfirmModal.value = false
-  await employeeStore.fetchAllEmployees()
 }
 
 /** ================================================

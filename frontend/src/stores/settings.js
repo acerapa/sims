@@ -102,11 +102,17 @@ export const useSettingsStore = defineStore('settings', () => {
 
   // branches methods
   const createBranch = async (model) => {
-    return await authenticatedApi('branch/register', Method.POST, model)
+    const res = await authenticatedApi('branch/register', Method.POST, model)
+    return res.status < 400
   }
 
   const updateBranch = async (id, model) => {
-    return await authenticatedApi(`branch/update/${id}`, Method.POST, model)
+    const res = await authenticatedApi(
+      `branch/update/${id}`,
+      Method.POST,
+      model
+    )
+    return res.status < 400
   }
 
   return {
