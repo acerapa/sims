@@ -53,13 +53,15 @@
 </template>
 
 <script setup>
-import { Method, authenticatedApi } from '@/api'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { onMounted, ref } from 'vue'
 import CustomInput from '../shared/CustomInput.vue'
 import { AccountSchema } from 'shared/validators'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 
 const showConfirmModal = ref(false)
 const settingsStore = useSettingsStore()
@@ -77,10 +79,6 @@ const props = defineProps({
 })
 
 const showModal = defineModel()
-
-const apiPath = props.selectedId
-  ? 'settings/accounts/update'
-  : 'settings/accounts/register'
 
 onMounted(() => {
   if (props.selectedId && props.selectedId) {
@@ -103,12 +101,26 @@ const onSubmit = async () => {
     return
   }
 
-  const res = await authenticatedApi(apiPath, Method.POST, model.value)
-  showModal.value = false
+  let isSuccess = false
+  if (props.selectedId) {
+    isSuccess = await settingsStore.updateAccount(props.selectedId, model.value)
+  } else {
+    isSuccess = await settingsStore.createAccount(model.value)
+  }
 
-  await settingsStore.fetchAllAccounts()
-  if (res.status == 200) {
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${props.selectedId ? 'updated' : 'created'} account!`,
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
     showModal.value = false
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${props.selectedId ? 'update' : 'create'} account!`,
+      type: ToastTypes.ERROR,
+      duration: 2000
+    })
   }
 }
 
@@ -119,6 +131,6 @@ const onDelete = async () => {
 const onAfterDelete = async () => {
   showModal.value = false
   showConfirmModal.value = false
-  await settingsStore.fetchAllAccounts()
+  await settingsStore.removeAccount(props.selectedId)
 }
 </script>

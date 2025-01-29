@@ -92,6 +92,9 @@ import { ObjectHelpers } from 'shared/helpers'
 import { useAppStore } from '@/stores/app'
 import { BranchCreateSchema } from 'shared/validators'
 import { BranchStatus } from 'shared'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 
 const props = defineProps({
   selectedId: {
@@ -141,24 +144,34 @@ const onSubmit = async () => {
     return
   }
 
-  let res = null
+  let isSuccess = null
   if (!props.selectedId) {
-    res = await settingStore.createBranch(model.value)
+    isSuccess = await settingStore.createBranch(model.value)
   } else {
-    res = await settingStore.updateBranch(props.selectedId, model.value)
+    isSuccess = await settingStore.updateBranch(props.selectedId, model.value)
   }
 
   if (model.value.branch.is_current && currentBranch.value) {
     if (props.selectedId != currentBranch.value.id) {
-      res = await settingStore.updateBranch(currentBranch.value.id, {
+      isSuccess = await settingStore.updateBranch(currentBranch.value.id, {
         branch: { is_current: false }
       })
     }
   }
 
-  if (res.status < 400) {
-    await settingStore.fetchAllBranches()
+  if (isSuccess) {
     showModal.value = false
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${props.selectedId ? 'updated' : 'created'} branch!`,
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${props.selectedId ? 'update' : 'create'} branch!`,
+      type: ToastTypes.ERROR,
+      duration: 2000
+    })
   }
 }
 
@@ -168,7 +181,7 @@ const onDelete = () => {
 
 const onAfterDelete = async () => {
   showModal.value = false
-  await settingStore.fetchAllBranches()
+  await settingStore.removeBranch(props.selectedId)
 }
 
 const employeeOptions = computed(() => employeeStore.employeeOptions())
@@ -203,6 +216,6 @@ onMounted(async () => {
   }
 
   currentBranch.value = appStore.currentBranch
-  await employeeStore.fetchAllEmployees()
+  await employeeStore.getEmployees()
 })
 </script>

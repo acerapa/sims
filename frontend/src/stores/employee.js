@@ -22,6 +22,14 @@ export const useEmployeeStore = defineStore('employee', () => {
     }
   }
 
+  const getEmployees = async () => {
+    if (!employees.value.length) {
+      await fetchAllEmployees()
+    }
+
+    return employees.value
+  }
+
   const employeeOptions = () => {
     return employees.value.map((employee) => {
       return {
@@ -83,6 +91,8 @@ export const useEmployeeStore = defineStore('employee', () => {
     updateEmployee,
     employeeOptions,
     registerEmployee,
-    fetchAllEmployees
+    fetchAllEmployees,
+
+    getEmployees
   }
 })

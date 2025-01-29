@@ -17,14 +17,6 @@ export const useSettingsStore = defineStore('settings', () => {
     return res.data.categories
   }
 
-  const fetchAllAccounts = async () => {
-    const res = await authenticatedApi('settings/accounts/all')
-    if (res.status == 200) {
-      accounts.value = res.data.accounts
-    }
-    return res.data.accounts
-  }
-
   const fetchAllProductReorderingPoints = async () => {
     const res = await authenticatedApi('product-setting/all')
     if (res.status == 200) {
@@ -55,14 +47,6 @@ export const useSettingsStore = defineStore('settings', () => {
     return productReorderingPoints.value
   }
 
-  const getAccounts = async () => {
-    if (!accounts.value.length) {
-      await fetchAllAccounts()
-    }
-
-    return accounts.value
-  }
-
   const getProductCategories = async () => {
     if (!productCategories.value.length) {
       await fetchAllProductCategories()
@@ -86,6 +70,79 @@ export const useSettingsStore = defineStore('settings', () => {
     return category
   }
 
+  /*
+   * ACCOUNTS METHODS START
+   */
+  const getAccounts = async () => {
+    if (!accounts.value.length) {
+      await fetchAllAccounts()
+    }
+
+    return accounts.value
+  }
+
+  const fetchAllAccounts = async () => {
+    const res = await authenticatedApi('settings/accounts/all')
+    if (res.status == 200) {
+      accounts.value = res.data.accounts
+    }
+    return res.data.accounts
+  }
+
+  const createAccount = async (data) => {
+    const res = await authenticatedApi(
+      'settings/accounts/register',
+      Method.POST,
+      data
+    )
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (accounts.value.length) {
+        accounts.value.unshift(res.data.account)
+      } else {
+        await fetchAllAccounts()
+      }
+    }
+
+    return isSuccess
+  }
+
+  const updateAccount = async (id, data) => {
+    const res = await authenticatedApi(
+      `settings/accounts/${id}`,
+      Method.PUT,
+      data
+    )
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (accounts.value.length) {
+        const index = accounts.value.findIndex((account) => account.id == id)
+        accounts.value[index] = res.data.account
+      } else {
+        await fetchAllAccounts()
+      }
+    }
+
+    return isSuccess
+  }
+
+  const removeAccount = async (id) => {
+    if (accounts.value.length) {
+      const index = accounts.value.findIndex((a) => a.id == id)
+      if (index > -1) {
+        accounts.value.splice(index, 1)
+      }
+    }
+  }
+  /*
+   * ACCOUNTS METHODS END
+   */
+
+  /*
+   * BRANCHES METHODS START
+   */
   const fetchAllBranches = async () => {
     const res = await authenticatedApi('branch/all')
 
@@ -100,9 +157,18 @@ export const useSettingsStore = defineStore('settings', () => {
     return branches.value.length ? branches.value : await fetchAllBranches()
   }
 
-  // branches methods
   const createBranch = async (model) => {
     const res = await authenticatedApi('branch/register', Method.POST, model)
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (!branches.value.length) {
+        await fetchAllBranches()
+      } else {
+        branches.value.unshift(res.data.branch)
+      }
+    }
+
     return res.status < 400
   }
 
@@ -112,21 +178,53 @@ export const useSettingsStore = defineStore('settings', () => {
       Method.POST,
       model
     )
+
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (!branches.value.length) {
+        await fetchAllBranches()
+      } else {
+        let index = branches.value.findIndex((branch) => branch.id == id)
+        branches.value[index] = res.data.branch
+      }
+    }
+
     return res.status < 400
   }
+
+  const removeBranch = async (id) => {
+    if (!branches.value.length) {
+      await fetchAllBranches()
+    } else {
+      let index = branches.value.findIndex((b) => b.id == id)
+      if (index > -1) {
+        branches.value.splice(index, 1)
+      }
+    }
+  }
+
+  /*
+   * BRANCHES METHODS END
+   */
 
   return {
     accounts,
     branches,
     productCategories,
     productReorderingPoints,
+
     getBranches,
-    createBranch,
-    updateBranch,
-    categoryOption,
     getAccounts,
-    fetchAllAccounts,
+    updateBranch,
+    createBranch,
+    removeBranch,
+    createAccount,
+    updateAccount,
+    removeAccount,
+    categoryOption,
     fetchAllBranches,
+    fetchAllAccounts,
     getReorderingPoints,
     getProductCategories,
     fetchAllProductCategories,
