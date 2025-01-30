@@ -58,6 +58,9 @@ import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import { onMounted, ref } from 'vue'
 import { useCustomerStore } from '@/stores/customer'
 import { CustomerSchema, ObjectHelpers } from 'shared'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 
 const showModal = defineModel()
 const showDeleteConfirmModal = ref(false)
@@ -89,7 +92,7 @@ const modelErrors = ref({
 })
 
 const onSubmit = async () => {
-  let res = false
+  let isSuccess = false
 
   // validate model
   const validateCustomer = CustomerSchema.options({
@@ -105,14 +108,27 @@ const onSubmit = async () => {
   }
 
   if (!props.selectedId) {
-    res = await customerStore.createCustomer(model.value)
+    isSuccess = await customerStore.createCustomer(model.value)
   } else {
-    res = await customerStore.updateCustomer(props.selectedId, model.value)
+    isSuccess = await customerStore.updateCustomer(
+      props.selectedId,
+      model.value
+    )
   }
 
-  if (res) {
+  if (isSuccess) {
     showModal.value = false
-    await customerStore.fetchCustomers()
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${props.selectedId ? 'updated' : 'created'} Customer!`,
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${props.selectedId ? 'update' : 'create'} Customer!`,
+      type: ToastTypes.ERROR,
+      duration: 2000
+    })
   }
 }
 
@@ -134,6 +150,8 @@ onMounted(async () => {
         model.value.address,
         customerStore.customer.address
       )
+
+      delete model.value.address.id
     }
   }
 })
