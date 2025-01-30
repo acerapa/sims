@@ -1,3 +1,4 @@
+const { sequelize } = require("../models");
 const Address = require("../models/address");
 const Customer = require("../models/customer");
 
@@ -5,6 +6,7 @@ module.exports = {
   all: async (req, res) => {
     try {
       const customers = await Customer.findAll({
+        order: [["createdAt", "DESC"]],
         include: {
           model: Address,
           as: "address",
@@ -39,11 +41,11 @@ module.exports = {
     try {
       const data = req.body.validated;
 
-      await Customer.create(data, {
+      const customer = await Customer.create(data, {
         include: { model: Address, as: "address" },
       });
 
-      res.sendResponse({}, "Successfully created!", 200);
+      res.sendResponse({ customer }, "Successfully created!", 200);
     } catch (error) {
       res.sendError(error, "Something went wrong!", 400);
     }
@@ -52,22 +54,33 @@ module.exports = {
   update: async (req, res) => {
     try {
       const data = req.body.validated;
-      const customer = await Customer.findOne({
+      await Customer.update(data, {
         where: {
           id: req.params.id,
         },
       });
 
-      await customer.update(data);
       if (data.address) {
         await Address.update(data.address, {
           where: {
-            id: customer.address_id,
+            id: sequelize.literal(
+              `(SELECT address_id FROM ${Customer.getTableName()} WHERE id = ${req.params.id})`
+            ),
           },
         });
       }
 
-      res.sendError({}, "Successfully updated!", 200);
+      const customer = await Customer.findOne({
+        where: {
+          id: req.params.id,
+        },
+        include: {
+          model: Address,
+          as: "address",
+        },
+      });
+
+      res.sendError({ customer }, "Successfully updated!", 200);
     } catch (error) {
       res.sendError(error, "Something went wrong!", 400);
     }

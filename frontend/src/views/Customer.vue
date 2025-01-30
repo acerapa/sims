@@ -49,7 +49,7 @@ const selectedId = ref(0)
 const customerStore = useCustomerStore()
 
 const filteredData = computed(() => {
-  return customerStore.customers
+  return customerStore.customers.filter((customer) => true)
 })
 
 /** ================================================

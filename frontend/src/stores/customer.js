@@ -25,7 +25,17 @@ export const useCustomerStore = defineStore('customer', () => {
   const createCustomer = async (model) => {
     const res = await authenticatedApi('customers/register', Method.POST, model)
 
-    return res.status < 400
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (customers.value.length) {
+        customers.value.unshift(res.data.customer)
+      } else {
+        await fetchCustomers()
+      }
+    }
+
+    return isSuccess
   }
 
   const updateCustomer = async (id, model) => {
@@ -35,7 +45,20 @@ export const useCustomerStore = defineStore('customer', () => {
       model
     )
 
-    return res.status < 400
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (customers.value.length) {
+        const index = customers.value.findIndex((c) => c.id == id)
+        if (index > -1) {
+          customers.value[index] = res.data.customer
+        }
+      } else {
+        await fetchCustomers()
+      }
+    }
+
+    return isSuccess
   }
 
   const fetchCustomerById = async (id) => {
