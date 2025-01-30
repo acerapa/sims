@@ -17,8 +17,8 @@ module.exports = {
     const { error } = AccountSchema.validate(req.body);
     if (!error) {
       try {
-        await Account.create(req.body);
-        res.sendResponse({}, "Successfully created!", 200);
+        const account = await Account.create(req.body);
+        res.sendResponse({ account }, "Successfully created!", 200);
       } catch (e) {
         res.sendError(e, "Something wen't wrong! => " + e.message, 400);
       }
@@ -40,7 +40,14 @@ module.exports = {
           },
         }
       );
-      res.sendResponse({}, "Successfully updated!", 200);
+
+      const account = await Account.findOne({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      res.sendResponse({ account }, "Successfully updated!", 200);
     } catch (e) {
       res.sendError(e, "Something wen't wrong! => " + e.message, 400);
     }

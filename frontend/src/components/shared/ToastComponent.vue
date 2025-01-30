@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-3 absolute bottom-0 right-0 p-2">
+  <div class="flex flex-col gap-3 absolute bottom-0 right-0 p-2 z-[60]">
     <button class="btn" @click="simulateToast" v-if="isTesting">
       Test me!
     </button>

@@ -28,13 +28,32 @@ module.exports = {
   register: async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-      const data = req.body.validated;
-      const address = await Address.create(data.address, { transaction });
-      const branch = { ...data.branch, address_id: address.id };
-      await Branch.create(branch, { transaction });
+      const data = {
+        ...req.body.validated.branch,
+        address: req.body.validated.address,
+      };
+
+      const branch = await Branch.create(data, {
+        include: [
+          {
+            model: Address,
+            as: "address",
+          },
+        ],
+        transaction,
+        raw: true,
+      });
+
+      const manager = await User.findOne({
+        where: {
+          id: branch.dataValues.branch_manager,
+        },
+      });
+
+      branch.dataValues.manager = manager;
 
       await transaction.commit();
-      res.sendResponse({}, "Successfully created!", 200);
+      res.sendResponse({ branch }, "Successfully created!", 200);
     } catch (e) {
       await transaction.rollback();
       res.sendError({}, "Something went wrong!", 400);
@@ -44,27 +63,47 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      const branch = await Branch.findOne({
-        where: {
-          id: req.params.id,
-        },
-      });
 
-      if (data.address) {
-        await Address.update(data.address, {
+      if (data.branch) {
+        await Branch.update(data.branch, {
           where: {
-            id: branch.address_id,
+            id: req.params.id,
           },
           transaction,
         });
       }
 
-      if (data.branch) {
-        await branch.update(data.branch, { transaction });
+      if (data.address) {
+        await Address.update(data.address, {
+          where: {
+            id: sequelize.literal(
+              `(SELECT address_id FROM ${Branch.getTableName()} WHERE id = ${req.params.id})`
+            ),
+          },
+          transaction,
+        });
       }
 
+      // lastly get the updated data
+      const branch = await Branch.findOne({
+        where: {
+          id: req.params.id,
+        },
+        include: [
+          {
+            model: Address,
+            as: "address",
+          },
+          {
+            model: User,
+            as: "manager",
+          },
+        ],
+        transaction,
+      });
+
       await transaction.commit();
-      res.sendResponse({}, "Successfully updated!", 200);
+      res.sendResponse({ branch }, "Successfully updated!", 200);
     } catch (e) {
       await transaction.rollback();
       res.sendError(e, "Something went wrong!", 400);

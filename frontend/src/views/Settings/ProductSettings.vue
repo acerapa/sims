@@ -14,9 +14,9 @@
       <CustomTable
         :has-pagination="true"
         title="Product Reordering Point"
+        :data="filteredReorderingPoints"
         @add-new-record="onNewReorderingPoint"
         :row-prop-init="productReorderingRowEvent"
-        :data="settingsStore.productReorderingPoints"
         :table-row-component="ProductReorderingPointRow"
         @view="onViewReOrdering"
       >
@@ -101,6 +101,10 @@ const filteredProductCategories = computed(() => {
   )
 })
 
+const filteredReorderingPoints = computed(() => {
+  return settingsStore.productReorderingPoints.filter(() => true)
+})
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -128,7 +132,7 @@ const onNewProductCategory = () => {
  ** ================================================*/
 
 onMounted(async () => {
-  await settingsStore.fetchAllProductCategories()
+  await settingsStore.getProductCategories()
   await settingsStore.fetchAllProductReorderingPoints()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
