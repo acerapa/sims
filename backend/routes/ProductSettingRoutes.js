@@ -8,7 +8,7 @@ const {
 } = require("../controllers/SettingController");
 
 router.get("/all", all);
-router.post("/update", update);
+router.put("/:id", update);
 router.post("/register", register);
 router.delete("/delete/:id", destroy);
 

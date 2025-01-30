@@ -8,13 +8,32 @@ export const useSettingsStore = defineStore('settings', () => {
   const branches = ref([])
   const productReorderingPoints = ref([])
 
-  const fetchAllProductCategories = async () => {
-    const res = await authenticatedApi('product-category/all')
-    if (res.status == 200) {
-      productCategories.value = res.data.categories
-    }
+  /*
+   * PRODUCT REORDERING POINTS METHODS START
+   */
+  const regulateProductReordering = (pointReordering) => {
+    const newPointProducts = pointReordering.product_details.map(
+      (pd) => pd.product.id
+    )
 
-    return res.data.categories
+    productReorderingPoints.value.forEach((prp) => {
+      newPointProducts.forEach((pointProduct) => {
+        if (prp.product_details.length) {
+          if (
+            prp.product_details
+              .map((pd) => pd.product.id)
+              .includes(pointProduct)
+          ) {
+            const index = prp.product_details.findIndex(
+              (pd) => pd.product.id == pointProduct
+            )
+            if (index > -1) {
+              prp.product_details.splice(index, 1)
+            }
+          }
+        }
+      })
+    })
   }
 
   const fetchAllProductReorderingPoints = async () => {
@@ -26,25 +45,75 @@ export const useSettingsStore = defineStore('settings', () => {
     return res.data.productReorderingPoints
   }
 
-  const categoryOption = async () => {
-    const cats = productCategories.value.length
-      ? productCategories.value
-      : await fetchAllProductCategories()
-
-    return cats.map((category) => {
-      return {
-        text: category.name,
-        value: category.id
-      }
-    })
-  }
-
   const getReorderingPoints = async () => {
     if (!productReorderingPoints.value.length) {
       await fetchAllProductReorderingPoints()
     }
 
     return productReorderingPoints.value
+  }
+
+  const registerReorderingPoint = async (model) => {
+    const res = await authenticatedApi(
+      'product-setting/register',
+      Method.POST,
+      model
+    )
+
+    const isSuccess = res.status < 400
+    if (isSuccess) {
+      if (productReorderingPoints.value.length) {
+        regulateProductReordering(res.data.point)
+
+        productReorderingPoints.value.unshift(res.data.point)
+      } else {
+        await fetchAllProductCategories()
+      }
+    }
+
+    return isSuccess
+  }
+
+  const updateReorderingPoint = async (id, model) => {
+    const res = await authenticatedApi(
+      `product-setting/${id}`,
+      Method.PUT,
+      model
+    )
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (productReorderingPoints.value.length) {
+        regulateProductReordering(res.data.point)
+
+        const index = productReorderingPoints.value.findIndex(
+          (prp) => prp.id == id
+        )
+        if (index > -1) {
+          productReorderingPoints.value[index] = res.data.point
+        }
+      } else {
+        await fetchAllProductReorderingPoints()
+      }
+    }
+
+    return isSuccess
+  }
+
+  /*
+   * PRODUCT REORDERING POINTS METHODS END
+   */
+
+  /*
+   * PRODUCT CATEGORIES METHODS START
+   */
+  const fetchAllProductCategories = async () => {
+    const res = await authenticatedApi('product-category/all')
+    if (res.status == 200) {
+      productCategories.value = res.data.categories
+    }
+
+    return res.data.categories
   }
 
   const getProductCategories = async () => {
@@ -69,6 +138,75 @@ export const useSettingsStore = defineStore('settings', () => {
 
     return category
   }
+
+  const categoryOption = async () => {
+    const cats = productCategories.value.length
+      ? productCategories.value
+      : await fetchAllProductCategories()
+
+    return cats.map((category) => {
+      return {
+        text: category.name,
+        value: category.id
+      }
+    })
+  }
+
+  const registerProductCategory = async (model) => {
+    const res = await authenticatedApi(
+      'product-category/register',
+      Method.POST,
+      model
+    )
+
+    const isSuccess = res.status < 400
+    if (isSuccess) {
+      if (productCategories.value.length) {
+        productCategories.value.unshift(res.data.category)
+      } else {
+        await fetchAllProductCategories()
+      }
+    }
+
+    return isSuccess
+  }
+
+  const updateProductCategory = async (id, model) => {
+    const res = await authenticatedApi(
+      `product-category/${id}`,
+      Method.PUT,
+      model
+    )
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (productCategories.value.length) {
+        const index = productCategories.value.findIndex((pc) => pc.id == id)
+        if (index > -1) {
+          productCategories.value[index] = res.data.category
+        }
+      } else {
+        await fetchAllProductCategories()
+      }
+    }
+
+    return isSuccess
+  }
+
+  const removeProductCategory = async (id) => {
+    if (productCategories.value.length) {
+      const index = productCategories.value.findIndex((pc) => pc.id == id)
+      if (index > -1) {
+        productCategories.value.splice(index, 1)
+      }
+    } else {
+      await fetchAllProductCategories()
+    }
+  }
+
+  /*
+   * PRODUCT CATEGORIES METHODS END
+   */
 
   /*
    * ACCOUNTS METHODS START
@@ -227,6 +365,11 @@ export const useSettingsStore = defineStore('settings', () => {
     fetchAllAccounts,
     getReorderingPoints,
     getProductCategories,
+    updateProductCategory,
+    removeProductCategory,
+    updateReorderingPoint,
+    registerProductCategory,
+    registerReorderingPoint,
     fetchAllProductCategories,
     getProductCategoryByIdSync,
     getProductCategoryByIdAsync,

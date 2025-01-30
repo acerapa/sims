@@ -28,13 +28,15 @@
   />
 </template>
 <script setup>
-import { Method, authenticatedApi } from '@/api'
 import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { onMounted, ref } from 'vue'
 import { CategorySchema } from 'shared'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 
 const showModal = defineModel()
 const showConfirmModal = ref(false)
@@ -84,10 +86,6 @@ onMounted(async () => {
   }
 })
 
-const apiPath = props.selectedId
-  ? 'product-category/update'
-  : 'product-category/register'
-
 const onSubmit = async () => {
   // validations
   const { error } = CategorySchema.options({ allowUnknown: true }).validate(
@@ -101,13 +99,30 @@ const onSubmit = async () => {
     return
   }
 
-  const res = await authenticatedApi(apiPath, Method.POST, model.value)
-
-  if (res.status == 200) {
-    showModal.value = false
+  let isSuccess = false
+  if (props.selectedId) {
+    isSuccess = await settingsStore.updateProductCategory(
+      props.selectedId,
+      model.value
+    )
+  } else {
+    isSuccess = await settingsStore.registerProductCategory(model.value)
   }
 
-  await settingsStore.fetchAllProductCategories()
+  if (isSuccess) {
+    showModal.value = false
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${props.selectedId ? 'updated' : 'created'} category!`,
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${props.selectedId ? 'update' : 'create'} category!`,
+      type: ToastTypes.ERROR,
+      duration: 2000
+    })
+  }
 }
 
 const onDelete = async () => {

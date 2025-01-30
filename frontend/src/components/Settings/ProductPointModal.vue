@@ -50,10 +50,12 @@ import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { onMounted, computed, ref } from 'vue'
 import { useProductStore } from '@/stores/product'
-import ProductModal from '@/components/Product/ProductModal.vue'
-import { authenticatedApi, Method } from '@/api'
+import ProductModal from '@/components/product/ProductModal.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { ProductReorderSchema } from 'shared'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 
 const props = defineProps({
   selectedId: {
@@ -66,10 +68,6 @@ const showModal = defineModel()
 const showConfirmModal = ref(false)
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
-
-const href = ref(
-  props.selectedId ? 'product-setting/update' : 'product-setting/register'
-)
 
 const showProductModal = ref(false)
 
@@ -97,8 +95,10 @@ onMounted(async () => {
     )
 
     if (orderingPoint) {
-      model.value = { ...orderingPoint }
-      model.value.products = orderingPoint.products.map((product) => product.id)
+      model.value.point = orderingPoint.point
+      model.value.products = orderingPoint.product_details.map(
+        (pd) => pd.product.id
+      )
     }
   }
 })
@@ -108,6 +108,7 @@ const onSubmit = async () => {
   const { error } = ProductReorderSchema.options({
     allowUnknown: true
   }).validate(model.value)
+
   if (error) {
     error.details.forEach((err) => {
       modelErrors.value[err.context.key] = err.message
@@ -116,10 +117,29 @@ const onSubmit = async () => {
     return
   }
 
-  const res = await authenticatedApi(href.value, Method.POST, model.value)
-  if (res.status == 200) {
-    await settingStore.fetchAllProductReorderingPoints()
+  let isSuccess = false
+  if (props.selectedId) {
+    isSuccess = await settingStore.updateReorderingPoint(
+      props.selectedId,
+      model.value
+    )
+  } else {
+    isSuccess = await settingStore.registerReorderingPoint(model.value)
+  }
+
+  if (isSuccess) {
     showModal.value = false
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${props.selectedId ? 'updated' : 'created'} re-ordering point!`,
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${props.selectedId ? 'update' : 'create'} re-ordering point!`,
+      type: ToastTypes.ERROR,
+      duration: 2000
+    })
   }
 }
 
