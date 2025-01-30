@@ -28,7 +28,17 @@ export const useProductStore = defineStore('product', () => {
       product
     )
 
-    return res.status < 400
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (products.value.length) {
+        products.value.unshift(res.data.product)
+      } else {
+        await fetchAllProducts()
+      }
+    }
+
+    return isSuccess
   }
 
   const updateProduct = async (id, data) => {

@@ -11,6 +11,7 @@ const ProductSupplier = require("../../models/product-supplier");
 const { Op } = require("sequelize");
 const { ProductType } = require("shared");
 const { sequelize } = require("../../models/index");
+const { findProduct } = require("../../services/ProductService");
 
 module.exports = {
   all: async (req, res) => {
@@ -97,43 +98,7 @@ module.exports = {
   },
   getProduct: async (req, res) => {
     try {
-      const product = await Product.findByPk(req.params.id, {
-        include: [
-          {
-            model: Supplier,
-            as: "suppliers",
-            attributes: ["id"],
-            through: { attributes: ["cost"] },
-          },
-          {
-            model: Account,
-            as: "income",
-            attributes: ["id"],
-          },
-          {
-            model: Account,
-            as: "expense",
-            attributes: ["id"],
-          },
-          {
-            model: ProductCategory,
-            as: "categories",
-            attributes: ["id", "name"],
-          },
-          {
-            model: ProductDetails,
-            as: "product_details",
-            include: {
-              model: ProductSettings,
-              as: "product_setting",
-            },
-          },
-        ],
-        where: {
-          type: ProductType.INVENTORY,
-        },
-      });
-
+      const product = await findProduct(req.params.id);
       res.sendResponse({ product }, "Successfully fetched!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
@@ -179,7 +144,10 @@ module.exports = {
       }
 
       await transaction.commit();
-      res.sendResponse({}, "Successfully Registered!");
+
+      const p = await findProduct(product.dataValues.id);
+
+      res.sendResponse({ product: p }, "Successfully Registered!");
     } catch (e) {
       await transaction.rollback();
       res.sendError(e, "Something wen't wrong! => " + e.message);
