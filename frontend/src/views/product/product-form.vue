@@ -197,12 +197,14 @@
     v-model="showCategoryModal"
     v-if="showCategoryModal"
     :general_cat="
-      model.categories.length ? model.categories[model.categories - 1] : ''
+      model.categories.length
+        ? model.categories[model.categories.length - 1]
+        : ''
     "
   />
   <AccountModal v-model="showAccountModal" v-if="showAccountModal" />
   <DeleteConfirmModal
-    :href="`items/delete/${route.query.id}`"
+    :href="`products/${route.query.id}`"
     v-model="showConfirmationModal"
     v-if="showConfirmationModal"
     @after-delete="onAfterDelete"
@@ -225,6 +227,7 @@ import SupplierSelectHeader from '@/components/product/SupplierSelectHeader.vue'
 import { useProductStore } from '@/stores/product'
 import { useRoute } from 'vue-router'
 import router from '@/router'
+import { ToastTypes } from '@/data/types'
 
 const route = useRoute()
 const settingStore = useSettingsStore()
@@ -336,15 +339,23 @@ const onSubmit = async () => {
     isSuccess = await productStore.registerProduct(data)
   }
 
-  // TODO: Add toast here
-  // If success redirect back to the product list
-
   // temporary redirect back if success is true
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 
   if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Product ${route.query.id ? 'updated' : 'created'} successfully!`,
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
     router.push({
       name: 'products'
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${route.query.id ? 'update' : 'create'} product!`,
+      type: ToastTypes.ERROR,
+      duration: 2000
     })
   }
 }
@@ -382,9 +393,9 @@ onMounted(async () => {
         }
       })
     }
+  } else {
+    model.value.details.item_code = await productStore.getProductItemCode()
   }
-
-  model.value.details.item_code = await productStore.getProductItemCode()
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })

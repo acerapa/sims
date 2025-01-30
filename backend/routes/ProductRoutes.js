@@ -14,7 +14,7 @@ const { validateBody } = require("../middleware/request-validator");
 
 const router = Router();
 
-router.delete("/delete/:id", destroy);
+router.delete("/:id", destroy);
 
 router.post("/register", validateBody(ProductItemSchema), register);
 router.put("/:id", validateBody(ProductItemSchema.optional()), updateProduct);
