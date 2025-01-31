@@ -25,7 +25,7 @@ module.exports = {
 
       const address = await Address.create(data.address, { transaction });
 
-      await Supplier.create(
+      const newRecord = await Supplier.create(
         {
           ...data.vendor,
           address_id: address.id,
@@ -35,7 +35,15 @@ module.exports = {
 
       await transaction.commit();
 
-      res.sendResponse({}, "Successfully registered!", 200);
+      const supplier = await Supplier.findOne({
+        where: { id: newRecord.dataValues.id },
+        include: {
+          model: Address,
+          as: "address",
+        },
+      });
+
+      res.sendResponse({ supplier }, "Successfully registered!", 200);
     } catch (e) {
       await transaction.rollback();
       res.sendError(e, "Somenthing wen't wrong => " + e.message, 400);
@@ -46,23 +54,30 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      const supplier = await Supplier.findByPk(req.params.id, {
+
+      await Supplier.update(data.vendor, {
+        where: { id: req.params.id },
+      });
+
+      await Address.update(data.address, {
+        where: {
+          id: sequelize.literal(
+            `(SELECT address_id FROM ${Supplier.getTableName()} WHERE id = ${req.params.id})`
+          ),
+        },
+      });
+
+      await transaction.commit();
+
+      const supplier = await Supplier.findOne({
+        where: { id: req.params.id },
         include: {
           model: Address,
           as: "address",
         },
       });
 
-      if (!supplier) {
-        throw new Error("Supplier not found!");
-      }
-
-      await supplier.update(data.vendor, { transaction });
-      await supplier.address.update(data.address, { transaction });
-
-      await transaction.commit();
-
-      res.sendResponse({}, "Successfully updated!");
+      res.sendResponse({ supplier }, "Successfully updated!");
     } catch (e) {
       await transaction.rollback();
       res.sendError(e.details, "Something wen't wrong! => " + e.message, 400);
