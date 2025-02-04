@@ -1,4 +1,4 @@
-import { authenticatedApi } from '@/api'
+import { authenticatedApi, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -24,9 +24,29 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
     }
   }
 
+  const createPurchaseOrder = async (data) => {
+    const res = await authenticatedApi(
+      '/purchase-order/register',
+      Method.POST,
+      data
+    )
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (purchaseOrders.value.length) {
+        purchaseOrders.value.unshift(res.data.order)
+      } else {
+        await fetchPurchaseOrders()
+      }
+    }
+
+    return isSuccess
+  }
+
   return {
     purchaseOrder,
     purchaseOrders,
+    createPurchaseOrder,
     fetchPurchaseOrders,
     fetchPurchaseOrderById
   }

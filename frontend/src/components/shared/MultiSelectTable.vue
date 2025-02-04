@@ -12,7 +12,7 @@
             : dataInputs[ndx]
         "
         v-model="dataInputs[ndx]"
-        v-bind="{ eventName: props.rowEventName, ndx: ndx }"
+        v-bind="propsBinder(ndx)"
         @remove="onRemove(ndx)"
       ></component>
       <div class="flex flex-col gap-4" v-if="!dataInputs.length">
@@ -23,9 +23,9 @@
   <div class="flex justify-between mt-4 items-center">
     <button
       type="button"
-      v-if="props.hasAddNewItem"
+      v-if="props.hasAddNewItem && !props.isDisabled"
       @click="onNewItem"
-      class="btn"
+      class="btn text-nowrap"
     >
       Add new item
     </button>
@@ -68,12 +68,36 @@ const props = defineProps({
   rowEventName: {
     type: String,
     required: false
+  },
+  rowProps: {
+    type: Object,
+    required: false
   }
 })
 
 const dataInputs = defineModel()
 const onNewItem = () => {
   dataInputs.value.push({ ...props.format })
+}
+
+const propsBinder = (ndx) => {
+  let bind = {
+    ndx: ndx
+  }
+
+  if (props.rowEventName) {
+    bind.eventName = props.rowEventName
+  }
+
+  if (props.isDisabled) {
+    bind.isDisabled = props.isDisabled
+  }
+
+  if (props.rowProps) {
+    bind = { ...bind, ...props.rowProps }
+  }
+
+  return bind
 }
 
 const onRemove = (ndx) => {

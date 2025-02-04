@@ -78,16 +78,16 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useProductStore } from '@/stores/product'
-import ProductModal from '@/components/Product/ProductModal.vue'
+import ProductModal from '@/components/product/ProductModal.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { getCost } from '@/helper'
 
 const props = defineProps({
-  selectedProducts: {
-    type: Array,
-    defualt: []
+  ndx: {
+    type: Number,
+    required: false
   },
   isDisabled: {
     type: Boolean,
@@ -100,6 +100,10 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
     required: false
+  },
+  selected: {
+    type: Array,
+    required: true
   }
 })
 
@@ -117,10 +121,12 @@ const productOptions = computed(() => {
     })
     .filter((prod) => {
       if (product.value.product_id == prod.value) return true
-      return !props.selectedProducts
-        .map((p) => p.product_id)
-        .includes(prod.value)
+      return !props.selected.map((p) => p.product_id).includes(prod.value)
     })
+})
+
+onMounted(async () => {
+  await productStore.getProducts()
 })
 
 watch(
@@ -132,7 +138,7 @@ watch(
       product.value.name = prd.name
       product.value.description = product.value.description
         ? product.value.description
-        : prd.purchase_description
+        : prd.product_details.purchase_description
       product.value.quantity = product.value.quantity
         ? product.value.quantity
         : 1 // will always set quantity upon create
