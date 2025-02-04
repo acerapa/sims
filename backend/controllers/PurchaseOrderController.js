@@ -36,24 +36,42 @@ module.exports = {
         transaction: transaction,
       });
 
-      const order = { ...data.order, address_id: address.id };
-      const purchaseOrder = await PurchaseOrder.create(order, {
+      const orderData = { ...data.order, address_id: address.id };
+      const purchaseOrder = await PurchaseOrder.create(orderData, {
         transaction: transaction,
       });
 
       await Promise.all([
-        ...data.products.map(async (product) => {
-          return await ProductTransaction.create(
+        ...data.products.map((product) => {
+          return ProductTransaction.create(
             {
               ...product,
-              transfer_id: purchaseOrder.id,
+              transfer_id: purchaseOrder.dataValues.id,
             },
             { transaction: transaction }
           );
         }),
       ]);
+
       await transaction.commit();
-      res.sendResponse({}, "Successfully created!");
+
+      const order = await PurchaseOrder.findOne({
+        where: {
+          id: purchaseOrder.dataValues.id,
+        },
+        include: [
+          {
+            model: Address,
+            as: "address",
+          },
+          {
+            model: Supplier,
+            as: "supplier",
+          },
+        ],
+      });
+
+      res.sendResponse({ order }, "Successfully created!");
     } catch (e) {
       await transaction.rollback();
       res.sendError({ ...e }, "Something wen't wrong! => " + e.messge);
@@ -81,7 +99,6 @@ module.exports = {
             where: { transfer_id: req.params.id },
             attributes: ["id", "product_id"],
           });
-
 
           const currentProductIds = products.map((p) => p.product_id);
 

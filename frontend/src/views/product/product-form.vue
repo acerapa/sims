@@ -339,7 +339,6 @@ const onSubmit = async () => {
     isSuccess = await productStore.registerProduct(data)
   }
 
-  // temporary redirect back if success is true
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 
   if (isSuccess) {

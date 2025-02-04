@@ -212,40 +212,30 @@
       </div>
 
       <div class="flex justify-between items-center mt-6">
-        <p class="text-base font-semibold">Select Products</p>
+        <div class="flex gap-2 items-center">
+          <p class="text-base font-semibold">Select Products</p>
+          <small
+            class="text-red-300 p-1 border border-red-300 rounded"
+            v-if="!model.order.supplier_id"
+          >
+            Please select supplier first
+          </small>
+        </div>
       </div>
 
-      <div class="max-[750px]:w-[calc(100vw-328px)]">
-        <div class="flex flex-col gap-4 max-w-full overflow-x-auto mb-4 pb-4">
-          <PurchaseOrderFormHeader :is-disabled="isDisabled" />
-          <div class="flex flex-col gap-4">
-            <PurchaseOrderFormRow
-              v-for="(product, ndx) in model.products"
-              v-model="model.products[ndx]"
-              :key="ndx"
-              :errors="
-                modelErrors.products[ndx] ? modelErrors.products[ndx] : {}
-              "
-              @remove="removeProduct(ndx)"
-              :selected-products="model.products"
-              :is-disabled="isDisabled"
-              :sup_id="model.order.supplier_id.toString()"
-            >
-            </PurchaseOrderFormRow>
-          </div>
-          <div class="flex flex-col gap-4" v-if="!model.products.length">
-            <p class="text-center text-sm">Table has no data!</p>
-          </div>
-        </div>
-        <div class="flex justify-between items-center pb-3">
-          <button
-            class="btn w-fit"
-            :class="[isDisabled ? 'pointer-events-none opacity-0' : '']"
-            @click="addNewProduct"
-          >
-            Add new item
-          </button>
-          <p>
+      <MultiSelectTable
+        :header-component="PurchaseOrderFormHeader"
+        :row-component="PurchaseOrderFormRow"
+        :format="productFormat"
+        v-model="model.products"
+        :is-disabled="model.order.supplier_id ? false : true"
+        :row-props="{
+          sup_id: model.order.supplier_id.toString(),
+          selected: model.products
+        }"
+      >
+        <template #aggregate>
+          <p class="text-end w-full">
             Total: &#8369;
             {{
               model.order.amount.toLocaleString('en', {
@@ -253,8 +243,8 @@
               })
             }}
           </p>
-        </div>
-      </div>
+        </template>
+      </MultiSelectTable>
 
       <!-- buttons -->
       <div
@@ -292,6 +282,7 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { Method, authenticatedApi } from '@/api'
@@ -302,6 +293,8 @@ import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import VendorModal from '@/components/Vendor/VendorModal.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
+import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
+
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { getCost } from '@/helper'
@@ -338,6 +331,15 @@ const productStore = useProductStore()
 const settingStore = useSettingsStore()
 const purchaseOrderStore = usePurchaseOrderStore()
 
+const productFormat = {
+  product_id: '',
+  name: '',
+  description: '',
+  quantity: '',
+  cost: '',
+  amount: ''
+}
+
 const modelDefualtValue = {
   order: {
     supplier_id: '',
@@ -357,16 +359,7 @@ const modelDefualtValue = {
     province: '',
     postal: ''
   },
-  products: [
-    {
-      product_id: '',
-      name: '',
-      description: '',
-      quantity: '',
-      cost: '',
-      amount: ''
-    }
-  ]
+  products: [{ ...productFormat }]
 }
 
 const model = ref(ObjectHelpers.copyObj(modelDefualtValue))
@@ -421,10 +414,6 @@ const addNewProduct = () => {
   }
 }
 
-const removeProduct = (ndx) => {
-  model.value.products.splice(ndx, 1)
-}
-
 const onSubmit = async (isAddNew = false) => {
   // pre modification
   if (model.value.order.type == PurchaseOrderType.COD) {
@@ -464,13 +453,10 @@ const onSubmit = async (isAddNew = false) => {
     return
   }
 
-  const res = await authenticatedApi(
-    'purchase-order/register',
-    Method.POST,
-    model.value
-  )
+  let isSuccess = false
+  isSuccess = await purchaseOrderStore.createPurchaseOrder(model.value)
 
-  if (res.status == 200) {
+  if (isSuccess) {
     // reset model
     model.value.products = []
     model.value.order = { ...modelDefualtValue.order }
