@@ -1,8 +1,5 @@
 import dashboard from '@/assets/icons/dashboard.svg'
 import inventory from '@/assets/icons/inventory.svg'
-import vendors from '@/assets/icons/vendors.svg'
-import customers from '@/assets/icons/customers.svg'
-import products from '@/assets/icons/products.svg'
 import reports from '@/assets/icons/reports.svg'
 import employees from '@/assets/icons/employees.svg'
 import settings from '@/assets/icons/settings.svg'
@@ -17,37 +14,19 @@ export default [
     icon: dashboard
   },
   {
-    text: 'Sales',
-    route: 'sales',
-    icon: sales,
-    children: [
-      {
-        text: 'Sales Order',
-        route: 'sales-order',
-        icon: outlineDot,
-        includes_active: ['sales-order-form']
-      },
-      {
-        text: 'Item Details',
-        route: 'item-details',
-        icon: outlineDot
-      }
-    ]
-  },
-  {
-    text: 'Inventory',
+    text: 'Inventory Management',
     route: 'inventory',
     icon: inventory,
     children: [
       {
-        text: 'Purchase Order',
-        route: 'purchase-order',
+        text: 'Products',
+        route: 'products',
         icon: outlineDot,
-        includes_active: ['purchase-order-create']
+        includes_active: ['product-form']
       },
       {
-        text: 'My Inventory',
-        route: 'my-inventory',
+        text: 'Services',
+        route: 'services',
         icon: outlineDot
       },
       {
@@ -58,7 +37,48 @@ export default [
     ]
   },
   {
-    text: 'Transfer Stocks',
+    text: 'Purchase Management',
+    route: 'purchase',
+    icon: inventory,
+    children: [
+      {
+        text: 'Purchase Order',
+        route: 'purchase-order',
+        icon: outlineDot,
+        includes_active: ['purchase-order-create']
+      },
+      {
+        text: 'Vendor management',
+        route: 'vendors',
+        icon: outlineDot
+      }
+    ]
+  },
+  {
+    text: 'Sales & Orders',
+    route: 'sales',
+    icon: sales,
+    children: [
+      {
+        text: 'Sales Order',
+        route: 'sales-order',
+        icon: outlineDot,
+        includes_active: ['sales-order-form']
+      },
+      {
+        text: 'Customers',
+        route: 'customers',
+        icon: outlineDot
+      },
+      {
+        text: 'Item Details',
+        route: 'item-details',
+        icon: outlineDot
+      }
+    ]
+  },
+  {
+    text: 'Stock Transfers',
     route: 'transfer',
     icon: transfer,
     children: [
@@ -87,27 +107,6 @@ export default [
         includes_active: ['fix-asset-form']
       }
     ]
-  },
-  {
-    text: 'Vendors/Suppliers',
-    route: 'vendors',
-    icon: vendors
-  },
-  {
-    text: 'Customers',
-    route: 'customers',
-    icon: customers
-  },
-  {
-    text: 'Products',
-    route: 'products',
-    icon: products,
-    includes_active: ['product-form']
-  },
-  {
-    text: 'Services',
-    route: 'services',
-    icon: products
   },
   {
     text: 'Reports',

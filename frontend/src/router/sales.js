@@ -33,6 +33,14 @@ export default [
           title: 'Sales Order',
           requiresAuth: true
         }
+      },
+      {
+        path: '/customers',
+        name: 'customers',
+        component: () => import('@/views/sales/Customer.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   }
