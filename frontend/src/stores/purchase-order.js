@@ -10,17 +10,13 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
     const res = await authenticatedApi('/purchase-order/all')
     if (res.status == 200) {
       purchaseOrders.value = res.data.orders
-      return res.data.orders
     }
-    return []
   }
 
   const fetchPurchaseOrderById = async (id) => {
     const res = await authenticatedApi('/purchase-order/' + id)
     if (res.status == 200) {
       purchaseOrder.value = res.data.order
-
-      return res.data.order
     }
   }
 
@@ -43,11 +39,54 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
     return isSuccess
   }
 
+  const updatePurchaseOrder = async (id, data) => {
+    const res = await authenticatedApi(`purchase-order/${id}`, Method.PUT, data)
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      // update purchase order
+      if (purchaseOrder.value.id == id) {
+        purchaseOrder.value = res.data.order
+      }
+
+      // update purchase orders
+      if (purchaseOrders.value.length) {
+        const index = purchaseOrders.value.findIndex((order) => order.id == id)
+        if (index > -1) {
+          purchaseOrders.value[index] = res.data.order
+        }
+      } else {
+        await fetchPurchaseOrders()
+      }
+    }
+
+    return isSuccess
+  }
+
+  const getPurchaseOrders = async () => {
+    if (purchaseOrders.value.length) {
+      return purchaseOrders.value
+    } else {
+      return await fetchPurchaseOrders()
+    }
+  }
+
+  const getPurchaseOrder = async (id) => {
+    if (!purchaseOrder.value || purchaseOrder.value.id != id) {
+      await fetchPurchaseOrderById(id)
+    }
+
+    return purchaseOrder.value
+  }
+
   return {
     purchaseOrder,
     purchaseOrders,
+    getPurchaseOrder,
+    getPurchaseOrders,
     createPurchaseOrder,
     fetchPurchaseOrders,
+    updatePurchaseOrder,
     fetchPurchaseOrderById
   }
 })

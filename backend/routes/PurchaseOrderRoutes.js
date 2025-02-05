@@ -9,8 +9,8 @@ const {
 Router.get("/all", PurchaseOrderController.all);
 Router.get("/:id", PurchaseOrderController.byId);
 Router.delete("/delete", PurchaseOrderController.delete);
-Router.post(
-  "/:id/update",
+Router.put(
+  "/:id",
   validateBody(PurchaseOrderUpdateSchema),
   PurchaseOrderController.update
 );
