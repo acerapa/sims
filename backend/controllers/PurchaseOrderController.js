@@ -4,6 +4,7 @@ const Supplier = require("../models/supplier");
 const Product = require("../models/product");
 const { sequelize } = require("../models");
 const PurchaseOrderProducts = require("../models/junction/purchase-order-products");
+const { findOrder } = require("../services/PurchaseOrderService");
 
 module.exports = {
   all: async (req, res) => {
@@ -18,6 +19,17 @@ module.exports = {
           {
             model: Supplier,
             as: "supplier",
+          },
+          {
+            model: Product,
+            as: "products",
+            include: [
+              {
+                model: Supplier,
+                as: "suppliers",
+                attributes: ["id"],
+              },
+            ],
           },
         ],
       });
@@ -55,21 +67,7 @@ module.exports = {
 
       await transaction.commit();
 
-      const order = await PurchaseOrder.findOne({
-        where: {
-          id: purchaseOrder.dataValues.id,
-        },
-        include: [
-          {
-            model: Address,
-            as: "address",
-          },
-          {
-            model: Supplier,
-            as: "supplier",
-          },
-        ],
-      });
+      const order = await findOrder(purchaseOrder.dataValues.id);
 
       res.sendResponse({ order }, "Successfully created!");
     } catch (e) {
@@ -83,13 +81,8 @@ module.exports = {
     try {
       const data = req.body.validated;
       if (data.order) {
-        const purchaseOrder = await PurchaseOrder.findOne({
-          where: {
-            id: req.params.id,
-          },
-        });
-
-        await purchaseOrder.update(data.order, {
+        await PurchaseOrder.update(data.order, {
+          where: { id: req.params.id },
           transaction: transaction,
         });
 
@@ -145,14 +138,20 @@ module.exports = {
         if (data.address) {
           await Address.update(data.address, {
             where: {
-              id: purchaseOrder.address_id,
+              id: sequelize.literal(
+                `(SELECT address_id FROM ${PurchaseOrder.getTableName()} WHERE id = ${req.params.id})`
+              ),
             },
             transaction: transaction,
           });
         }
       }
+
       await transaction.commit();
-      res.sendResponse({}, "Successfully updated!", 200);
+
+      const order = await findOrder(req.params.id);
+
+      res.sendResponse({ order }, "Successfully updated!", 200);
     } catch (e) {
       await transaction.rollback();
       res.sendError({ ...e }, "Something wen't wrong! => " + e.message, 400);
@@ -161,38 +160,7 @@ module.exports = {
 
   byId: async (req, res) => {
     try {
-      const order = await PurchaseOrder.findByPk(req.params.id, {
-        include: [
-          {
-            model: Address,
-            as: "address",
-          },
-          {
-            model: Supplier,
-            as: "supplier",
-          },
-          {
-            model: Product,
-            as: "products",
-            include: [
-              {
-                model: Supplier,
-                as: "suppliers",
-                attributes: ["id"],
-              },
-            ],
-          },
-        ],
-      });
-
-      // map products to get the cost from the supplier
-      order.products = order.products.map((product) => {
-        let supplier = product.suppliers.find(
-          (sup) => sup.id == order.supplier_id
-        );
-        product.cost = supplier ? supplier.ProductSupplier.cost : product.cost;
-        return product;
-      });
+      const order = await findOrder(req.params.id);
 
       res.sendResponse({ order }, "Successfully fetched!");
     } catch (e) {

@@ -26,7 +26,7 @@
             @change="
               () => {
                 selectedStatus = PurchaseStatusMap[model.order.status]
-                onUpdate()
+                onSubmit()
               }
             "
           />
@@ -273,7 +273,7 @@
             type="button"
             class="btn"
             v-if="isEdit && !isDisabled"
-            @click="onUpdate"
+            @click="onSubmit"
           >
             Update
           </button>
@@ -285,7 +285,6 @@
 
 <script setup>
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
-import { Method, authenticatedApi } from '@/api'
 import PurchaseOrderFormRow from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormRow.vue'
 import PurchaseOrderFormHeader from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormHeader.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
@@ -314,6 +313,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useSettingsStore } from '@/stores/settings'
 import { usePrint } from '@/use/usePrint'
+import { ToastTypes } from '@/data/types'
 
 const route = useRoute()
 const isEdit = ref(false)
@@ -454,40 +454,45 @@ const onSubmit = async (isAddNew = false) => {
   }
 
   let isSuccess = false
-  isSuccess = await purchaseOrderStore.createPurchaseOrder(model.value)
-
-  if (isSuccess) {
-    // reset model
-    model.value.products = []
-    model.value.order = { ...modelDefualtValue.order }
-    // get current branch address
-    model.value.address = ObjectHelpers.assignSameFields(
-      model.value.address,
-      appStore.currentBranch.address
-    )
-    addNewProduct()
-
-    if (!isAddNew) {
-      router.push({
-        name: 'purchase-order'
-      })
-    }
-  }
-}
-
-const onUpdate = async () => {
   if (route.query.id) {
-    Event.emit(EventEnum.IS_PAGE_LOADING, true)
-    const res = await authenticatedApi(
-      `purchase-order/${route.query.id}/update`,
-      Method.POST,
+    isSuccess = await purchaseOrderStore.updatePurchaseOrder(
+      route.query.id,
       model.value
     )
+  } else {
+    isSuccess = await purchaseOrderStore.createPurchaseOrder(model.value)
+  }
 
-    if (res.status == 200) {
-      console.log('Api is working and need to check the result in db')
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Purchase Order ${route.query.id ? 'Updated' : 'Created'} successfully!`,
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
+
+    if (!route.query.id) {
+      // reset model
+      model.value.products = []
+      model.value.order = { ...modelDefualtValue.order }
+      // get current branch address
+      model.value.address = ObjectHelpers.assignSameFields(
+        model.value.address,
+        appStore.currentBranch.address
+      )
+      addNewProduct()
+
+      if (!isAddNew) {
+        router.push({
+          name: 'purchase-order'
+        })
+      }
     }
-    Event.emit(EventEnum.IS_PAGE_LOADING, false)
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${route.query.id ? 'update' : 'create'} purchase order!`,
+      type: ToastTypes.ERROR,
+      duration: 2000
+    })
   }
 }
 
@@ -504,13 +509,13 @@ const onReceiveOrder = () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await supplierStore.fetchAllSuppliers()
-  await productStore.fetchAllProducts()
+  await supplierStore.getSuppliers()
+  await productStore.getProducts()
   await settingStore.getBranches()
 
   if (route.query.id) {
     isEdit.value = true
-    await purchaseOrderStore.fetchPurchaseOrderById(route.query.id)
+    await purchaseOrderStore.getPurchaseOrder(route.query.id)
     status.value = purchaseOrderStore.purchaseOrder.status
     const order = purchaseOrderStore.purchaseOrder
     orderStatus.value = order.status

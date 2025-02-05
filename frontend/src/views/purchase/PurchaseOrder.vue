@@ -214,10 +214,8 @@ const purchaseOrderStore = usePurchaseOrderStore()
  ** ================================================*/
 
 onMounted(async () => {
-  if (supplierStore.supplierOptions.length == 0) {
-    await supplierStore.fetchAllSuppliers()
-  }
-  await purchaseOrderStore.fetchPurchaseOrders()
+  await supplierStore.getSuppliers()
+  await purchaseOrderStore.getPurchaseOrders()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>
