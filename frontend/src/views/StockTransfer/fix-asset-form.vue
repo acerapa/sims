@@ -146,7 +146,7 @@ onMounted(async () => {
     model.value.products = transfer.products.map((p) => {
       return ObjectHelpers.assignSameFields(
         { ...productDefaultValue },
-        p.ProductTransaction
+        p.StockTransferProducts
       )
     })
   }

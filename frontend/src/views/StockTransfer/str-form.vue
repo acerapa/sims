@@ -343,11 +343,11 @@ onMounted(async () => {
       // populate products
       model.value.products = transfer.products.map((p) => {
         return {
-          product_id: p.ProductTransaction.product_id,
-          description: p.ProductTransaction.description,
-          quantity: p.ProductTransaction.quantity,
-          cost: p.ProductTransaction.cost,
-          amount: p.ProductTransaction.amount
+          product_id: p.StockTransferProducts.product_id,
+          description: p.StockTransferProducts.description,
+          quantity: p.StockTransferProducts.quantity,
+          cost: p.StockTransferProducts.cost,
+          amount: p.StockTransferProducts.amount
         }
       })
     } else {

@@ -49,6 +49,7 @@ Product.belongsToMany(StockTransfer, {
   as: "stock_transfers",
 });
 
+// Product Category and General Product Category Relations
 ProductCategory.hasMany(ProductCategory, {
   foreignKey: "general_cat",
   as: "sub_categories",

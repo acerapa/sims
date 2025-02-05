@@ -11,7 +11,7 @@ PurchaseOrderProducts.init(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      authoIncrement: true,
+      autoIncrement: true,
     },
     product_id: {
       type: DataTypes.INTEGER,
@@ -29,7 +29,7 @@ PurchaseOrderProducts.init(
         key: "id",
       },
     },
-    descrription: {
+    description: {
       type: DataTypes.STRING,
       allowNull: true,
     },

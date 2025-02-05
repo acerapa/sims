@@ -2,9 +2,9 @@ const { sequelize } = require("../models");
 const Branch = require("../models/branch");
 const User = require("../models/user");
 const Product = require("../models/product");
-const ProductTransaction = require("../models/product-transaction");
 const StockTranfer = require("../models/stock-transfer");
 const Supplier = require("../models/supplier");
+const StockTransferProducts = require("../models/junction/stock-transfer-products");
 
 module.exports = {
   all: async (req, res) => {
@@ -45,7 +45,7 @@ module.exports = {
           },
           {
             model: Product,
-            through: ProductTransaction,
+            through: StockTransferProducts,
             as: "products",
             attributes: ["id"],
           },
@@ -71,8 +71,8 @@ module.exports = {
 
       await Promise.all(
         data.products.map((product) => {
-          product.transfer_id = transfer.id;
-          return ProductTransaction.create(product, {
+          product.stock_transfer_id = transfer.id;
+          return StockTransferProducts.create(product, {
             transaction: transaction,
           });
         })
@@ -98,9 +98,9 @@ module.exports = {
         });
       }
       if (data.products) {
-        const products = await ProductTransaction.findAll({
+        const products = await StockTransferProducts.findAll({
           where: {
-            transfer_id: req.params.id,
+            stock_transfer_id: req.params.id,
           },
           attributes: ["id", "product_id"],
         });
@@ -112,8 +112,8 @@ module.exports = {
           ...data.products
             .filter((p) => !currentProductIds.includes(p.product_id))
             .map((p) =>
-              ProductTransaction.create(
-                { ...p, transfer_id: req.params.id },
+              StockTransferProducts.create(
+                { ...p, stock_transfer_id: req.params.id },
                 { transaction: transaction }
               )
             ),
@@ -126,14 +126,14 @@ module.exports = {
                 (p) => p.product_id == product.product_id
               );
 
-              return ProductTransaction.update(toUpdateFields, {
+              return StockTransferProducts.update(toUpdateFields, {
                 where: {
                   id: product.id,
                 },
                 transaction: transaction,
               });
             } else {
-              return ProductTransaction.destroy({
+              return StockTransferProducts.destroy({
                 where: {
                   id: product.id,
                 },
@@ -191,7 +191,7 @@ module.exports = {
           },
           {
             model: Product,
-            through: ProductTransaction,
+            through: StockTransferProducts,
             as: "products",
             attributes: ["id"],
           },

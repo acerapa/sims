@@ -6,6 +6,16 @@
     @after-delete="onAfterDelete"
   />
   <div class="cont flex flex-col gap-6">
+    <AlertComponent
+      v-if="!currentBranch"
+      type="danger"
+      :text="'Please select current branch'"
+    >
+      Please refer
+      <RouterLink class="text-blue-400 underline" :to="{ name: 'branches' }">
+        here!
+      </RouterLink>
+    </AlertComponent>
     <div class="flex gap-6">
       <div class="flex-1">
         <p class="font-bold">Transfer Information</p>
@@ -96,6 +106,7 @@
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
+import AlertComponent from '@/components/shared/AlertComponent.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import RmaProductSelectRow from '@/components/stock-transfer/RmaProductSelectRow.vue'
 import RmaProductSelectHeader from '@/components/stock-transfer/RmaProductSelectHeader.vue'
@@ -273,7 +284,9 @@ onMounted(async () => {
   await settingsStore.getBranches()
   currentBranch.value = appStore.currentBranch
 
-  model.value.transfer.branch_from = currentBranch.value.id
+  model.value.transfer.branch_from = currentBranch.value
+    ? currentBranch.value.id
+    : ''
   model.value.transfer.processed_by = authStore.getAuthUser().id
 
   if (route.query.id) {
@@ -292,13 +305,13 @@ onMounted(async () => {
 
       model.value.products = rma.products.map((p) => {
         return {
-          product_id: p.ProductTransaction.product_id,
-          description: p.ProductTransaction.description,
-          quantity: p.ProductTransaction.quantity,
-          cost: p.ProductTransaction.cost,
-          amount: p.ProductTransaction.amount,
-          problem: p.ProductTransaction.problem,
-          serial_number: p.ProductTransaction.serial_number
+          product_id: p.StockTransferProducts.product_id,
+          description: p.StockTransferProducts.description,
+          quantity: p.StockTransferProducts.quantity,
+          cost: p.StockTransferProducts.cost,
+          amount: p.StockTransferProducts.amount,
+          problem: p.StockTransferProducts.problem,
+          serial_number: p.StockTransferProducts.serial_number
         }
       })
     } else {

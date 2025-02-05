@@ -44,6 +44,14 @@ StockTransferProducts.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    serial_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    problem: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   { sequelize }
 );

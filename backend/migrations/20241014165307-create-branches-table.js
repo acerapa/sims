@@ -1,5 +1,6 @@
 "use strict";
 
+const { getColumnConstrains } = require("../models");
 const Branch = require("../models/branch");
 
 /** @type {import('sequelize-cli').Migration} */
@@ -25,6 +26,16 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+
+    const constraints = await getColumnConstrains(Branch.getTableName());
+
+    if (constraints.length) {
+      await Promise.all(
+        constraints.map((cnt) => {
+          queryInterface.removeConstraint(cnt.tableName, cnt.constraintName);
+        })
+      );
+    }
 
     await queryInterface.dropTable(Branch.getTableName());
   },
