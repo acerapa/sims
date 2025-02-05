@@ -1,7 +1,6 @@
 "use strict";
 
-const { getColumnConstrains } = require("../models");
-const Branch = require("../models/branch");
+const PurchaseOrderProducts = require("../models/junction/purchase-order-products");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -14,8 +13,8 @@ module.exports = {
      */
 
     await queryInterface.createTable(
-      Branch.getTableName(),
-      Branch.getAttributes()
+      PurchaseOrderProducts.tableName,
+      PurchaseOrderProducts.getAttributes()
     );
   },
 
@@ -26,17 +25,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-
-    const constraints = await getColumnConstrains(Branch.getTableName());
-
-    if (constraints.length) {
-      await Promise.all(
-        constraints.map((cnt) => {
-          queryInterface.removeConstraint(cnt.tableName, cnt.constraintName);
-        })
-      );
-    }
-
-    await queryInterface.dropTable(Branch.getTableName());
+    await queryInterface.dropTable(PurchaseOrderProducts.tableName);
   },
 };

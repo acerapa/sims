@@ -8,16 +8,48 @@ const Customer = require("./customer");
 const BranchMember = require("./branch-member");
 const StockTransfer = require("./stock-transfer");
 const PurchaseOrder = require("./purchase-order");
+const PurchaseOrderProducts = require("./junction/purchase-order-products");
 const ProductSettings = require("./product-setting");
 const ProductSupplier = require("./product-supplier");
 const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
-const ProductTransaction = require("./product-transaction");
 const PhysicalInventoryItem = require("./physical-inventory-item");
 const ProductToCategories = require("./junction/product-to-categories");
 const ProductDetails = require("./product-details");
 const ServiceDetails = require("./service-details");
+const StockTransferProducts = require("./junction/stock-transfer-products");
 
+// Purchase Order, Purchase Order Product and Product Relations
+PurchaseOrder.belongsToMany(Product, {
+  through: PurchaseOrderProducts,
+  foreignKey: "purchase_order_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(PurchaseOrder, {
+  through: PurchaseOrderProducts,
+  foreignKey: "product_id",
+  otherKey: "purchase_order_id",
+  as: "purchase_orders",
+});
+
+// Stock Transfer, Product and Stock Transfer Product Relations
+StockTransfer.belongsToMany(Product, {
+  through: StockTransferProducts,
+  foreignKey: "stock_transfer_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(StockTransfer, {
+  through: StockTransferProducts,
+  foreignKey: "product_id",
+  otherKey: "stock_transfer_id",
+  as: "stock_transfers",
+});
+
+// Product Category and General Product Category Relations
 ProductCategory.hasMany(ProductCategory, {
   foreignKey: "general_cat",
   as: "sub_categories",
@@ -73,20 +105,6 @@ Supplier.belongsToMany(Product, {
   as: "products",
   foreignKey: "supplier_id",
   otherKey: "product_id",
-});
-
-Product.belongsToMany(PurchaseOrder, {
-  through: ProductTransaction,
-  foreignKey: "product_id",
-  otherKey: "transfer_id",
-  as: "orders",
-});
-
-PurchaseOrder.belongsToMany(Product, {
-  through: ProductTransaction,
-  foreignKey: "transfer_id",
-  otherKey: "product_id",
-  as: "products",
 });
 
 PurchaseOrder.belongsTo(Address, {
@@ -201,21 +219,6 @@ BranchMember.belongsTo(Branch, {
 Branch.hasOne(BranchMember, {
   foreignKey: "branch_id",
   as: "branch_through",
-});
-
-// Stock transfer version
-StockTransfer.belongsToMany(Product, {
-  through: ProductTransaction,
-  foreignKey: "transfer_id",
-  otherKey: "product_id",
-  as: "products",
-});
-
-Product.belongsToMany(StockTransfer, {
-  through: ProductTransaction,
-  foreignKey: "product_id",
-  otherKey: "transfer_id",
-  as: "transfers",
 });
 
 StockTransfer.belongsTo(Branch, {

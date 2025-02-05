@@ -1,6 +1,7 @@
-'use strict';
+"use strict";
 
-const User = require('../models/user');
+const { getColumnConstrains } = require("../models");
+const User = require("../models/user");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -22,6 +23,15 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
 
+    const constraints = await getColumnConstrains(User.getTableName());
+    if (constraints.length) {
+      await Promise.all(
+        constraints.map((cnt) =>
+          queryInterface.removeConstraint(cnt.tableName, cnt.constraintName)
+        )
+      );
+    }
+
     await queryInterface.dropTable(User.getTableName());
-  }
+  },
 };

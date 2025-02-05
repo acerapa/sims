@@ -7,6 +7,7 @@ import inventoryRoutes from './inventory'
 import settingsRoutes from './settings'
 import transferRoutes from './transfer'
 import salesRoutes from './sales'
+import purchaseRoutes from './purchase'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,7 +17,8 @@ const router = createRouter({
     ...settingsRoutes,
     ...reportRoutes,
     ...transferRoutes,
-    ...salesRoutes
+    ...salesRoutes,
+    ...purchaseRoutes
   ]
 })
 

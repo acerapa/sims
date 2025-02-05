@@ -534,16 +534,16 @@ onMounted(async () => {
         return {
           product_id: product.id,
           name: product.name,
-          description: product.ProductTransaction.description
-            ? product.ProductTransaction.description
+          description: product.PurchaseOrderProducts.description
+            ? product.PurchaseOrderProducts.description
             : product.purchase_description,
-          quantity: product.ProductTransaction.quantity,
+          quantity: product.PurchaseOrderProducts.quantity,
           cost: getCost(
-            product.ProductTransaction.cost,
+            product.PurchaseOrderProducts.cost,
             product,
             order.supplier_id
           ),
-          amount: product.ProductTransaction.amount
+          amount: product.PurchaseOrderProducts.amount
         }
       })
     ]
@@ -587,7 +587,7 @@ watch(
   () => {
     if (model.value.products.length) {
       model.value.order.amount = model.value.products
-        .map((prod) => prod.amount)
+        .map((prod) => parseInt(prod.amount))
         .reduce((a, b) => a + b, 0)
     }
   },

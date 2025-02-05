@@ -7,7 +7,9 @@
       :class="isIncludedRoute(nav) ? 'bg-dark-blue font-bold exact-active' : ''"
       @click="emitRouteClick(props.nav.route, props.nav.children)"
     >
-      <div class="flex-1 flex gap-3">
+      <div
+        class="flex-1 flex items-center gap-3 text-sm tracking-wider text-nowrap"
+      >
         <img :src="props.nav.icon" alt="" />
         {{ props.nav.text }}
       </div>
@@ -39,7 +41,9 @@
       >
         <img :src="child.icon" class="outline-dot" alt="dot" />
         <img :src="dot" class="dot" alt="dot" />
-        {{ child.text }}
+        <p class="text-nowrap text-sm">
+          {{ child.text }}
+        </p>
       </RouterLink>
     </div>
   </div>

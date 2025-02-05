@@ -1,8 +1,6 @@
 "use strict";
 
-const ProductTransaction = require("../models/product-transaction");
-const tableName = ProductTransaction.getTableName();
-const attributes = ProductTransaction.getAttributes();
+const StockTransferProducts = require("../models/junction/stock-transfer-products");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -13,7 +11,11 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable(tableName, attributes);
+
+    await queryInterface.createTable(
+      StockTransferProducts.getTableName(),
+      StockTransferProducts.getAttributes()
+    );
   },
 
   async down(queryInterface, Sequelize) {
@@ -23,6 +25,7 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable(tableName);
+
+    await queryInterface.dropTable(StockTransferProducts.getTableName());
   },
 };
