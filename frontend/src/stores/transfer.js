@@ -40,15 +40,48 @@ export const useTransferStore = defineStore('tranfer', function () {
   }
 
   const createTransfer = async (model) => {
-    return await authenticatedApi(`stock-transfer/register`, Method.POST, model)
-  }
-
-  const updateTransfer = async (model, id) => {
-    return await authenticatedApi(
-      `stock-transfer/update/${id}`,
+    const res = await authenticatedApi(
+      `stock-transfer/register`,
       Method.POST,
       model
     )
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (transfers.value.length) {
+        transfers.value.unshift(res.data.transfer)
+      } else {
+        await fetchTransfers()
+      }
+    }
+
+    return isSuccess
+  }
+
+  const updateTransfer = async (model, id) => {
+    const res = await authenticatedApi(
+      `stock-transfer/${id}`,
+      Method.PUT,
+      model
+    )
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (id == transfer.value.id) {
+        transfer.value = res.data.transfer
+      }
+
+      if (transfers.value.length) {
+        const index = transfers.value.findIndex((t) => t.id == id)
+        if (index > -1) {
+          transfers.value[index] = res.data.transfer
+        }
+      } else {
+        await fetchTransfers()
+      }
+    }
+
+    return isSuccess
   }
 
   const fetchById = async (id) => {

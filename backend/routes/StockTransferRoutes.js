@@ -16,6 +16,6 @@ router.get("/", all);
 router.get("/:id", getById);
 router.delete("/:id", destroy);
 router.post("/register", validateBody(StockTransferCreateSchema), register);
-router.post("/update/:id", validateBody(StockTransferUpdateSchema), update);
+router.put("/:id", validateBody(StockTransferUpdateSchema), update);
 
 module.exports = router;
