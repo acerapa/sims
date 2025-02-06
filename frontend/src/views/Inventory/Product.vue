@@ -105,6 +105,7 @@ import { EventEnum } from '@/data/event'
 import { DateHelpers } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
 import router from '@/router'
+import { InventoryConst } from '@/router/constants/route.constants'
 
 const selectedId = ref(0)
 const searchText = ref('')
@@ -194,13 +195,13 @@ const filteredData = computed(() => {
  ** ================================================*/
 const onNewRecord = () => {
   router.push({
-    name: 'product-form'
+    name: InventoryConst.PRODUCT_FORM
   })
 }
 
 const onView = (id) => {
   router.push({
-    name: 'product-form',
+    name: InventoryConst.PRODUCT_FORM,
     query: { id }
   })
 }

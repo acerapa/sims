@@ -253,7 +253,10 @@
       >
         <button class="btn-danger-outline" v-if="route.query.id">Delete</button>
         <div class="flex gap-3">
-          <RouterLink :to="{ name: 'purchase-order' }" class="btn-gray-outline">
+          <RouterLink
+            :to="{ name: PurchaseConst.PURCHASE_ORDER }"
+            class="btn-gray-outline"
+          >
             {{ isDisabled ? 'Back' : 'Cancel' }}
           </RouterLink>
           <button
@@ -314,6 +317,7 @@ import { useAppStore } from '@/stores/app'
 import { useSettingsStore } from '@/stores/settings'
 import { usePrint } from '@/use/usePrint'
 import { ToastTypes } from '@/data/types'
+import { PurchaseConst } from '@/router/constants/route.constants'
 
 const route = useRoute()
 const isEdit = ref(false)
@@ -483,7 +487,7 @@ const onSubmit = async (isAddNew = false) => {
 
       if (!isAddNew) {
         router.push({
-          name: 'purchase-order'
+          name: PurchaseConst.PURCHASE_ORDER
         })
       }
     }
@@ -498,7 +502,7 @@ const onSubmit = async (isAddNew = false) => {
 
 const onReceiveOrder = () => {
   router.push({
-    name: 'purchase-receive-order',
+    name: PurchaseConst.PURCHASE_RECEIVE_ORDER,
     params: {
       id: route.query.id
     }

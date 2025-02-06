@@ -33,6 +33,7 @@ import CustomTable from '@/components/shared/CustomTable.vue'
 import { useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import IbrrListRow from '@/components/stock-transfer/ibrr-list-row.vue'
+import { TransferConst } from '@/router/constants/route.constants'
 
 const router = useRouter()
 const searchText = ref('')
@@ -67,13 +68,13 @@ const filteredData = computed(() => {
  ** ================================================*/
 const onAddNewRecord = () => {
   router.push({
-    name: 'ibrr-form'
+    name: TransferConst.IBRR_FORM
   })
 }
 
 const onView = (id) => {
   router.push({
-    name: 'ibrr-form',
+    name: TransferConst.IBRR_FORM,
     query: { id: id }
   })
 }

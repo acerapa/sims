@@ -8,6 +8,7 @@ import settingsRoutes from './settings'
 import transferRoutes from './transfer'
 import salesRoutes from './sales'
 import purchaseRoutes from './purchase'
+import { CommonConst } from './constants/route.constants'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,11 +30,11 @@ router.beforeEach(async (to, from, next) => {
     if (isAuth) {
       next()
     } else {
-      if (to.name == 'login') {
+      if (to.name == CommonConst.LOGIN) {
         next()
         return
       } else {
-        next({ name: 'login' })
+        next({ name: CommonConst.LOGIN })
         return
       }
     }

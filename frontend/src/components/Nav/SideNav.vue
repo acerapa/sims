@@ -1,5 +1,5 @@
 <template>
-  <div class="w-72 fixed h-screen bg-regular-blue text-white">
+  <div class="w-72 fixed h-screen bg-regular-blue text-white z-30">
     <!-- User Profile -->
     <div class="bg-lighter-blue flex p-3 items-center h-15 relative">
       <div class="flex-1 cursor-pointer" @click.stop="showDropdown = true">

@@ -85,6 +85,7 @@ import CustomInput from '@/components/shared/CustomInput.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { getCost } from '@/helper'
+import { PurchaseConst } from '@/router/constants/route.constants'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import {
   ProductOrderedStatus,
@@ -175,7 +176,7 @@ const onReceiveOrder = async () => {
   if (res.status == 200) {
     await purchaseOrderStore.fetchPurchaseOrderById(route.params.id)
     router.push({
-      name: 'purchase-order-create',
+      name: PurchaseConst.PURCHASE_ORDER_FORM,
       query: {
         id: route.params.id
       }

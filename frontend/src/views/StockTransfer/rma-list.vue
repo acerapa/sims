@@ -33,6 +33,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useTransferStore } from '@/stores/transfer'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
+import { TransferConst } from '@/router/constants/route.constants'
 
 const searchText = ref('')
 const router = useRouter()
@@ -68,13 +69,13 @@ const filterData = computed(() => {
  ** ================================================*/
 const onNewRecord = () => {
   router.push({
-    name: 'rma-form'
+    name: TransferConst.RMA_FORM
   })
 }
 
 const onView = (id) => {
   router.push({
-    name: 'rma-form',
+    name: TransferConst.RMA_FORM,
     query: {
       id: id
     }

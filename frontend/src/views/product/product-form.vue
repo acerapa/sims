@@ -348,7 +348,7 @@ const onSubmit = async () => {
       duration: 2000
     })
     router.push({
-      name: 'products'
+      name: route.query.redirect ? route.query.redirect : 'products'
     })
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {

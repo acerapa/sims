@@ -26,7 +26,7 @@
         name="included-products"
         :options="productOptions"
         v-model="model.products"
-        @add-new="showProductModal = true"
+        @add-new="onAddNewProduct"
         placeholder="Select included products"
         :has-add-new="true"
         :can-search="true"
@@ -42,7 +42,6 @@
     :href="`product-setting/delete/${props.selectedId}`"
     @after-delete="onAfterDelete"
   />
-  <ProductModal v-model="showProductModal" v-if="showProductModal" />
 </template>
 <script setup>
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
@@ -50,12 +49,13 @@ import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { onMounted, computed, ref } from 'vue'
 import { useProductStore } from '@/stores/product'
-import ProductModal from '@/components/product/ProductModal.vue'
 import { useSettingsStore } from '@/stores/settings'
 import { ProductReorderSchema } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { useRouter } from 'vue-router'
+import { InventoryConst } from '@/router/constants/route.constants'
 
 const props = defineProps({
   selectedId: {
@@ -66,6 +66,8 @@ const props = defineProps({
 
 const showModal = defineModel()
 const showConfirmModal = ref(false)
+
+const router = useRouter()
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
 
@@ -151,5 +153,14 @@ const onAfterDelete = async () => {
   showModal.value = false
   showConfirmModal.value = false
   await settingStore.fetchAllProductReorderingPoints()
+}
+
+const onAddNewProduct = () => {
+  router.push({
+    name: InventoryConst.PRODUCT_FORM,
+    query: {
+      redirect: 'product-settings'
+    }
+  })
 }
 </script>
