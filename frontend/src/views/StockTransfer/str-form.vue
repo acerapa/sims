@@ -140,12 +140,13 @@ import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
 import { TransferType } from 'shared/enums'
-import { DateHelpers, GeneralHelpers, ObjectHelpers } from 'shared/helpers'
+import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { StockTransferCreateSchema } from 'shared'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { usePrint } from '@/use/usePrint'
+import { ToastTypes } from '@/data/types'
 
 const rowEventName = 'str-product-row'
 
@@ -287,14 +288,29 @@ const onSubmit = async () => {
     return
   }
 
+  let isSuccess = false
   if (!isEdit.value) {
     model.value.transfer.when = new Date()
-    await transferStore.createTransfer(model.value)
-    router.push({
-      name: 'str-list'
-    })
+    isSuccess = await transferStore.createTransfer(model.value)
   } else {
-    await transferStore.updateTransfer(model.value, route.query.id)
+    isSuccess = await transferStore.updateTransfer(model.value, route.query.id)
+  }
+
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${isEdit.value ? 'updated' : 'created'} STR!`,
+      type: ToastTypes.SUCCESS
+    })
+    if (!isEdit.value) {
+      router.push({
+        name: 'str-list'
+      })
+    }
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${isEdit.value ? 'update' : 'create'} STR!`,
+      type: ToastTypes.ERROR
+    })
   }
 }
 
@@ -304,7 +320,8 @@ const onCancel = () => {
   })
 }
 
-const onAfterDelete = () => {
+const onAfterDelete = async () => {
+  await transferStore.removeTransfer(route.query.id)
   router.push({
     name: 'str-list'
   })
@@ -314,7 +331,7 @@ const onAfterDelete = () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await productStore.fetchAllProducts()
+  await productStore.getProducts()
   await settingStore.getBranches()
 
   // check if there is an id query param

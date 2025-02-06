@@ -2,7 +2,8 @@
   <DeleteConfirmModal
     v-model="showConfirmModal"
     v-if="showConfirmModal"
-    :href="``"
+    :href="`stock-transfer/${route.query.id}`"
+    @after-delete="onAfterDelete"
   />
   <div class="cont">
     <p class="text-base font-bold">Fix asset form</p>
@@ -53,13 +54,19 @@
         class="flex gap-3"
         :class="route.query.id ? 'justify-between' : 'justify-end'"
       >
-        <button class="btn-danger-outline" v-if="route.query.id">Delete</button>
+        <button
+          class="btn-danger-outline"
+          @click="showConfirmModal = true"
+          v-if="route.query.id"
+        >
+          Delete
+        </button>
         <div class="flex gap-3">
           <button class="btn-gray-outline" @click="onCancel">Cancel</button>
           <button class="btn-outline" v-if="!route.query.id">
             Save and New
           </button>
-          <button class="btn" @click="onSubmit">
+          <button class="btn" @click="onSubmit()">
             {{ route.query.id ? 'Update' : 'Save' }}
           </button>
         </div>
@@ -85,6 +92,8 @@ import { useSettingsStore } from '@/stores/settings'
 import { useAppStore } from '@/stores/app'
 import { StockTransferCreateSchema } from 'shared'
 import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 
 const rowEventName = 'fix-asset-row-event'
 
@@ -153,6 +162,7 @@ onMounted(async () => {
 })
 
 const onSubmit = async (isAddNew = false) => {
+  let isSuccess = false
   if (!route.query.id && authUser.value) {
     // additional settings
     model.value.transfer.processed_by = authUser.value.id
@@ -194,12 +204,26 @@ const onSubmit = async (isAddNew = false) => {
       return
     }
 
-    await transferStore.createTransfer(model.value)
+    isSuccess = await transferStore.createTransfer(model.value)
   } else {
-    await transferStore.updateTransfer(model.value, route.query.id)
+    isSuccess = await transferStore.updateTransfer(model.value, route.query.id)
   }
 
-  if (!isAddNew) {
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${
+        route.query.id ? 'updated' : 'created'
+      } PO to Fix!`,
+      type: ToastTypes.SUCCESS
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${route.query.id ? 'update' : 'create'} PO to Fix!`,
+      type: ToastTypes.ERROR
+    })
+  }
+
+  if (!isAddNew && isSuccess && !route.query.id) {
     router.push({
       name: 'fix-asset-list'
     })
@@ -210,5 +234,12 @@ const onSubmit = async (isAddNew = false) => {
 
 const onCancel = () => {
   router.back()
+}
+
+const onAfterDelete = async () => {
+  await transferStore.removeTransfer(route.query.id)
+  router.push({
+    name: 'fix-asset-list'
+  })
 }
 </script>

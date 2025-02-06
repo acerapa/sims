@@ -84,7 +84,7 @@ const onView = (id) => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await transferStore.fetchTransfers()
+  await transferStore.getTransfers()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>
