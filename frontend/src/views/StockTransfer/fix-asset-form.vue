@@ -94,6 +94,7 @@ import { StockTransferCreateSchema } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { TransferConst } from '@/router/constants/route.constants'
 
 const rowEventName = 'fix-asset-row-event'
 
@@ -225,7 +226,7 @@ const onSubmit = async (isAddNew = false) => {
 
   if (!isAddNew && isSuccess && !route.query.id) {
     router.push({
-      name: 'fix-asset-list'
+      name: TransferConst.FIX_ASSET_LIST
     })
 
     return
@@ -239,7 +240,7 @@ const onCancel = () => {
 const onAfterDelete = async () => {
   await transferStore.removeTransfer(route.query.id)
   router.push({
-    name: 'fix-asset-list'
+    name: TransferConst.FIX_ASSET_LIST
   })
 }
 </script>

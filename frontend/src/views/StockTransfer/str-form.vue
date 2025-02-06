@@ -147,6 +147,7 @@ import { RouterLink, useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { usePrint } from '@/use/usePrint'
 import { ToastTypes } from '@/data/types'
+import { TransferConst } from '@/router/constants/route.constants'
 
 const rowEventName = 'str-product-row'
 
@@ -303,7 +304,7 @@ const onSubmit = async () => {
     })
     if (!isEdit.value) {
       router.push({
-        name: 'str-list'
+        name: TransferConst.STR_LIST
       })
     }
   } else {
@@ -316,14 +317,14 @@ const onSubmit = async () => {
 
 const onCancel = () => {
   router.push({
-    name: 'str-list'
+    name: TransferConst.STR_LIST
   })
 }
 
 const onAfterDelete = async () => {
   await transferStore.removeTransfer(route.query.id)
   router.push({
-    name: 'str-list'
+    name: TransferConst.STR_LIST
   })
 }
 

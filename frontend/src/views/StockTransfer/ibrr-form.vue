@@ -126,6 +126,7 @@ import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
 import Event from '@/event'
+import { TransferConst } from '@/router/constants/route.constants'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
@@ -276,7 +277,7 @@ const onSubmit = async () => {
       type: ToastTypes.SUCCESS
     })
     if (!isEdit.value) {
-      router.push({ name: 'ibrr-list' })
+      router.push({ name: TransferConst.IBRR_LIST })
     }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -287,12 +288,12 @@ const onSubmit = async () => {
 }
 
 const onCancel = () => {
-  router.push({ name: 'ibrr-list' })
+  router.push({ name: TransferConst.IBRR_LIST })
 }
 
 const onAfterDelete = async () => {
   await transferStore.removeTransfer(route.query.id)
-  router.push({ name: 'ibrr-list' })
+  router.push({ name: TransferConst.IBRR_LIST })
 }
 
 /** ================================================

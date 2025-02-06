@@ -128,6 +128,7 @@ import {
   ProductTransferSchema
 } from 'shared/validators'
 import { ToastTypes } from '@/data/types'
+import { TransferConst } from '@/router/constants/route.constants'
 
 const rowEventName = 'rma-product-event'
 
@@ -268,7 +269,7 @@ const onSubmit = async () => {
       type: ToastTypes.SUCCESS
     })
     router.push({
-      name: 'rma-list'
+      name: TransferConst.RMA_LIST
     })
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -285,7 +286,7 @@ const onCancel = () => {
 const onAfterDelete = async () => {
   await transferStore.removeTransfer(route.query.id)
   router.push({
-    name: 'rma-list'
+    name: TransferConst.RMA_LIST
   })
 }
 

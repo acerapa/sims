@@ -34,6 +34,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import { DateHelpers } from 'shared/helpers'
+import { TransferConst } from '@/router/constants/route.constants'
 
 const searchText = ref()
 const router = useRouter()
@@ -69,13 +70,13 @@ const filteredData = computed(() => {
  ** ================================================*/
 const onAddNewRecord = () => {
   router.push({
-    name: 'str-form'
+    name: TransferConst.STR_FORM
   })
 }
 
 const onView = (id) => {
   router.push({
-    name: 'str-form',
+    name: TransferConst.STR_FORM,
     query: { id }
   })
 }

@@ -6,6 +6,11 @@ import settings from '@/assets/icons/settings.svg'
 import outlineDot from '@/assets/icons/outline-dot.svg'
 import transfer from '@/assets/icons/transfer.png'
 import sales from '@/assets/icons/sales.png'
+import {
+  InventoryConst,
+  PurchaseConst,
+  TransferConst
+} from '@/router/constants/route.constants'
 
 export default [
   {
@@ -20,18 +25,18 @@ export default [
     children: [
       {
         text: 'Products',
-        route: 'products',
+        route: InventoryConst.PRODUCTS,
         icon: outlineDot,
-        includes_active: ['product-form']
+        includes_active: [InventoryConst.PRODUCT_FORM]
       },
       {
         text: 'Services',
-        route: 'services',
+        route: InventoryConst.SERVICES,
         icon: outlineDot
       },
       {
         text: 'Inventory Stock Status',
-        route: 'inventory-stock-status',
+        route: InventoryConst.INVENTORY_STOCK_STATUS,
         icon: outlineDot
       }
     ]
@@ -43,13 +48,13 @@ export default [
     children: [
       {
         text: 'Purchase Order',
-        route: 'purchase-order',
+        route: PurchaseConst.PURCHASE_ORDER,
         icon: outlineDot,
-        includes_active: ['purchase-order-create']
+        includes_active: [PurchaseConst.PURCHASE_ORDER_FORM]
       },
       {
         text: 'Vendor management',
-        route: 'vendors',
+        route: PurchaseConst.VENDORS,
         icon: outlineDot
       }
     ]
@@ -79,32 +84,32 @@ export default [
   },
   {
     text: 'Stock Transfers',
-    route: 'transfer',
+    route: TransferConst.TRANSFER,
     icon: transfer,
     children: [
       {
         text: 'STR List',
-        route: 'str-list',
+        route: TransferConst.STR_LIST,
         icon: outlineDot,
-        includes_active: ['str-form']
+        includes_active: [TransferConst.STR_FORM]
       },
       {
         text: 'IBRR List',
-        route: 'ibrr-list',
+        route: TransferConst.IBRR_LIST,
         icon: outlineDot,
-        includes_active: ['ibrr-form']
+        includes_active: [TransferConst.IBRR_FORM]
       },
       {
         text: 'RMA List',
-        route: 'rma-list',
+        route: TransferConst.RMA_LIST,
         icon: outlineDot,
-        includes_active: ['rma-form']
+        includes_active: [TransferConst.RMA_FORM]
       },
       {
         text: 'PO to Fix list',
-        route: 'fix-asset-list',
+        route: TransferConst.FIX_ASSET_LIST,
         icon: outlineDot,
-        includes_active: ['fix-asset-form']
+        includes_active: [TransferConst.FIX_ASSET_FORM]
       }
     ]
   },

@@ -1,5 +1,4 @@
 <template>
-  <ProductModal v-model="showModal" v-if="showModal" />
   <slot></slot>
   <div
     class="grid gap-3 items-start min-w-[750px]"
@@ -19,7 +18,7 @@
         placeholder="Select product"
         :options="productOptions"
         :has-add-new="true"
-        @add-new="showModal = true"
+        @add-new="onNewProduct"
         v-model="product.product_id"
         :error="props.errors.product_id"
         :key="product.product_id"
@@ -80,9 +79,13 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useProductStore } from '@/stores/product'
-import ProductModal from '@/components/product/ProductModal.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { getCost } from '@/helper'
+import { useRouter } from 'vue-router'
+import {
+  InventoryConst,
+  PurchaseConst
+} from '@/router/constants/route.constants'
 
 const props = defineProps({
   ndx: {
@@ -107,8 +110,8 @@ const props = defineProps({
   }
 })
 
+const router = useRouter()
 const product = defineModel()
-const showModal = ref(false)
 const emit = defineEmits(['remove'])
 const productStore = useProductStore()
 const productOptions = computed(() => {
@@ -124,6 +127,15 @@ const productOptions = computed(() => {
       return !props.selected.map((p) => p.product_id).includes(prod.value)
     })
 })
+
+const onNewProduct = () => {
+  router.push({
+    name: InventoryConst.PRODUCT_FORM,
+    query: {
+      redirect: PurchaseConst.PURCHASE_ORDER_FORM
+    }
+  })
+}
 
 onMounted(async () => {
   await productStore.getProducts()

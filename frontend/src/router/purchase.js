@@ -1,23 +1,25 @@
+import { PurchaseConst } from './constants/route.constants'
+
 export default [
   {
     path: '/purchase',
-    name: 'purchase',
+    name: PurchaseConst.PURCHASE,
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
-      name: 'purchase-order'
+      name: PurchaseConst.PURCHASE_ORDER
     },
     children: [
       {
         path: '/purchase-order',
-        name: 'purchase-order',
+        name: PurchaseConst.PURCHASE_ORDER,
         component: () => import('@/views/purchase/PurchaseOrder.vue'),
         meta: {
           requiresAuth: true
         }
       },
       {
-        path: '/purchase-order-create',
-        name: 'purchase-order-create',
+        path: '/purchase-order-form',
+        name: PurchaseConst.PURCHASE_ORDER_FORM,
         component: () => import('@/views/purchase/PurchaseOrderForm.vue'),
         meta: {
           requiresAuth: true,
@@ -26,7 +28,7 @@ export default [
       },
       {
         path: '/purchase-receive-order/:id',
-        name: 'purchase-receive-order',
+        name: PurchaseConst.PURCHASE_RECEIVE_ORDER,
         component: () => import('@/views/purchase/ReceiveOrder.vue'),
         meta: {
           title: 'Receive Order',
@@ -35,7 +37,7 @@ export default [
       },
       {
         path: '/vendors',
-        name: 'vendors',
+        name: PurchaseConst.VENDORS,
         component: () => import('@/views/purchase/Vendor.vue'),
         meta: {
           requiresAuth: true

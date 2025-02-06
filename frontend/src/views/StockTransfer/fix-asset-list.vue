@@ -34,6 +34,7 @@ import { onMounted, computed, ref } from 'vue'
 import Event from '@/event'
 import { EventEnum } from '../../data/event/index'
 import { DateHelpers } from 'shared/helpers'
+import { TransferConst } from '@/router/constants/route.constants'
 
 const router = useRouter()
 const searchText = ref('')
@@ -60,13 +61,13 @@ const filteredData = computed(() => {
 
 const onAddNewRecord = () => {
   router.push({
-    name: 'fix-asset-form'
+    name: TransferConst.FIX_ASSET_FORM
   })
 }
 
 const onView = (id) => {
   router.push({
-    name: 'fix-asset-form',
+    name: TransferConst.FIX_ASSET_FORM,
     query: {
       id
     }

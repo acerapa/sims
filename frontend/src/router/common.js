@@ -1,3 +1,5 @@
+import { CommonConst } from './constants/route.constants'
+
 export default [
   {
     path: '/',
@@ -6,7 +8,7 @@ export default [
     children: [
       {
         path: '/dashboard',
-        name: 'dashboard',
+        name: CommonConst.DASHBOARD,
         component: () => import('@/views/Dashboard.vue'),
         meta: {
           requiresAuth: true
@@ -14,7 +16,7 @@ export default [
       },
       {
         path: '/employees',
-        name: 'employees',
+        name: CommonConst.EMPLOYEES,
         component: () => import('@/views/Employee.vue'),
         meta: {
           requiresAuth: true
@@ -48,7 +50,7 @@ export default [
   },
   {
     path: '/login',
-    name: 'login',
+    name: CommonConst.LOGIN,
     component: () => import('@/views/Sign-in.vue')
   }
 ]

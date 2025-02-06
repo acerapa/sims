@@ -14,7 +14,7 @@
   />
   <div class="flex flex-col gap-6">
     <RouterLink
-      :to="{ name: 'purchase-order-create' }"
+      :to="{ name: PurchaseConst.PURCHASE_ORDER_FORM }"
       class="btn w-fit"
       @click="showModal = true"
     >
@@ -119,6 +119,7 @@ import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
+import { PurchaseConst } from '@/router/constants/route.constants'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import { useVendorStore } from '@/stores/supplier'
 import { DateHelpers } from 'shared'
@@ -200,7 +201,7 @@ const filteredData = computed(() => {
  ** ================================================*/
 const onView = (id) => {
   router.push({
-    name: 'purchase-order-create',
+    name: PurchaseConst.PURCHASE_ORDER_FORM,
     query: {
       id: id ? id : selectedId.value
     }

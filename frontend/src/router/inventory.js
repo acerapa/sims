@@ -1,8 +1,9 @@
 import Product from '@/views/Inventory/Product.vue'
+import { InventoryConst } from './constants/route.constants'
 export default [
   {
     path: '/inventory',
-    name: 'inventory',
+    name: InventoryConst.INVENTORY,
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
       name: 'products'
@@ -10,7 +11,7 @@ export default [
     children: [
       {
         path: '/inventory-stock-status',
-        name: 'inventory-stock-status',
+        name: InventoryConst.INVENTORY_STOCK_STATUS,
         component: () =>
           import('@/views/Inventory/InventoryStockStatusPage.vue'),
         meta: {
@@ -20,7 +21,7 @@ export default [
       },
       {
         path: '/physical-inventory-details/:id',
-        name: 'physical-inventory-details',
+        name: InventoryConst.PHYSICAL_INVENTORY_DETAILS,
         component: () =>
           import('@/views/Inventory/PhysicalInventoryDetails.vue'),
         meta: {
@@ -30,7 +31,7 @@ export default [
       },
       {
         path: '/products',
-        name: 'products',
+        name: InventoryConst.PRODUCTS,
         component: Product,
         meta: {
           requiresAuth: true
@@ -38,7 +39,7 @@ export default [
       },
       {
         path: '/product/form',
-        name: 'product-form',
+        name: InventoryConst.PRODUCT_FORM,
         component: () => import('@/views/product/product-form.vue'),
         meta: {
           requiresAuth: true
@@ -46,7 +47,7 @@ export default [
       },
       {
         path: '/services',
-        name: 'services',
+        name: InventoryConst.SERVICES,
         component: () => import('@/views/Inventory/Services.vue'),
         meta: {
           requiresAuth: true
