@@ -320,7 +320,8 @@ const onCancel = () => {
   })
 }
 
-const onAfterDelete = () => {
+const onAfterDelete = async () => {
+  await transferStore.removeTransfer(route.query.id)
   router.push({
     name: 'str-list'
   })

@@ -127,6 +127,7 @@ import {
   Joi,
   ProductTransferSchema
 } from 'shared/validators'
+import { ToastTypes } from '@/data/types'
 
 const rowEventName = 'rma-product-event'
 
@@ -253,16 +254,27 @@ const onSubmit = async () => {
     return
   }
 
+  let isSuccess = false
   if (!isEdit.value) {
     model.value.transfer.when = new Date()
-    const res = await transferStore.createTransfer(model.value)
-    if (res.status == 200) {
-      router.push({
-        name: 'rma-list'
-      })
-    }
+    isSuccess = await transferStore.createTransfer(model.value)
   } else {
-    await transferStore.updateTransfer(model.value, route.query.id)
+    isSuccess = await transferStore.updateTransfer(model.value, route.query.id)
+  }
+
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${isEdit.value ? 'updated' : 'created'} RMA!`,
+      type: ToastTypes.SUCCESS
+    })
+    router.push({
+      name: 'rma-list'
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${isEdit.value ? 'update' : 'create'} RMA!`,
+      type: ToastTypes.ERROR
+    })
   }
 }
 
@@ -270,7 +282,8 @@ const onCancel = () => {
   router.back()
 }
 
-const onAfterDelete = () => {
+const onAfterDelete = async () => {
+  await transferStore.removeTransfer(route.query.id)
   router.push({
     name: 'rma-list'
   })
@@ -280,7 +293,7 @@ const onAfterDelete = () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await vendorStore.fetchAllSuppliers()
+  await vendorStore.getSuppliers()
   await settingsStore.getBranches()
   currentBranch.value = appStore.currentBranch
 

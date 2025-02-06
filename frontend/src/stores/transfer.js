@@ -67,8 +67,10 @@ export const useTransferStore = defineStore('tranfer', function () {
     const isSuccess = res.status < 400
 
     if (isSuccess) {
-      if (id == transfer.value.id) {
-        transfer.value = res.data.transfer
+      if (transfer.value) {
+        if (id == transfer.value.id) {
+          transfer.value = res.data.transfer
+        }
       }
 
       if (transfers.value.length) {
@@ -99,6 +101,15 @@ export const useTransferStore = defineStore('tranfer', function () {
     return t ? t : await fetchById(id)
   }
 
+  const removeTransfer = async (id) => {
+    if (transfers.value.length) {
+      transfers.value = transfers.value.filter((t) => t.id != id)
+    } else {
+      // assuming the transfer is already deleted
+      await fetchTransfers()
+    }
+  }
+
   return {
     fix,
     rmas,
@@ -108,6 +119,7 @@ export const useTransferStore = defineStore('tranfer', function () {
     getTransfers,
     fetchTransfers,
     updateTransfer,
+    removeTransfer,
     createTransfer
   }
 })

@@ -2,7 +2,7 @@
   <div>
     <div
       class="grid gap-3 items-start min-w-[750px]"
-      :class="[props.isDisabled ? 'grid grid-cols-9' : 'grid-cols-10']"
+      :class="[props.isDisabled ? 'grid grid-cols-10' : 'grid-cols-11']"
     >
       <div class="col-span-2 flex gap-3">
         <CustomInput
@@ -60,6 +60,16 @@
       <CustomInput
         class="col-span-1"
         type="number"
+        name="cost"
+        placeholder="Cost"
+        :disabled="props.isDisabled"
+        v-model="model.cost"
+        :error-has-text="false"
+        :error="modelErrors.cost"
+      />
+      <CustomInput
+        class="col-span-1"
+        type="number"
         name="amount"
         placeholder="Amount"
         :disabled="props.isDisabled"
@@ -85,7 +95,7 @@
 <script setup>
 import { useProductStore } from '@/stores/product'
 import CustomInput from '../shared/CustomInput.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import Event from '@/event'
 const props = defineProps({
   ndx: {
@@ -127,6 +137,7 @@ const onChange = () => {
       model.value.description = product.purchase_description
       model.value.cost = product.price
       model.value.quantity = 1
+      model.value.amount = 0
     }
   } else {
     model.value.serial_number = ''
@@ -143,4 +154,11 @@ onMounted(async () => {
     await productStore.fetchAllProducts()
   }
 })
+
+watch(
+  () => [model.value.quantity, model.value.cost],
+  () => {
+    model.value.amount = model.value.quantity * model.value.cost
+  }
+)
 </script>

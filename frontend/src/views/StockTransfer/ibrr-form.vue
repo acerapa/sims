@@ -124,6 +124,7 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import IbrrSelectHeader from '@/components/stock-transfer/ibrr-select-header.vue'
 import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 import Event from '@/event'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
@@ -264,11 +265,24 @@ const onSubmit = async () => {
     return
   }
 
-  if (!isEdit.value) {
-    await transferStore.createTransfer(model.value)
-    router.push({ name: 'ibrr-list' })
+  let isSuccess = false
+  if (!isEdit.value) isSuccess = await transferStore.createTransfer(model.value)
+  else
+    isSuccess = await transferStore.updateTransfer(model.value, route.query.id)
+
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${isEdit.value ? 'updated' : 'created'} IBRR!`,
+      type: ToastTypes.SUCCESS
+    })
+    if (!isEdit.value) {
+      router.push({ name: 'ibrr-list' })
+    }
   } else {
-    await transferStore.updateTransfer(model.value, route.query.id)
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${isEdit.value ? 'update' : 'create'} IBRR!`,
+      type: ToastTypes.ERROR
+    })
   }
 }
 
@@ -276,7 +290,8 @@ const onCancel = () => {
   router.push({ name: 'ibrr-list' })
 }
 
-const onAfterDelete = () => {
+const onAfterDelete = async () => {
+  await transferStore.removeTransfer(route.query.id)
   router.push({ name: 'ibrr-list' })
 }
 
@@ -285,7 +300,7 @@ const onAfterDelete = () => {
  ** ================================================*/
 onMounted(async () => {
   await settingStore.getBranches()
-  await productStore.fetchAllProducts()
+  await productStore.getProducts()
 
   // check if route has transfer id
   if (route.query.id) {
