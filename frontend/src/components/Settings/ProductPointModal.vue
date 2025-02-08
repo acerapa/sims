@@ -1,7 +1,7 @@
 <template>
   <ModalWrapper
     v-model="showModal"
-    title="New Ordering Point"
+    :title="props.selectedId ? 'Edit Re-ordering Point' : 'New Ordering Point'"
     modal-class="[&>form>div]:overflow-visible"
     :has-delete="props.selectedId ? true : false"
     @submit="onSubmit"
@@ -56,6 +56,7 @@ import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
 import { useRouter } from 'vue-router'
 import { InventoryConst } from '@/router/constants/route.constants'
+import { useAppStore } from '@/stores/app'
 
 const props = defineProps({
   selectedId: {
@@ -68,10 +69,9 @@ const showModal = defineModel()
 const showConfirmModal = ref(false)
 
 const router = useRouter()
+const appStore = useAppStore()
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
-
-const showProductModal = ref(false)
 
 const productOptions = computed(() => {
   return productStore.products.map((product) => {

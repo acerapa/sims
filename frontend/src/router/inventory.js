@@ -6,7 +6,7 @@ export default [
     name: InventoryConst.INVENTORY,
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
-      name: 'products'
+      name: InventoryConst.PRODUCTS
     },
     children: [
       {
