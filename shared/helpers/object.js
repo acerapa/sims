@@ -151,8 +151,6 @@ class ObjectHelpers {
       return false;
     }
 
-    // console.log("I passed here!");
-    // console.log(arr1, arr2);
     // check if the values are the same
     for (let i = 0; i < arr1.length; i++) {
       // type checking
@@ -168,7 +166,6 @@ class ObjectHelpers {
             return false;
           }
         } else {
-          // console.log(`comparing values: ${arr1[i] != arr2[i]}`);
           if (arr1[i] != arr2[i]) {
             return false;
           }
