@@ -25,6 +25,28 @@ export const useAppStore = defineStore('app', () => {
     return Object.keys(pages.value).includes(page)
   }
 
+  const isModalExist = (modal) => {
+    return Object.keys(modals.value).includes(modal)
+  }
+
+  const evaluatePageScopes = (routeData) => {
+    const { to } = routeData
+    Object.keys(pages.value).forEach((key) => {
+      if (!pages.value[key].route_scope.includes(to.name)) {
+        delete pages.value[key]
+      }
+    })
+  }
+
+  const evaluateModalScopes = (routeData) => {
+    const { to } = routeData
+    Object.keys(modals.value).forEach((key) => {
+      if (!modals.value[key].route_scope.includes(to.name)) {
+        delete modals.value[key]
+      }
+    })
+  }
+
   return {
     pages,
     modals,
@@ -32,7 +54,10 @@ export const useAppStore = defineStore('app', () => {
     currentBranch,
 
     isPageExist,
+    isModalExist,
     setPageState,
-    setModalState
+    setModalState,
+    evaluatePageScopes,
+    evaluateModalScopes
   }
 })

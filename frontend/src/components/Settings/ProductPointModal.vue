@@ -47,15 +47,18 @@
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
-import { ProductReorderSchema } from 'shared'
+import { ObjectHelpers, ProductReorderSchema } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
 import { useRouter } from 'vue-router'
-import { InventoryConst } from '@/router/constants/route.constants'
+import {
+  InventoryConst,
+  SettingConst
+} from '@/router/constants/route.constants'
 import { useAppStore } from '@/stores/app'
 
 const props = defineProps({
@@ -73,6 +76,17 @@ const appStore = useAppStore()
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
 
+const model = ref({
+  point: '',
+  products: []
+})
+
+const modelErrors = ref({})
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+
 const productOptions = computed(() => {
   return productStore.products.map((product) => {
     return {
@@ -82,29 +96,9 @@ const productOptions = computed(() => {
   })
 })
 
-const model = ref({
-  point: '',
-  products: []
-})
-
-const modelErrors = ref({})
-
-onMounted(async () => {
-  await productStore.fetchAllProducts()
-  if (props.selectedId) {
-    let orderingPoint = settingStore.productReorderingPoints.find(
-      (point) => point.id == props.selectedId
-    )
-
-    if (orderingPoint) {
-      model.value.point = orderingPoint.point
-      model.value.products = orderingPoint.product_details.map(
-        (pd) => pd.product.id
-      )
-    }
-  }
-})
-
+/** ================================================
+ * METHODS
+ ** ================================================*/
 const onSubmit = async () => {
   // validations
   const { error } = ProductReorderSchema.options({
@@ -163,4 +157,61 @@ const onAddNewProduct = () => {
     }
   })
 }
+
+const setPointModalState = () => {
+  appStore.setModalState('product_point_modal', {
+    state: model.value,
+    route_scope: [
+      SettingConst.PRODUCT_REORDERING_POINT,
+      InventoryConst.PRODUCT_FORM
+    ]
+  })
+}
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+
+onMounted(async () => {
+  await productStore.fetchAllProducts()
+  if (props.selectedId) {
+    let orderingPoint = settingStore.productReorderingPoints.find(
+      (point) => point.id == props.selectedId
+    )
+
+    if (orderingPoint) {
+      model.value.point = orderingPoint.point
+      model.value.products = orderingPoint.product_details.map(
+        (pd) => pd.product.id
+      )
+    }
+  }
+
+  if (appStore.isModalExist('product_point_modal')) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.modals['product_point_modal']
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.modals['product_point_modal'].state
+      )
+    }
+  } else {
+    setPointModalState()
+  }
+})
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value,
+  () => {
+    setPointModalState()
+  },
+  { deep: true }
+)
 </script>

@@ -4,7 +4,9 @@ export default [
   {
     path: '/',
     component: () => import('@/layout/NavLayout.vue'),
-    redirect: '/dashboard',
+    redirect: {
+      name: CommonConst.DASHBOARD
+    },
     children: [
       {
         path: '/dashboard',

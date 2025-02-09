@@ -58,7 +58,7 @@
   </div>
 </template>
 <script setup>
-import { computed, onBeforeMount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
 import ProductCategoryRow from '@/components/Settings/ProductCategoryRow.vue'
@@ -69,7 +69,10 @@ import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { useAppStore } from '@/stores/app'
 import { ObjectHelpers } from 'shared'
-import { InventoryConst } from '@/router/constants/route.constants'
+import {
+  InventoryConst,
+  SettingConst
+} from '@/router/constants/route.constants'
 
 const appStore = useAppStore()
 const settingsStore = useSettingsStore()
@@ -137,7 +140,7 @@ const onNewProductCategory = () => {
 const setProductSettingPageState = () => {
   appStore.setPageState('product_settings', {
     state: pageState,
-    route_scope: InventoryConst.PRODUCT_FORM
+    route_scope: [SettingConst.PRODUCT_SETTINGS, InventoryConst.PRODUCT_FORM]
   })
 }
 
@@ -172,10 +175,6 @@ onMounted(async () => {
   } else {
     setProductSettingPageState()
   }
-})
-
-onBeforeMount(() => {
-  console.log('Before component is mounted')
 })
 
 /** ================================================

@@ -1,15 +1,17 @@
+import { SettingConst } from './constants/route.constants'
+
 export default [
   {
     path: '/settings',
-    name: 'setting',
+    name: SettingConst.SETTING,
     redirect: {
-      name: 'branches'
+      name: SettingConst.BRANCHES
     },
     component: () => import('@/layout/NavLayout.vue'),
     children: [
       {
         path: 'product-settings',
-        name: 'product-settings',
+        name: SettingConst.PRODUCT_SETTINGS,
         component: () => import('@/views/Settings/ProductSettings.vue'),
         meta: {
           requiresAuth: true
@@ -17,7 +19,7 @@ export default [
       },
       {
         path: 'account-settings',
-        name: 'account-settings',
+        name: SettingConst.ACCOUNT_SETTINGS,
         component: () => import('@/views/Settings/Account.vue'),
         meta: {
           requiresAuth: true
@@ -25,7 +27,7 @@ export default [
       },
       {
         path: 'branches',
-        name: 'branches',
+        name: SettingConst.BRANCHES,
         component: () => import('@/views/Settings/Branch.vue'),
         meta: {
           requiresAuth: true
