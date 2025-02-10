@@ -105,7 +105,7 @@ import { EventEnum } from '@/data/event'
 import { DateHelpers } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
 import router from '@/router'
-import { InventoryConst } from '@/router/constants/route.constants'
+import { InventoryConst } from '@/const/route.constants'
 
 const selectedId = ref(0)
 const searchText = ref('')

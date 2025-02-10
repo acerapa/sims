@@ -29,7 +29,6 @@
             :has-label="true"
             :error-has-text="true"
             label="Select supplier"
-            @change="populateAddress"
             :options="supplierOptions"
             placeholder="Select supplier"
             :error="modelErrors.supplier_id"
@@ -112,7 +111,7 @@ import RmaProductSelectRow from '@/components/stock-transfer/RmaProductSelectRow
 import RmaProductSelectHeader from '@/components/stock-transfer/RmaProductSelectHeader.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { useVendorStore } from '@/stores/supplier'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { TransferType } from 'shared/enums'
 import { useRoute, useRouter } from 'vue-router'
@@ -128,7 +127,8 @@ import {
   ProductTransferSchema
 } from 'shared/validators'
 import { ToastTypes } from '@/data/types'
-import { TransferConst } from '@/router/constants/route.constants'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
+import { PageStateConst } from '@/const/state.constants'
 
 const rowEventName = 'rma-product-event'
 
@@ -290,6 +290,13 @@ const onAfterDelete = async () => {
   })
 }
 
+const setRMAFormPageState = () => {
+  appStore.setPageState(PageStateConst.RMA_FORM, {
+    route_scope: [InventoryConst.PRODUCT_FORM, TransferConst.RMA_FORM],
+    state: model.value
+  })
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -315,7 +322,6 @@ onMounted(async () => {
         new Date(),
         'YYYY-MM-DDTHH:II:SS-A'
       )
-      populateAddress()
 
       model.value.products = rma.products.map((p) => {
         return {
@@ -335,6 +341,38 @@ onMounted(async () => {
     isEdit.value = true
   }
 
+  // set page state
+  if (appStore.isPageExist(PageStateConst.RMA_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.RMA_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.RMA_FORM].state
+      )
+    }
+  } else {
+    setRMAFormPageState()
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value,
+  () => {
+    setRMAFormPageState()
+
+    if (model.value.transfer.supplier_id) {
+      populateAddress()
+    }
+  },
+  { deep: true }
+)
 </script>

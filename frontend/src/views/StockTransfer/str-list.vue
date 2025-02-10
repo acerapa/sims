@@ -34,7 +34,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import { DateHelpers } from 'shared/helpers'
-import { TransferConst } from '@/router/constants/route.constants'
+import { TransferConst } from '@/const/route.constants'
 
 const searchText = ref()
 const router = useRouter()

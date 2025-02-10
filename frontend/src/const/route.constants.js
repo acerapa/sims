@@ -32,3 +32,10 @@ export const TransferConst = Object.freeze({
   FIX_ASSET_LIST: 'fix-asset-list',
   FIX_ASSET_FORM: 'fix-asset-form'
 })
+
+export const SettingConst = Object.freeze({
+  SETTING: 'setting',
+  BRANCHES: 'branches',
+  PRODUCT_SETTINGS: 'product-settings',
+  ACCOUNT_SETTINGS: 'account-settings'
+})

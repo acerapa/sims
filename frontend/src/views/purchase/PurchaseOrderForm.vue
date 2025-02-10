@@ -317,11 +317,13 @@ import { useAppStore } from '@/stores/app'
 import { useSettingsStore } from '@/stores/settings'
 import { usePrint } from '@/use/usePrint'
 import { ToastTypes } from '@/data/types'
-import { PurchaseConst } from '@/router/constants/route.constants'
+import { InventoryConst, PurchaseConst } from '@/const/route.constants'
+import { PageStateConst } from '@/const/state.constants'
 
 const route = useRoute()
-const isEdit = ref(false)
 const router = useRouter()
+
+const isEdit = ref(false)
 const selectedStatus = ref()
 const statusModal = ref(false)
 const showVendorModal = ref(false)
@@ -509,6 +511,16 @@ const onReceiveOrder = () => {
   })
 }
 
+const setPurchaseOrderFormPageState = () => {
+  appStore.setPageState(PageStateConst.PURCHASE_ORDER_FORM, {
+    route_scope: [
+      InventoryConst.PRODUCT_FORM,
+      PurchaseConst.PURCHASE_ORDER_FORM
+    ],
+    state: model.value
+  })
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -559,12 +571,27 @@ onMounted(async () => {
   }
 
   // get current branch address
-
   if (appStore.currentBranch) {
     model.value.address = ObjectHelpers.assignSameFields(
       model.value.address,
       appStore.currentBranch.address
     )
+  }
+
+  if (appStore.isPageExist(PageStateConst.PURCHASE_ORDER_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.PURCHASE_ORDER_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.PURCHASE_ORDER_FORM].state
+      )
+    }
+  } else {
+    setPurchaseOrderFormPageState()
   }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
@@ -592,16 +619,17 @@ watch(
 )
 
 watch(
-  () => model.value.products,
+  () => model.value,
   () => {
+    setPurchaseOrderFormPageState()
+
+    // If there are changes in the model run these
     if (model.value.products.length) {
       model.value.order.amount = model.value.products
         .map((prod) => parseInt(prod.amount))
         .reduce((a, b) => a + b, 0)
     }
   },
-  {
-    deep: true
-  }
+  { deep: true }
 )
 </script>

@@ -18,7 +18,7 @@
           placeholder="Select product"
           :options="productStore.productOptions"
           :has-add-new="true"
-          @add-new="showModal = true"
+          @add-new="onAddNewProduct"
           v-model="model.product_id"
           :can-search="true"
           :disabled="props.isDisabled"
@@ -97,6 +97,8 @@ import { useProductStore } from '@/stores/product'
 import CustomInput from '../shared/CustomInput.vue'
 import { onMounted, ref, watch } from 'vue'
 import Event from '@/event'
+import { useRouter } from 'vue-router'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
 const props = defineProps({
   ndx: {
     type: Number,
@@ -114,6 +116,7 @@ const props = defineProps({
 
 const emit = defineEmits(['remove'])
 const productStore = useProductStore()
+const router = useRouter()
 const model = defineModel()
 const modelErrors = ref({})
 
@@ -147,6 +150,15 @@ const onChange = () => {
     model.value.quantity = ''
     model.value.cost = ''
   }
+}
+
+const onAddNewProduct = () => {
+  router.push({
+    name: InventoryConst.PRODUCT_FORM,
+    query: {
+      redirect: TransferConst.RMA_FORM
+    }
+  })
 }
 
 onMounted(async () => {

@@ -9,8 +9,9 @@ import sales from '@/assets/icons/sales.png'
 import {
   InventoryConst,
   PurchaseConst,
+  SettingConst,
   TransferConst
-} from '@/router/constants/route.constants'
+} from '@/const/route.constants'
 
 export default [
   {
@@ -132,22 +133,22 @@ export default [
   },
   {
     text: 'Settings',
-    route: 'setting',
+    route: SettingConst.SETTING,
     icon: settings,
     children: [
       {
         text: 'Branches',
-        route: 'branches',
+        route: SettingConst.BRANCHES,
         icon: outlineDot
       },
       {
         text: 'Account Settings',
-        route: 'account-settings',
+        route: SettingConst.ACCOUNT_SETTINGS,
         icon: outlineDot
       },
       {
         text: 'Product Settings',
-        route: 'product-settings',
+        route: SettingConst.PRODUCT_SETTINGS,
         icon: outlineDot
       }
     ]

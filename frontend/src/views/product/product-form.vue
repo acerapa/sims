@@ -228,6 +228,7 @@ import { useProductStore } from '@/stores/product'
 import { useRoute } from 'vue-router'
 import router from '@/router'
 import { ToastTypes } from '@/data/types'
+import { InventoryConst } from '@/const/route.constants'
 
 const route = useRoute()
 const settingStore = useSettingsStore()
@@ -348,7 +349,9 @@ const onSubmit = async () => {
       duration: 2000
     })
     router.push({
-      name: route.query.redirect ? route.query.redirect : 'products'
+      name: route.query.redirect
+        ? route.query.redirect
+        : InventoryConst.PRODUCTS
     })
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -361,10 +364,13 @@ const onSubmit = async () => {
 
 const onAfterDelete = async () => {
   await productStore.removeProduct(route.query.id)
-  router.push({ name: 'products' })
+  router.push({ name: InventoryConst.PRODUCTS })
 }
 
-const onCancel = () => router.push({ name: 'products' })
+const onCancel = () =>
+  router.push({
+    name: route.query.redirect ? route.query.redirect : InventoryConst.PRODUCTS
+  })
 
 onMounted(async () => {
   await settingStore.getAccounts()

@@ -69,6 +69,112 @@ class ObjectHelpers {
 
     return !preserveType ? JSON.parse(JSON.stringify(obj)) : obj;
   };
+
+  /**
+   * This function will compare two objects and returns boolean
+   * Criteria for validating
+   * 1. The number of keys must be the same
+   * 2. The values of the keys must be the same
+   *
+   * @param {*} obj1
+   * @param {*} obj2
+   *
+   * @returns boolean
+   */
+  static compareObjects = (obj1, obj2) => {
+    if (typeof obj1 != "object" || typeof obj2 != "object") {
+      console.error("`obj1` and `obj2` must be of type object");
+      return;
+    } else if (Array.isArray(obj1) || Array.isArray(obj2)) {
+      console.error("`obj1` and `obj2` must not be of type array");
+      return;
+    }
+
+    // validating if keys are the same
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length != keys2.length) {
+      return false;
+    } else {
+      for (const key of keys1) {
+        if (!keys2.includes(key)) {
+          return false;
+        }
+      }
+    }
+
+    // validating if values are the same
+    for (const key in obj1) {
+      // type checking
+      if (typeof obj1[key] != typeof obj2[key]) {
+        return false;
+      } else {
+        if (typeof obj1[key] == "object") {
+          if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) {
+            if (!this.compareArrays(obj1[key], obj2[key])) return false;
+          } else if (!Array.isArray(obj1[key]) && !Array.isArray(obj2[key])) {
+            if (!this.compareObjects(obj1[key], obj2[key])) return false;
+          } else {
+            return false;
+          }
+        } else {
+          if (obj1[key] != obj2[key]) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  };
+
+  /**
+   * This function will compare two array and returns boolean
+   * Criteria for validating
+   * 1. Values must be the same
+   * 2. Order must be the same
+   *
+   * @param {*} arr1
+   * @param {*} arr2
+   *
+   * @returns boolean
+   */
+  static compareArrays = (arr1, arr2) => {
+    if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
+      console.error("`arr1` and `arr2` must be of type array");
+      return;
+    }
+
+    // check the length of both arrays
+    if (arr1.length != arr2.length) {
+      return false;
+    }
+
+    // check if the values are the same
+    for (let i = 0; i < arr1.length; i++) {
+      // type checking
+      if (typeof arr1[i] != typeof arr2[i]) {
+        return false;
+      } else {
+        if (typeof arr1[i] == "object") {
+          if (Array.isArray(arr1[i]) && Array.isArray(arr2[i])) {
+            if (!this.compareArrays(arr1[i], arr2[i])) return false;
+          } else if (!Array.isArray(arr1[i]) && !Array.isArray(arr2[i])) {
+            if (!this.compareObjects(arr1[i], arr2[i])) return false;
+          } else {
+            return false;
+          }
+        } else {
+          if (arr1[i] != arr2[i]) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  };
 }
 
 module.exports = { ObjectHelpers };

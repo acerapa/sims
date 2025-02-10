@@ -1,14 +1,14 @@
 <template>
   <div>
     <ProductCategoryModal
-      v-model="showModal"
-      v-if="showModal"
-      :selected-id="selectedId"
+      v-model="pageState.showCategoyModal"
+      v-if="pageState.showCategoyModal"
+      :selected-id="pageState.selectedCategoryId"
     />
     <ProductPointModal
-      v-model="reorderingModalShow"
-      v-if="reorderingModalShow"
-      :selected-id="selectedReorderingId"
+      v-model="pageState.showReorderingModal"
+      v-if="pageState.showReorderingModal"
+      :selected-id="pageState.selectedReorderingId"
     />
     <div class="flex flex-col gap-6">
       <CustomTable
@@ -58,7 +58,7 @@
   </div>
 </template>
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
 import ProductCategoryRow from '@/components/Settings/ProductCategoryRow.vue'
@@ -67,12 +67,19 @@ import CustomTable from '@/components/shared/CustomTable.vue'
 import ProductReorderingPointRow from '@/components/Settings/ProductReorderingPointRow.vue'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
+import { useAppStore } from '@/stores/app'
+import { ObjectHelpers } from 'shared'
+import { InventoryConst, SettingConst } from '@/const/route.constants'
+import { PageStateConst } from '@/const/state.constants'
 
-const selectedId = ref(-1)
-const showModal = ref(false)
-const selectedReorderingId = ref(-1)
-const reorderingModalShow = ref(false)
+const appStore = useAppStore()
 const settingsStore = useSettingsStore()
+const pageState = reactive({
+  selectedCategoryId: -1,
+  showCategoyModal: false,
+  selectedReorderingId: -1,
+  showReorderingModal: false
+})
 
 /** ================================================
  * EVENTS
@@ -109,24 +116,32 @@ const filteredReorderingPoints = computed(() => {
  * METHODS
  ** ================================================*/
 const onViewCategory = (id) => {
-  selectedId.value = id
-  showModal.value = true
+  pageState.selectedCategoryId = id
+  pageState.showCategoyModal = true
 }
 
 const onViewReOrdering = (id) => {
-  selectedReorderingId.value = id
-  reorderingModalShow.value = true
+  pageState.selectedReorderingId = id
+  pageState.showReorderingModal = true
 }
 
 const onNewReorderingPoint = () => {
-  selectedReorderingId.value = 0
-  reorderingModalShow.value = true
+  pageState.selectedReorderingId = 0
+  pageState.showReorderingModal = true
 }
 
 const onNewProductCategory = () => {
-  selectedId.value = 0
-  showModal.value = true
+  pageState.selectedCategoryId = 0
+  pageState.showCategoyModal = true
 }
+
+const setProductSettingPageState = () => {
+  appStore.setPageState(PageStateConst.PRODUCT_SETTINGS, {
+    state: pageState,
+    route_scope: [SettingConst.PRODUCT_SETTINGS, InventoryConst.PRODUCT_FORM]
+  })
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -135,5 +150,39 @@ onMounted(async () => {
   await settingsStore.getProductCategories()
   await settingsStore.fetchAllProductReorderingPoints()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
+
+  if (appStore.isPageExist(PageStateConst.PRODUCT_SETTINGS)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        pageState,
+        appStore.pages[PageStateConst.PRODUCT_SETTINGS]
+      )
+    ) {
+      let {
+        selectedCategoryId,
+        selectedReorderingId,
+        showCategoyModal,
+        showReorderingModal
+      } = appStore.pages[PageStateConst.PRODUCT_SETTINGS].state
+
+      pageState.selectedCategoryId = selectedCategoryId
+      pageState.selectedReorderingId = selectedReorderingId
+      pageState.showCategoyModal = showCategoyModal
+      pageState.showReorderingModal = showReorderingModal
+    }
+  } else {
+    setProductSettingPageState()
+  }
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => pageState,
+  () => {
+    setProductSettingPageState()
+  },
+  { deep: true }
+)
 </script>

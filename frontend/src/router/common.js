@@ -1,10 +1,12 @@
-import { CommonConst } from './constants/route.constants'
+import { CommonConst } from '../const/route.constants'
 
 export default [
   {
     path: '/',
     component: () => import('@/layout/NavLayout.vue'),
-    redirect: '/dashboard',
+    redirect: {
+      name: CommonConst.DASHBOARD
+    },
     children: [
       {
         path: '/dashboard',
