@@ -1,4 +1,4 @@
-import { PurchaseConst } from './constants/route.constants'
+import { PurchaseConst } from '../const/route.constants'
 
 export default [
   {

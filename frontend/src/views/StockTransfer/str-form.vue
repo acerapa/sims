@@ -35,7 +35,6 @@
               label="Select Receiving Branch"
               placeholder="Select Branch"
               v-model="model.transfer.branch_to"
-              @change="populateAddress"
               :error="modelErrors.branch_to"
               :error-has-text="true"
             />
@@ -147,7 +146,8 @@ import { RouterLink, useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { usePrint } from '@/use/usePrint'
 import { ToastTypes } from '@/data/types'
-import { TransferConst } from '@/router/constants/route.constants'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
+import { PageStateConst } from '@/const/state.constants'
 
 const rowEventName = 'str-product-row'
 
@@ -328,6 +328,13 @@ const onAfterDelete = async () => {
   })
 }
 
+const setSTRFromPageState = () => {
+  appStore.setPageState(PageStateConst.STR_FORM, {
+    route_scope: [InventoryConst.PRODUCT_FORM, TransferConst.STR_FORM],
+    state: model.value
+  })
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -354,9 +361,6 @@ onMounted(async () => {
         new Date(transfer.when),
         'YYYY-MM-DDTHH:II:SS-A'
       )
-
-      // populate address from the receiver in the transfer
-      populateAddress()
 
       // populate products
       model.value.products = transfer.products.map((p) => {
@@ -385,6 +389,23 @@ onMounted(async () => {
   // set processed by
   model.value.transfer.processed_by = authStore.getAuthUser().id
 
+  // set page state
+  if (appStore.isPageExist(PageStateConst.STR_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.STR_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.STR_FORM].state
+      )
+    }
+  } else {
+    setSTRFromPageState()
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 
@@ -392,4 +413,19 @@ onBeforeUnmount(() => {
   // remove interval
   clearInterval(timeInterval)
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value,
+  () => {
+    setSTRFromPageState()
+
+    if (model.value.transfer.branch_to) {
+      populateAddress()
+    }
+  },
+  { deep: true }
+)
 </script>

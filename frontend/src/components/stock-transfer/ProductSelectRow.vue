@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ProductModal v-model="showModal" v-if="showModal" />
     <slot></slot>
     <div
       class="grid gap-3 items-start min-w-[750px]"
@@ -20,7 +19,7 @@
           placeholder="Select product"
           :options="productStore.productOptions"
           :has-add-new="true"
-          @add-new="showModal = true"
+          @add-new="onAddNew"
           v-model="model.product_id"
           :can-search="true"
           :disabled="props.isDisabled"
@@ -87,9 +86,10 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import CustomInput from '../shared/CustomInput.vue'
-import ProductModal from '../product/ProductModal.vue'
 import { useProductStore } from '@/stores/product'
 import Event from '@/event'
+import { useRouter } from 'vue-router'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
 
 const emit = defineEmits(['remove'])
 
@@ -106,10 +106,11 @@ const props = defineProps({
     required: false
   }
 })
-const showModal = ref(false)
+
 const model = defineModel()
 const modelErrors = ref({})
 
+const router = useRouter()
 const productStore = useProductStore()
 
 /** ================================================
@@ -125,10 +126,9 @@ Event.on(
   true
 )
 
-onMounted(async () => {
-  await productStore.getProducts()
-})
-
+/** ================================================
+ * METHODS
+ ** ================================================*/
 const onChange = () => {
   if (model.value.product_id) {
     const product = productStore.products.find(
@@ -148,6 +148,25 @@ const onChange = () => {
   }
 }
 
+const onAddNew = () => {
+  router.push({
+    name: InventoryConst.PRODUCT_FORM,
+    query: {
+      redirect: TransferConst.STR_FORM
+    }
+  })
+}
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+onMounted(async () => {
+  await productStore.getProducts()
+})
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
 watch(
   () => model.value.quantity,
   () => {

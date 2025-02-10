@@ -8,7 +8,7 @@ import settingsRoutes from './settings'
 import transferRoutes from './transfer'
 import salesRoutes from './sales'
 import purchaseRoutes from './purchase'
-import { CommonConst } from './constants/route.constants'
+import { CommonConst } from '../const/route.constants'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 

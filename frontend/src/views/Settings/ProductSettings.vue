@@ -69,10 +69,8 @@ import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { useAppStore } from '@/stores/app'
 import { ObjectHelpers } from 'shared'
-import {
-  InventoryConst,
-  SettingConst
-} from '@/router/constants/route.constants'
+import { InventoryConst, SettingConst } from '@/const/route.constants'
+import { PageStateConst } from '@/const/state.constants'
 
 const appStore = useAppStore()
 const settingsStore = useSettingsStore()
@@ -138,7 +136,7 @@ const onNewProductCategory = () => {
 }
 
 const setProductSettingPageState = () => {
-  appStore.setPageState('product_settings', {
+  appStore.setPageState(PageStateConst.PRODUCT_SETTINGS, {
     state: pageState,
     route_scope: [SettingConst.PRODUCT_SETTINGS, InventoryConst.PRODUCT_FORM]
   })
@@ -153,11 +151,11 @@ onMounted(async () => {
   await settingsStore.fetchAllProductReorderingPoints()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 
-  if (appStore.isPageExist('product_settings')) {
+  if (appStore.isPageExist(PageStateConst.PRODUCT_SETTINGS)) {
     if (
       !ObjectHelpers.compareObjects(
         pageState,
-        appStore.pages['product_settings']
+        appStore.pages[PageStateConst.PRODUCT_SETTINGS]
       )
     ) {
       let {
@@ -165,7 +163,7 @@ onMounted(async () => {
         selectedReorderingId,
         showCategoyModal,
         showReorderingModal
-      } = appStore.pages['product_settings'].state
+      } = appStore.pages[PageStateConst.PRODUCT_SETTINGS].state
 
       pageState.selectedCategoryId = selectedCategoryId
       pageState.selectedReorderingId = selectedReorderingId

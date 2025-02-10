@@ -1,5 +1,5 @@
 import Product from '@/views/Inventory/Product.vue'
-import { InventoryConst } from './constants/route.constants'
+import { InventoryConst } from '../const/route.constants'
 export default [
   {
     path: '/inventory',

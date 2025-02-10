@@ -34,7 +34,7 @@ import { onMounted, computed, ref } from 'vue'
 import Event from '@/event'
 import { EventEnum } from '../../data/event/index'
 import { DateHelpers } from 'shared/helpers'
-import { TransferConst } from '@/router/constants/route.constants'
+import { TransferConst } from '@/const/route.constants'
 
 const router = useRouter()
 const searchText = ref('')

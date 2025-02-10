@@ -51,7 +51,6 @@
               label="From Branch"
               :error-has-text="true"
               :options="branchOptions"
-              @change="populateAddress"
               placeholder="Select Branch"
               :error="modelErrors.branch_from"
               v-model="model.transfer.branch_from"
@@ -126,7 +125,7 @@ import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
 import Event from '@/event'
-import { TransferConst } from '@/router/constants/route.constants'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
@@ -135,8 +134,9 @@ import { useTransferStore } from '@/stores/transfer'
 import { TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { StockTransferCreateSchema } from 'shared/validators'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { PageStateConst } from '@/const/state.constants'
 
 const ibrrEventName = 'ibrr-product-row'
 
@@ -296,6 +296,13 @@ const onAfterDelete = async () => {
   router.push({ name: TransferConst.IBRR_LIST })
 }
 
+const setIBRRFormPageState = () => {
+  appStore.setPageState(PageStateConst.IBRR_FORM, {
+    route_scope: [TransferConst.IBRR_FORM, InventoryConst.PRODUCT_FORM],
+    state: model.value
+  })
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -319,9 +326,6 @@ onMounted(async () => {
         'YYYY-MM-DDTHH:II:SS-A'
       )
 
-      // populate address
-      populateAddress()
-
       // populate products
       model.value.products = transfer.products.map((p) => {
         return {
@@ -343,6 +347,23 @@ onMounted(async () => {
 
   model.value.transfer.processed_by = authStore.getAuthUser().id
 
+  // set page state
+  if (appStore.isPageExist(PageStateConst.IBRR_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.IBRR_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.IBRR_FORM].state
+      )
+    }
+  } else {
+    setIBRRFormPageState()
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 
@@ -350,4 +371,19 @@ onBeforeUnmount(() => {
   // clear interval
   clearInterval(timeInterval)
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value,
+  () => {
+    setIBRRFormPageState()
+
+    if (model.value.transfer.branch_from) {
+      populateAddress()
+    }
+  },
+  { deep: true }
+)
 </script>

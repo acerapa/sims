@@ -84,7 +84,7 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import { TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useTransferStore } from '@/stores/transfer'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -94,7 +94,8 @@ import { StockTransferCreateSchema } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
-import { TransferConst } from '@/router/constants/route.constants'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
+import { PageStateConst } from '@/const/state.constants'
 
 const rowEventName = 'fix-asset-row-event'
 
@@ -132,36 +133,9 @@ const router = useRouter()
 const model = ref({ ...defaultValue })
 const modelErrors = ref({})
 
-onMounted(async () => {
-  await purchaseOrderStore.fetchPurchaseOrders()
-
-  await settingStore.getBranches()
-  authUser.value = await authStore.getAuthUser()
-  currentBranch.value = appStore.currentBranch.id
-
-  if (route.query.id) {
-    const transfer = await transferStore.getById(route.query.id)
-    model.value.transfer = ObjectHelpers.assignSameFields(
-      model.value.transfer,
-      transfer
-    )
-
-    // small modifications
-    model.value.transfer.when = DateHelpers.formatDate(
-      new Date(transfer.when),
-      'YYYY-MM-DDTHH:II-A'
-    )
-
-    // products
-    model.value.products = transfer.products.map((p) => {
-      return ObjectHelpers.assignSameFields(
-        { ...productDefaultValue },
-        p.StockTransferProducts
-      )
-    })
-  }
-})
-
+/** ================================================
+ * METHODS
+ ** ================================================*/
 const onSubmit = async (isAddNew = false) => {
   let isSuccess = false
   if (!route.query.id && authUser.value) {
@@ -243,4 +217,72 @@ const onAfterDelete = async () => {
     name: TransferConst.FIX_ASSET_LIST
   })
 }
+
+const setFixAssetPageState = () => {
+  appStore.setPageState(PageStateConst.FIX_ASSET_FORM, {
+    route_scope: [TransferConst.FIX_ASSET_FORM, InventoryConst.PRODUCT_FORM],
+    state: model.value
+  })
+}
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+onMounted(async () => {
+  await purchaseOrderStore.fetchPurchaseOrders()
+
+  await settingStore.getBranches()
+  authUser.value = await authStore.getAuthUser()
+  currentBranch.value = appStore.currentBranch.id
+
+  if (route.query.id) {
+    const transfer = await transferStore.getById(route.query.id)
+    model.value.transfer = ObjectHelpers.assignSameFields(
+      model.value.transfer,
+      transfer
+    )
+
+    // small modifications
+    model.value.transfer.when = DateHelpers.formatDate(
+      new Date(transfer.when),
+      'YYYY-MM-DDTHH:II-A'
+    )
+
+    // products
+    model.value.products = transfer.products.map((p) => {
+      return ObjectHelpers.assignSameFields(
+        { ...productDefaultValue },
+        p.StockTransferProducts
+      )
+    })
+  }
+
+  // set page state
+  if (appStore.isPageExist(PageStateConst.FIX_ASSET_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.FIX_ASSET_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.FIX_ASSET_FORM].state
+      )
+    }
+  } else {
+    setFixAssetPageState()
+  }
+})
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value,
+  () => {
+    setFixAssetPageState()
+  },
+  { deep: true }
+)
 </script>

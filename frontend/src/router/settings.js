@@ -1,4 +1,4 @@
-import { SettingConst } from './constants/route.constants'
+import { SettingConst } from '../const/route.constants'
 
 export default [
   {

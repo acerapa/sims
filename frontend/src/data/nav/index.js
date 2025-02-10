@@ -11,7 +11,7 @@ import {
   PurchaseConst,
   SettingConst,
   TransferConst
-} from '@/router/constants/route.constants'
+} from '@/const/route.constants'
 
 export default [
   {

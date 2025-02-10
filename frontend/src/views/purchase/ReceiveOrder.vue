@@ -85,7 +85,7 @@ import CustomInput from '@/components/shared/CustomInput.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { getCost } from '@/helper'
-import { PurchaseConst } from '@/router/constants/route.constants'
+import { PurchaseConst } from '@/const/route.constants'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import {
   ProductOrderedStatus,

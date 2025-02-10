@@ -82,10 +82,7 @@ import { useProductStore } from '@/stores/product'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { getCost } from '@/helper'
 import { useRouter } from 'vue-router'
-import {
-  InventoryConst,
-  PurchaseConst
-} from '@/router/constants/route.constants'
+import { InventoryConst, PurchaseConst } from '@/const/route.constants'
 
 const props = defineProps({
   ndx: {

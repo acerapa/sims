@@ -228,7 +228,7 @@ import { useProductStore } from '@/stores/product'
 import { useRoute } from 'vue-router'
 import router from '@/router'
 import { ToastTypes } from '@/data/types'
-import { InventoryConst } from '@/router/constants/route.constants'
+import { InventoryConst } from '@/const/route.constants'
 
 const route = useRoute()
 const settingStore = useSettingsStore()

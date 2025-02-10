@@ -1,4 +1,4 @@
-import { TransferConst } from './constants/route.constants'
+import { TransferConst } from '../const/route.constants'
 
 export default [
   {

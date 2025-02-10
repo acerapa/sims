@@ -1,4 +1,4 @@
-import { CommonConst } from './constants/route.constants'
+import { CommonConst } from '../const/route.constants'
 
 export default [
   {

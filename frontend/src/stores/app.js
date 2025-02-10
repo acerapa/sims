@@ -33,7 +33,7 @@ export const useAppStore = defineStore('app', () => {
     const { to } = routeData
     Object.keys(pages.value).forEach((key) => {
       if (!pages.value[key].route_scope.includes(to.name)) {
-        delete pages.value[key]
+        removePage(key)
       }
     })
   }
@@ -42,9 +42,17 @@ export const useAppStore = defineStore('app', () => {
     const { to } = routeData
     Object.keys(modals.value).forEach((key) => {
       if (!modals.value[key].route_scope.includes(to.name)) {
-        delete modals.value[key]
+        removeModal(key)
       }
     })
+  }
+
+  const removePage = (page) => {
+    delete pages.value[page]
+  }
+
+  const removeModal = (modal) => {
+    delete modals.value[modal]
   }
 
   return {
@@ -53,6 +61,8 @@ export const useAppStore = defineStore('app', () => {
     currentNav,
     currentBranch,
 
+    removePage,
+    removeModal,
     isPageExist,
     isModalExist,
     setPageState,

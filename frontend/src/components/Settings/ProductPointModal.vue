@@ -55,11 +55,9 @@ import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
 import { useRouter } from 'vue-router'
-import {
-  InventoryConst,
-  SettingConst
-} from '@/router/constants/route.constants'
+import { InventoryConst, SettingConst } from '@/const/route.constants'
 import { useAppStore } from '@/stores/app'
+import { ModalStateConst } from '@/const/state.constants'
 
 const props = defineProps({
   selectedId: {
@@ -159,12 +157,9 @@ const onAddNewProduct = () => {
 }
 
 const setPointModalState = () => {
-  appStore.setModalState('product_point_modal', {
+  appStore.setModalState(ModalStateConst.PRODUCT_POINT_MODAL, {
     state: model.value,
-    route_scope: [
-      SettingConst.PRODUCT_REORDERING_POINT,
-      InventoryConst.PRODUCT_FORM
-    ]
+    route_scope: [SettingConst.PRODUCT_SETTINGS, InventoryConst.PRODUCT_FORM]
   })
 }
 
@@ -187,16 +182,16 @@ onMounted(async () => {
     }
   }
 
-  if (appStore.isModalExist('product_point_modal')) {
+  if (appStore.isModalExist(ModalStateConst.PRODUCT_POINT_MODAL)) {
     if (
       !ObjectHelpers.compareObjects(
         model.value,
-        appStore.modals['product_point_modal']
+        appStore.modals[ModalStateConst.PRODUCT_POINT_MODAL].state
       )
     ) {
       model.value = ObjectHelpers.assignSameFields(
         model.value,
-        appStore.modals['product_point_modal'].state
+        appStore.modals[ModalStateConst.PRODUCT_POINT_MODAL].state
       )
     }
   } else {
