@@ -1,6 +1,6 @@
 "use strict";
 
-const { getColumnConstrains } = require("../models");
+const { removeConstraints } = require("../models");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -13,16 +13,9 @@ module.exports = {
      */
 
     const isTableExist = await queryInterface.tableExists("product_transfer");
-    const constraints = await getColumnConstrains("product_transfer");
 
     if (isTableExist) {
-      if (constraints.length) {
-        await Promise.all(
-          constraints.map((cnt) =>
-            queryInterface.removeConstraint(cnt.tableName, cnt.constraintName)
-          )
-        );
-      }
+      await removeConstraints("product_transfer", queryInterface);
       await queryInterface.dropTable("product_transfer");
     }
   },
