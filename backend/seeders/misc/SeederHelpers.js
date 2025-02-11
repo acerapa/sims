@@ -83,21 +83,26 @@ const removeSeederExecution = async (seeder_name) => {
 };
 
 const getSeederExecution = async (seeder_name) => {
-  // check if the seeder is in cache
-  const cache = extractCache();
   let seeder = null;
-  const seedIndex = cache.findIndex((s) => s.name === seeder_name);
-  if (seedIndex > -1) {
-    seeder = cache[seedIndex];
-  } else {
-    seeder = await Seeder.findOne({
-      where: { name: seeder_name },
-      attributes: ["name", "data"],
-    });
+  // check if the seeder is in cache
+  const isExecuted = await checkIfSeederExecuted(seeder_name);
 
-    if (seeder) {
-      cache.push(seeder);
-      fs.writeFileSync(seederCachePath, JSON.stringify(cache));
+  if (isExecuted) {
+    const cache = extractCache();
+
+    const seedIndex = cache.findIndex((s) => s.name === seeder_name);
+    if (seedIndex > -1) {
+      seeder = cache[seedIndex];
+    } else {
+      seeder = await Seeder.findOne({
+        where: { name: seeder_name },
+        attributes: ["name", "data"],
+      });
+
+      if (seeder) {
+        cache.push(seeder);
+        fs.writeFileSync(seederCachePath, JSON.stringify(cache));
+      }
     }
   }
 
