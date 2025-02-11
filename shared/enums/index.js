@@ -137,6 +137,14 @@ const SalesOrderType = Object.freeze({
   INSTALLMENT: "installment",
 });
 
+const ConsoleColors = {
+  RED: "\x1b[31m",
+  BLUE: "\x1b[34m",
+  GREEN: "\x1b[32m",
+  RESET: "\x1b[0m",
+  YELLOW: "\x1b[33m",
+};
+
 module.exports = {
   UserType,
   ItemType,
@@ -145,6 +153,7 @@ module.exports = {
   BranchStatus,
   TransferType,
   ProductStatus,
+  ConsoleColors,
   SalesOrderType,
   BranchStatusMap,
   LocalStorageKeys,

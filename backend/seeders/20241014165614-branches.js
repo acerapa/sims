@@ -11,6 +11,7 @@ const {
   removeSeederExecution,
 } = require("./misc/SeederHelpers");
 const { Op } = require("sequelize");
+const { removeConstraints } = require("../models");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -45,6 +46,9 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
+    // remove constaints
+    await removeConstraints(Branch.getTableName(), queryInterface);
+
     const seeder = await getSeederExecution(basename(__filename));
     if (seeder) {
       await Branch.destroy({

@@ -10,6 +10,7 @@ const {
   removeSeederExecution,
 } = require("./misc/SeederHelpers");
 const { Op } = require("sequelize");
+const { removeConstraints } = require("../models");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -99,12 +100,8 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
+    // remove constaints
+    await removeConstraints(User.getTableName(), queryInterface);
 
     const seeder = await getSeederExecution(basename(__filename));
     if (seeder) {

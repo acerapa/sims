@@ -1,6 +1,6 @@
 "use strict";
 
-const { getColumnConstrains } = require("../models");
+const { removeConstraints } = require("../models");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -12,17 +12,9 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
 
-    const constraints = await getColumnConstrains("B2BTransfers");
-
     const isTableExist = await queryInterface.tableExists("B2BTransfers");
     if (isTableExist) {
-      if (constraints.length) {
-        await Promise.all(
-          constraints.map((cnt) =>
-            queryInterface.removeConstraint(cnt.tableName, cnt.constraintName)
-          )
-        );
-      }
+      await removeConstraints("B2BTransfers", queryInterface);
       await queryInterface.dropTable("B2BTransfers");
     }
   },

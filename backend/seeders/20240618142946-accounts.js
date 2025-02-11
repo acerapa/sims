@@ -2,6 +2,7 @@
 
 const { basename } = require("path");
 const Account = require("../models/account");
+const fields = require("./dummy/accounts");
 const {
   checkIfSeederExecuted,
   registerSeederExecution,
@@ -9,6 +10,7 @@ const {
   removeSeederExecution,
 } = require("./misc/SeederHelpers");
 const { Op } = require("sequelize");
+const { removeConstraints } = require("../models");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -22,50 +24,6 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    const fields = [
-      {
-        name: "Hardware",
-        type: "income",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: "Software",
-        type: "income",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: "Services",
-        type: "income",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: "Others",
-        type: "income",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: "Rentals",
-        type: "expense",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: "Travel",
-        type: "expense",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: "Mail Allowance",
-        type: "expense",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
 
     const isExecuted = await checkIfSeederExecuted(basename(__filename));
     console.log("isExecuted", isExecuted);
@@ -81,12 +39,9 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
+    // remove constaints
+    await removeConstraints(Account.getTableName(), queryInterface);
+
     const seeder = await getSeederExecution(basename(__filename));
     if (seeder) {
       await Account.destroy({

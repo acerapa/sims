@@ -1,5 +1,5 @@
 "use strict";
-const { getColumnConstrains } = require("../models");
+const { removeConstraints } = require("../models");
 const Supplier = require("../models/supplier");
 
 /** @type {import('sequelize-cli').Migration} */
@@ -11,14 +11,8 @@ module.exports = {
     );
   },
   async down(queryInterface, Sequelize) {
-    const constraints = await getColumnConstrains(Supplier.getTableName());
-    if (constraints.length) {
-      await Promise.all(
-        constraints.map((cnt) =>
-          queryInterface.removeConstraint(cnt.tableName, cnt.constraintName)
-        )
-      );
-    }
+    // remove constraints
+    await removeConstraints(Supplier.getTableName(), queryInterface);
     await queryInterface.dropTable(Supplier.getTableName());
   },
 };
