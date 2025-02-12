@@ -58,6 +58,31 @@ module.exports = {
           };
         }),
       },
+      {
+        name: "A4 Tech mouse",
+        type: ProductType.INVENTORY,
+        price: 650,
+        expense_account: expense[getRandomDigitBetween(0, expense.length)],
+        income_account: income[getRandomDigitBetween(0, income.length)],
+        product_details: {
+          stock: 30,
+          purchase_description: "This is a sample description",
+          sales_description: "This is a sample description",
+          status: ProductStatus.ACTIVE,
+          is_manually_set_cost: true,
+          cost: 500,
+          item_code: "qwertyu3",
+          product_setting_id:
+            product_settings[getRandomDigitBetween(0, product_settings.length)],
+        },
+        categories: [computers],
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 450,
+          };
+        }),
+      },
     ];
   },
 };

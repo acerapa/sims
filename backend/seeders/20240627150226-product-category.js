@@ -18,6 +18,7 @@ module.exports = {
     const isExecuted = await checkIfSeederExecuted(basename(__filename));
     console.log("isExecuted", isExecuted);
     if (!isExecuted) {
+      // TODO: This execution need to use a recursion to access all the sub categories
       const res = await Promise.all(
         categories.map((category) => {
           return ProductCategory.create(category, {
@@ -25,6 +26,12 @@ module.exports = {
               {
                 model: ProductCategory,
                 as: "sub_categories",
+                include: [
+                  {
+                    model: ProductCategory,
+                    as: "sub_categories",
+                  },
+                ],
               },
             ],
           });
