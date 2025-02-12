@@ -1,5 +1,6 @@
 const { DataTypes, Model, Op } = require("sequelize");
 const { sequelize } = require(".");
+const { ConsoleColors } = require("shared/enums");
 
 class ProductCategory extends Model {}
 
@@ -13,7 +14,7 @@ ProductCategory.init(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: false,
     },
     general_cat: {
       type: DataTypes.INTEGER,
@@ -49,4 +50,30 @@ ProductCategory.addHook("beforeBulkDestroy", async (options) => {
   );
 });
 
+ProductCategory.addHook("beforeCreate", async (category) => {
+  let categories = [];
+  if (category.general_cat) {
+    categories = await ProductCategory.findAll({
+      where: {
+        general_cat: category.general_cat,
+      },
+    });
+  } else {
+    categories = await ProductCategory.findAll({
+      where: {
+        general_cat: null,
+      },
+    });
+  }
+
+  const categoryNames = categories.map((c) => c.name);
+  if (categoryNames.includes(category.name)) {
+    const generalCategory = await ProductCategory.findByPk(
+      category.general_cat
+    );
+    throw new Error(
+      `Category ${category.name} already exists in general category ${generalCategory.name}`
+    );
+  }
+});
 module.exports = ProductCategory;

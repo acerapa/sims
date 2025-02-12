@@ -26,6 +26,12 @@ module.exports = {
               {
                 model: ProductCategory,
                 as: "sub_categories",
+                include: [
+                  {
+                    model: ProductCategory,
+                    as: "sub_categories",
+                  },
+                ],
               },
             ],
           });

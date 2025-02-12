@@ -89,7 +89,7 @@ const onView = (id) => {
  ** ================================================*/
 
 onMounted(async () => {
-  await vendorStore.fetchAllSuppliers()
+  await vendorStore.getSuppliers()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>
