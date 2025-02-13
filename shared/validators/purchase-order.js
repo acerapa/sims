@@ -32,7 +32,7 @@ const PurchaseProductSchema = Joi.object({
   cost: Joi.number().required(),
   amount: Joi.number().required(),
   quantity_received: Joi.number().optional(),
-  remarks: Joi.string().optional(),
+  remarks: Joi.string().allow(null, "").optional(),
   status: Joi.string().valid(...Object.values(ProductOrderedStatus)),
 });
 

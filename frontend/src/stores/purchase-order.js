@@ -14,10 +14,21 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
   }
 
   const fetchPurchaseOrderById = async (id) => {
-    const res = await authenticatedApi('/purchase-order/' + id)
+    const res = await authenticatedApi('purchase-order/' + id)
     if (res.status == 200) {
       purchaseOrder.value = res.data.order
     }
+  }
+
+  const receivePurchaseOrder = async (id, data) => {
+    const res = await authenticatedApi(
+      `purchase-order/${id}/receive-order`,
+      Method.PUT,
+      data
+    )
+    const isSuccess = res.status < 400
+
+    return isSuccess
   }
 
   const createPurchaseOrder = async (data) => {
@@ -87,6 +98,7 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
     createPurchaseOrder,
     fetchPurchaseOrders,
     updatePurchaseOrder,
+    receivePurchaseOrder,
     fetchPurchaseOrderById
   }
 })
