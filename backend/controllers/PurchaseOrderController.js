@@ -4,7 +4,10 @@ const Supplier = require("../models/supplier");
 const Product = require("../models/product");
 const { sequelize } = require("../models");
 const PurchaseOrderProducts = require("../models/junction/purchase-order-products");
-const { findOrder } = require("../services/PurchaseOrderService");
+const { findOrder, updateOrder } = require("../services/PurchaseOrderService");
+const { Op } = require("sequelize");
+const { ItemType } = require("shared/enums");
+const ProductDetails = require("../models/product-details");
 
 module.exports = {
   all: async (req, res) => {
@@ -80,72 +83,8 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      if (data.order) {
-        await PurchaseOrder.update(data.order, {
-          where: { id: req.params.id },
-          transaction: transaction,
-        });
 
-        // update related products
-        if (data.products) {
-          const products = await PurchaseOrderProducts.findAll({
-            where: { purchase_order_id: req.params.id },
-            attributes: ["id", "product_id"],
-          });
-
-          const currentProductIds = products.map((p) => p.product_id);
-
-          await Promise.all([
-            // determine the products in data.products needs to be created
-            ...data.products
-              .filter((p) => !currentProductIds.includes(p.product_id))
-              .map((p) =>
-                PurchaseOrderProducts.create(
-                  { ...p, purchase_order_id: req.params.id },
-                  { transaction: transaction }
-                )
-              ),
-
-            // determine the products weither they it will be updated or deleted
-            ...products.map((product) => {
-              // TODO: Need to check if the data has changes to update
-              const dataProductIds = data.products.map((p) => p.product_id);
-
-              if (dataProductIds.includes(product.product_id)) {
-                const toUpdateFields = data.products.find(
-                  (p) => p.product_id == product.product_id
-                );
-
-                return PurchaseOrderProducts.update(toUpdateFields, {
-                  where: {
-                    id: product.id,
-                  },
-                  transaction: transaction,
-                });
-              } else {
-                return PurchaseOrderProducts.destroy({
-                  where: {
-                    id: product.id,
-                  },
-                  transaction: transaction,
-                });
-              }
-            }),
-          ]);
-        }
-
-        // update purchase order address
-        if (data.address) {
-          await Address.update(data.address, {
-            where: {
-              id: sequelize.literal(
-                `(SELECT address_id FROM ${PurchaseOrder.getTableName()} WHERE id = ${req.params.id})`
-              ),
-            },
-            transaction: transaction,
-          });
-        }
-      }
+      await updateOrder(req.params.id, data, transaction);
 
       await transaction.commit();
 
@@ -155,6 +94,49 @@ module.exports = {
     } catch (e) {
       await transaction.rollback();
       res.sendError({ ...e }, "Something wen't wrong! => " + e.message, 400);
+    }
+  },
+
+  receiveOrder: async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+      const data = req.body.validated;
+      await updateOrder(req.params.id, data, transaction);
+
+      // reflect products stock basing form the quantity received
+      const products = await Product.findAll({
+        where: {
+          id: {
+            [Op.in]: data.products.map((p) => p.product_id),
+          },
+          type: ItemType.INVENTORY,
+        },
+        attributes: ["id"],
+        include: {
+          model: ProductDetails,
+          as: "product_details",
+          attributes: ["id", "stock"],
+        },
+      });
+
+      await Promise.all(
+        products.map((p) => {
+          const productData = data.products.find((dp) => dp.product_id == p.id);
+          return p.product_details.update({
+            stock: p.product_details.stock + productData.quantity_received,
+          });
+        })
+      );
+
+      await transaction.commit();
+      res.sendResponse({}, "Successfully received!");
+    } catch (error) {
+      await transaction.rollback();
+      res.sendError(
+        { ...error },
+        "Something wen't wrong! => " + error.message,
+        400
+      );
     }
   },
 
@@ -168,7 +150,7 @@ module.exports = {
     }
   },
 
-  delete: async (req, res) => {
+  destory: async (req, res) => {
     try {
       await PurchaseOrder.destroy({
         where: {

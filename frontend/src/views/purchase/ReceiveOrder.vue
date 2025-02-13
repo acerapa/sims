@@ -42,9 +42,9 @@
           </p>
           <CustomInput
             type="number"
-            name="quantity"
+            name="quantity_received"
             class="col-span-1"
-            v-model="product.quantity"
+            v-model="product.quantity_received"
           />
           <CustomInput
             :rows="1"
@@ -80,7 +80,6 @@
 </template>
 
 <script setup>
-import { authenticatedApi, Method } from '@/api'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
@@ -167,21 +166,17 @@ const onCancel = () => {
 }
 
 const onReceiveOrder = async () => {
-  const res = await authenticatedApi(
-    `purchase-order/${route.params.id}/update`,
-    Method.POST,
-    model.value
-  )
+  await purchaseOrderStore.receivePurchaseOrder(route.params.id, model.value)
 
-  if (res.status == 200) {
-    await purchaseOrderStore.fetchPurchaseOrderById(route.params.id)
-    router.push({
-      name: PurchaseConst.PURCHASE_ORDER_FORM,
-      query: {
-        id: route.params.id
-      }
-    })
-  }
+  // if (res.status == 200) {
+  //   await purchaseOrderStore.fetchPurchaseOrderById(route.params.id)
+  //   router.push({
+  //     name: PurchaseConst.PURCHASE_ORDER_FORM,
+  //     query: {
+  //       id: route.params.id
+  //     }
+  //   })
+  // }
 }
 
 /** ================================================
@@ -222,6 +217,7 @@ onMounted(async () => {
             ? product.PurchaseOrderProducts.description
             : product.purchase_description,
           quantity: product.PurchaseOrderProducts.quantity,
+          quantity_received: product.PurchaseOrderProducts.quantity,
           status: product.PurchaseOrderProducts.status
             ? product.PurchaseOrderProducts.status
             : PurchaseOrderProductsedStatus.OPEN,
