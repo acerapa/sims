@@ -213,7 +213,14 @@
 
       <div class="flex justify-between items-center mt-6">
         <div class="flex gap-2 items-center">
-          <p class="text-base font-semibold">Select Products</p>
+          <p class="text-base font-semibold">
+            {{
+              model.order.status == PurchaseOrderStatus.COMPLETED
+                ? 'Selected'
+                : 'Select'
+            }}
+            Products
+          </p>
           <small
             class="text-red-300 p-1 border border-red-300 rounded"
             v-if="!model.order.supplier_id"
@@ -228,7 +235,12 @@
         :row-component="PurchaseOrderFormRow"
         :format="productFormat"
         v-model="model.products"
-        :is-disabled="model.order.supplier_id ? false : true"
+        :is-disabled="
+          model.order.supplier_id &&
+          model.order.status != PurchaseOrderStatus.COMPLETED
+            ? false
+            : true
+        "
         :row-props="{
           sup_id: model.order.supplier_id.toString(),
           selected: model.products

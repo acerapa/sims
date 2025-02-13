@@ -1,6 +1,10 @@
 <template>
   <div>
-    <component :is="props.headerComponent" class="mb-4" />
+    <component
+      :is="props.headerComponent"
+      v-bind="{ isDisabled: props.isDisabled }"
+      class="mb-4"
+    />
     <div class="flex flex-col gap-4">
       <component
         :is="props.rowComponent"
