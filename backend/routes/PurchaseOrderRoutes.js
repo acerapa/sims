@@ -1,23 +1,27 @@
 const Router = require("express").Router();
-const PurchaseOrderController = require("../controllers/PurchaseOrderController");
+const {
+  all,
+  byId,
+  destory,
+  receiveOrder,
+  update,
+  register,
+} = require("../controllers/PurchaseOrderController");
 const { validateBody } = require("../middleware/request-validator");
 const {
   PurchaseOrderCreationSchema,
   PurchaseOrderUpdateSchema,
 } = require("shared");
 
-Router.get("/all", PurchaseOrderController.all);
-Router.get("/:id", PurchaseOrderController.byId);
-Router.delete("/delete", PurchaseOrderController.delete);
-Router.post(
-  "/:id/update",
+Router.get("/all", all);
+Router.get("/:id", byId);
+Router.delete("/delete", destory);
+Router.put("/:id", validateBody(PurchaseOrderUpdateSchema), update);
+Router.post("/register", validateBody(PurchaseOrderCreationSchema), register);
+Router.put(
+  "/:id/receive-order",
   validateBody(PurchaseOrderUpdateSchema),
-  PurchaseOrderController.update
-);
-Router.post(
-  "/register",
-  validateBody(PurchaseOrderCreationSchema),
-  PurchaseOrderController.register
+  receiveOrder
 );
 
 module.exports = Router;

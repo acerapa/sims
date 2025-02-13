@@ -51,7 +51,6 @@
               label="From Branch"
               :error-has-text="true"
               :options="branchOptions"
-              @change="populateAddress"
               placeholder="Select Branch"
               :error="modelErrors.branch_from"
               v-model="model.transfer.branch_from"
@@ -74,7 +73,7 @@
       </div>
       <div class="flex flex-col gap-3">
         <p class="font-semibold">Select Product</p>
-        <ProductMultiSelectTable
+        <MultiSelectTable
           v-model="model.products"
           :header-component="IbrrSelectHeader"
           :row-component="ProductSelectRow"
@@ -120,11 +119,13 @@ import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue'
+import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import IbrrSelectHeader from '@/components/stock-transfer/ibrr-select-header.vue'
 import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 import Event from '@/event'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
@@ -133,8 +134,9 @@ import { useTransferStore } from '@/stores/transfer'
 import { TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { StockTransferCreateSchema } from 'shared/validators'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { PageStateConst } from '@/const/state.constants'
 
 const ibrrEventName = 'ibrr-product-row'
 
@@ -264,20 +266,41 @@ const onSubmit = async () => {
     return
   }
 
-  if (!isEdit.value) {
-    await transferStore.createTransfer(model.value)
-    router.push({ name: 'ibrr-list' })
+  let isSuccess = false
+  if (!isEdit.value) isSuccess = await transferStore.createTransfer(model.value)
+  else
+    isSuccess = await transferStore.updateTransfer(model.value, route.query.id)
+
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${isEdit.value ? 'updated' : 'created'} IBRR!`,
+      type: ToastTypes.SUCCESS
+    })
+    if (!isEdit.value) {
+      router.push({ name: TransferConst.IBRR_LIST })
+    }
   } else {
-    await transferStore.updateTransfer(model.value, route.query.id)
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${isEdit.value ? 'update' : 'create'} IBRR!`,
+      type: ToastTypes.ERROR
+    })
   }
 }
 
 const onCancel = () => {
-  router.push({ name: 'ibrr-list' })
+  router.push({ name: TransferConst.IBRR_LIST })
 }
 
-const onAfterDelete = () => {
-  router.push({ name: 'ibrr-list' })
+const onAfterDelete = async () => {
+  await transferStore.removeTransfer(route.query.id)
+  router.push({ name: TransferConst.IBRR_LIST })
+}
+
+const setIBRRFormPageState = () => {
+  appStore.setPageState(PageStateConst.IBRR_FORM, {
+    route_scope: [TransferConst.IBRR_FORM, InventoryConst.PRODUCT_FORM],
+    state: model.value
+  })
 }
 
 /** ================================================
@@ -285,7 +308,7 @@ const onAfterDelete = () => {
  ** ================================================*/
 onMounted(async () => {
   await settingStore.getBranches()
-  await productStore.fetchAllProducts()
+  await productStore.getProducts()
 
   // check if route has transfer id
   if (route.query.id) {
@@ -303,17 +326,14 @@ onMounted(async () => {
         'YYYY-MM-DDTHH:II:SS-A'
       )
 
-      // populate address
-      populateAddress()
-
       // populate products
       model.value.products = transfer.products.map((p) => {
         return {
-          product_id: p.ProductTransaction.product_id,
-          description: p.ProductTransaction.description,
-          cost: p.ProductTransaction.cost,
-          quantity: p.ProductTransaction.quantity,
-          amount: p.ProductTransaction.amount
+          product_id: p.StockTransferProducts.product_id,
+          description: p.StockTransferProducts.description,
+          cost: p.StockTransferProducts.cost,
+          quantity: p.StockTransferProducts.quantity,
+          amount: p.StockTransferProducts.amount
         }
       })
     }
@@ -327,6 +347,23 @@ onMounted(async () => {
 
   model.value.transfer.processed_by = authStore.getAuthUser().id
 
+  // set page state
+  if (appStore.isPageExist(PageStateConst.IBRR_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.IBRR_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.IBRR_FORM].state
+      )
+    }
+  } else {
+    setIBRRFormPageState()
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 
@@ -334,4 +371,19 @@ onBeforeUnmount(() => {
   // clear interval
   clearInterval(timeInterval)
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value,
+  () => {
+    setIBRRFormPageState()
+
+    if (model.value.transfer.branch_from) {
+      populateAddress()
+    }
+  },
+  { deep: true }
+)
 </script>

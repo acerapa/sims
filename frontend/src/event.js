@@ -35,6 +35,12 @@ class Event {
       }
     }
   }
+
+  // TODO: Need to add this function to remove events that are no longer needed
+  // Main benefit is to reduce the memory usage and enhance the performance
+  static removeEvent(event) {
+    // code ...
+  }
 }
 
 export default Event

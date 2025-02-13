@@ -34,6 +34,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import { DateHelpers } from 'shared/helpers'
+import { TransferConst } from '@/const/route.constants'
 
 const searchText = ref()
 const router = useRouter()
@@ -69,13 +70,13 @@ const filteredData = computed(() => {
  ** ================================================*/
 const onAddNewRecord = () => {
   router.push({
-    name: 'str-form'
+    name: TransferConst.STR_FORM
   })
 }
 
 const onView = (id) => {
   router.push({
-    name: 'str-form',
+    name: TransferConst.STR_FORM,
     query: { id }
   })
 }
@@ -84,7 +85,7 @@ const onView = (id) => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await transferStore.fetchTransfers()
+  await transferStore.getTransfers()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>

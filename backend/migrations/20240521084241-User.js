@@ -1,6 +1,7 @@
-'use strict';
+"use strict";
 
-const User = require('../models/user');
+const { removeConstraints } = require("../models");
+const User = require("../models/user");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -15,13 +16,8 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
-
+    // remove constraints
+    await removeConstraints(User.getTableName(), queryInterface);
     await queryInterface.dropTable(User.getTableName());
-  }
+  },
 };

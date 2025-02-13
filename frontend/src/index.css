@@ -75,7 +75,7 @@ select.input {
 }
 
 .btn-outline {
-  @apply px-4 py-2 rounded border border-primary text-primary font-semibold text-sm bg-white;
+  @apply px-3 py-2 rounded border border-primary text-primary font-semibold text-sm bg-white hover:bg-primary hover:text-white;
 }
 
 .btn-danger {
@@ -83,7 +83,7 @@ select.input {
 }
 
 .btn-danger-outline {
-  @apply btn-outline !border-danger !text-danger;
+  @apply btn-outline !border-danger !text-danger hover:!bg-danger hover:!text-white;
 }
 
 .btn-green {
@@ -95,7 +95,7 @@ select.input {
 }
 
 .btn-gray-outline {
-  @apply btn-outline !border-gray-600 !text-gray-600;
+  @apply btn-outline !border-gray-600 !text-gray-600 hover:!text-white hover:!border-white;
 }
 
 .status {
@@ -147,5 +147,24 @@ select.input {
 
   100% {
     transform: rotate(180deg);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }

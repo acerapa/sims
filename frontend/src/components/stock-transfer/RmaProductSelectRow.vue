@@ -2,7 +2,7 @@
   <div>
     <div
       class="grid gap-3 items-start min-w-[750px]"
-      :class="[props.isDisabled ? 'grid grid-cols-9' : 'grid-cols-10']"
+      :class="[props.isDisabled ? 'grid grid-cols-10' : 'grid-cols-11']"
     >
       <div class="col-span-2 flex gap-3">
         <CustomInput
@@ -18,7 +18,7 @@
           placeholder="Select product"
           :options="productStore.productOptions"
           :has-add-new="true"
-          @add-new="showModal = true"
+          @add-new="onAddNewProduct"
           v-model="model.product_id"
           :can-search="true"
           :disabled="props.isDisabled"
@@ -60,6 +60,16 @@
       <CustomInput
         class="col-span-1"
         type="number"
+        name="cost"
+        placeholder="Cost"
+        :disabled="props.isDisabled"
+        v-model="model.cost"
+        :error-has-text="false"
+        :error="modelErrors.cost"
+      />
+      <CustomInput
+        class="col-span-1"
+        type="number"
         name="amount"
         placeholder="Amount"
         :disabled="props.isDisabled"
@@ -85,8 +95,10 @@
 <script setup>
 import { useProductStore } from '@/stores/product'
 import CustomInput from '../shared/CustomInput.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import Event from '@/event'
+import { useRouter } from 'vue-router'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
 const props = defineProps({
   ndx: {
     type: Number,
@@ -104,6 +116,7 @@ const props = defineProps({
 
 const emit = defineEmits(['remove'])
 const productStore = useProductStore()
+const router = useRouter()
 const model = defineModel()
 const modelErrors = ref({})
 
@@ -127,6 +140,7 @@ const onChange = () => {
       model.value.description = product.purchase_description
       model.value.cost = product.price
       model.value.quantity = 1
+      model.value.amount = 0
     }
   } else {
     model.value.serial_number = ''
@@ -138,9 +152,25 @@ const onChange = () => {
   }
 }
 
+const onAddNewProduct = () => {
+  router.push({
+    name: InventoryConst.PRODUCT_FORM,
+    query: {
+      redirect: TransferConst.RMA_FORM
+    }
+  })
+}
+
 onMounted(async () => {
   if (productStore.productOptions.length === 0) {
     await productStore.fetchAllProducts()
   }
 })
+
+watch(
+  () => [model.value.quantity, model.value.cost],
+  () => {
+    model.value.amount = model.value.quantity * model.value.cost
+  }
+)
 </script>

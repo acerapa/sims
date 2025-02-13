@@ -17,9 +17,14 @@
       </RouterLink>
     </AlertComponent>
     <div class="cont">
+      <button type="button" class="btn float-right" @click="startPrint">
+        &#128438; Print
+      </button>
       <div class="flex gap-4 max-lg:flex-col">
         <div class="flex flex-col gap-3 flex-1">
-          <p class="text-base font-semibold">Transfer Information</p>
+          <div class="flex justify-between">
+            <p class="text-base font-semibold">Transfer Information</p>
+          </div>
           <div class="flex gap-3">
             <CustomInput
               type="select"
@@ -30,7 +35,6 @@
               label="Select Receiving Branch"
               placeholder="Select Branch"
               v-model="model.transfer.branch_to"
-              @change="populateAddress"
               :error="modelErrors.branch_to"
               :error-has-text="true"
             />
@@ -125,7 +129,7 @@ import AddressForm from '@/components/shared/AddressForm.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
-import ProductMulitpleSelect from '@/components/shared/ProductMultiSelectTable.vue'
+import ProductMulitpleSelect from '@/components/shared/MultiSelectTable.vue'
 import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
@@ -135,11 +139,15 @@ import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
 import { TransferType } from 'shared/enums'
-import { DateHelpers, GeneralHelpers, ObjectHelpers } from 'shared/helpers'
+import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { StockTransferCreateSchema } from 'shared'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
+import { usePrint } from '@/use/usePrint'
+import { ToastTypes } from '@/data/types'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
+import { PageStateConst } from '@/const/state.constants'
 
 const rowEventName = 'str-product-row'
 
@@ -148,6 +156,7 @@ const router = useRouter()
 const isEdit = ref(false)
 const appStore = useAppStore()
 const authStore = useAuthStore()
+const { startPrint } = usePrint()
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
 const transferStore = useTransferStore()
@@ -280,26 +289,49 @@ const onSubmit = async () => {
     return
   }
 
+  let isSuccess = false
   if (!isEdit.value) {
     model.value.transfer.when = new Date()
-    await transferStore.createTransfer(model.value)
-    router.push({
-      name: 'str-list'
-    })
+    isSuccess = await transferStore.createTransfer(model.value)
   } else {
-    await transferStore.updateTransfer(model.value, route.query.id)
+    isSuccess = await transferStore.updateTransfer(model.value, route.query.id)
+  }
+
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${isEdit.value ? 'updated' : 'created'} STR!`,
+      type: ToastTypes.SUCCESS
+    })
+    if (!isEdit.value) {
+      router.push({
+        name: TransferConst.STR_LIST
+      })
+    }
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${isEdit.value ? 'update' : 'create'} STR!`,
+      type: ToastTypes.ERROR
+    })
   }
 }
 
 const onCancel = () => {
   router.push({
-    name: 'str-list'
+    name: TransferConst.STR_LIST
   })
 }
 
-const onAfterDelete = () => {
+const onAfterDelete = async () => {
+  await transferStore.removeTransfer(route.query.id)
   router.push({
-    name: 'str-list'
+    name: TransferConst.STR_LIST
+  })
+}
+
+const setSTRFromPageState = () => {
+  appStore.setPageState(PageStateConst.STR_FORM, {
+    route_scope: [InventoryConst.PRODUCT_FORM, TransferConst.STR_FORM],
+    state: model.value
   })
 }
 
@@ -307,7 +339,7 @@ const onAfterDelete = () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await productStore.fetchAllProducts()
+  await productStore.getProducts()
   await settingStore.getBranches()
 
   // check if there is an id query param
@@ -330,17 +362,14 @@ onMounted(async () => {
         'YYYY-MM-DDTHH:II:SS-A'
       )
 
-      // populate address from the receiver in the transfer
-      populateAddress()
-
       // populate products
       model.value.products = transfer.products.map((p) => {
         return {
-          product_id: p.ProductTransaction.product_id,
-          description: p.ProductTransaction.description,
-          quantity: p.ProductTransaction.quantity,
-          cost: p.ProductTransaction.cost,
-          amount: p.ProductTransaction.amount
+          product_id: p.StockTransferProducts.product_id,
+          description: p.StockTransferProducts.description,
+          quantity: p.StockTransferProducts.quantity,
+          cost: p.StockTransferProducts.cost,
+          amount: p.StockTransferProducts.amount
         }
       })
     } else {
@@ -360,6 +389,23 @@ onMounted(async () => {
   // set processed by
   model.value.transfer.processed_by = authStore.getAuthUser().id
 
+  // set page state
+  if (appStore.isPageExist(PageStateConst.STR_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.STR_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.STR_FORM].state
+      )
+    }
+  } else {
+    setSTRFromPageState()
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 
@@ -367,4 +413,19 @@ onBeforeUnmount(() => {
   // remove interval
   clearInterval(timeInterval)
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value,
+  () => {
+    setSTRFromPageState()
+
+    if (model.value.transfer.branch_to) {
+      populateAddress()
+    }
+  },
+  { deep: true }
+)
 </script>

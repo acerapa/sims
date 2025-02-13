@@ -1,5 +1,5 @@
-const { DataTypes, Model } = require('sequelize');
-const { sequelize } = require('.');
+const { DataTypes, Model } = require("sequelize");
+const { sequelize } = require(".");
 
 class Account extends Model {}
 
@@ -8,21 +8,20 @@ Account.init(
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     type: {
       type: DataTypes.STRING,
-      allowNull: false
-    }
+      allowNull: false,
+    },
   },
   {
     sequelize,
-    paranoid: true,
-    timestamps: true
+    timestamps: true,
   }
 );
 

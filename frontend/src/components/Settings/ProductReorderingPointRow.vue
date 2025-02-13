@@ -11,10 +11,10 @@
     <div class="col-span-3 text-sm flex flex-wrap gap-3">
       <p
         class="text-xs bg-blue-200 px-2 py-1 rounded"
-        v-for="(product, ndx) in props.productReordering.products"
+        v-for="(pd, ndx) in props.productReordering.product_details"
         :key="ndx"
       >
-        {{ product.name }}
+        {{ pd.product.name }}
       </p>
     </div>
   </div>

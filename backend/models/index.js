@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 const process = require("process");
+const { ConsoleColors } = require("shared/enums");
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config")["development"]; // force to use development configs
@@ -14,7 +15,7 @@ let sequelize = new Sequelize(
   config.database,
   config.username,
   config.password,
-  config
+  { ...config, logging: false }
 );
 
 sequelize
@@ -99,6 +100,26 @@ const getColumnConstrains = async (table) => {
   return results;
 };
 
+const removeConstraints = async (table, queryInterface) => {
+  console.log(
+    `${ConsoleColors.BLUE}Removing constraints...${ConsoleColors.RESET}`
+  );
+  const constraints = await getColumnConstrains(table);
+
+  if (constraints.length) {
+    await Promise.all(
+      constraints.map((cnt) => {
+        queryInterface.removeConstraint(cnt.tableName, cnt.constraintName);
+      })
+    );
+  }
+
+  console.log(
+    `${ConsoleColors.GREEN}Constraints removed successfully${ConsoleColors.RESET}`
+  );
+};
+
+db.removeConstraints = removeConstraints;
 db.getColumnConstrains = getColumnConstrains;
 db.isColumnExistInTable = isColumnExistInTable;
 db.areColumnsExistInTable = areColumnsExistInTable;

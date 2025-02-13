@@ -27,5 +27,6 @@
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "cody.debug.verbose": true
 }

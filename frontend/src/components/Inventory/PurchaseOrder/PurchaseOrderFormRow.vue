@@ -1,5 +1,4 @@
 <template>
-  <ProductModal v-model="showModal" v-if="showModal" />
   <slot></slot>
   <div
     class="grid gap-3 items-start min-w-[750px]"
@@ -19,7 +18,7 @@
         placeholder="Select product"
         :options="productOptions"
         :has-add-new="true"
-        @add-new="showModal = true"
+        @add-new="onNewProduct"
         v-model="product.product_id"
         :error="props.errors.product_id"
         :key="product.product_id"
@@ -78,16 +77,17 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useProductStore } from '@/stores/product'
-import ProductModal from '@/components/Product/ProductModal.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { getCost } from '@/helper'
+import { useRouter } from 'vue-router'
+import { InventoryConst, PurchaseConst } from '@/const/route.constants'
 
 const props = defineProps({
-  selectedProducts: {
-    type: Array,
-    defualt: []
+  ndx: {
+    type: Number,
+    required: false
   },
   isDisabled: {
     type: Boolean,
@@ -100,11 +100,15 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
     required: false
+  },
+  selected: {
+    type: Array,
+    required: true
   }
 })
 
+const router = useRouter()
 const product = defineModel()
-const showModal = ref(false)
 const emit = defineEmits(['remove'])
 const productStore = useProductStore()
 const productOptions = computed(() => {
@@ -117,10 +121,21 @@ const productOptions = computed(() => {
     })
     .filter((prod) => {
       if (product.value.product_id == prod.value) return true
-      return !props.selectedProducts
-        .map((p) => p.product_id)
-        .includes(prod.value)
+      return !props.selected.map((p) => p.product_id).includes(prod.value)
     })
+})
+
+const onNewProduct = () => {
+  router.push({
+    name: InventoryConst.PRODUCT_FORM,
+    query: {
+      redirect: PurchaseConst.PURCHASE_ORDER_FORM
+    }
+  })
+}
+
+onMounted(async () => {
+  await productStore.getProducts()
 })
 
 watch(
@@ -132,7 +147,7 @@ watch(
       product.value.name = prd.name
       product.value.description = product.value.description
         ? product.value.description
-        : prd.purchase_description
+        : prd.product_details.purchase_description
       product.value.quantity = product.value.quantity
         ? product.value.quantity
         : 1 // will always set quantity upon create

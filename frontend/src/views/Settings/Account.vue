@@ -162,7 +162,7 @@ const onNewRecord = () => {
  ** ================================================*/
 
 onMounted(async () => {
-  await settingsStore.fetchAllAccounts()
+  await settingsStore.getAccounts()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>

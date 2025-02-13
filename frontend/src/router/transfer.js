@@ -1,15 +1,17 @@
+import { TransferConst } from '../const/route.constants'
+
 export default [
   {
     path: '/transfer',
-    name: 'transfer',
+    name: TransferConst.TRANSFER,
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
-      name: 'str-list'
+      name: TransferConst.STR_LIST
     },
     children: [
       {
         path: '/ibrr-list',
-        name: 'ibrr-list',
+        name: TransferConst.IBRR_LIST,
         component: () => import('@/views/StockTransfer/ibrr-list.vue'),
         meta: {
           requiresAuth: true,
@@ -18,7 +20,7 @@ export default [
       },
       {
         path: '/ibrr-form',
-        name: 'ibrr-form',
+        name: TransferConst.IBRR_FORM,
         component: () => import('@/views/StockTransfer/ibrr-form.vue'),
         meta: {
           requiresAuth: true,
@@ -27,7 +29,7 @@ export default [
       },
       {
         path: '/str-list',
-        name: 'str-list',
+        name: TransferConst.STR_LIST,
         component: () => import('@/views/StockTransfer/str-list.vue'),
         meta: {
           requiresAuth: true,
@@ -36,7 +38,7 @@ export default [
       },
       {
         path: '/str-form',
-        name: 'str-form',
+        name: TransferConst.STR_FORM,
         component: () => import('@/views/StockTransfer/str-form.vue'),
         meta: {
           requiresAuth: true,
@@ -45,7 +47,7 @@ export default [
       },
       {
         path: 'rma-list',
-        name: 'rma-list',
+        name: TransferConst.RMA_LIST,
         component: () => import('@/views/StockTransfer/rma-list.vue'),
         meta: {
           title: 'Return Merchandise Authority List',
@@ -54,7 +56,7 @@ export default [
       },
       {
         path: 'rma-form',
-        name: 'rma-form',
+        name: TransferConst.RMA_FORM,
         component: () => import('@/views/StockTransfer/rma-form.vue'),
         meta: {
           title: 'Return Merchandise Authority Form',
@@ -63,7 +65,7 @@ export default [
       },
       {
         path: 'fix-asset',
-        name: 'fix-asset-list',
+        name: TransferConst.FIX_ASSET_LIST,
         component: () => import('@/views/StockTransfer/fix-asset-list.vue'),
         meta: {
           title: 'PO to Fixed Asset List',
@@ -72,7 +74,7 @@ export default [
       },
       {
         path: 'fix-asset-form',
-        name: 'fix-asset-form',
+        name: TransferConst.FIX_ASSET_FORM,
         component: () => import('@/views/StockTransfer/fix-asset-form.vue'),
         meta: {
           title: 'Fixed Asset Form',

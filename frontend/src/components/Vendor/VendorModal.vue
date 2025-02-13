@@ -3,8 +3,8 @@
     :title="title"
     v-model="showModal"
     @submit="onSubmit"
-    :has-delete="true"
     @delete="showDeleteConfirmModal = true"
+    :has-delete="props.selectedId ? true : false"
     :save-btn="props.selectedId ? 'Update' : 'Save'"
   >
     <div class="flex flex-col gap-4 my-7">
@@ -149,13 +149,15 @@
 <script setup>
 import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { Method, authenticatedApi } from '@/api'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import AddressForm from '../shared/AddressForm.vue'
 import { useVendorStore } from '@/stores/supplier'
 import { onMounted, ref } from 'vue'
 import { VendorCreateSchema } from 'shared'
 import { ObjectHelpers } from 'shared'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
 
 const showModal = defineModel()
 const showDeleteConfirmModal = ref(false)
@@ -172,9 +174,7 @@ const title = ref(
   props.selectedId ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier'
 )
 const apiPath = ref(
-  props.selectedId
-    ? `suppliers/${props.selectedId}/update`
-    : 'suppliers/register'
+  props.selectedId ? `suppliers/${props.selectedId}` : 'suppliers/register'
 )
 const model = ref({
   vendor: {
@@ -212,15 +212,29 @@ const onSubmit = async () => {
     return
   }
 
-  const res = await authenticatedApi(apiPath.value, Method.POST, model.value)
-  await supplierStore.fetchAllSuppliers()
-
+  let isSuccess = false
   if (props.selectedId) {
-    await supplierStore.fetchSupplierById(props.selectedId)
+    isSuccess = await supplierStore.updateSupplier(
+      props.selectedId,
+      model.value
+    )
+  } else {
+    isSuccess = await supplierStore.registerSupplier(model.value)
   }
 
-  if (res.status == 200) {
+  if (isSuccess) {
     showModal.value = false
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${props.selectedId ? 'updated' : 'created'} Vendor/Supplier!`,
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${props.selectedId ? 'update' : 'create'} Vendor/Supplier!`,
+      type: ToastTypes.ERROR,
+      duration: 2000
+    })
   }
 }
 

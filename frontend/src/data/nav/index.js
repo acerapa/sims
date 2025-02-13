@@ -1,14 +1,17 @@
 import dashboard from '@/assets/icons/dashboard.svg'
 import inventory from '@/assets/icons/inventory.svg'
-import vendors from '@/assets/icons/vendors.svg'
-import customers from '@/assets/icons/customers.svg'
-import products from '@/assets/icons/products.svg'
 import reports from '@/assets/icons/reports.svg'
 import employees from '@/assets/icons/employees.svg'
 import settings from '@/assets/icons/settings.svg'
 import outlineDot from '@/assets/icons/outline-dot.svg'
 import transfer from '@/assets/icons/transfer.png'
 import sales from '@/assets/icons/sales.png'
+import {
+  InventoryConst,
+  PurchaseConst,
+  SettingConst,
+  TransferConst
+} from '@/const/route.constants'
 
 export default [
   {
@@ -17,7 +20,48 @@ export default [
     icon: dashboard
   },
   {
-    text: 'Sales',
+    text: 'Inventory Management',
+    route: 'inventory',
+    icon: inventory,
+    children: [
+      {
+        text: 'Products',
+        route: InventoryConst.PRODUCTS,
+        icon: outlineDot,
+        includes_active: [InventoryConst.PRODUCT_FORM]
+      },
+      {
+        text: 'Services',
+        route: InventoryConst.SERVICES,
+        icon: outlineDot
+      },
+      {
+        text: 'Inventory Stock Status',
+        route: InventoryConst.INVENTORY_STOCK_STATUS,
+        icon: outlineDot
+      }
+    ]
+  },
+  {
+    text: 'Purchase Management',
+    route: 'purchase',
+    icon: inventory,
+    children: [
+      {
+        text: 'Purchase Order',
+        route: PurchaseConst.PURCHASE_ORDER,
+        icon: outlineDot,
+        includes_active: [PurchaseConst.PURCHASE_ORDER_FORM]
+      },
+      {
+        text: 'Vendor management',
+        route: PurchaseConst.VENDORS,
+        icon: outlineDot
+      }
+    ]
+  },
+  {
+    text: 'Sales & Orders',
     route: 'sales',
     icon: sales,
     children: [
@@ -28,6 +72,11 @@ export default [
         includes_active: ['sales-order-form']
       },
       {
+        text: 'Customers',
+        route: 'customers',
+        icon: outlineDot
+      },
+      {
         text: 'Item Details',
         route: 'item-details',
         icon: outlineDot
@@ -35,73 +84,35 @@ export default [
     ]
   },
   {
-    text: 'Inventory',
-    route: 'inventory',
-    icon: inventory,
-    children: [
-      {
-        text: 'Purchase Order',
-        route: 'purchase-order',
-        icon: outlineDot,
-        includes_active: ['purchase-order-create']
-      },
-      {
-        text: 'My Inventory',
-        route: 'my-inventory',
-        icon: outlineDot
-      },
-      {
-        text: 'Inventory Stock Status',
-        route: 'inventory-stock-status',
-        icon: outlineDot
-      }
-    ]
-  },
-  {
-    text: 'Transfer Stocks',
-    route: 'transfer',
+    text: 'Stock Transfers',
+    route: TransferConst.TRANSFER,
     icon: transfer,
     children: [
       {
         text: 'STR List',
-        route: 'str-list',
+        route: TransferConst.STR_LIST,
         icon: outlineDot,
-        includes_active: ['str-form']
+        includes_active: [TransferConst.STR_FORM]
       },
       {
         text: 'IBRR List',
-        route: 'ibrr-list',
+        route: TransferConst.IBRR_LIST,
         icon: outlineDot,
-        includes_active: ['ibrr-form']
+        includes_active: [TransferConst.IBRR_FORM]
       },
       {
         text: 'RMA List',
-        route: 'rma-list',
+        route: TransferConst.RMA_LIST,
         icon: outlineDot,
-        includes_active: ['rma-form']
+        includes_active: [TransferConst.RMA_FORM]
       },
       {
         text: 'PO to Fix list',
-        route: 'fix-asset-list',
+        route: TransferConst.FIX_ASSET_LIST,
         icon: outlineDot,
-        includes_active: ['fix-asset-form']
+        includes_active: [TransferConst.FIX_ASSET_FORM]
       }
     ]
-  },
-  {
-    text: 'Vendors/Suppliers',
-    route: 'vendors',
-    icon: vendors
-  },
-  {
-    text: 'Customers',
-    route: 'customers',
-    icon: customers
-  },
-  {
-    text: 'Products',
-    route: 'products',
-    icon: products
   },
   {
     text: 'Reports',
@@ -122,22 +133,22 @@ export default [
   },
   {
     text: 'Settings',
-    route: 'setting',
+    route: SettingConst.SETTING,
     icon: settings,
     children: [
       {
         text: 'Branches',
-        route: 'branches',
+        route: SettingConst.BRANCHES,
         icon: outlineDot
       },
       {
         text: 'Account Settings',
-        route: 'account-settings',
+        route: SettingConst.ACCOUNT_SETTINGS,
         icon: outlineDot
       },
       {
         text: 'Product Settings',
-        route: 'product-settings',
+        route: SettingConst.PRODUCT_SETTINGS,
         icon: outlineDot
       }
     ]

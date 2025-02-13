@@ -1,7 +1,7 @@
 <template>
   <ModalWrapper
     v-model="showModal"
-    title="New Ordering Point"
+    :title="props.selectedId ? 'Edit Re-ordering Point' : 'New Ordering Point'"
     modal-class="[&>form>div]:overflow-visible"
     :has-delete="props.selectedId ? true : false"
     @submit="onSubmit"
@@ -26,7 +26,7 @@
         name="included-products"
         :options="productOptions"
         v-model="model.products"
-        @add-new="showProductModal = true"
+        @add-new="onAddNewProduct"
         placeholder="Select included products"
         :has-add-new="true"
         :can-search="true"
@@ -42,18 +42,22 @@
     :href="`product-setting/delete/${props.selectedId}`"
     @after-delete="onAfterDelete"
   />
-  <ProductModal v-model="showProductModal" v-if="showProductModal" />
 </template>
 <script setup>
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useProductStore } from '@/stores/product'
-import ProductModal from '@/components/Product/ProductModal.vue'
-import { authenticatedApi, Method } from '@/api'
 import { useSettingsStore } from '@/stores/settings'
-import { ProductReorderSchema } from 'shared'
+import { ObjectHelpers, ProductReorderSchema } from 'shared'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
+import { ToastTypes } from '@/data/types'
+import { useRouter } from 'vue-router'
+import { InventoryConst, SettingConst } from '@/const/route.constants'
+import { useAppStore } from '@/stores/app'
+import { ModalStateConst } from '@/const/state.constants'
 
 const props = defineProps({
   selectedId: {
@@ -64,14 +68,22 @@ const props = defineProps({
 
 const showModal = defineModel()
 const showConfirmModal = ref(false)
+
+const router = useRouter()
+const appStore = useAppStore()
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
 
-const href = ref(
-  props.selectedId ? 'product-setting/update' : 'product-setting/register'
-)
+const model = ref({
+  point: '',
+  products: []
+})
 
-const showProductModal = ref(false)
+const modelErrors = ref({})
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
 
 const productOptions = computed(() => {
   return productStore.products.map((product) => {
@@ -82,32 +94,15 @@ const productOptions = computed(() => {
   })
 })
 
-const model = ref({
-  point: '',
-  products: []
-})
-
-const modelErrors = ref({})
-
-onMounted(async () => {
-  await productStore.fetchAllProducts()
-  if (props.selectedId) {
-    let orderingPoint = settingStore.productReorderingPoints.find(
-      (point) => point.id == props.selectedId
-    )
-
-    if (orderingPoint) {
-      model.value = { ...orderingPoint }
-      model.value.products = orderingPoint.products.map((product) => product.id)
-    }
-  }
-})
-
+/** ================================================
+ * METHODS
+ ** ================================================*/
 const onSubmit = async () => {
   // validations
   const { error } = ProductReorderSchema.options({
     allowUnknown: true
   }).validate(model.value)
+
   if (error) {
     error.details.forEach((err) => {
       modelErrors.value[err.context.key] = err.message
@@ -116,10 +111,29 @@ const onSubmit = async () => {
     return
   }
 
-  const res = await authenticatedApi(href.value, Method.POST, model.value)
-  if (res.status == 200) {
-    await settingStore.fetchAllProductReorderingPoints()
+  let isSuccess = false
+  if (props.selectedId) {
+    isSuccess = await settingStore.updateReorderingPoint(
+      props.selectedId,
+      model.value
+    )
+  } else {
+    isSuccess = await settingStore.registerReorderingPoint(model.value)
+  }
+
+  if (isSuccess) {
     showModal.value = false
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${props.selectedId ? 'updated' : 'created'} re-ordering point!`,
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${props.selectedId ? 'update' : 'create'} re-ordering point!`,
+      type: ToastTypes.ERROR,
+      duration: 2000
+    })
   }
 }
 
@@ -132,4 +146,67 @@ const onAfterDelete = async () => {
   showConfirmModal.value = false
   await settingStore.fetchAllProductReorderingPoints()
 }
+
+const onAddNewProduct = () => {
+  router.push({
+    name: InventoryConst.PRODUCT_FORM,
+    query: {
+      redirect: 'product-settings'
+    }
+  })
+}
+
+const setPointModalState = () => {
+  appStore.setModalState(ModalStateConst.PRODUCT_POINT_MODAL, {
+    state: model.value,
+    route_scope: [SettingConst.PRODUCT_SETTINGS, InventoryConst.PRODUCT_FORM]
+  })
+}
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+
+onMounted(async () => {
+  await productStore.fetchAllProducts()
+  if (props.selectedId) {
+    let orderingPoint = settingStore.productReorderingPoints.find(
+      (point) => point.id == props.selectedId
+    )
+
+    if (orderingPoint) {
+      model.value.point = orderingPoint.point
+      model.value.products = orderingPoint.product_details.map(
+        (pd) => pd.product.id
+      )
+    }
+  }
+
+  if (appStore.isModalExist(ModalStateConst.PRODUCT_POINT_MODAL)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.modals[ModalStateConst.PRODUCT_POINT_MODAL].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.modals[ModalStateConst.PRODUCT_POINT_MODAL].state
+      )
+    }
+  } else {
+    setPointModalState()
+  }
+})
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value,
+  () => {
+    setPointModalState()
+  },
+  { deep: true }
+)
 </script>

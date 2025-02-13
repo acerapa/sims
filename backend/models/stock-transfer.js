@@ -5,9 +5,9 @@ const Branch = require("./branch");
 const User = require("./user");
 const Supplier = require("./supplier");
 
-class StockTranfer extends Model {}
+class StockTransfer extends Model {}
 
-StockTranfer.init(
+StockTransfer.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -73,4 +73,4 @@ StockTranfer.init(
   }
 );
 
-module.exports = StockTranfer;
+module.exports = StockTransfer;

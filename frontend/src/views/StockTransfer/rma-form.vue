@@ -6,6 +6,16 @@
     @after-delete="onAfterDelete"
   />
   <div class="cont flex flex-col gap-6">
+    <AlertComponent
+      v-if="!currentBranch"
+      type="danger"
+      :text="'Please select current branch'"
+    >
+      Please refer
+      <RouterLink class="text-blue-400 underline" :to="{ name: 'branches' }">
+        here!
+      </RouterLink>
+    </AlertComponent>
     <div class="flex gap-6">
       <div class="flex-1">
         <p class="font-bold">Transfer Information</p>
@@ -19,7 +29,6 @@
             :has-label="true"
             :error-has-text="true"
             label="Select supplier"
-            @change="populateAddress"
             :options="supplierOptions"
             placeholder="Select supplier"
             :error="modelErrors.supplier_id"
@@ -51,14 +60,14 @@
     </div>
     <div class="flex flex-col gap-3">
       <p class="font-bold">Select Products</p>
-      <ProductMultiSelectTable
+      <MultiSelectTable
         v-model="model.products"
         :header-component="RmaProductSelectHeader"
         :row-component="RmaProductSelectRow"
         :format="productDefaultValue"
         :row-event-name="rowEventName"
       >
-      </ProductMultiSelectTable>
+      </MultiSelectTable>
 
       <div
         class="flex gap-3 mt-4"
@@ -96,12 +105,13 @@
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
+import AlertComponent from '@/components/shared/AlertComponent.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import RmaProductSelectRow from '@/components/stock-transfer/RmaProductSelectRow.vue'
 import RmaProductSelectHeader from '@/components/stock-transfer/RmaProductSelectHeader.vue'
-import ProductMultiSelectTable from '@/components/shared/ProductMultiSelectTable.vue'
+import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { useVendorStore } from '@/stores/supplier'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { TransferType } from 'shared/enums'
 import { useRoute, useRouter } from 'vue-router'
@@ -116,6 +126,9 @@ import {
   Joi,
   ProductTransferSchema
 } from 'shared/validators'
+import { ToastTypes } from '@/data/types'
+import { InventoryConst, TransferConst } from '@/const/route.constants'
+import { PageStateConst } from '@/const/state.constants'
 
 const rowEventName = 'rma-product-event'
 
@@ -242,16 +255,27 @@ const onSubmit = async () => {
     return
   }
 
+  let isSuccess = false
   if (!isEdit.value) {
     model.value.transfer.when = new Date()
-    const res = await transferStore.createTransfer(model.value)
-    if (res.status == 200) {
-      router.push({
-        name: 'rma-list'
-      })
-    }
+    isSuccess = await transferStore.createTransfer(model.value)
   } else {
-    await transferStore.updateTransfer(model.value, route.query.id)
+    isSuccess = await transferStore.updateTransfer(model.value, route.query.id)
+  }
+
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${isEdit.value ? 'updated' : 'created'} RMA!`,
+      type: ToastTypes.SUCCESS
+    })
+    router.push({
+      name: TransferConst.RMA_LIST
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${isEdit.value ? 'update' : 'create'} RMA!`,
+      type: ToastTypes.ERROR
+    })
   }
 }
 
@@ -259,9 +283,17 @@ const onCancel = () => {
   router.back()
 }
 
-const onAfterDelete = () => {
+const onAfterDelete = async () => {
+  await transferStore.removeTransfer(route.query.id)
   router.push({
-    name: 'rma-list'
+    name: TransferConst.RMA_LIST
+  })
+}
+
+const setRMAFormPageState = () => {
+  appStore.setPageState(PageStateConst.RMA_FORM, {
+    route_scope: [InventoryConst.PRODUCT_FORM, TransferConst.RMA_FORM],
+    state: model.value
   })
 }
 
@@ -269,11 +301,13 @@ const onAfterDelete = () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await vendorStore.fetchAllSuppliers()
+  await vendorStore.getSuppliers()
   await settingsStore.getBranches()
   currentBranch.value = appStore.currentBranch
 
-  model.value.transfer.branch_from = currentBranch.value.id
+  model.value.transfer.branch_from = currentBranch.value
+    ? currentBranch.value.id
+    : ''
   model.value.transfer.processed_by = authStore.getAuthUser().id
 
   if (route.query.id) {
@@ -288,17 +322,16 @@ onMounted(async () => {
         new Date(),
         'YYYY-MM-DDTHH:II:SS-A'
       )
-      populateAddress()
 
       model.value.products = rma.products.map((p) => {
         return {
-          product_id: p.ProductTransaction.product_id,
-          description: p.ProductTransaction.description,
-          quantity: p.ProductTransaction.quantity,
-          cost: p.ProductTransaction.cost,
-          amount: p.ProductTransaction.amount,
-          problem: p.ProductTransaction.problem,
-          serial_number: p.ProductTransaction.serial_number
+          product_id: p.StockTransferProducts.product_id,
+          description: p.StockTransferProducts.description,
+          quantity: p.StockTransferProducts.quantity,
+          cost: p.StockTransferProducts.cost,
+          amount: p.StockTransferProducts.amount,
+          problem: p.StockTransferProducts.problem,
+          serial_number: p.StockTransferProducts.serial_number
         }
       })
     } else {
@@ -308,6 +341,38 @@ onMounted(async () => {
     isEdit.value = true
   }
 
+  // set page state
+  if (appStore.isPageExist(PageStateConst.RMA_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.RMA_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.RMA_FORM].state
+      )
+    }
+  } else {
+    setRMAFormPageState()
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value,
+  () => {
+    setRMAFormPageState()
+
+    if (model.value.transfer.supplier_id) {
+      populateAddress()
+    }
+  },
+  { deep: true }
+)
 </script>

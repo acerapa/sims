@@ -1,31 +1,17 @@
+import Product from '@/views/Inventory/Product.vue'
+import { InventoryConst } from '../const/route.constants'
 export default [
   {
     path: '/inventory',
-    name: 'inventory',
+    name: InventoryConst.INVENTORY,
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
-      name: 'purchase-order'
+      name: InventoryConst.PRODUCTS
     },
     children: [
       {
-        path: '/my-inventory',
-        name: 'my-inventory',
-        component: () => import('@/views/Inventory/Inventory.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/purchase-order',
-        name: 'purchase-order',
-        component: () => import('@/views/Inventory/PurchaseOrder.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
         path: '/inventory-stock-status',
-        name: 'inventory-stock-status',
+        name: InventoryConst.INVENTORY_STOCK_STATUS,
         component: () =>
           import('@/views/Inventory/InventoryStockStatusPage.vue'),
         meta: {
@@ -34,30 +20,36 @@ export default [
         }
       },
       {
-        path: '/purchase-order-create',
-        name: 'purchase-order-create',
-        component: () => import('@/views/Inventory/PurchaseOrderForm.vue'),
-        meta: {
-          requiresAuth: true,
-          title: 'Purchase Order Form'
-        }
-      },
-      {
-        path: '/purchase-receive-order/:id',
-        name: 'purchase-receive-order',
-        component: () => import('@/views/Inventory/ReceiveOrder.vue'),
-        meta: {
-          title: 'Receive Order',
-          requiresAuth: true
-        }
-      },
-      {
         path: '/physical-inventory-details/:id',
-        name: 'physical-inventory-details',
+        name: InventoryConst.PHYSICAL_INVENTORY_DETAILS,
         component: () =>
           import('@/views/Inventory/PhysicalInventoryDetails.vue'),
         meta: {
           title: 'Physical Inventory',
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/products',
+        name: InventoryConst.PRODUCTS,
+        component: Product,
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/product/form',
+        name: InventoryConst.PRODUCT_FORM,
+        component: () => import('@/views/product/product-form.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/services',
+        name: InventoryConst.SERVICES,
+        component: () => import('@/views/Inventory/Services.vue'),
+        meta: {
           requiresAuth: true
         }
       }

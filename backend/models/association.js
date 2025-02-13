@@ -8,12 +8,59 @@ const Customer = require("./customer");
 const BranchMember = require("./branch-member");
 const StockTransfer = require("./stock-transfer");
 const PurchaseOrder = require("./purchase-order");
+const PurchaseOrderProducts = require("./junction/purchase-order-products");
 const ProductSettings = require("./product-setting");
 const ProductSupplier = require("./product-supplier");
 const ProductCategory = require("./product-category");
 const PhysicalInventory = require("./physical-inventory");
-const ProductTransaction = require("./product-transaction");
 const PhysicalInventoryItem = require("./physical-inventory-item");
+const ProductToCategories = require("./junction/product-to-categories");
+const ProductDetails = require("./product-details");
+const ServiceDetails = require("./service-details");
+const StockTransferProducts = require("./junction/stock-transfer-products");
+
+// Purchase Order, Purchase Order Product and Product Relations
+PurchaseOrder.belongsToMany(Product, {
+  through: PurchaseOrderProducts,
+  foreignKey: "purchase_order_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(PurchaseOrder, {
+  through: PurchaseOrderProducts,
+  foreignKey: "product_id",
+  otherKey: "purchase_order_id",
+  as: "purchase_orders",
+});
+
+// Stock Transfer, Product and Stock Transfer Product Relations
+StockTransfer.belongsToMany(Product, {
+  through: StockTransferProducts,
+  foreignKey: "stock_transfer_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(StockTransfer, {
+  through: StockTransferProducts,
+  foreignKey: "product_id",
+  otherKey: "stock_transfer_id",
+  as: "stock_transfers",
+});
+
+// Product Category and General Product Category Relations
+ProductCategory.hasMany(ProductCategory, {
+  foreignKey: "general_cat",
+  as: "sub_categories",
+  onDelete: "CASCADE",
+  hooks: true,
+});
+
+ProductCategory.belongsTo(ProductCategory, {
+  foreignKey: "general_cat",
+  as: "general_category",
+});
 
 Address.hasMany(Customer, {
   foreignKey: "address_id",
@@ -60,34 +107,6 @@ Supplier.belongsToMany(Product, {
   otherKey: "product_id",
 });
 
-Product.belongsTo(ProductCategory, {
-  foreignKey: "category_id",
-  as: "category",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-
-ProductCategory.hasMany(Product, {
-  foreignKey: "category_id",
-  as: "products",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-
-Product.belongsToMany(PurchaseOrder, {
-  through: ProductTransaction,
-  foreignKey: "product_id",
-  otherKey: "transfer_id",
-  as: "orders",
-});
-
-PurchaseOrder.belongsToMany(Product, {
-  through: ProductTransaction,
-  foreignKey: "transfer_id",
-  otherKey: "product_id",
-  as: "products",
-});
-
 PurchaseOrder.belongsTo(Address, {
   foreignKey: "address_id",
   as: "address",
@@ -99,13 +118,13 @@ PurchaseOrder.belongsTo(Supplier, {
   onDelete: "CASCADE",
 });
 
-ProductSettings.hasMany(Product, {
+ProductSettings.hasMany(ProductDetails, {
   foreignKey: "product_setting_id",
-  as: "products",
+  as: "product_details",
   onDelete: "SET NULL",
 });
 
-Product.belongsTo(ProductSettings, {
+ProductDetails.belongsTo(ProductSettings, {
   foreignKey: "product_setting_id",
   as: "product_setting",
   onDelete: "NO ACTION",
@@ -133,10 +152,6 @@ PhysicalInventoryItem.belongsTo(PhysicalInventory, {
   foreignKey: "physical_inventory_id",
   as: "physical_inventory",
 });
-
-module.exports = {
-  Supplier,
-};
 
 // PhysicalInventory to User
 User.hasMany(PhysicalInventory, {
@@ -206,21 +221,6 @@ Branch.hasOne(BranchMember, {
   as: "branch_through",
 });
 
-// Stock transfer version
-StockTransfer.belongsToMany(Product, {
-  through: ProductTransaction,
-  foreignKey: "transfer_id",
-  otherKey: "product_id",
-  as: "products",
-});
-
-Product.belongsToMany(StockTransfer, {
-  through: ProductTransaction,
-  foreignKey: "product_id",
-  otherKey: "transfer_id",
-  as: "transfers",
-});
-
 StockTransfer.belongsTo(Branch, {
   foreignKey: "branch_to",
   as: "receiver",
@@ -250,3 +250,45 @@ StockTransfer.belongsTo(Supplier, {
   foreignKey: "supplier_id",
   as: "supplier",
 });
+
+// Product and ProductCategory relationships
+Product.belongsToMany(ProductCategory, {
+  through: ProductToCategories,
+  foreignKey: "product_id",
+  otherKey: "category_id",
+  as: "categories",
+});
+
+ProductCategory.belongsToMany(Product, {
+  through: ProductToCategories,
+  foreignKey: "category_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+// Item, Product and Service relationships
+Product.hasOne(ProductDetails, {
+  foreignKey: "product_id",
+  as: "product_details",
+});
+
+Product.hasOne(ServiceDetails, {
+  foreignKey: "product_id",
+  as: "service_details",
+});
+
+ProductDetails.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+ServiceDetails.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+module.exports = {
+  ProductCategory,
+  Supplier,
+  Branch,
+};

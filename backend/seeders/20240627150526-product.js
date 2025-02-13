@@ -1,34 +1,56 @@
 "use strict";
 const path = require("path");
+const {
+  checkIfSeederExecuted,
+  registerSeederExecution,
+  getSeederExecution,
+  removeSeederExecution,
+} = require("./misc/SeederHelpers");
 
 const base_path = path.dirname(__dirname);
 
-const Product = require(base_path + "/models/product");
-const Supplier = require(base_path + "/models/supplier");
+const Product = require("../models/product");
+const { Op } = require("sequelize");
+const ProductDetails = require("../models/product-details");
 const { getProducts } = require(base_path + "/seeders/dummy/products");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    /**
-     * Add seed commands here.
-     *
-     * Example:
-     * await queryInterface.bulkInsert('People', [{
-     *   name: 'John Doe',
-     *   isBetaMember: false
-     * }], {});
-     */
-    const products = await getProducts();
-    for (let ndx = 0; ndx < products.length; ndx++) {
-      const product = await Product.create(products[ndx]);
-      for (let i = 0; i < products[ndx].suppliers.length; i++) {
-        await product.addSupplier(products[ndx].suppliers[i].id, {
-          through: {
-            cost: products[ndx].suppliers[i].cost,
-          },
-        });
-      }
+    const isExecuted = await checkIfSeederExecuted(path.basename(__filename));
+    if (!isExecuted) {
+      const product_ids = [];
+      const products = await getProducts();
+
+      await Promise.all(
+        products.map(async (product, ndx) => {
+          const prd = await Product.create(product, {
+            include: {
+              model: ProductDetails,
+              as: "product_details",
+            },
+          });
+          product_ids.push(prd.id);
+          return Promise.all([
+            ...products[ndx].suppliers.map((s) =>
+              prd.addSupplier(s.id, {
+                through: {
+                  cost: s.cost,
+                },
+              })
+            ),
+            ...products[ndx].categories.map((c) => {
+              return prd.addCategory(c);
+            }),
+          ]);
+        })
+      );
+
+      await registerSeederExecution(
+        path.basename(__filename),
+        product_ids,
+        true
+      );
     }
   },
 
@@ -40,6 +62,17 @@ module.exports = {
      * await queryInterface.bulkDelete('People', null, {});
      */
 
-    await queryInterface.bulkDelete(Product.getTableName(), null, {});
+    const seeder = await getSeederExecution(path.basename(__filename));
+    if (seeder) {
+      await Product.destroy({
+        where: {
+          id: {
+            [Op.in]: seeder.data,
+          },
+        },
+      });
+
+      await removeSeederExecution(path.basename(__filename));
+    }
   },
 };

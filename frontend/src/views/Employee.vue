@@ -93,7 +93,7 @@ const onNewRecord = () => {
  ** ================================================*/
 
 onMounted(async () => {
-  await employeeStore.fetchAllEmployees()
+  await employeeStore.getEmployees()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>
