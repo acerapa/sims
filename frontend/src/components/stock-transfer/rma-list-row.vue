@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-9 gap-3 gen-table-row items-center"
+    class="grid grid-cols-10 gap-3 gen-table-row items-center"
     @click="emit('view', props.rma.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
@@ -16,12 +16,21 @@
     <p class="col-span-2 text-sm">
       {{ DateHelpers.formatDate(props.rma.when, 'MM/DD/YYYY HH:II a') }}
     </p>
+    <div class="col-span-1">
+      <BadgeComponent
+        :text="StockTransferStatusMap[props.rma.status].text"
+        :custom-class="StockTransferStatusMap[props.rma.status].class"
+        x
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { DateHelpers } from 'shared/helpers'
+import BadgeComponent from '../shared/BadgeComponent.vue'
 import { computed } from 'vue'
+import { StockTransferStatusMap } from 'shared'
 
 const emit = defineEmits(['view'])
 
