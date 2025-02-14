@@ -113,7 +113,7 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { useVendorStore } from '@/stores/supplier'
 import { computed, onMounted, ref, watch } from 'vue'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
-import { TransferType } from 'shared/enums'
+import { StockTransferStatus, TransferType } from 'shared/enums'
 import { useRoute, useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import { useAppStore } from '@/stores/app'
@@ -170,7 +170,8 @@ const defualtValue = {
     memo: '',
     branch_from: '',
     processed_by: '',
-    type: TransferType.RMA
+    type: TransferType.RMA,
+    status: StockTransferStatus.OPEN
   },
   products: [{ ...productDefaultValue }]
 }

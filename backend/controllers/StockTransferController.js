@@ -5,7 +5,10 @@ const Product = require("../models/product");
 const StockTranfer = require("../models/stock-transfer");
 const Supplier = require("../models/supplier");
 const StockTransferProducts = require("../models/junction/stock-transfer-products");
-const { findTransfer } = require("../services/StockTransferService");
+const {
+  findTransfer,
+  updateTransfer,
+} = require("../services/StockTransferService");
 
 module.exports = {
   all: async (req, res) => {
@@ -92,61 +95,9 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      if (data.transfer) {
-        await StockTranfer.update(data.transfer, {
-          where: {
-            id: req.params.id,
-          },
-          transaction: transaction,
-        });
-      }
-      if (data.products) {
-        const products = await StockTransferProducts.findAll({
-          where: {
-            stock_transfer_id: req.params.id,
-          },
-          attributes: ["id", "product_id"],
-        });
 
-        const currentProductIds = products.map((p) => p.product_id);
+      await updateTransfer(req.params.id, data, transaction);
 
-        await Promise.all([
-          // determine products needs to be created
-          ...data.products
-            .filter((p) => !currentProductIds.includes(p.product_id))
-            .map((p) =>
-              StockTransferProducts.create(
-                { ...p, stock_transfer_id: req.params.id },
-                { transaction: transaction }
-              )
-            ),
-          // determine the products weither they it will be updated or deleted
-          ...products.map((product) => {
-            const dataProductIds = data.products.map((p) => p.product_id);
-
-            if (dataProductIds.includes(product.product_id)) {
-              const toUpdateFields = data.products.find(
-                (p) => p.product_id == product.product_id
-              );
-
-              return StockTransferProducts.update(toUpdateFields, {
-                where: {
-                  id: product.id,
-                },
-                transaction: transaction,
-              });
-            } else {
-              return StockTransferProducts.destroy({
-                where: {
-                  id: product.id,
-                },
-
-                transaction: transaction,
-              });
-            }
-          }),
-        ]);
-      }
       await transaction.commit();
 
       const transfer = await findTransfer(req.params.id);

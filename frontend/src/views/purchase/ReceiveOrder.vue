@@ -94,6 +94,7 @@ import {
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ToastTypes } from '@/data/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -166,17 +167,32 @@ const onCancel = () => {
 }
 
 const onReceiveOrder = async () => {
-  await purchaseOrderStore.receivePurchaseOrder(route.params.id, model.value)
+  const isSuccess = await purchaseOrderStore.receivePurchaseOrder(
+    route.params.id,
+    model.value
+  )
 
-  // if (res.status == 200) {
-  //   await purchaseOrderStore.fetchPurchaseOrderById(route.params.id)
-  //   router.push({
-  //     name: PurchaseConst.PURCHASE_ORDER_FORM,
-  //     query: {
-  //       id: route.params.id
-  //     }
-  //   })
-  // }
+  if (isSuccess) {
+    await purchaseOrderStore.fetchPurchaseOrderById(route.params.id)
+    router.push({
+      name: PurchaseConst.PURCHASE_ORDER_FORM,
+      query: {
+        id: route.params.id
+      }
+    })
+
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: 'Purchase order received successfully',
+      type: ToastTypes.SUCCESS,
+      duration: 2000
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: 'Failed to receive purchase order',
+      type: ToastTypes.ERROR,
+      duration: 2000
+    })
+  }
 }
 
 /** ================================================
@@ -185,6 +201,24 @@ const onReceiveOrder = async () => {
 onMounted(async () => {
   if (route.params.id) {
     await purchaseOrderStore.fetchPurchaseOrderById(route.params.id)
+
+    // check order status
+    if (
+      purchaseOrderStore.purchaseOrder.status === PurchaseOrderStatus.COMPLETED
+    ) {
+      Event.emit(EventEnum.TOAST_MESSAGE, {
+        message: 'Purchase order already received!',
+        type: ToastTypes.INFO,
+        duration: 2000
+      })
+
+      setTimeout(() => {
+        router.back()
+      }, 1000)
+
+      return
+    }
+
     model.value.order = ObjectHelpers.assignSameFields(
       model.value.order,
       purchaseOrderStore.purchaseOrder

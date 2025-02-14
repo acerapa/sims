@@ -82,7 +82,7 @@ import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
-import { TransferType } from 'shared/enums'
+import { StockTransferStatus, TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { onMounted, ref, watch } from 'vue'
 import { useTransferStore } from '@/stores/transfer'
@@ -114,6 +114,7 @@ const defaultValue = {
     branch_to: '',
     processed_by: '',
     type: TransferType.FIX,
+    status: StockTransferStatus.OPEN,
     when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A')
   },
   products: [{ ...productDefaultValue }]

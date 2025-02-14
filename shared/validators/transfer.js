@@ -3,6 +3,7 @@ const {
   BranchStatus,
   TransferType,
   ProductTransferStatus,
+  StockTransferStatus,
 } = require("shared/enums");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
 const { AddressSchema } = require("./user");
@@ -57,6 +58,7 @@ const StockTransferSchema = Joi.object({
     then: Joi.required(),
     otherwise: Joi.allow(null, "").optional(),
   }),
+  status: Joi.string().valid(...Object.values(StockTransferStatus)),
 });
 
 const ProductTransferSchema = Joi.object({
