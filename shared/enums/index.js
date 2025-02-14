@@ -110,6 +110,27 @@ const TransferType = Object.freeze({
   FIX: "fix",
 });
 
+const StockTransferStatus = Object.freeze({
+  OPEN: "open",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
+});
+
+const StockTransferStatusMap = Object.freeze({
+  [StockTransferStatus.OPEN]: {
+    text: "Open",
+    class: "purchase-status-open",
+  },
+  [StockTransferStatus.COMPLETED]: {
+    text: "Completed",
+    class: "purchase-status-completed",
+  },
+  [StockTransferStatus.CANCELLED]: {
+    text: "Cancelled",
+    class: "purchase-status-cancelled",
+  },
+});
+
 const ProductTransferStatus = Object.freeze({
   OPEN: "open",
   COMPLETE: "complete",
@@ -159,9 +180,11 @@ module.exports = {
   LocalStorageKeys,
   PurchaseOrderType,
   PurchaseStatusMap,
+  StockTransferStatus,
   PurchaseOrderStatus,
   ProductOrderedStatus,
   ProductTransferStatus,
+  StockTransferStatusMap,
   PhysicalInventoryStatus,
   PhysicalInventoryStatusMap,
 };

@@ -131,7 +131,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
-import { TransferType } from 'shared/enums'
+import { StockTransferStatus, TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { StockTransferCreateSchema } from 'shared/validators'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -167,6 +167,7 @@ const model = ref({
     branch_from: '',
     processed_by: '',
     type: TransferType.IBRR,
+    status: StockTransferStatus.OPEN,
     when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A')
   },
   products: [{ ...productDefaultValue }]

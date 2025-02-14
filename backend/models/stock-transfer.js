@@ -4,6 +4,7 @@ const { TransferType } = require("shared");
 const Branch = require("./branch");
 const User = require("./user");
 const Supplier = require("./supplier");
+const { StockTransferStatus } = require("shared/enums");
 
 class StockTransfer extends Model {}
 
@@ -29,6 +30,11 @@ StockTransfer.init(
     str_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
+    },
+    status: {
+      type: DataTypes.ENUM,
+      values: Object.values(StockTransferStatus),
+      defaultValue: StockTransferStatus.OPEN,
     },
     po_no: {
       type: DataTypes.INTEGER,
