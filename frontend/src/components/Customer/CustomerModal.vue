@@ -40,6 +40,43 @@
         v-model="model.address"
         :address-errors="modelErrors.address"
       />
+
+      <p class="font-semibold mt-5">Contact Information</p>
+      <div class="flex gap-3 mt-3">
+        <CustomInput
+          type="text"
+          class="flex-1"
+          :has-label="true"
+          label="Phone Number"
+          name="phone_number"
+          placeholder="Phone Number"
+          :error-has-text="true"
+          :error="modelErrors.phone_number"
+          v-model="model.phone_number"
+        />
+        <CustomInput
+          type="text"
+          class="flex-1"
+          :has-label="true"
+          label="Viber"
+          name="viber"
+          placeholder="Viber"
+          :error-has-text="true"
+          :error="modelErrors.viber"
+          v-model="model.viber"
+        />
+      </div>
+      <CustomInput
+        type="text"
+        class="flex-1 mt-3"
+        :has-label="true"
+        label="Facebook"
+        name="facebook_url"
+        placeholder="Facebook"
+        :error-has-text="true"
+        :error="modelErrors.facebook_url"
+        v-model="model.facebook_url"
+      />
     </div>
   </ModalWrapper>
   <DeleteConfirmModal
@@ -83,7 +120,10 @@ const defaultModel = {
     city: '',
     province: '',
     postal: ''
-  }
+  },
+  phone_number: '',
+  facebook_url: '',
+  viber: ''
 }
 
 const model = ref(defaultModel)
