@@ -111,7 +111,11 @@ class ObjectHelpers {
         return false;
       } else {
         if (typeof obj1[key] == "object") {
-          if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) {
+          if (Object.is(null, obj1[key]) != Object.is(null, obj2[key])) {
+            return false;
+          } else if (Object.is(null, obj1[key]) == Object.is(null, obj2[key])) {
+            continue;
+          } else if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) {
             if (!this.compareArrays(obj1[key], obj2[key])) return false;
           } else if (!Array.isArray(obj1[key]) && !Array.isArray(obj2[key])) {
             if (!this.compareObjects(obj1[key], obj2[key])) return false;
@@ -158,6 +162,10 @@ class ObjectHelpers {
         return false;
       } else {
         if (typeof arr1[i] == "object") {
+          if (Object.is(null, arr1[i]) != Object.is(null, arr2[i]))
+            return false;
+          else if (Object.is(null, arr1[i]) == Object.is(null, arr2[i]))
+            continue;
           if (Array.isArray(arr1[i]) && Array.isArray(arr2[i])) {
             if (!this.compareArrays(arr1[i], arr2[i])) return false;
           } else if (!Array.isArray(arr1[i]) && !Array.isArray(arr2[i])) {

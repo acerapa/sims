@@ -16,10 +16,16 @@
         here!
       </RouterLink>
     </AlertComponent>
-    <div class="cont">
-      <button type="button" class="btn float-right" @click="startPrint">
-        &#128438; Print
-      </button>
+    <div class="cont relative">
+      <div
+        class="flex items-center justify-end gap-3 absolute top-4 right-4"
+        v-if="route.query.id"
+      >
+        <SelectStatusDropdown v-model="model.transfer.status" />
+        <button type="button" class="btn float-right" @click="startPrint">
+          &#128438; Print
+        </button>
+      </div>
       <div class="flex gap-4 max-lg:flex-col">
         <div class="flex flex-col gap-3 flex-1">
           <div class="flex justify-between">
@@ -128,6 +134,7 @@ import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import ProductMulitpleSelect from '@/components/shared/MultiSelectTable.vue'
 import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue'

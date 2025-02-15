@@ -5,7 +5,14 @@
     :href="`stock-transfer/${route.query.id}`"
     @after-delete="onAfterDelete"
   />
-  <div class="cont">
+  <div class="cont relative">
+    <div
+      class="flex items-center justify-end gap-3 absolute top-4 right-4"
+      v-if="route.query.id"
+    >
+      <SelectStatusDropdown v-model="model.transfer.status" />
+      <button type="button" class="btn float-right">&#128438; Print</button>
+    </div>
     <p class="text-base font-bold">Fix asset form</p>
     <div class="flex flex-col gap-3">
       <div class="mt-3 flex gap-3">
@@ -96,6 +103,7 @@ import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 
 const rowEventName = 'fix-asset-row-event'
 
