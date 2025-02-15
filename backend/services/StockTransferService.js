@@ -1,10 +1,12 @@
-const { TransferType } = require("shared/enums");
+const { TransferType, StockTransferStatus } = require("shared/enums");
 const Branch = require("../models/branch");
+const ProductDetails = require("../models/product-details");
 const StockTransferProducts = require("../models/junction/stock-transfer-products");
 const Product = require("../models/product");
 const StockTransfer = require("../models/stock-transfer");
 const Supplier = require("../models/supplier");
 const User = require("../models/user");
+const { Op } = require("sequelize");
 
 const findTransfer = async (id) => {
   return await StockTransfer.findOne({
@@ -125,12 +127,45 @@ const updateTransfer = async (id, data, transaction) => {
   await reflectStockTransferToStock(data);
 };
 
+/**
+ * Reflect transfered product stock wheiter a receive or sent stock.
+ *
+ * @param {*} data Data of the stock transfer
+ */
 const reflectStockTransferToStock = async (data) => {
-  if (data.transfer.status) {
+  if (data.transfer.status === StockTransferStatus.COMPLETED) {
+    const products = await Product.findAll({
+      where: {
+        id: {
+          [Op.in]: data.products.map((p) => p.product_id),
+        },
+      },
+      attributes: ["id"],
+      include: {
+        model: ProductDetails,
+        as: "product_details",
+        attributes: ["id", "stock"],
+      },
+    });
+
     if (data.transfer.type === TransferType.IBRR) {
-      // increase the stock of the receive products
+      await Promise.all(
+        products.map((p) => {
+          const productData = data.products.find((pd) => pd.product_id == p.id);
+          return p.product_details.update({
+            stock: p.product_details.stock + productData.quantity,
+          });
+        })
+      );
     } else {
-      // decrease the stock of the send products
+      await Promise.all(
+        products.map((p) => {
+          const productData = data.products.find((pd) => pd.product_id == p.id);
+          return p.product_details.update({
+            stock: p.product_details.stock - productData.quantity,
+          });
+        })
+      );
     }
   }
 };

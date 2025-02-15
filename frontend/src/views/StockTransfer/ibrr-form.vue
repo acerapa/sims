@@ -17,7 +17,14 @@
       </RouterLink>
     </AlertComponent>
 
-    <div class="cont flex flex-col gap-8">
+    <div class="cont relative">
+      <div
+        class="flex items-center justify-end gap-3 absolute top-4 right-4"
+        v-if="route.query.id"
+      >
+        <SelectStatusDropdown v-model="model.transfer.status" />
+        <button type="button" class="btn float-right">&#128438; Print</button>
+      </div>
       <div class="flex gap-3">
         <div class="flex-1">
           <p class="font-semibold">Receive Information</p>
@@ -71,7 +78,7 @@
           <AddressForm :has-label="true" v-model="address" :disabled="true" />
         </div>
       </div>
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3 mt-8">
         <p class="font-semibold">Select Product</p>
         <MultiSelectTable
           v-model="model.products"
@@ -117,6 +124,7 @@
 <script setup>
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'

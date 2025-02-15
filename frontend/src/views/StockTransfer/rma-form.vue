@@ -5,7 +5,14 @@
     :href="`stock-transfer/${route.query.id}`"
     @after-delete="onAfterDelete"
   />
-  <div class="cont flex flex-col gap-6">
+  <div class="cont flex flex-col gap-6 relative">
+    <div
+      class="flex items-center justify-end gap-3 absolute top-4 right-4"
+      v-if="route.query.id"
+    >
+      <SelectStatusDropdown v-model="model.transfer.status" />
+      <button type="button" class="btn float-right">&#128438; Print</button>
+    </div>
     <AlertComponent
       v-if="!currentBranch"
       type="danger"
@@ -129,6 +136,7 @@ import {
 import { ToastTypes } from '@/data/types'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 
 const rowEventName = 'rma-product-event'
 
@@ -344,6 +352,12 @@ onMounted(async () => {
 
   // set page state
   if (appStore.isPageExist(PageStateConst.RMA_FORM)) {
+    console.log(
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.RMA_FORM].state
+      )
+    )
     if (
       !ObjectHelpers.compareObjects(
         model.value,
@@ -358,6 +372,15 @@ onMounted(async () => {
   } else {
     setRMAFormPageState()
   }
+
+  // contact number
+  // facebook
+  // viber
+
+  // open account
+  // closed account
+
+  //gigabook.
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
