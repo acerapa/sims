@@ -8,6 +8,9 @@ const CustomerSchema = joi.object({
   address: ValidatorHelpers.makeSchemaFieldOptional(AddressSchema).options({
     allowUnknown: true,
   }),
+  viber: joi.string().allow("", null),
+  phone_number: joi.string().allow("", null),
+  facebook_url: joi.string().allow("", null),
 });
 
 module.exports = {

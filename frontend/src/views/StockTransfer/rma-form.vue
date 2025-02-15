@@ -373,10 +373,6 @@ onMounted(async () => {
     setRMAFormPageState()
   }
 
-  // contact number
-  // facebook
-  // viber
-
   // open account
   // closed account
 
