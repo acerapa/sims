@@ -21,7 +21,10 @@
         class="flex items-center justify-end gap-3 absolute top-4 right-4"
         v-if="route.query.id"
       >
-        <SelectStatusDropdown v-model="model.transfer.status" />
+        <SelectStatusDropdown
+          v-model="model.transfer.status"
+          :class="isCompleted || isCancelled"
+        />
         <button type="button" class="btn float-right" @click="startPrint">
           &#128438; Print
         </button>
@@ -36,13 +39,14 @@
               type="select"
               name="branch"
               class="flex-1"
-              :options="branchOptions"
               :has-label="true"
-              label="Select Receiving Branch"
+              :options="branchOptions"
               placeholder="Select Branch"
+              label="Select Receiving Branch"
               v-model="model.transfer.branch_to"
               :error="modelErrors.branch_to"
               :error-has-text="true"
+              :disabled="isCompleted || isCancelled"
             />
             <CustomInput
               type="datetime-local"
@@ -64,6 +68,7 @@
             placeholder="Write Something"
             :error="modelErrors.memo"
             :error-has-text="true"
+            :disabled="isCompleted || isCancelled"
           />
         </div>
 
@@ -85,13 +90,21 @@
           :row-component="ProductSelectRow"
           :format="productDefaultValue"
           :row-event-name="rowEventName"
+          :is-disabled="isCompleted || isCancelled"
         >
           <template v-slot:aggregate>
             <div>
               <span class="font-bold text-sm">Total: </span>
-              <span class="text-sm"
-                >&#8369; {{ totalAmount ? totalAmount : 0 }}</span
-              >
+              <span class="text-sm">
+                &#8369;
+                {{
+                  totalAmount
+                    ? totalAmount.toLocaleString('en', {
+                        minimumFractionDigits: 2
+                      })
+                    : '0.00'
+                }}
+              </span>
             </div>
           </template>
         </ProductMulitpleSelect>
@@ -103,11 +116,11 @@
         <button
           class="btn-danger-outline"
           @click="showConfirmModal = true"
-          v-if="route.query.id"
+          v-if="route.query.id && !isCompleted && !isCancelled"
         >
           Delete
         </button>
-        <div class="flex gap-3">
+        <div class="flex gap-3" v-if="!isCompleted && !isCancelled">
           <button class="btn-gray-outline" @click="onCancel">Cancel</button>
           <button
             class="btn-outline disabled:opacity-50"
@@ -123,6 +136,12 @@
           >
             {{ isEdit ? 'Update' : 'Save' }}
           </button>
+        </div>
+        <div
+          class="flex gap-3 justify-end w-full"
+          v-if="isCompleted || isCancelled"
+        >
+          <button class="btn-gray-outline" @click="onCancel">Back</button>
         </div>
       </div>
     </div>
@@ -211,9 +230,25 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
  * COMPUTED
  ** ================================================*/
 const totalAmount = computed(() => {
-  return model.value.products.length
-    ? model.value.products.map((p) => p.amount).reduce((a, b) => a + b)
-    : 0
+  const toReduce = model.value.products.length
+    ? model.value.products
+        .filter((p) => p.amount)
+        .map((p) => parseInt(p.amount))
+    : []
+
+  return toReduce.length ? toReduce.reduce((a, b) => a + b) : 0
+})
+
+const isCompleted = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status === StockTransferStatus.COMPLETED
+    : false
+})
+
+const isCancelled = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status === StockTransferStatus.CANCELLED
+    : false
 })
 
 const branchOptions = computed(() => {
@@ -420,6 +455,9 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   // remove interval
   clearInterval(timeInterval)
+
+  // remove transfer set on the state
+  transferStore.transfer = null
 })
 
 /** ================================================
