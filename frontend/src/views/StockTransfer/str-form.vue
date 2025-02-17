@@ -23,7 +23,7 @@
       >
         <SelectStatusDropdown
           v-model="model.transfer.status"
-          :class="isCompleted || isCancelled"
+          :class="isCompleted || isCancelled ? 'pointer-events-none' : ''"
         />
         <button type="button" class="btn float-right" @click="startPrint">
           &#128438; Print

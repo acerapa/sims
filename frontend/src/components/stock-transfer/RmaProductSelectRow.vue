@@ -52,7 +52,7 @@
         type="number"
         name="quantity"
         placeholder="Quantity"
-        :disabled="props.isDisabled"
+        :disabled="true"
         v-model="model.quantity"
         :error-has-text="false"
         :error="modelErrors.quantity"
