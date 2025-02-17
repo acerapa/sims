@@ -22,7 +22,10 @@
         class="flex items-center justify-end gap-3 absolute top-4 right-4"
         v-if="route.query.id"
       >
-        <SelectStatusDropdown v-model="model.transfer.status" />
+        <SelectStatusDropdown
+          v-model="model.transfer.status"
+          :class="isCancelled || isCompleted ? 'pointer-events-none' : ''"
+        />
         <button type="button" class="btn float-right">&#128438; Print</button>
       </div>
       <div class="flex gap-3">
@@ -49,6 +52,7 @@
               :error-has-text="true"
               :error="modelErrors.str_id"
               v-model="model.transfer.str_id"
+              :disabled="isCancelled || isCompleted"
             />
             <CustomInput
               type="select"
@@ -61,6 +65,7 @@
               placeholder="Select Branch"
               :error="modelErrors.branch_from"
               v-model="model.transfer.branch_from"
+              :disabled="isCancelled || isCompleted"
             />
           </div>
           <CustomInput
@@ -71,6 +76,7 @@
             label="Memo"
             v-model="model.transfer.memo"
             placeholder="Write Something"
+            :disabled="isCancelled || isCompleted"
           />
         </div>
         <div class="flex-1">
@@ -86,11 +92,29 @@
           :row-component="ProductSelectRow"
           :format="productDefaultValue"
           :row-event-name="ibrrEventName"
-        />
+          :is-disabled="isCancelled || isCompleted"
+        >
+          <template v-slot:aggregate>
+            <div>
+              <span class="font-bold text-sm">Total: </span>
+              <span class="text-sm">
+                &#8369;
+                {{
+                  totalAmount
+                    ? totalAmount.toLocaleString('en', {
+                        minimumFractionDigits: 2
+                      })
+                    : '0.00'
+                }}
+              </span>
+            </div>
+          </template>
+        </MultiSelectTable>
       </div>
       <div
         class="flex gap-3 mt-4"
         :class="route.query.id ? 'justify-between' : 'justify-end'"
+        v-if="!isCancelled && !isCompleted"
       >
         <button
           class="btn-danger-outline"
@@ -116,6 +140,9 @@
             {{ isEdit ? 'Update' : 'Save' }}
           </button>
         </div>
+      </div>
+      <div class="flex w-full justify-end" v-if="isCancelled || isCompleted">
+        <button class="btn-gray-outline" @click="onCancel">Back</button>
       </div>
     </div>
   </div>
@@ -209,6 +236,25 @@ const branchOptions = computed(() => {
     .filter((opt) =>
       currentBranch.value ? currentBranch.value.id != opt.value : true
     )
+})
+
+const totalAmount = computed(() => {
+  const consumable = model.value.products
+    .filter((p) => p.amount)
+    .map((p) => parseInt(p.amount))
+  return consumable.length ? consumable.reduce((a, b) => a + b) : 0
+})
+
+const isCompleted = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status == StockTransferStatus.COMPLETED
+    : false
+})
+
+const isCancelled = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status == StockTransferStatus.CANCELLED
+    : false
 })
 
 /** ================================================

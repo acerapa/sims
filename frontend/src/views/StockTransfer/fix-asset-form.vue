@@ -25,6 +25,7 @@
           :error-has-text="true"
           :error="modelErrors.po_no"
           v-model="model.transfer.po_no"
+          :disabled="isCompleted || isCancelled"
         />
         <CustomInput
           name="when"
@@ -42,6 +43,7 @@
         :has-label="true"
         class="w-[calc(50%_-_6px)]"
         v-model="model.transfer.memo"
+        :disabled="isCompleted || isCancelled"
         placeholder="Ex. This is a descriptions"
       />
     </div>
@@ -54,12 +56,29 @@
         :row-component="ProductSelectRow"
         :header-component="ProductSelectHeader"
         :row-event-name="rowEventName"
+        :is-disabled="isCompleted || isCancelled"
       >
+        <template v-slot:aggregate>
+          <div>
+            <span class="font-bold text-sm">Total: </span>
+            <span class="text-sm">
+              &#8369;
+              {{
+                totalAmount
+                  ? totalAmount.toLocaleString('en', {
+                      minimumFractionDigits: 2
+                    })
+                  : '0.00'
+              }}
+            </span>
+          </div>
+        </template>
       </MultiSelectTable>
 
       <div
         class="flex gap-3"
         :class="route.query.id ? 'justify-between' : 'justify-end'"
+        v-if="!isCancelled && !isCompleted"
       >
         <button
           class="btn-danger-outline"
@@ -78,6 +97,10 @@
           </button>
         </div>
       </div>
+
+      <div class="flex w-full justify-end" v-if="isCancelled || isCompleted">
+        <button class="btn-gray-outline" @click="onCancel">Back</button>
+      </div>
     </div>
   </div>
 </template>
@@ -91,7 +114,7 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import { StockTransferStatus, TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useTransferStore } from '@/stores/transfer'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -141,6 +164,29 @@ const authUser = ref()
 const router = useRouter()
 const model = ref({ ...defaultValue })
 const modelErrors = ref({})
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const totalAmount = computed(() => {
+  const consumable = model.value.products
+    .filter((p) => p.amount)
+    .map((p) => parseInt(p.amount))
+
+  return consumable.reduce((a, b) => a + b, 0)
+})
+
+const isCompleted = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status == StockTransferStatus.COMPLETED
+    : false
+})
+
+const isCancelled = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status == StockTransferStatus.CANCELLED
+    : false
+})
 
 /** ================================================
  * METHODS

@@ -10,7 +10,10 @@
       class="flex items-center justify-end gap-3 absolute top-4 right-4"
       v-if="route.query.id"
     >
-      <SelectStatusDropdown v-model="model.transfer.status" />
+      <SelectStatusDropdown
+        v-model="model.transfer.status"
+        :class="isCancelled || isCompleted ? 'pointer-events-none' : ''"
+      />
       <button type="button" class="btn float-right">&#128438; Print</button>
     </div>
     <AlertComponent
@@ -40,6 +43,7 @@
             placeholder="Select supplier"
             :error="modelErrors.supplier_id"
             v-model="model.transfer.supplier_id"
+            :disabled="isCompleted || isCancelled"
           />
           <CustomInput
             name="when"
@@ -48,6 +52,7 @@
             :has-label="true"
             type="datetime-local"
             v-model="model.transfer.when"
+            :disabled="isCompleted || isCancelled"
           />
         </div>
         <CustomInput
@@ -58,6 +63,7 @@
           :has-label="true"
           placeholder="Memo"
           v-model="model.transfer.memo"
+          :disabled="isCompleted || isCancelled"
         />
       </div>
       <div class="flex-1">
@@ -73,12 +79,29 @@
         :row-component="RmaProductSelectRow"
         :format="productDefaultValue"
         :row-event-name="rowEventName"
+        :is-disabled="isCompleted || isCancelled"
       >
+        <template v-slot:aggregate>
+          <div>
+            <span class="font-bold text-sm">Total: </span>
+            <span class="text-sm">
+              &#8369;
+              {{
+                totalAmount
+                  ? totalAmount.toLocaleString('en', {
+                      minimumFractionDigits: 2
+                    })
+                  : '0.00'
+              }}
+            </span>
+          </div>
+        </template>
       </MultiSelectTable>
 
       <div
         class="flex gap-3 mt-4"
         :class="route.query.id ? 'justify-between' : 'justify-end'"
+        v-if="!isCancelled && !isCompleted"
       >
         <button
           class="btn-danger-outline"
@@ -104,6 +127,9 @@
             {{ isEdit ? 'Update' : 'Save' }}
           </button>
         </div>
+      </div>
+      <div class="flex w-full justify-end" v-if="isCancelled || isCompleted">
+        <button class="btn-gray-outline" @click="onCancel">Back</button>
       </div>
     </div>
   </div>
@@ -202,6 +228,25 @@ const supplierOptions = computed(() => {
       value: supplier.id
     }
   })
+})
+
+const totalAmount = computed(() => {
+  const consumable = model.value.products
+    .filter((p) => p.amount)
+    .map((p) => parseInt(p.amount))
+  return consumable.length ? consumable.reduce((a, b) => a + b) : 0
+})
+
+const isCompleted = computed(() => {
+  return model.value.transfer
+    ? model.value.transfer.status == StockTransferStatus.COMPLETED
+    : false
+})
+
+const isCancelled = computed(() => {
+  return model.value.transfer
+    ? model.value.transfer.status == StockTransferStatus.CANCELLED
+    : false
 })
 
 /** ================================================
@@ -352,12 +397,6 @@ onMounted(async () => {
 
   // set page state
   if (appStore.isPageExist(PageStateConst.RMA_FORM)) {
-    console.log(
-      !ObjectHelpers.compareObjects(
-        model.value,
-        appStore.pages[PageStateConst.RMA_FORM].state
-      )
-    )
     if (
       !ObjectHelpers.compareObjects(
         model.value,

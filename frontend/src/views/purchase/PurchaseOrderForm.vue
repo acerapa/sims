@@ -638,6 +638,7 @@ watch(
     // If there are changes in the model run these
     if (model.value.products.length) {
       model.value.order.amount = model.value.products
+        .filter((p) => p.amount)
         .map((prod) => parseInt(prod.amount))
         .reduce((a, b) => a + b, 0)
     }
