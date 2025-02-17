@@ -86,7 +86,23 @@
           :row-component="ProductSelectRow"
           :format="productDefaultValue"
           :row-event-name="ibrrEventName"
-        />
+        >
+          <template v-slot:aggregate>
+            <div>
+              <span class="font-bold text-sm">Total: </span>
+              <span class="text-sm">
+                &#8369;
+                {{
+                  totalAmount
+                    ? totalAmount.toLocaleString('en', {
+                        minimumFractionDigits: 2
+                      })
+                    : '0.00'
+                }}
+              </span>
+            </div>
+          </template>
+        </MultiSelectTable>
       </div>
       <div
         class="flex gap-3 mt-4"
@@ -209,6 +225,13 @@ const branchOptions = computed(() => {
     .filter((opt) =>
       currentBranch.value ? currentBranch.value.id != opt.value : true
     )
+})
+
+const totalAmount = computed(() => {
+  const consumable = model.value.products
+    .filter((p) => p.amount)
+    .map((p) => parseInt(p.amount))
+  return consumable.length ? consumable.reduce((a, b) => a + b) : 0
 })
 
 /** ================================================
