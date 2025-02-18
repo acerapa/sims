@@ -116,12 +116,13 @@
             class="btn-outline disabled:opacity-50"
             :disabled="false"
             v-if="!isEdit"
+            @click="onSubmit(true)"
           >
             Save and New
           </button>
           <button
             class="btn disabled:opacity-50"
-            @click="onSubmit"
+            @click="onSubmit(false)"
             :disabled="false"
           >
             {{ isEdit ? 'Update' : 'Save' }}
@@ -210,7 +211,7 @@ const defualtValue = {
   products: [{ ...productDefaultValue }]
 }
 
-const model = ref({ ...defualtValue })
+const model = ref(ObjectHelpers.copyObj(defualtValue))
 const modelErrors = ref({})
 
 /** ================================================
@@ -263,7 +264,7 @@ const populateAddress = () => {
   )
 }
 
-const onSubmit = async () => {
+const onSubmit = async (saveAndNew) => {
   // validate model
   // modify validation schema
   const RMAProductSchema = ProductTransferSchema.keys({
@@ -322,9 +323,15 @@ const onSubmit = async () => {
       message: `Successfully ${isEdit.value ? 'updated' : 'created'} RMA!`,
       type: ToastTypes.SUCCESS
     })
-    router.push({
-      name: TransferConst.RMA_LIST
-    })
+    if (saveAndNew) {
+      model.value = ObjectHelpers.copyObj(defualtValue)
+      setCurrentBranch()
+      setProccessedBy()
+    } else {
+      router.push({
+        name: TransferConst.RMA_LIST
+      })
+    }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
       message: `Failed to ${isEdit.value ? 'update' : 'create'} RMA!`,
@@ -344,6 +351,17 @@ const onAfterDelete = async () => {
   })
 }
 
+const setCurrentBranch = () => {
+  currentBranch.value = appStore.currentBranch
+  model.value.transfer.branch_from = currentBranch.value
+    ? currentBranch.value.id
+    : ''
+}
+
+const setProccessedBy = () => {
+  model.value.transfer.processed_by = authStore.getAuthUser().id
+}
+
 const setRMAFormPageState = () => {
   appStore.setPageState(PageStateConst.RMA_FORM, {
     route_scope: [InventoryConst.PRODUCT_FORM, TransferConst.RMA_FORM],
@@ -357,12 +375,12 @@ const setRMAFormPageState = () => {
 onMounted(async () => {
   await vendorStore.getSuppliers()
   await settingsStore.getBranches()
-  currentBranch.value = appStore.currentBranch
 
-  model.value.transfer.branch_from = currentBranch.value
-    ? currentBranch.value.id
-    : ''
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+  // set current branch
+  setCurrentBranch()
+
+  // set proccessed by
+  setProccessedBy()
 
   if (route.query.id) {
     const rma = await transferStore.getById(route.query.id)
