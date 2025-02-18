@@ -5,7 +5,17 @@
     :href="`stock-transfer/${route.query.id}`"
     @after-delete="onAfterDelete"
   />
-  <div class="cont flex flex-col gap-6">
+  <div class="cont flex flex-col gap-6 relative">
+    <div
+      class="flex items-center justify-end gap-3 absolute top-4 right-4"
+      v-if="route.query.id"
+    >
+      <SelectStatusDropdown
+        v-model="model.transfer.status"
+        :class="isCancelled || isCompleted ? 'pointer-events-none' : ''"
+      />
+      <button type="button" class="btn float-right">&#128438; Print</button>
+    </div>
     <AlertComponent
       v-if="!currentBranch"
       type="danger"
@@ -33,6 +43,7 @@
             placeholder="Select supplier"
             :error="modelErrors.supplier_id"
             v-model="model.transfer.supplier_id"
+            :disabled="isCompleted || isCancelled"
           />
           <CustomInput
             name="when"
@@ -41,6 +52,7 @@
             :has-label="true"
             type="datetime-local"
             v-model="model.transfer.when"
+            :disabled="isCompleted || isCancelled"
           />
         </div>
         <CustomInput
@@ -51,6 +63,7 @@
           :has-label="true"
           placeholder="Memo"
           v-model="model.transfer.memo"
+          :disabled="isCompleted || isCancelled"
         />
       </div>
       <div class="flex-1">
@@ -66,12 +79,29 @@
         :row-component="RmaProductSelectRow"
         :format="productDefaultValue"
         :row-event-name="rowEventName"
+        :is-disabled="isCompleted || isCancelled"
       >
+        <template v-slot:aggregate>
+          <div>
+            <span class="font-bold text-sm">Total: </span>
+            <span class="text-sm">
+              &#8369;
+              {{
+                totalAmount
+                  ? totalAmount.toLocaleString('en', {
+                      minimumFractionDigits: 2
+                    })
+                  : '0.00'
+              }}
+            </span>
+          </div>
+        </template>
       </MultiSelectTable>
 
       <div
         class="flex gap-3 mt-4"
         :class="route.query.id ? 'justify-between' : 'justify-end'"
+        v-if="!isCancelled && !isCompleted"
       >
         <button
           class="btn-danger-outline"
@@ -86,17 +116,21 @@
             class="btn-outline disabled:opacity-50"
             :disabled="false"
             v-if="!isEdit"
+            @click="onSubmit(true)"
           >
             Save and New
           </button>
           <button
             class="btn disabled:opacity-50"
-            @click="onSubmit"
+            @click="onSubmit(false)"
             :disabled="false"
           >
             {{ isEdit ? 'Update' : 'Save' }}
           </button>
         </div>
+      </div>
+      <div class="flex w-full justify-end" v-if="isCancelled || isCompleted">
+        <button class="btn-gray-outline" @click="onCancel">Back</button>
       </div>
     </div>
   </div>
@@ -113,7 +147,7 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { useVendorStore } from '@/stores/supplier'
 import { computed, onMounted, ref, watch } from 'vue'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
-import { TransferType } from 'shared/enums'
+import { StockTransferStatus, TransferType } from 'shared/enums'
 import { useRoute, useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import { useAppStore } from '@/stores/app'
@@ -129,6 +163,7 @@ import {
 import { ToastTypes } from '@/data/types'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 
 const rowEventName = 'rma-product-event'
 
@@ -170,12 +205,13 @@ const defualtValue = {
     memo: '',
     branch_from: '',
     processed_by: '',
-    type: TransferType.RMA
+    type: TransferType.RMA,
+    status: StockTransferStatus.OPEN
   },
   products: [{ ...productDefaultValue }]
 }
 
-const model = ref({ ...defualtValue })
+const model = ref(ObjectHelpers.copyObj(defualtValue))
 const modelErrors = ref({})
 
 /** ================================================
@@ -195,6 +231,25 @@ const supplierOptions = computed(() => {
   })
 })
 
+const totalAmount = computed(() => {
+  const consumable = model.value.products
+    .filter((p) => p.amount)
+    .map((p) => parseInt(p.amount))
+  return consumable.length ? consumable.reduce((a, b) => a + b) : 0
+})
+
+const isCompleted = computed(() => {
+  return model.value.transfer
+    ? model.value.transfer.status == StockTransferStatus.COMPLETED
+    : false
+})
+
+const isCancelled = computed(() => {
+  return model.value.transfer
+    ? model.value.transfer.status == StockTransferStatus.CANCELLED
+    : false
+})
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -209,7 +264,7 @@ const populateAddress = () => {
   )
 }
 
-const onSubmit = async () => {
+const onSubmit = async (saveAndNew) => {
   // validate model
   // modify validation schema
   const RMAProductSchema = ProductTransferSchema.keys({
@@ -268,9 +323,15 @@ const onSubmit = async () => {
       message: `Successfully ${isEdit.value ? 'updated' : 'created'} RMA!`,
       type: ToastTypes.SUCCESS
     })
-    router.push({
-      name: TransferConst.RMA_LIST
-    })
+    if (saveAndNew) {
+      model.value = ObjectHelpers.copyObj(defualtValue)
+      setCurrentBranch()
+      setProccessedBy()
+    } else {
+      router.push({
+        name: TransferConst.RMA_LIST
+      })
+    }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
       message: `Failed to ${isEdit.value ? 'update' : 'create'} RMA!`,
@@ -290,6 +351,17 @@ const onAfterDelete = async () => {
   })
 }
 
+const setCurrentBranch = () => {
+  currentBranch.value = appStore.currentBranch
+  model.value.transfer.branch_from = currentBranch.value
+    ? currentBranch.value.id
+    : ''
+}
+
+const setProccessedBy = () => {
+  model.value.transfer.processed_by = authStore.getAuthUser().id
+}
+
 const setRMAFormPageState = () => {
   appStore.setPageState(PageStateConst.RMA_FORM, {
     route_scope: [InventoryConst.PRODUCT_FORM, TransferConst.RMA_FORM],
@@ -303,12 +375,12 @@ const setRMAFormPageState = () => {
 onMounted(async () => {
   await vendorStore.getSuppliers()
   await settingsStore.getBranches()
-  currentBranch.value = appStore.currentBranch
 
-  model.value.transfer.branch_from = currentBranch.value
-    ? currentBranch.value.id
-    : ''
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+  // set current branch
+  setCurrentBranch()
+
+  // set proccessed by
+  setProccessedBy()
 
   if (route.query.id) {
     const rma = await transferStore.getById(route.query.id)
@@ -357,6 +429,11 @@ onMounted(async () => {
   } else {
     setRMAFormPageState()
   }
+
+  // open account
+  // closed account
+
+  //gigabook.
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })

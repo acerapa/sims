@@ -51,7 +51,10 @@ export default [
         text: 'Purchase Order',
         route: PurchaseConst.PURCHASE_ORDER,
         icon: outlineDot,
-        includes_active: [PurchaseConst.PURCHASE_ORDER_FORM]
+        includes_active: [
+          PurchaseConst.PURCHASE_ORDER_FORM,
+          PurchaseConst.PURCHASE_RECEIVE_ORDER
+        ]
       },
       {
         text: 'Vendor management',

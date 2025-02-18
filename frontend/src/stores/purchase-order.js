@@ -26,9 +26,8 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
       Method.PUT,
       data
     )
-    const isSuccess = res.status < 400
 
-    return isSuccess
+    return res.status < 400
   }
 
   const createPurchaseOrder = async (data) => {

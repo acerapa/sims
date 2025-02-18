@@ -97,8 +97,16 @@ export const useTransferStore = defineStore('tranfer', function () {
   }
 
   const getById = async (id) => {
-    const t = transfers.value.find((t) => t.id == id)
-    return t ? t : await fetchById(id)
+    if (!transfer.value || transfer.value.id != id) {
+      await fetchById(id)
+    } else {
+      const t = transfers.value.find((t) => t.id == id)
+      if (t) {
+        transfer.value = t
+      }
+    }
+
+    return transfer.value
   }
 
   const removeTransfer = async (id) => {
@@ -115,6 +123,9 @@ export const useTransferStore = defineStore('tranfer', function () {
     rmas,
     strs,
     ibrrs,
+    transfer,
+    transfers,
+
     getById,
     getTransfers,
     fetchTransfers,

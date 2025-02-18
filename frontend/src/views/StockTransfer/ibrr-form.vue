@@ -17,7 +17,17 @@
       </RouterLink>
     </AlertComponent>
 
-    <div class="cont flex flex-col gap-8">
+    <div class="cont relative">
+      <div
+        class="flex items-center justify-end gap-3 absolute top-4 right-4"
+        v-if="route.query.id"
+      >
+        <SelectStatusDropdown
+          v-model="model.transfer.status"
+          :class="isCancelled || isCompleted ? 'pointer-events-none' : ''"
+        />
+        <button type="button" class="btn float-right">&#128438; Print</button>
+      </div>
       <div class="flex gap-3">
         <div class="flex-1">
           <p class="font-semibold">Receive Information</p>
@@ -42,6 +52,7 @@
               :error-has-text="true"
               :error="modelErrors.str_id"
               v-model="model.transfer.str_id"
+              :disabled="isCancelled || isCompleted"
             />
             <CustomInput
               type="select"
@@ -54,6 +65,7 @@
               placeholder="Select Branch"
               :error="modelErrors.branch_from"
               v-model="model.transfer.branch_from"
+              :disabled="isCancelled || isCompleted"
             />
           </div>
           <CustomInput
@@ -64,6 +76,7 @@
             label="Memo"
             v-model="model.transfer.memo"
             placeholder="Write Something"
+            :disabled="isCancelled || isCompleted"
           />
         </div>
         <div class="flex-1">
@@ -71,7 +84,7 @@
           <AddressForm :has-label="true" v-model="address" :disabled="true" />
         </div>
       </div>
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-3 mt-8">
         <p class="font-semibold">Select Product</p>
         <MultiSelectTable
           v-model="model.products"
@@ -79,11 +92,29 @@
           :row-component="ProductSelectRow"
           :format="productDefaultValue"
           :row-event-name="ibrrEventName"
-        />
+          :is-disabled="isCancelled || isCompleted"
+        >
+          <template v-slot:aggregate>
+            <div>
+              <span class="font-bold text-sm">Total: </span>
+              <span class="text-sm">
+                &#8369;
+                {{
+                  totalAmount
+                    ? totalAmount.toLocaleString('en', {
+                        minimumFractionDigits: 2
+                      })
+                    : '0.00'
+                }}
+              </span>
+            </div>
+          </template>
+        </MultiSelectTable>
       </div>
       <div
         class="flex gap-3 mt-4"
         :class="route.query.id ? 'justify-between' : 'justify-end'"
+        v-if="!isCancelled && !isCompleted"
       >
         <button
           class="btn-danger-outline"
@@ -98,17 +129,21 @@
             class="btn-outline disabled:opacity-50"
             :disabled="!currentBranch"
             v-if="!isEdit"
+            @click="onSubmit(true)"
           >
             Save and New
           </button>
           <button
             class="btn disabled:opacity-50"
-            @click="onSubmit"
+            @click="onSubmit(false)"
             :disabled="!currentBranch"
           >
             {{ isEdit ? 'Update' : 'Save' }}
           </button>
         </div>
+      </div>
+      <div class="flex w-full justify-end" v-if="isCancelled || isCompleted">
+        <button class="btn-gray-outline" @click="onCancel">Back</button>
       </div>
     </div>
   </div>
@@ -117,6 +152,7 @@
 <script setup>
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
@@ -131,7 +167,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
-import { TransferType } from 'shared/enums'
+import { StockTransferStatus, TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { StockTransferCreateSchema } from 'shared/validators'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -159,7 +195,7 @@ const productDefaultValue = {
   amount: ''
 }
 
-const model = ref({
+const defaultValue = {
   transfer: {
     memo: '',
     str_id: '',
@@ -167,10 +203,13 @@ const model = ref({
     branch_from: '',
     processed_by: '',
     type: TransferType.IBRR,
+    status: StockTransferStatus.OPEN,
     when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A')
   },
   products: [{ ...productDefaultValue }]
-})
+}
+
+const model = ref(ObjectHelpers.copyObj(defaultValue))
 
 const modelErrors = ref({})
 
@@ -202,6 +241,25 @@ const branchOptions = computed(() => {
     )
 })
 
+const totalAmount = computed(() => {
+  const consumable = model.value.products
+    .filter((p) => p.amount)
+    .map((p) => parseInt(p.amount))
+  return consumable.length ? consumable.reduce((a, b) => a + b) : 0
+})
+
+const isCompleted = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status == StockTransferStatus.COMPLETED
+    : false
+})
+
+const isCancelled = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status == StockTransferStatus.CANCELLED
+    : false
+})
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -227,7 +285,7 @@ const populateAddress = () => {
   }
 }
 
-const onSubmit = async () => {
+const onSubmit = async (saveAndNew) => {
   clearInterval(timeInterval)
 
   // validate model
@@ -276,8 +334,14 @@ const onSubmit = async () => {
       message: `Successfully ${isEdit.value ? 'updated' : 'created'} IBRR!`,
       type: ToastTypes.SUCCESS
     })
-    if (!isEdit.value) {
-      router.push({ name: TransferConst.IBRR_LIST })
+    if (saveAndNew) {
+      model.value = ObjectHelpers.copyObj(defaultValue)
+      setCurrentBranch()
+      setProccessedBy()
+    } else {
+      if (!isEdit.value) {
+        router.push({ name: TransferConst.IBRR_LIST })
+      }
     }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -294,6 +358,17 @@ const onCancel = () => {
 const onAfterDelete = async () => {
   await transferStore.removeTransfer(route.query.id)
   router.push({ name: TransferConst.IBRR_LIST })
+}
+
+const setCurrentBranch = () => {
+  currentBranch.value = appStore.currentBranch
+  if (currentBranch.value) {
+    model.value.transfer.branch_to = currentBranch.value.id
+  }
+}
+
+const setProccessedBy = () => {
+  model.value.transfer.processed_by = authStore.getAuthUser().id
 }
 
 const setIBRRFormPageState = () => {
@@ -340,12 +415,11 @@ onMounted(async () => {
     isEdit.value = true
   }
 
-  currentBranch.value = appStore.currentBranch
-  if (currentBranch.value) {
-    model.value.transfer.branch_to = currentBranch.value.id
-  }
+  // set current branch
+  setCurrentBranch()
 
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+  // set proccessed by
+  setProccessedBy()
 
   // set page state
   if (appStore.isPageExist(PageStateConst.IBRR_FORM)) {

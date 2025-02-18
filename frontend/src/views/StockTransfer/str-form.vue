@@ -16,10 +16,19 @@
         here!
       </RouterLink>
     </AlertComponent>
-    <div class="cont">
-      <button type="button" class="btn float-right" @click="startPrint">
-        &#128438; Print
-      </button>
+    <div class="cont relative">
+      <div
+        class="flex items-center justify-end gap-3 absolute top-4 right-4"
+        v-if="route.query.id"
+      >
+        <SelectStatusDropdown
+          v-model="model.transfer.status"
+          :class="isCompleted || isCancelled ? 'pointer-events-none' : ''"
+        />
+        <button type="button" class="btn float-right" @click="startPrint">
+          &#128438; Print
+        </button>
+      </div>
       <div class="flex gap-4 max-lg:flex-col">
         <div class="flex flex-col gap-3 flex-1">
           <div class="flex justify-between">
@@ -30,13 +39,14 @@
               type="select"
               name="branch"
               class="flex-1"
-              :options="branchOptions"
               :has-label="true"
-              label="Select Receiving Branch"
+              :options="branchOptions"
               placeholder="Select Branch"
+              label="Select Receiving Branch"
               v-model="model.transfer.branch_to"
               :error="modelErrors.branch_to"
               :error-has-text="true"
+              :disabled="isCompleted || isCancelled"
             />
             <CustomInput
               type="datetime-local"
@@ -58,6 +68,7 @@
             placeholder="Write Something"
             :error="modelErrors.memo"
             :error-has-text="true"
+            :disabled="isCompleted || isCancelled"
           />
         </div>
 
@@ -77,15 +88,23 @@
           v-model="model.products"
           :header-component="ProductSelectHeader"
           :row-component="ProductSelectRow"
-          :format="productDefaultValue"
+          :format="{ ...productDefaultValue }"
           :row-event-name="rowEventName"
+          :is-disabled="isCompleted || isCancelled"
         >
           <template v-slot:aggregate>
             <div>
               <span class="font-bold text-sm">Total: </span>
-              <span class="text-sm"
-                >&#8369; {{ totalAmount ? totalAmount : 0 }}</span
-              >
+              <span class="text-sm">
+                &#8369;
+                {{
+                  totalAmount
+                    ? totalAmount.toLocaleString('en', {
+                        minimumFractionDigits: 2
+                      })
+                    : '0.00'
+                }}
+              </span>
             </div>
           </template>
         </ProductMulitpleSelect>
@@ -97,26 +116,33 @@
         <button
           class="btn-danger-outline"
           @click="showConfirmModal = true"
-          v-if="route.query.id"
+          v-if="route.query.id && !isCompleted && !isCancelled"
         >
           Delete
         </button>
-        <div class="flex gap-3">
+        <div class="flex gap-3" v-if="!isCompleted && !isCancelled">
           <button class="btn-gray-outline" @click="onCancel">Cancel</button>
           <button
             class="btn-outline disabled:opacity-50"
             :disabled="!currentBranch"
             v-if="!isEdit"
+            @click="onSubmit(true)"
           >
             Save and New
           </button>
           <button
             class="btn disabled:opacity-50"
-            @click="onSubmit"
+            @click="onSubmit(false)"
             :disabled="!currentBranch"
           >
             {{ isEdit ? 'Update' : 'Save' }}
           </button>
+        </div>
+        <div
+          class="flex gap-3 justify-end w-full"
+          v-if="isCompleted || isCancelled"
+        >
+          <button class="btn-gray-outline" @click="onCancel">Back</button>
         </div>
       </div>
     </div>
@@ -128,6 +154,7 @@ import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import ProductMulitpleSelect from '@/components/shared/MultiSelectTable.vue'
 import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue'
@@ -138,7 +165,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
-import { TransferType } from 'shared/enums'
+import { StockTransferStatus, TransferType } from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { StockTransferCreateSchema } from 'shared'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -183,15 +210,16 @@ const defaultValue = {
     branch_to: '',
     branch_from: '',
     processed_by: '',
-    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A'),
-    type: TransferType.STR
+    type: TransferType.STR,
+    status: StockTransferStatus.OPEN,
+    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A')
   },
   products: [{ ...productDefaultValue }]
 }
 
 const currentBranch = ref()
 const modelErrors = ref({ products: [] })
-const model = ref(defaultValue)
+const model = ref(ObjectHelpers.copyObj(defaultValue))
 const showConfirmModal = ref(false)
 
 /** ================================================
@@ -203,9 +231,25 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
  * COMPUTED
  ** ================================================*/
 const totalAmount = computed(() => {
-  return model.value.products.length
-    ? model.value.products.map((p) => p.amount).reduce((a, b) => a + b)
-    : 0
+  const toReduce = model.value.products.length
+    ? model.value.products
+        .filter((p) => p.amount)
+        .map((p) => parseInt(p.amount))
+    : []
+
+  return toReduce.length ? toReduce.reduce((a, b) => a + b) : 0
+})
+
+const isCompleted = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status === StockTransferStatus.COMPLETED
+    : false
+})
+
+const isCancelled = computed(() => {
+  return transferStore.transfer
+    ? transferStore.transfer.status === StockTransferStatus.CANCELLED
+    : false
 })
 
 const branchOptions = computed(() => {
@@ -250,7 +294,7 @@ const populateAddress = () => {
   }
 }
 
-const onSubmit = async () => {
+const onSubmit = async (saveAndNew = false) => {
   clearInterval(timeInterval)
 
   // validate model
@@ -302,10 +346,17 @@ const onSubmit = async () => {
       message: `Successfully ${isEdit.value ? 'updated' : 'created'} STR!`,
       type: ToastTypes.SUCCESS
     })
-    if (!isEdit.value) {
-      router.push({
-        name: TransferConst.STR_LIST
-      })
+
+    if (saveAndNew) {
+      model.value = ObjectHelpers.copyObj(defaultValue)
+      setCurrentBranch()
+      setProccessedBy()
+    } else {
+      if (!isEdit.value) {
+        router.push({
+          name: TransferConst.STR_LIST
+        })
+      }
     }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -326,6 +377,17 @@ const onAfterDelete = async () => {
   router.push({
     name: TransferConst.STR_LIST
   })
+}
+
+const setCurrentBranch = () => {
+  currentBranch.value = appStore.currentBranch
+  if (currentBranch.value) {
+    model.value.transfer.branch_from = currentBranch.value.id
+  }
+}
+
+const setProccessedBy = () => {
+  model.value.transfer.processed_by = authStore.getAuthUser().id
 }
 
 const setSTRFromPageState = () => {
@@ -381,13 +443,10 @@ onMounted(async () => {
   }
 
   // set branch from
-  currentBranch.value = appStore.currentBranch
-  if (currentBranch.value) {
-    model.value.transfer.branch_from = currentBranch.value.id
-  }
+  setCurrentBranch()
 
   // set processed by
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+  setProccessedBy()
 
   // set page state
   if (appStore.isPageExist(PageStateConst.STR_FORM)) {
@@ -412,6 +471,9 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   // remove interval
   clearInterval(timeInterval)
+
+  // remove transfer set on the state
+  transferStore.transfer = null
 })
 
 /** ================================================

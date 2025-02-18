@@ -26,6 +26,18 @@ Customer.init(
         key: "id",
       },
     },
+    phone_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    facebook_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    viber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     sequelize,

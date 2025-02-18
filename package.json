@@ -8,12 +8,12 @@
     "rm-nm-vite": "rm -r frontend/node_modules/.vite",
     "re-install-shared": "yarn workspace backend install-shared && yarn workspace frontend install-shared",
     "uninstall-shared": "yarn workspace backend uninstall-shared && yarn workspace frontend uninstall-shared",
-    "migrate": "yarn workspace backend sequelize db:migrate",
-    "migrate-undo": "yarn workspace backend sequelize db:migrate:undo",
-    "migrate-undo-all": "yarn workspace backend sequelize db:migrate:undo:all",
-    "specific-seed": "yarn workspace backend sequelize db:seed",
     "seed-all": "yarn workspace backend sequelize db:seed:all",
     "seed-undo-all": "yarn workspace backend sequelize db:seed:undo:all",
+    "migrate": "yarn workspace backend sequelize db:migrate",
+    "migrate-undo": "yarn workspace backend sequelize db:migrate:undo",
+    "migrate-undo-all": "yarn seed-undo-all && yarn workspace backend sequelize db:migrate:undo:all",
+    "specific-seed": "yarn workspace backend sequelize db:seed",
     "sequelize": "yarn workspace backend sequelize"
   },
   "workspaces": [
