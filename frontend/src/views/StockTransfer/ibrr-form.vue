@@ -129,12 +129,13 @@
             class="btn-outline disabled:opacity-50"
             :disabled="!currentBranch"
             v-if="!isEdit"
+            @click="onSubmit(true)"
           >
             Save and New
           </button>
           <button
             class="btn disabled:opacity-50"
-            @click="onSubmit"
+            @click="onSubmit(false)"
             :disabled="!currentBranch"
           >
             {{ isEdit ? 'Update' : 'Save' }}
@@ -194,7 +195,7 @@ const productDefaultValue = {
   amount: ''
 }
 
-const model = ref({
+const defaultValue = {
   transfer: {
     memo: '',
     str_id: '',
@@ -206,7 +207,9 @@ const model = ref({
     when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A')
   },
   products: [{ ...productDefaultValue }]
-})
+}
+
+const model = ref(ObjectHelpers.copyObj(defaultValue))
 
 const modelErrors = ref({})
 
@@ -282,7 +285,7 @@ const populateAddress = () => {
   }
 }
 
-const onSubmit = async () => {
+const onSubmit = async (saveAndNew) => {
   clearInterval(timeInterval)
 
   // validate model
@@ -331,8 +334,14 @@ const onSubmit = async () => {
       message: `Successfully ${isEdit.value ? 'updated' : 'created'} IBRR!`,
       type: ToastTypes.SUCCESS
     })
-    if (!isEdit.value) {
-      router.push({ name: TransferConst.IBRR_LIST })
+    if (saveAndNew) {
+      model.value = ObjectHelpers.copyObj(defaultValue)
+      setCurrentBranch()
+      setProccessedBy()
+    } else {
+      if (!isEdit.value) {
+        router.push({ name: TransferConst.IBRR_LIST })
+      }
     }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -349,6 +358,17 @@ const onCancel = () => {
 const onAfterDelete = async () => {
   await transferStore.removeTransfer(route.query.id)
   router.push({ name: TransferConst.IBRR_LIST })
+}
+
+const setCurrentBranch = () => {
+  currentBranch.value = appStore.currentBranch
+  if (currentBranch.value) {
+    model.value.transfer.branch_to = currentBranch.value.id
+  }
+}
+
+const setProccessedBy = () => {
+  model.value.transfer.processed_by = authStore.getAuthUser().id
 }
 
 const setIBRRFormPageState = () => {
@@ -395,12 +415,11 @@ onMounted(async () => {
     isEdit.value = true
   }
 
-  currentBranch.value = appStore.currentBranch
-  if (currentBranch.value) {
-    model.value.transfer.branch_to = currentBranch.value.id
-  }
+  // set current branch
+  setCurrentBranch()
 
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+  // set proccessed by
+  setProccessedBy()
 
   // set page state
   if (appStore.isPageExist(PageStateConst.IBRR_FORM)) {
