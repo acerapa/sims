@@ -89,10 +89,14 @@
         </button>
         <div class="flex gap-3">
           <button class="btn-gray-outline" @click="onCancel">Cancel</button>
-          <button class="btn-outline" v-if="!route.query.id">
+          <button
+            class="btn-outline"
+            v-if="!route.query.id"
+            @click="onSubmit(true)"
+          >
             Save and New
           </button>
-          <button class="btn" @click="onSubmit()">
+          <button class="btn" @click="onSubmit(false)">
             {{ route.query.id ? 'Update' : 'Save' }}
           </button>
         </div>
@@ -162,7 +166,7 @@ const purchaseOrderStore = usePurchaseOrderStore()
 
 const authUser = ref()
 const router = useRouter()
-const model = ref({ ...defaultValue })
+const model = ref(ObjectHelpers.copyObj(defaultValue))
 const modelErrors = ref({})
 
 /** ================================================
@@ -191,7 +195,7 @@ const isCancelled = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
-const onSubmit = async (isAddNew = false) => {
+const onSubmit = async (isAddNew) => {
   let isSuccess = false
   if (!route.query.id && authUser.value) {
     // additional settings
@@ -246,19 +250,20 @@ const onSubmit = async (isAddNew = false) => {
       } PO to Fix!`,
       type: ToastTypes.SUCCESS
     })
+    if (isAddNew) {
+      model.value = ObjectHelpers.copyObj(defaultValue)
+    } else {
+      if (!route.query.id) {
+        router.push({
+          name: TransferConst.FIX_ASSET_LIST
+        })
+      }
+    }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
       message: `Failed to ${route.query.id ? 'update' : 'create'} PO to Fix!`,
       type: ToastTypes.ERROR
     })
-  }
-
-  if (!isAddNew && isSuccess && !route.query.id) {
-    router.push({
-      name: TransferConst.FIX_ASSET_LIST
-    })
-
-    return
   }
 }
 
