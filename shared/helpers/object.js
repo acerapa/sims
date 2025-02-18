@@ -58,16 +58,56 @@ class ObjectHelpers {
    * This function will create a copy of the object cutting any references from the original
    *
    * @param {*} obj target object
-   * @param {*} preserveType preserve the type of the values in the object
    * @returns object
    */
-  static copyObj = (obj, preserveType = false) => {
+  static copyObj = (obj) => {
     if (typeof obj != "object" || Array.isArray(obj)) {
       console.error("`obj` must be of type object");
       return;
     }
 
-    return !preserveType ? JSON.parse(JSON.stringify(obj)) : obj;
+    const newObj = {};
+
+    for (let key in obj) {
+      if (typeof obj[key] == "object") {
+        if (Array.isArray(obj[key])) {
+          newObj[key] = this.copyArr(obj[key]);
+        } else {
+          newObj[key] = this.copyObj(obj[key]);
+        }
+      } else {
+        newObj[key] = obj[key];
+      }
+    }
+
+    return newObj;
+  };
+
+  /**
+   * Cloning an array and cut references from the original
+   * @param {*} arr
+   * @returns
+   */
+  static copyArr = (arr) => {
+    if (!Array.isArray(arr)) {
+      console.error("`arr` must be of type array");
+      return;
+    }
+    const copiedArr = [];
+
+    for (let ndx = 0; ndx < arr.length; ndx++) {
+      if (typeof arr[ndx] == "object") {
+        if (Array.isArray(arr[ndx])) {
+          copiedArr.push(this.copyArr(arr[ndx]));
+        } else {
+          copiedArr.push(this.copyObj(arr[ndx]));
+        }
+      } else {
+        copiedArr.push(arr[ndx]);
+      }
+    }
+
+    return copiedArr;
   };
 
   /**
