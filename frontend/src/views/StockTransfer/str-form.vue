@@ -88,7 +88,7 @@
           v-model="model.products"
           :header-component="ProductSelectHeader"
           :row-component="ProductSelectRow"
-          :format="productDefaultValue"
+          :format="{ ...productDefaultValue }"
           :row-event-name="rowEventName"
           :is-disabled="isCompleted || isCancelled"
         >
@@ -126,12 +126,13 @@
             class="btn-outline disabled:opacity-50"
             :disabled="!currentBranch"
             v-if="!isEdit"
+            @click="onSubmit(true)"
           >
             Save and New
           </button>
           <button
             class="btn disabled:opacity-50"
-            @click="onSubmit"
+            @click="onSubmit(false)"
             :disabled="!currentBranch"
           >
             {{ isEdit ? 'Update' : 'Save' }}
@@ -209,16 +210,16 @@ const defaultValue = {
     branch_to: '',
     branch_from: '',
     processed_by: '',
-    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A'),
     type: TransferType.STR,
-    status: StockTransferStatus.OPEN
+    status: StockTransferStatus.OPEN,
+    when: DateHelpers.formatDate(new Date(), 'YYYY-MM-DDTHH:II-A')
   },
   products: [{ ...productDefaultValue }]
 }
 
 const currentBranch = ref()
 const modelErrors = ref({ products: [] })
-const model = ref(defaultValue)
+const model = ref(ObjectHelpers.copyObj(defaultValue))
 const showConfirmModal = ref(false)
 
 /** ================================================
@@ -293,7 +294,7 @@ const populateAddress = () => {
   }
 }
 
-const onSubmit = async () => {
+const onSubmit = async (saveAndNew = false) => {
   clearInterval(timeInterval)
 
   // validate model
@@ -345,10 +346,17 @@ const onSubmit = async () => {
       message: `Successfully ${isEdit.value ? 'updated' : 'created'} STR!`,
       type: ToastTypes.SUCCESS
     })
-    if (!isEdit.value) {
-      router.push({
-        name: TransferConst.STR_LIST
-      })
+
+    if (saveAndNew) {
+      model.value = ObjectHelpers.copyObj(defaultValue)
+      setCurrentBranch()
+      setProccessedBy()
+    } else {
+      if (!isEdit.value) {
+        router.push({
+          name: TransferConst.STR_LIST
+        })
+      }
     }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -369,6 +377,17 @@ const onAfterDelete = async () => {
   router.push({
     name: TransferConst.STR_LIST
   })
+}
+
+const setCurrentBranch = () => {
+  currentBranch.value = appStore.currentBranch
+  if (currentBranch.value) {
+    model.value.transfer.branch_from = currentBranch.value.id
+  }
+}
+
+const setProccessedBy = () => {
+  model.value.transfer.processed_by = authStore.getAuthUser().id
 }
 
 const setSTRFromPageState = () => {
@@ -424,13 +443,10 @@ onMounted(async () => {
   }
 
   // set branch from
-  currentBranch.value = appStore.currentBranch
-  if (currentBranch.value) {
-    model.value.transfer.branch_from = currentBranch.value.id
-  }
+  setCurrentBranch()
 
   // set processed by
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+  setProccessedBy()
 
   // set page state
   if (appStore.isPageExist(PageStateConst.STR_FORM)) {
