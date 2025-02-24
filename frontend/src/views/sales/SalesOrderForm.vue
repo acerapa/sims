@@ -6,13 +6,15 @@
         <div class="flex gap-3">
           <CustomInput
             type="select"
-            :options="[]"
             class="flex-1"
             :has-label="true"
             :has-add-new="true"
             name="customer_id"
+            :error-has-text="true"
             label="Select Customer"
+            :options="customerOptions"
             placeholder="Select Customer"
+            :error="modelErrors.cusstomer_id"
             v-model="model.sales_order.customer_id"
             @add-new="showCustomerModel = true"
           />
@@ -80,6 +82,9 @@
       :row-component="SalesOrderFormRow"
       v-model="model.sales_order_products"
       :format="{ ...productTransferModal }"
+      :row-props="{
+        selected: model.sales_order_products
+      }"
     ></MultiSelectTable>
 
     <!-- buttons -->
@@ -114,7 +119,7 @@
 
 <script setup>
 import Event from '@/event'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import { SalesOrderType } from 'shared'
@@ -125,6 +130,7 @@ import SalesOrderFormRow from '@/components/sales/SalesOrderFormRow.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
 import { SalesConst } from '../../const/route.constants'
+import { useCustomerStore } from '@/stores/customer'
 
 const route = useRoute()
 
@@ -132,9 +138,11 @@ const showCustomerModel = ref(false)
 const isEdit = ref(false)
 const isDisabled = ref(false)
 
+const customerStore = useCustomerStore()
+
 const productTransferModal = {
   product_id: '',
-  description: [],
+  description: '',
   quantity: 0,
   price: 0,
   total: 0,
@@ -161,12 +169,35 @@ const defaultModel = {
 }
 
 const model = ref({ ...defaultModel })
+const modelErrors = ref({})
 /** ================================================
  * EVENTS
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
-onMounted(() => {
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const customerOptions = computed(() => {
+  return customerStore.customers.map((customer) => {
+    return {
+      text: `${customer.first_name} ${customer.last_name}`,
+      value: customer.id
+    }
+  })
+})
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const onSubmit = async (saveAndNew) => {}
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+onMounted(async () => {
+  await customerStore.getCustomers()
+
   if (route.query.id) {
     // code ...
   }
