@@ -12,8 +12,8 @@
             :has-add-new="true"
             name="customer_id"
             label="Select Customer"
-            v-model="model.customer_id"
             placeholder="Select Customer"
+            v-model="model.sales_order.customer_id"
             @add-new="showCustomerModel = true"
           />
           <CustomInput
@@ -32,7 +32,7 @@
             :has-label="true"
             name="customer_id"
             label="Order Type"
-            v-model="model.type"
+            v-model="model.sales_order.type"
             placeholder="Order Type"
           />
         </div>
@@ -42,9 +42,9 @@
             type="date"
             class="flex-1"
             :has-label="true"
-            name="order_date"
-            label="Order Date"
-            v-model="model.date_purchases"
+            name="purchase_date"
+            label="Purchase Date"
+            v-model="model.sales_order.date_purchase"
           />
           <CustomInput
             type="date"
@@ -78,9 +78,36 @@
     <MultiSelectTable
       :header-component="SalesOrderFormHeader"
       :row-component="SalesOrderFormRow"
-      v-model="model.products"
+      v-model="model.sales_order_products"
       :format="{ ...productTransferModal }"
     ></MultiSelectTable>
+
+    <!-- buttons -->
+    <div
+      class="flex gap-3 mt-6"
+      :class="route.query.id ? 'justify-between' : 'justify-end'"
+    >
+      <button class="btn-danger-outline" v-if="route.query.id">Delete</button>
+      <div class="flex gap-3">
+        <RouterLink :to="{ name: SalesConst.SALES }" class="btn-gray-outline">
+          {{ isDisabled ? 'Back' : 'Cancel' }}
+        </RouterLink>
+        <button type="button" class="btn-outline" @click="" v-if="!isEdit">
+          Save and New
+        </button>
+        <button type="button" class="btn" @click="" v-if="!isEdit">Save</button>
+
+        <!-- edit page save button -->
+        <button
+          type="button"
+          class="btn"
+          v-if="isEdit && !isDisabled"
+          @click=""
+        >
+          Update
+        </button>
+      </div>
+    </div>
   </div>
   <CustomerModal v-if="showCustomerModel" v-model="showCustomerModel" />
 </template>
@@ -97,14 +124,17 @@ import CustomerModal from '@/components/Customer/CustomerModal.vue'
 import SalesOrderFormRow from '@/components/sales/SalesOrderFormRow.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
+import { SalesConst } from '../../const/route.constants'
 
 const route = useRoute()
 
 const showCustomerModel = ref(false)
+const isEdit = ref(false)
+const isDisabled = ref(false)
 
 const productTransferModal = {
   product_id: '',
-  serial_numbers: [],
+  description: [],
   quantity: 0,
   price: 0,
   total: 0,
@@ -112,20 +142,22 @@ const productTransferModal = {
 }
 
 const defaultModel = {
-  customer_id: '',
-  type: '',
+  sales_order: {
+    customer_id: '',
+    type: '',
+    reference_no: '',
+    memo: '',
+    date_purchase: '',
+    bill_due: '',
+    discount: 0
+  },
   shipment_address: {
     address1: '',
     address2: '',
     city: '',
     postal: ''
   },
-  reference_no: '',
-  memo: '',
-  date_purchases: '',
-  bill_due: '',
-  discount: 0,
-  products: [{ ...productTransferModal }]
+  sales_order_products: [{ ...productTransferModal }]
 }
 
 const model = ref({ ...defaultModel })

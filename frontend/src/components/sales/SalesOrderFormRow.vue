@@ -19,11 +19,11 @@
     <CustomInput
       type="multi-string"
       class="col-span-3"
-      name="serial_numbers"
-      v-model="model.serial_numbers"
-      placeholder="Serial Numbers"
+      name="description"
+      v-model="model.description"
+      placeholder="Item Description"
       :error-has-text="false"
-      :error="modelErrors.serial_numbers"
+      :error="modelErrors.description"
     />
 
     <CustomInput

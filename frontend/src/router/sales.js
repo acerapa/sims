@@ -1,14 +1,16 @@
+import { SalesConst } from '@/const/route.constants'
+
 export default [
   {
-    name: 'sales',
+    name: SalesConst.SALES,
     path: '/sales',
     component: () => import('@/layout/NavLayout.vue'),
     redirect: {
-      name: 'sales-order'
+      name: SalesConst.SALES_ORDER
     },
     children: [
       {
-        name: 'item-details',
+        name: SalesConst.ITEM_DETAILS,
         path: '/item-details',
         component: () => import('@/views/sales/ItemDatails.vue'),
         meta: {
@@ -17,7 +19,7 @@ export default [
         }
       },
       {
-        name: 'sales-order-form',
+        name: SalesConst.SALES_ORDER_FORM,
         path: '/sales-order-form',
         component: () => import('@/views/sales/SalesOrderForm.vue'),
         meta: {
@@ -26,7 +28,7 @@ export default [
         }
       },
       {
-        name: 'sales-order',
+        name: SalesConst.SALES_ORDER,
         path: '/sales-order',
         component: () => import('@/views/sales/SalesOrder.vue'),
         meta: {
@@ -36,7 +38,7 @@ export default [
       },
       {
         path: '/customers',
-        name: 'customers',
+        name: SalesConst.CUSTOMERS,
         component: () => import('@/views/sales/Customer.vue'),
         meta: {
           requiresAuth: true

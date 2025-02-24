@@ -1,9 +1,29 @@
+const { sequelize } = require("../models");
+const SalesOrderProduct = require("../models/junction/sales-order-product");
 const SalesOrder = require("../models/sales-order");
 
 module.exports = {
   register: async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-      await SalesOrder.create(req.body.validated);
+      const data = req.body.validated;
+      let salesOrder = null;
+      if (data.sales_order) {
+        salesOrder = await SalesOrder.create(data, { transaction });
+      }
+
+      if (data.sales_order_products && salesOrder) {
+        await Promise.all(
+          data.sales_order_products.map((salesProduct) => {
+            return SalesOrderProduct.create(
+              { ...salesProduct, sales_order_id: salesOrder.id },
+              { transaction }
+            );
+          })
+        );
+      }
+
+      await transaction.commit();
       res.sendResponse({}, "Sales order created successfully", 200);
     } catch (error) {
       res.sendError(error, "Something went wrong", 400);
