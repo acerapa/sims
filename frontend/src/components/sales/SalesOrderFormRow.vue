@@ -11,19 +11,19 @@
       placeholder="Select Product"
       :has-add-new="true"
       @add-new=""
-      :options="[]"
+      :options="productOptions"
       :error-has-text="false"
       :error="modelErrors.product_id"
     />
 
     <CustomInput
-      type="multi-string"
+      type="text"
       class="col-span-3"
-      name="serial_numbers"
-      v-model="model.serial_numbers"
-      placeholder="Serial Numbers"
+      name="description"
+      v-model="model.description"
+      placeholder="Item Description"
       :error-has-text="false"
-      :error="modelErrors.serial_numbers"
+      :error="modelErrors.description"
     />
 
     <CustomInput
@@ -80,7 +80,8 @@
 <script setup>
 import { useProductStore } from '@/stores/product'
 import CustomInput from '../shared/CustomInput.vue'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import Event from '@/event'
 
 const props = defineProps({
   ndx: {
@@ -94,6 +95,10 @@ const props = defineProps({
   eventName: {
     type: String,
     required: false
+  },
+  selected: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -102,7 +107,53 @@ const productStore = useProductStore()
 const model = defineModel()
 const modelErrors = ref({})
 
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+Event.on(props.eventName, (data) => {
+  modelErrors.value = data ? data : {}
+})
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const productOptions = computed(() => {
+  return productStore.products
+    .map((product) => {
+      return {
+        text: product.name,
+        value: product.id
+      }
+    })
+    .filter((prod) => {
+      if (model.value.product_id == prod.value) return true
+      return !props.selected.map((p) => p.product_id).includes(prod.value)
+    })
+})
+
 onMounted(async () => {
   await productStore.getProducts()
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => model.value.product_id,
+  (val) => {
+    const prd = productStore.products.find((p) => p.id == val)
+    if (prd) {
+      model.value.description = prd.product_details.sales_description
+      model.value.price = prd.price
+      model.value.quantity = 1
+    }
+  }
+)
+
+watch(
+  () => [model.value.quantity, model.value.price],
+  () => {
+    model.value.total = model.value.quantity * model.value.price
+  }
+)
 </script>

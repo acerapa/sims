@@ -2,6 +2,7 @@ const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
 const Customer = require("./customer");
 const Address = require("./address");
+const { SalesOrderStatus, SalesOrderType } = require("shared/enums");
 
 class SalesOrder extends Model {}
 
@@ -16,7 +17,7 @@ SalesOrder.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    date_order: {
+    purchase_date: {
       type: DataTypes.DATE,
       allowNull: false,
     },
@@ -35,7 +36,17 @@ SalesOrder.init(
         key: "id",
       },
     },
-    shipment_address: {
+    type: {
+      type: DataTypes.ENUM,
+      values: Object.values(SalesOrderType),
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM,
+      values: Object.values(SalesOrderStatus),
+      defaultValue: SalesOrderStatus.OPEN,
+    },
+    shipment_address_id: {
       type: DataTypes.INTEGER,
       references: {
         model: Address,

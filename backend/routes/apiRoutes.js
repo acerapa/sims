@@ -24,6 +24,9 @@ router.use("/services", serviceRoutes);
 const purchaseOrderRoutes = require("./PurchaseOrderRoutes");
 router.use("/purchase-order", purchaseOrderRoutes);
 
+const salesOrderRoutes = require("./SalesOrderRoutes");
+router.use("/sales-order", salesOrderRoutes);
+
 const productSettingRoutes = require("./ProductSettingRoutes");
 router.use("/product-setting", productSettingRoutes);
 
