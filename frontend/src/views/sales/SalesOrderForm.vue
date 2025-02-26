@@ -49,8 +49,8 @@
             name="purchase_date"
             label="Purchase Date"
             :error-has-text="true"
-            :error="modelErrors.date_purchase"
-            v-model="model.sales_order.date_purchase"
+            :error="modelErrors.purchase_date"
+            v-model="model.sales_order.purchase_date"
           />
           <CustomInput
             type="date"
@@ -59,19 +59,29 @@
             name="bill_due"
             label="Bill Due"
             :error-has-text="true"
-            v-model="model.bill_due"
             :error="modelErrors.bill_due"
+            v-model="model.sales_order.bill_due"
           />
         </div>
+        <CustomInput
+          type="date"
+          class="flex-1"
+          :has-label="true"
+          name="delivery_date"
+          label="Delivery Date"
+          :error-has-text="true"
+          :error="modelErrors.delivery_date"
+          v-model="model.sales_order.delivery_date"
+        />
         <CustomInput
           name="memo"
           label="Memo"
           type="textarea"
           :has-label="true"
           placeholder="Memo"
-          v-model="model.memo"
           :error-has-text="true"
           :error="modelErrors.memo"
+          v-model="model.sales_order.memo"
         />
       </div>
       <div class="flex-1">
@@ -91,6 +101,7 @@
       :row-component="SalesOrderFormRow"
       v-model="model.sales_order_products"
       :format="{ ...productTransferModal }"
+      :row-event-name="rowEventName"
       :row-props="{
         selected: model.sales_order_products
       }"
@@ -136,7 +147,7 @@
 <script setup>
 import Event from '@/event'
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import {
   SalesOrderCreateSchema,
@@ -151,13 +162,18 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
 import { SalesConst } from '../../const/route.constants'
 import { useCustomerStore } from '@/stores/customer'
+import { useSalesStore } from '@/stores/sales'
+import { ToastTypes } from '@/data/types'
 
 const route = useRoute()
+const router = useRouter()
 
-const showCustomerModel = ref(false)
 const isEdit = ref(false)
 const isDisabled = ref(false)
+const showCustomerModel = ref(false)
+const rowEventName = 'sales-order-row-event'
 
+const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
 
 const productTransferModal = {
@@ -173,11 +189,10 @@ const defaultModel = {
   sales_order: {
     customer_id: '',
     type: '',
-    reference_no: '',
     memo: '',
-    date_purchase: '',
+    purchase_date: '',
+    delivery_date: '',
     bill_due: '',
-    discount: 0,
     status: SalesOrderStatus.OPEN
   },
   shipment_address: {
@@ -191,7 +206,7 @@ const defaultModel = {
 }
 
 const model = ref({ ...defaultModel })
-const modelErrors = ref({ shipment_address: {} })
+const modelErrors = ref({})
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -213,8 +228,10 @@ const customerOptions = computed(() => {
  * METHODS
  ** ================================================*/
 const onSubmit = async (saveAndNew) => {
-  // TODO:
   // validation
+  modelErrors.value = {}
+  Event.emit(rowEventName, modelErrors.value.sales_order_products)
+
   const { error } = SalesOrderCreateSchema.validate(model.value, {
     abortEarly: false
   })
@@ -222,7 +239,19 @@ const onSubmit = async (saveAndNew) => {
   if (error) {
     error.details.forEach((err) => {
       if (err.path.includes('sales_order_products')) {
-        // code here
+        if (
+          modelErrors.value[err.path[0]] &&
+          Object.keys(modelErrors.value[err.path[0]]).length
+        ) {
+          modelErrors.value[err.path[0]] = {
+            ...modelErrors.value[err.path[0]],
+            [err.context.key]: err.message.replace(/"[^"]*"/g, err.context.key)
+          }
+        } else {
+          modelErrors.value[err.path[0]] = {
+            [err.context.key]: err.message.replace(/"[^"]*"/g, err.context.key)
+          }
+        }
       } else if (err.path.includes('shipment_address')) {
         if (
           modelErrors.value[err.path[0]] &&
@@ -245,10 +274,28 @@ const onSubmit = async (saveAndNew) => {
       }
     })
 
-    console.log(modelErrors.value)
+    // trigger event to show errors in the products selection table
+    Event.emit(rowEventName, modelErrors.value.sales_order_products)
+    return
   }
-  // submitting to api
-  // toast response
+
+  const isSuccess = await salesStore.createSalesOrder(model.value)
+
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Successfully ${route.query.id ? 'updated' : 'created'} Sales Order!`,
+      type: ToastTypes.SUCCESS
+    })
+
+    router.push({
+      name: SalesConst.SALES_ORDER
+    })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      message: `Failed to ${route.query.id ? 'update' : 'create'} Sales Order!`,
+      type: ToastTypes.ERROR
+    })
+  }
 }
 
 /** ================================================

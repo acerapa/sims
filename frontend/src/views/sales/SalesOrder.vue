@@ -1,9 +1,11 @@
 <template>
   <CustomTable
     title="Sales Order List"
-    :data="[]"
+    :data="filteredData"
+    :has-pagination="true"
     :row-prop-init="rowPropInit"
     @add-new-record="onAddNewRecord"
+    :table-row-component="SalesOrderRow"
   >
     <template #table_header>
       <div class="grid grid-cols-9 gap-3 min-w-[935px]">
@@ -25,8 +27,9 @@
 import CustomTable from '@/components/shared/CustomTable.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
+import SalesOrderRow from '../../components/sales/SalesOrderRow.vue'
 import { useSalesStore } from '@/stores/sales'
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const salesStore = useSalesStore()
@@ -38,6 +41,16 @@ const router = useRouter()
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 const rowPropInit = 'sales-order-row-prop-init'
+Event.on(rowPropInit, (data) => {
+  return { order: data }
+})
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const filteredData = computed(() => {
+  return salesStore.salesOrders.filter((salesOrder) => salesOrder)
+})
 
 /** ================================================
  * METHODS

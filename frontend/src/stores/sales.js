@@ -8,7 +8,7 @@ export const useSalesStore = defineStore('sales', () => {
 
   const createSalesOrder = async (data) => {
     const res = await authenticatedApi(
-      'sales-orders/register',
+      'sales-order/register',
       Method.POST,
       data
     )
@@ -28,7 +28,7 @@ export const useSalesStore = defineStore('sales', () => {
   }
 
   const fetchSalesOrders = async () => {
-    const res = await authenticatedApi('sales-orders/all')
+    const res = await authenticatedApi('sales-order/all')
     const isSuccess = res.status < 400
 
     if (isSuccess) {

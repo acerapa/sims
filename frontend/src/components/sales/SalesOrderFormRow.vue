@@ -81,6 +81,7 @@
 import { useProductStore } from '@/stores/product'
 import CustomInput from '../shared/CustomInput.vue'
 import { computed, onMounted, ref, watch } from 'vue'
+import Event from '@/event'
 
 const props = defineProps({
   ndx: {
@@ -105,6 +106,13 @@ const emit = defineEmits(['emit'])
 const productStore = useProductStore()
 const model = defineModel()
 const modelErrors = ref({})
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+Event.on(props.eventName, (data) => {
+  modelErrors.value = data ? data : {}
+})
 
 /** ================================================
  * COMPUTED

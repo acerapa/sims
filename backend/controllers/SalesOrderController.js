@@ -8,7 +8,7 @@ module.exports = {
   all: async (req, res) => {
     try {
       const orders = await SalesOrder.findAll({
-        order: [["created_at", "DESC"]],
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: Address,
@@ -32,7 +32,7 @@ module.exports = {
       const data = req.body.validated;
       let salesOrder = null;
       if (data.sales_order) {
-        salesOrder = await SalesOrder.create(data, { transaction });
+        salesOrder = await SalesOrder.create(data.sales_order, { transaction });
       }
 
       if (data.sales_order_products && salesOrder) {
