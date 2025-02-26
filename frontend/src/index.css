@@ -137,6 +137,16 @@ select.input {
   background-color: rgb(107, 114, 128, 0.2);
 }
 
+.sales-types-cash {
+  color: #008080;
+  background-color: rgba(0, 128, 128, 0.2);
+}
+
+.sales-types-installment {
+  color: #800080;
+  background-color: rgba(128, 0, 128, 0.2);
+}
+
 /*=====================================================
  * KEYFRAMES, ANIMATIONS, TRANSISTIONS
  ======================================================*/

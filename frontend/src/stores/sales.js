@@ -46,11 +46,50 @@ export const useSalesStore = defineStore('sales', () => {
     return salesOrders.value
   }
 
+  const fetchSalesOrder = async (id) => {
+    const res = await authenticatedApi(`sales-order/${id}`)
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (salesOrders.value && salesOrders.value.length) {
+        const index = salesOrders.value.findIndex((item) => item.id == id)
+        salesOrders.value[index] = res.data.order
+      }
+
+      salesOrder.value = res.data.order
+    }
+
+    return isSuccess
+  }
+
+  const getSalesOrder = async (id) => {
+    if (!salesOrder.value || salesOrder.value.id != id) {
+      salesOrder.value = salesOrders.value.find((item) => item.id == id)
+
+      if (!salesOrder.value) {
+        await fetchSalesOrder(id)
+      }
+    }
+
+    return salesOrder.value
+  }
+
+  const removeSalesOrder = async (id) => {
+    if (salesOrders.value.length) {
+      salesOrders.value = salesOrders.value.filter((item) => item.id != id)
+    } else {
+      await fetchSalesOrders()
+    }
+  }
+
   return {
     salesOrder,
     salesOrders,
+    getSalesOrder,
     getSalesOrders,
+    fetchSalesOrder,
     fetchSalesOrders,
-    createSalesOrder
+    createSalesOrder,
+    removeSalesOrder
   }
 })

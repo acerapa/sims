@@ -3,6 +3,7 @@ const Address = require("../models/address");
 const SalesOrderProduct = require("../models/junction/sales-order-product");
 const Product = require("../models/product");
 const SalesOrder = require("../models/sales-order");
+const { findSalesOrder } = require("../services/SalesOrderService");
 
 module.exports = {
   all: async (req, res) => {
@@ -26,13 +27,34 @@ module.exports = {
     }
   },
 
+  byId: async (req, res) => {
+    try {
+      const order = await findSalesOrder(req.params.id);
+
+      res.sendResponse({ order }, "Sales order fetched successfully", 200);
+    } catch (error) {
+      res.sendError(error, "Something went wrong", 400);
+    }
+  },
+
   register: async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
       let salesOrder = null;
+
+      let shipmentAddress = null;
+      if (data.shipment_address) {
+        shipmentAddress = await Address.create(data.shipment_address, {
+          transaction,
+        });
+      }
+
       if (data.sales_order) {
-        salesOrder = await SalesOrder.create(data.sales_order, { transaction });
+        salesOrder = await SalesOrder.create(
+          { ...data.sales_order, shipment_address_id: shipmentAddress.id },
+          { transaction }
+        );
       }
 
       if (data.sales_order_products && salesOrder) {
@@ -47,7 +69,23 @@ module.exports = {
       }
 
       await transaction.commit();
-      res.sendResponse({}, "Sales order created successfully", 200);
+
+      const order = await findSalesOrder(salesOrder.id);
+      res.sendResponse({ order }, "Sales order created successfully", 200);
+    } catch (error) {
+      res.sendError(error, "Something went wrong", 400);
+    }
+  },
+
+  destroy: async (req, res) => {
+    try {
+      await SalesOrder.destroy({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      res.sendResponse({}, "Sales order deleted successfully", 200);
     } catch (error) {
       res.sendError(error, "Something went wrong", 400);
     }

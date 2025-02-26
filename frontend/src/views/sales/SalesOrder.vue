@@ -6,17 +6,18 @@
     :row-prop-init="rowPropInit"
     @add-new-record="onAddNewRecord"
     :table-row-component="SalesOrderRow"
+    @view="onView"
   >
     <template #table_header>
-      <div class="grid grid-cols-9 gap-3 min-w-[935px]">
+      <div class="grid grid-cols-8 gap-3 min-w-[935px]">
         <div class="col-span-1 flex gap-3 items-center">
           <input type="checkbox" class="input" />
           <p class="table-header">#</p>
         </div>
-        <p class="col-span-2 table-header">Type</p>
+        <p class="col-span-1 table-header">Type</p>
         <p class="col-span-1 table-header">Total</p>
-        <p class="col-span-2 table-header">Date</p>
         <p class="col-span-2 table-header">Purchase Date</p>
+        <p class="col-span-2 table-header">Bill Due</p>
         <p class="col-span-1 table-header">Status</p>
       </div>
     </template>
@@ -31,9 +32,10 @@ import SalesOrderRow from '../../components/sales/SalesOrderRow.vue'
 import { useSalesStore } from '@/stores/sales'
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { SalesConst } from '@/const/route.constants'
 
-const salesStore = useSalesStore()
 const router = useRouter()
+const salesStore = useSalesStore()
 
 /** ================================================
  * EVENTS
@@ -61,6 +63,16 @@ const onAddNewRecord = () => {
   })
 }
 
+const onView = (id) => {
+  router.push({
+    name: SalesConst.SALES_ORDER_FORM,
+    query: { id }
+  })
+}
+
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
 onMounted(async () => {
   await salesStore.getSalesOrders()
 

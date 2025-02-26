@@ -112,18 +112,29 @@
       class="flex gap-3 mt-6"
       :class="route.query.id ? 'justify-between' : 'justify-end'"
     >
-      <button class="btn-danger-outline" v-if="route.query.id">Delete</button>
+      <button
+        class="btn-danger-outline"
+        v-if="route.query.id"
+        @click="showDeleteModal = true"
+      >
+        Delete
+      </button>
       <div class="flex gap-3">
         <RouterLink :to="{ name: SalesConst.SALES }" class="btn-gray-outline">
           {{ isDisabled ? 'Back' : 'Cancel' }}
         </RouterLink>
-        <button type="button" class="btn-outline" @click="" v-if="!isEdit">
+        <button
+          type="button"
+          class="btn-outline"
+          @click=""
+          v-if="!route.query.id"
+        >
           Save and New
         </button>
         <button
           type="button"
           class="btn"
-          v-if="!isEdit"
+          v-if="!route.query.id"
           @click="onSubmit(false)"
         >
           Save
@@ -133,7 +144,7 @@
         <button
           type="button"
           class="btn"
-          v-if="isEdit && !isDisabled"
+          v-if="route.query.id && !isDisabled"
           @click=""
         >
           Update
@@ -142,6 +153,12 @@
     </div>
   </div>
   <CustomerModal v-if="showCustomerModel" v-model="showCustomerModel" />
+  <DeleteConfirmModal
+    v-if="showDeleteModal && route.query.id"
+    v-model="showDeleteModal"
+    :href="`sales-order/${route.query.id}`"
+    @after-delete="onAfterDelete"
+  />
 </template>
 
 <script setup>
@@ -150,6 +167,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import {
+  ObjectHelpers,
   SalesOrderCreateSchema,
   SalesOrderStatus,
   SalesOrderType
@@ -160,6 +178,7 @@ import CustomerModal from '@/components/Customer/CustomerModal.vue'
 import SalesOrderFormRow from '@/components/sales/SalesOrderFormRow.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import { SalesConst } from '../../const/route.constants'
 import { useCustomerStore } from '@/stores/customer'
 import { useSalesStore } from '@/stores/sales'
@@ -168,8 +187,8 @@ import { ToastTypes } from '@/data/types'
 const route = useRoute()
 const router = useRouter()
 
-const isEdit = ref(false)
 const isDisabled = ref(false)
+const showDeleteModal = ref(false)
 const showCustomerModel = ref(false)
 const rowEventName = 'sales-order-row-event'
 
@@ -298,6 +317,12 @@ const onSubmit = async (saveAndNew) => {
   }
 }
 
+const onAfterDelete = async () => {
+  salesStore.removeSalesOrder(route.query.id)
+  router.push({
+    name: SalesConst.SALES_ORDER
+  })
+}
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -305,7 +330,43 @@ onMounted(async () => {
   await customerStore.getCustomers()
 
   if (route.query.id) {
-    // code ...
+    await salesStore.getSalesOrder(route.query.id)
+
+    model.value.sales_order = ObjectHelpers.assignSameFields(
+      model.value.sales_order,
+      salesStore.salesOrder
+    )
+
+    // few dates patches
+    model.value.sales_order.purchase_date = salesStore.salesOrder.purchase_date
+      ? new Date(salesStore.salesOrder.purchase_date)
+          .toISOString()
+          .split('T')[0]
+      : ''
+    model.value.sales_order.bill_due = salesStore.salesOrder.bill_due
+      ? new Date(salesStore.salesOrder.bill_due).toISOString().split('T')[0]
+      : ''
+    model.value.sales_order.delivery_date = salesStore.salesOrder.delivery_date
+      ? new Date(salesStore.salesOrder.delivery_date)
+          .toISOString()
+          .split('T')[0]
+      : ''
+
+    // address
+    model.value.shipment_address = ObjectHelpers.assignSameFields(
+      model.value.shipment_address,
+      salesStore.salesOrder.shipment_address
+    )
+
+    // products
+    model.value.sales_order_products = salesStore.salesOrder.products.map(
+      (p) => {
+        return ObjectHelpers.assignSameFields(
+          productTransferModal,
+          p.SalesOrderProduct
+        )
+      }
+    )
   }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
