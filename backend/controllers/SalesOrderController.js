@@ -3,7 +3,10 @@ const Address = require("../models/address");
 const SalesOrderProduct = require("../models/junction/sales-order-product");
 const Product = require("../models/product");
 const SalesOrder = require("../models/sales-order");
-const { findSalesOrder } = require("../services/SalesOrderService");
+const {
+  findSalesOrder,
+  updateSalesOrder,
+} = require("../services/SalesOrderService");
 
 module.exports = {
   all: async (req, res) => {
@@ -73,6 +76,22 @@ module.exports = {
       const order = await findSalesOrder(salesOrder.id);
       res.sendResponse({ order }, "Sales order created successfully", 200);
     } catch (error) {
+      await transaction.rollback();
+      res.sendError(error, "Something went wrong", 400);
+    }
+  },
+
+  update: async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+      const data = req.body.validated;
+      await updateSalesOrder(req.params.id, data, transaction);
+      await transaction.commit();
+
+      const order = await findSalesOrder(req.params.id);
+      res.sendResponse({ order }, "Sales order updated successfully", 200);
+    } catch (error) {
+      await transaction.rollback();
       res.sendError(error, "Something went wrong", 400);
     }
   },

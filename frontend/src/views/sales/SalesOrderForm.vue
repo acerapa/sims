@@ -145,7 +145,7 @@
           type="button"
           class="btn"
           v-if="route.query.id && !isDisabled"
-          @click=""
+          @click="onSubmit(false)"
         >
           Update
         </button>
@@ -224,7 +224,7 @@ const defaultModel = {
   sales_order_products: [{ ...productTransferModal }]
 }
 
-const model = ref({ ...defaultModel })
+const model = ref(ObjectHelpers.copyObj(defaultModel))
 const modelErrors = ref({})
 /** ================================================
  * EVENTS
@@ -298,7 +298,13 @@ const onSubmit = async (saveAndNew) => {
     return
   }
 
-  const isSuccess = await salesStore.createSalesOrder(model.value)
+  let isSuccess = false
+
+  if (route.query.id) {
+    isSuccess = await salesStore.updateSalesOrder(route.query.id, model.value)
+  } else {
+    isSuccess = await salesStore.createSalesOrder(model.value)
+  }
 
   if (isSuccess) {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -361,8 +367,9 @@ onMounted(async () => {
     // products
     model.value.sales_order_products = salesStore.salesOrder.products.map(
       (p) => {
+        let salesProductsModel = ObjectHelpers.copyObj(productTransferModal)
         return ObjectHelpers.assignSameFields(
-          productTransferModal,
+          salesProductsModel,
           p.SalesOrderProduct
         )
       }

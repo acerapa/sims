@@ -27,6 +27,27 @@ export const useSalesStore = defineStore('sales', () => {
     return isSuccess
   }
 
+  const updateSalesOrder = async (id, data) => {
+    const res = await authenticatedApi(`sales-order/${id}`, Method.PUT, data)
+
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      if (salesOrders.value.length) {
+        const index = salesOrders.value.findIndex((item) => item.id == id)
+        salesOrders.value[index] = res.data.order
+      } else {
+        await fetchSalesOrders()
+      }
+
+      if (salesOrder.value && salesOrder.value.id == id) {
+        salesOrder.value = res.data.order
+      }
+    }
+
+    return isSuccess
+  }
+
   const fetchSalesOrders = async () => {
     const res = await authenticatedApi('sales-order/all')
     const isSuccess = res.status < 400
@@ -90,6 +111,7 @@ export const useSalesStore = defineStore('sales', () => {
     fetchSalesOrder,
     fetchSalesOrders,
     createSalesOrder,
-    removeSalesOrder
+    removeSalesOrder,
+    updateSalesOrder
   }
 })
