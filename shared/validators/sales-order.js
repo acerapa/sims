@@ -1,5 +1,6 @@
 const joi = require("joi");
 const { AddressSchema } = require("./user");
+const { SalesOrderStatus } = require("../enums/index");
 
 const SalesOrderSchema = joi.object({
   memo: joi.string().allow("", null).optional(),
@@ -7,6 +8,7 @@ const SalesOrderSchema = joi.object({
   date_delivery: joi.date().allow("", null).optional(),
   bill_due: joi.date().allow("", null).optional(),
   customer_id: joi.number().required(),
+  status: joi.string().valid(...Object.values(SalesOrderStatus)),
   shipment_address: joi.number().required(),
 });
 

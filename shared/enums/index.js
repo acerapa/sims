@@ -158,6 +158,14 @@ const SalesOrderType = Object.freeze({
   INSTALLMENT: "installment",
 });
 
+const SalesOrderStatus = Object.freeze({
+  OPEN: "open",
+  CONFIRMED: "confirmed",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
+  OVERDUE: "overdue",
+});
+
 const ConsoleColors = {
   RED: "\x1b[31m",
   BLUE: "\x1b[34m",
@@ -178,6 +186,7 @@ module.exports = {
   SalesOrderType,
   BranchStatusMap,
   LocalStorageKeys,
+  SalesOrderStatus,
   PurchaseOrderType,
   PurchaseStatusMap,
   StockTransferStatus,

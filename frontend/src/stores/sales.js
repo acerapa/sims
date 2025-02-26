@@ -27,9 +27,30 @@ export const useSalesStore = defineStore('sales', () => {
     return isSuccess
   }
 
+  const fetchSalesOrders = async () => {
+    const res = await authenticatedApi('sales-orders/all')
+    const isSuccess = res.status < 400
+
+    if (isSuccess) {
+      salesOrders.value = res.data.orders
+    }
+
+    return isSuccess
+  }
+
+  const getSalesOrders = async () => {
+    if (!salesOrders.value.length) {
+      await fetchSalesOrders()
+    }
+
+    return salesOrders.value
+  }
+
   return {
     salesOrder,
     salesOrders,
+    getSalesOrders,
+    fetchSalesOrders,
     createSalesOrder
   }
 })

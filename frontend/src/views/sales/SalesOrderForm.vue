@@ -14,7 +14,7 @@
             label="Select Customer"
             :options="customerOptions"
             placeholder="Select Customer"
-            :error="modelErrors.cusstomer_id"
+            :error="modelErrors.customer_id"
             v-model="model.sales_order.customer_id"
             @add-new="showCustomerModel = true"
           />
@@ -36,6 +36,8 @@
             label="Order Type"
             v-model="model.sales_order.type"
             placeholder="Order Type"
+            :error-has-text="true"
+            :error="modelErrors.type"
           />
         </div>
 
@@ -46,6 +48,8 @@
             :has-label="true"
             name="purchase_date"
             label="Purchase Date"
+            :error-has-text="true"
+            :error="modelErrors.date_purchase"
             v-model="model.sales_order.date_purchase"
           />
           <CustomInput
@@ -54,7 +58,9 @@
             :has-label="true"
             name="bill_due"
             label="Bill Due"
+            :error-has-text="true"
             v-model="model.bill_due"
+            :error="modelErrors.bill_due"
           />
         </div>
         <CustomInput
@@ -64,6 +70,8 @@
           :has-label="true"
           placeholder="Memo"
           v-model="model.memo"
+          :error-has-text="true"
+          :error="modelErrors.memo"
         />
       </div>
       <div class="flex-1">
@@ -72,6 +80,7 @@
           :has-label="true"
           class="flex-1"
           v-model="model.shipment_address"
+          :address-errors="modelErrors.shipment_address"
         />
       </div>
     </div>
@@ -100,7 +109,14 @@
         <button type="button" class="btn-outline" @click="" v-if="!isEdit">
           Save and New
         </button>
-        <button type="button" class="btn" @click="" v-if="!isEdit">Save</button>
+        <button
+          type="button"
+          class="btn"
+          v-if="!isEdit"
+          @click="onSubmit(false)"
+        >
+          Save
+        </button>
 
         <!-- edit page save button -->
         <button
@@ -122,7 +138,11 @@ import Event from '@/event'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { EventEnum } from '@/data/event'
-import { SalesOrderType } from 'shared'
+import {
+  SalesOrderCreateSchema,
+  SalesOrderStatus,
+  SalesOrderType
+} from 'shared'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
@@ -157,19 +177,21 @@ const defaultModel = {
     memo: '',
     date_purchase: '',
     bill_due: '',
-    discount: 0
+    discount: 0,
+    status: SalesOrderStatus.OPEN
   },
   shipment_address: {
     address1: '',
     address2: '',
     city: '',
+    province: '',
     postal: ''
   },
   sales_order_products: [{ ...productTransferModal }]
 }
 
 const model = ref({ ...defaultModel })
-const modelErrors = ref({})
+const modelErrors = ref({ shipment_address: {} })
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -190,7 +212,44 @@ const customerOptions = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
-const onSubmit = async (saveAndNew) => {}
+const onSubmit = async (saveAndNew) => {
+  // TODO:
+  // validation
+  const { error } = SalesOrderCreateSchema.validate(model.value, {
+    abortEarly: false
+  })
+
+  if (error) {
+    error.details.forEach((err) => {
+      if (err.path.includes('sales_order_products')) {
+        // code here
+      } else if (err.path.includes('shipment_address')) {
+        if (
+          modelErrors.value[err.path[0]] &&
+          Object.keys(modelErrors.value[err.path[0]])
+        ) {
+          modelErrors.value[err.path[0]] = {
+            ...modelErrors.value[err.path[0]],
+            [err.path[1]]: err.message.replace(/"[^"]*"/g, err.context.key)
+          }
+        } else {
+          modelErrors.value[err.path[0]] = {
+            [err.path[1]]: err.message.replace(/"[^"]*"/g, err.context.key)
+          }
+        }
+      } else {
+        modelErrors.value[err.context.key] = err.message.replace(
+          /"[^"]*"/g,
+          err.context.key
+        )
+      }
+    })
+
+    console.log(modelErrors.value)
+  }
+  // submitting to api
+  // toast response
+}
 
 /** ================================================
  * LIFE CYCLE HOOKS
