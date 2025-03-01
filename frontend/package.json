@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "remove-dist": "rm -r dist",
+    "remove-vite": "rm -r node_modules/.vite",
     "format-fix": "prettier ./src --write",
     "format-check": "prettier ./src --check",
     "install-shared": "yarn add file:../shared",
