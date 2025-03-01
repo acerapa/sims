@@ -1,5 +1,6 @@
 <template>
   <CustomTable
+    class="w-[calc(100vw_-_328px)]"
     :has-filter="true"
     :data="filteredData"
     :has-pagination="true"
@@ -10,7 +11,7 @@
     @view="onView"
   >
     <template #table_header>
-      <div class="grid grid-cols-10 gap-3">
+      <div class="grid grid-cols-10 gap-3 min-w-[907px]">
         <div class="col-span-1 flex gap-3 items-center">
           <input type="checkbox" class="input" />
           <p class="table-header">#</p>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-9 gap-3 gen-table-row"
+    class="grid grid-cols-9 gap-3 gen-table-row min-w-[940px]"
     @click.stop="viewRow(props.branch.id)"
   >
     <div class="col-span-1 flex gap-3 items-center h-fit">

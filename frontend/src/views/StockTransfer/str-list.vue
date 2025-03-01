@@ -5,12 +5,13 @@
       :data="filteredData"
       :has-pagination="true"
       :row-prop-init="rowPropInit"
+      class="w-[calc(100vw_-_328px)]"
       v-model:search-text="searchText"
       @add-new-record="onAddNewRecord"
       :table-row-component="StrListRow"
     >
       <template #table_header>
-        <div class="grid grid-cols-8 gap-3">
+        <div class="grid grid-cols-8 gap-3 min-w-[1048px]">
           <div class="col-span-1 flex gap-3 items-center">
             <input type="checkbox" class="input" />
             <p class="table-header">#</p>

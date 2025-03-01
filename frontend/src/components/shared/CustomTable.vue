@@ -1,5 +1,5 @@
 <template>
-  <div class="relative shadow overflow-x-hidden">
+  <div class="relative overflow-x-hidden">
     <div class="table-wrapper w-full relative flex flex-col gap-4">
       <!-- Table tools -->
       <div class="sticky top-0">

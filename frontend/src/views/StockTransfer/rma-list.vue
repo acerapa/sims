@@ -6,12 +6,13 @@
       :has-pagination="true"
       :row-prop-init="rowInitProp"
       @add-new-record="onNewRecord"
+      class="w-[calc(100vw_-_328px)]"
       v-model:search-text="searchText"
       :table-row-component="RmaListRow"
       @view="onView"
     >
       <template #table_header>
-        <div class="grid grid-cols-10 gap-3">
+        <div class="grid grid-cols-10 gap-3 min-w-[790px]">
           <div class="col-span-1 flex gap-3 items-center">
             <input type="checkbox" class="input" />
             <p class="table-header">#</p>
