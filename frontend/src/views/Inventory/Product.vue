@@ -8,11 +8,11 @@
   <div class="w-[calc(100vw_-_328px)] flex gap-4 max-[1620px]:flex-col-reverse">
     <CustomTable
       @view="onView"
+      class="w-full"
       :has-filter="true"
       :has-add-btn="true"
       :data="filteredData"
       :has-pagination="true"
-      class="w-full"
       @add-new-record="onNewRecord"
       v-model:search-text="searchText"
       :row-prop-init="productRowEvent"

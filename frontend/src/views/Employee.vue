@@ -5,12 +5,12 @@
     v-if="showModal"
   />
   <CustomTable
-    class="relative"
     title="Employee table"
     :has-add-btn="true"
     :data="filteredData"
     :has-pagination="true"
     @add-new-record="onNewRecord"
+    class="w-[calc(100vw_-_328px)]"
     v-model:search-text="searchText"
     :row-prop-init="employeeRowEvent"
     :table-row-component="EmployeeRow"

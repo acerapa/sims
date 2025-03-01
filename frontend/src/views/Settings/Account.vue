@@ -11,6 +11,7 @@
       :data="filteredData"
       :has-pagination="true"
       v-model:is-edit="isEdit"
+      class="w-[calc(100vw_-_328px)]"
       :row-prop-init="accountRowEvent"
       v-model:search-text="searchText"
       :table-row-component="AccountRow"
@@ -18,7 +19,7 @@
       @view="onView"
     >
       <template #table_header>
-        <div class="grid grid-cols-8 gap-3">
+        <div class="grid grid-cols-8 gap-3 min-w-[495px]">
           <div class="col-span-1 flex gap-3 items-center">
             <input type="checkbox" class="input" />
             <p class="table-header">#</p>

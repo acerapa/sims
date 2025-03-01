@@ -1,9 +1,10 @@
 <template>
   <CustomTable
-    title="Sales Order List"
     :data="filteredData"
     :has-pagination="true"
+    title="Sales Order List"
     :row-prop-init="rowPropInit"
+    class="w-[calc(100vw_-_328px)]"
     @add-new-record="onAddNewRecord"
     v-model:search-text="searchText"
     :table-row-component="SalesOrderRow"

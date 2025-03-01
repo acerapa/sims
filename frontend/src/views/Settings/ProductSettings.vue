@@ -13,6 +13,7 @@
     <div class="flex flex-col gap-6">
       <CustomTable
         :has-pagination="true"
+        class="w-[calc(100vw_-_328px)]"
         title="Product Reordering Point"
         :data="filteredReorderingPoints"
         @add-new-record="onNewReorderingPoint"
@@ -37,6 +38,7 @@
         @view="onViewCategory"
         :has-check-box="false"
         title="Product Categories"
+        class="w-[calc(100vw_-_328px)]"
         :data="filteredProductCategories"
         @add-new-record="onNewProductCategory"
         :row-prop-init="productCategoryRowEvent"

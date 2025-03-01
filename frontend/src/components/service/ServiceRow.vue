@@ -13,10 +13,10 @@
     <p class="col-span-4 text-sm">
       {{ props.service.service_details.description }}
     </p>
-    <p class="col-span-1 text-end pr-3">
+    <p class="col-span-1 text-sm text-end pr-3">
       {{ parseFloat(props.service.price).toFixed(2) }}
     </p>
-    <p class="col-span-2 text-center">
+    <p class="col-span-2 text-sm text-center">
       {{
         new Date(props.service.createdAt).toLocaleString('default', {
           day: '2-digit',
