@@ -167,6 +167,8 @@ const reflectStockTransferToStock = async (data) => {
         })
       );
     }
+
+    // implement notification system here
   }
 };
 
