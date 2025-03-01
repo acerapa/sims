@@ -5,92 +5,100 @@
     :selected-id="selectedId"
   />
 
-  <CustomTable
-    :has-filter="true"
-    :has-add-btn="true"
-    :data="filteredData"
-    :has-pagination="true"
-    v-model:search-text="searchText"
-    :row-prop-init="productRowEvent"
-    :table-row-component="ProductRow"
-    @view="onView"
-    @add-new-record="onNewRecord"
-  >
-    <template #table_header>
-      <div class="grid grid-cols-9 gap-3 min-w-[907px]">
-        <div class="col-span-1 flex gap-3 items-center">
-          <input type="checkbox" class="input" />
-          <p class="table-header">#</p>
+  <div class="w-[calc(100vw_-_328px)] flex gap-4 max-[1620px]:flex-col-reverse">
+    <CustomTable
+      @view="onView"
+      :has-filter="true"
+      :has-add-btn="true"
+      :data="filteredData"
+      :has-pagination="true"
+      class="w-full"
+      @add-new-record="onNewRecord"
+      v-model:search-text="searchText"
+      :row-prop-init="productRowEvent"
+      :table-row-component="ProductRow"
+    >
+      <template #table_header>
+        <div class="grid grid-cols-9 gap-3 w-full min-w-[907px]">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-3 table-header">Name</p>
+          <p class="col-span-1 table-header">Item Code</p>
+          <p class="col-span-1 table-header text-end">Price</p>
+          <p class="col-span-1 table-header text-end pr-2">Stock</p>
+          <p class="col-span-1 table-header">Added on</p>
+          <p class="col-span-1 table-header">Status</p>
         </div>
-        <p class="col-span-3 table-header">Name</p>
-        <p class="col-span-1 table-header">Item Code</p>
-        <p class="col-span-1 table-header text-end">Price</p>
-        <p class="col-span-1 table-header text-end pr-2">Stock</p>
-        <p class="col-span-1 table-header">Added on</p>
-        <p class="col-span-1 table-header">Status</p>
-      </div>
-    </template>
+      </template>
 
-    <!-- filter contents -->
-    <template v-slot:filters>
-      <div class="flex flex-col gap-3 mt-3">
-        <CustomInput
-          type="select"
-          name="Category"
-          :has-label="true"
-          label="Select Category"
-          v-model="filters.category"
-          :options="categoryOptions"
-          placeholder="Select Category"
-          @reset="filters.category = null"
-        />
-        <div>
-          <small>Added on</small>
-          <div class="flex gap-3">
-            <CustomInput
-              type="date"
-              name="date_from"
-              placeholder="From"
-              v-model="filters.added_on_from"
-              @reset="filters.added_on_from = ''"
-              input-class="min-w-[200px] max-h-[38px]"
-            />
-            <CustomInput
-              type="date"
-              name="date_to"
-              placeholder="To"
-              v-model="filters.added_on_to"
-              @reset="filters.added_on_to = ''"
-              input-class="min-w-[200px] max-h-[38px]"
-            />
+      <!-- filter contents -->
+      <template v-slot:filters>
+        <div class="flex flex-col gap-3 mt-3">
+          <CustomInput
+            type="select"
+            name="Category"
+            :has-label="true"
+            label="Select Category"
+            v-model="filters.category"
+            :options="categoryOptions"
+            placeholder="Select Category"
+            @reset="filters.category = null"
+          />
+          <div>
+            <small>Added on</small>
+            <div class="flex gap-3">
+              <CustomInput
+                type="date"
+                name="date_from"
+                placeholder="From"
+                v-model="filters.added_on_from"
+                @reset="filters.added_on_from = ''"
+                input-class="min-w-[200px] max-h-[38px]"
+              />
+              <CustomInput
+                type="date"
+                name="date_to"
+                placeholder="To"
+                v-model="filters.added_on_to"
+                @reset="filters.added_on_to = ''"
+                input-class="min-w-[200px] max-h-[38px]"
+              />
+            </div>
+          </div>
+          <div>
+            <small>Stocks</small>
+            <div class="flex gap-3">
+              <CustomInput
+                name="from"
+                label="From"
+                type="number"
+                :has-label="true"
+                placeholder="From"
+                v-model="filters.stock_from"
+                @reset="filters.stock_from = null"
+              />
+              <CustomInput
+                name="to"
+                label="From"
+                type="number"
+                :has-label="true"
+                placeholder="To"
+                v-model="filters.stock_to"
+                @reset="filters.stock_to = null"
+              />
+            </div>
           </div>
         </div>
-        <div>
-          <small>Stocks</small>
-          <div class="flex gap-3">
-            <CustomInput
-              name="from"
-              label="From"
-              type="number"
-              :has-label="true"
-              placeholder="From"
-              v-model="filters.stock_from"
-              @reset="filters.stock_from = null"
-            />
-            <CustomInput
-              name="to"
-              label="From"
-              type="number"
-              :has-label="true"
-              placeholder="To"
-              v-model="filters.stock_to"
-              @reset="filters.stock_to = null"
-            />
-          </div>
-        </div>
-      </div>
-    </template>
-  </CustomTable>
+      </template>
+    </CustomTable>
+    <div class="cont min-w-80 h-fit !py-0">
+      <p class="my-3">📣 Alerts and Notifications</p>
+      <hr class="-mx-4" />
+      <p class="text-sm text-center my-6">No Alerts and Notifications</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
