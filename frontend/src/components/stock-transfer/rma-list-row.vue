@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-10 gap-3 gen-table-row items-center"
+    class="grid grid-cols-10 gap-3 gen-table-row items-center min-w-[790px]"
     @click="emit('view', props.rma.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">

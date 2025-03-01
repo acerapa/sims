@@ -9,6 +9,7 @@ import sales from '@/assets/icons/sales.png'
 import {
   InventoryConst,
   PurchaseConst,
+  SalesConst,
   SettingConst,
   TransferConst
 } from '@/const/route.constants'
@@ -65,23 +66,23 @@ export default [
   },
   {
     text: 'Sales & Orders',
-    route: 'sales',
+    route: SalesConst.SALES,
     icon: sales,
     children: [
       {
         text: 'Sales Order',
-        route: 'sales-order',
+        route: SalesConst.SALES_ORDER,
         icon: outlineDot,
-        includes_active: ['sales-order-form']
+        includes_active: [SalesConst.SALES_ORDER_FORM]
       },
       {
         text: 'Customers',
-        route: 'customers',
+        route: SalesConst.CUSTOMERS,
         icon: outlineDot
       },
       {
         text: 'Item Details',
-        route: 'item-details',
+        route: SalesConst.ITEM_DETAILS,
         icon: outlineDot
       }
     ]

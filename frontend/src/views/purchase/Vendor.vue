@@ -9,6 +9,7 @@
       :has-add-btn="true"
       :data="filteredData"
       :has-pagination="true"
+      class="w-[calc(100vw_-_328px)]"
       :row-prop-init="vendorRowEvent"
       v-model:search-text="searchText"
       :table-row-component="VendorRow"

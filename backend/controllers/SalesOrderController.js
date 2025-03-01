@@ -1,19 +1,110 @@
+const { sequelize } = require("../models");
+const Address = require("../models/address");
+const SalesOrderProduct = require("../models/junction/sales-order-product");
+const Product = require("../models/product");
 const SalesOrder = require("../models/sales-order");
+const {
+  findSalesOrder,
+  updateSalesOrder,
+} = require("../services/SalesOrderService");
 
 module.exports = {
-  register: async (req, res) => {
+  all: async (req, res) => {
     try {
-      await SalesOrder.create(req.body.validated);
-      res.sendResponse({}, "Sales order created successfully", 200);
+      const orders = await SalesOrder.findAll({
+        order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: Address,
+            as: "shipment_address",
+          },
+          {
+            model: Product,
+            as: "products",
+          },
+        ],
+      });
+      res.sendResponse({ orders }, "Sales orders fetched successfully", 200);
     } catch (error) {
       res.sendError(error, "Something went wrong", 400);
     }
   },
 
-  all: async (req, res) => {
+  byId: async (req, res) => {
     try {
-      const salesOrders = await SalesOrder.findAll();
-      res.sendResponse(salesOrders, "Sales orders fetched successfully", 200);
+      const order = await findSalesOrder(req.params.id);
+
+      res.sendResponse({ order }, "Sales order fetched successfully", 200);
+    } catch (error) {
+      res.sendError(error, "Something went wrong", 400);
+    }
+  },
+
+  register: async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+      const data = req.body.validated;
+      let salesOrder = null;
+
+      let shipmentAddress = null;
+      if (data.shipment_address) {
+        shipmentAddress = await Address.create(data.shipment_address, {
+          transaction,
+        });
+      }
+
+      if (data.sales_order) {
+        salesOrder = await SalesOrder.create(
+          { ...data.sales_order, shipment_address_id: shipmentAddress.id },
+          { transaction }
+        );
+      }
+
+      if (data.sales_order_products && salesOrder) {
+        await Promise.all(
+          data.sales_order_products.map((salesProduct) => {
+            return SalesOrderProduct.create(
+              { ...salesProduct, sales_order_id: salesOrder.id },
+              { transaction }
+            );
+          })
+        );
+      }
+
+      await transaction.commit();
+
+      const order = await findSalesOrder(salesOrder.id);
+      res.sendResponse({ order }, "Sales order created successfully", 200);
+    } catch (error) {
+      await transaction.rollback();
+      res.sendError(error, "Something went wrong", 400);
+    }
+  },
+
+  update: async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+      const data = req.body.validated;
+      await updateSalesOrder(req.params.id, data, transaction);
+      await transaction.commit();
+
+      const order = await findSalesOrder(req.params.id);
+      res.sendResponse({ order }, "Sales order updated successfully", 200);
+    } catch (error) {
+      await transaction.rollback();
+      res.sendError(error, "Something went wrong", 400);
+    }
+  },
+
+  destroy: async (req, res) => {
+    try {
+      await SalesOrder.destroy({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      res.sendResponse({}, "Sales order deleted successfully", 200);
     } catch (error) {
       res.sendError(error, "Something went wrong", 400);
     }

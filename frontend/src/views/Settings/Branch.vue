@@ -2,18 +2,18 @@
   <BranchModal v-model="showModal" v-if="showModal" :selected-id="selectedId" />
   <div class="flex flex-col gap-4">
     <CustomTable
-      class="relative"
       title="Branch List"
       :data="filterData"
       :has-pagination="true"
       :row-prop-init="rowPropInit"
+      class="w-[calc(100vw_-_328px)]"
       v-model:search-text="searchText"
       :table-row-component="BranchRow"
       @view="onView"
       @add-new-record="onNewRecord()"
     >
       <template #table_header>
-        <div class="grid grid-cols-9 gap-3">
+        <div class="grid grid-cols-9 gap-3 min-w-[940px]">
           <div class="col-span-1 flex gap-3 items-center">
             <input type="checkbox" class="input" />
             <p class="table-header">#</p>

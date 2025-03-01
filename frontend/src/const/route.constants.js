@@ -21,6 +21,14 @@ export const PurchaseConst = Object.freeze({
   VENDORS: 'vendors'
 })
 
+export const SalesConst = Object.freeze({
+  SALES: 'sales',
+  SALES_ORDER: 'sales-order',
+  SALES_ORDER_FORM: 'sales-order-form',
+  CUSTOMERS: 'customers',
+  ITEM_DETAILS: 'item-details'
+})
+
 export const TransferConst = Object.freeze({
   TRANSFER: 'transfer',
   STR_LIST: 'str-list',

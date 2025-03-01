@@ -5,13 +5,14 @@
       title="Fix Asset List"
       :has-pagination="true"
       :row-prop-init="rowPropInit"
+      class="w-[calc(100vw_-_328px)]"
       @add-new-record="onAddNewRecord"
       v-model:search-text="searchText"
       :table-row-component="FixAssetRow"
       @view="onView"
     >
       <template #table_header>
-        <div class="grid grid-cols-7 gap-3">
+        <div class="grid grid-cols-7 gap-3 min-w-[740px]">
           <div class="col-span-1 flex gap-3 items-center">
             <input type="checkbox" class="input" />
             <p class="table-header">#</p>

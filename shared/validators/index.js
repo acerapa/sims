@@ -6,6 +6,7 @@ const AccountValidators = require("./account");
 const TransferValidators = require("./transfer");
 const CustomerValidators = require("./customer");
 const SalesOrderValidators = require("./sales-order");
+const NotificationValidators = require("./notification");
 const PurchaseOrderValidators = require("./purchase-order");
 
 const Joi = require("joi");
@@ -20,5 +21,6 @@ module.exports = {
   ...TransferValidators,
   ...CustomerValidators,
   ...SalesOrderValidators,
+  ...NotificationValidators,
   ...PurchaseOrderValidators,
 };

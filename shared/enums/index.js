@@ -158,6 +158,53 @@ const SalesOrderType = Object.freeze({
   INSTALLMENT: "installment",
 });
 
+const SalesOrderTypeMap = Object.freeze({
+  [SalesOrderType.CASH]: {
+    text: "Cash",
+    class: "sales-types-cash",
+  },
+  [SalesOrderType.INSTALLMENT]: {
+    text: "Installment",
+    class: "sales-types-installment",
+  },
+});
+
+const SalesOrderStatus = Object.freeze({
+  OPEN: "open",
+  CONFIRMED: "confirmed",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
+  OVERDUE: "overdue",
+});
+
+const SalesOrderStatusMap = Object.freeze({
+  [SalesOrderStatus.OPEN]: {
+    text: "Open",
+    class: "purchase-status-open",
+  },
+  [SalesOrderStatus.CONFIRMED]: {
+    text: "Confirmed",
+    class: "purchase-status-confirmed",
+  },
+  [SalesOrderStatus.COMPLETED]: {
+    text: "Completed",
+    class: "purchase-status-completed",
+  },
+  [SalesOrderStatus.CANCELLED]: {
+    text: "Cancelled",
+    class: "purchase-status-cancelled",
+  },
+  [SalesOrderStatus.OVERDUE]: {
+    text: "Overdue",
+    class: "purchase-status-overdue",
+  },
+});
+
+const NotificationStatus = Object.freeze({
+  UNREAD: "unread",
+  READ: "read",
+});
+
 const ConsoleColors = {
   RED: "\x1b[31m",
   BLUE: "\x1b[34m",
@@ -178,10 +225,14 @@ module.exports = {
   SalesOrderType,
   BranchStatusMap,
   LocalStorageKeys,
+  SalesOrderStatus,
   PurchaseOrderType,
   PurchaseStatusMap,
+  SalesOrderTypeMap,
+  NotificationStatus,
   StockTransferStatus,
   PurchaseOrderStatus,
+  SalesOrderStatusMap,
   ProductOrderedStatus,
   ProductTransferStatus,
   StockTransferStatusMap,

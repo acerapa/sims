@@ -5,6 +5,7 @@
     :selected-id="selectedId"
   />
   <CustomTable
+    :class="`w-[calc(100vw_-_${328}px)]`"
     :data="filteredData"
     title="Customer List"
     :has-pagination="true"
@@ -19,12 +20,14 @@
     @view="onView"
   >
     <template #table_header>
-      <div class="grid grid-cols-5 gap-3">
+      <div class="grid grid-cols-8 gap-3 min-w-[888px]">
         <div class="col-span-1 flex gap-3 items-center">
           <input type="checkbox" class="input" />
           <p class="font-bold">#</p>
         </div>
         <p class="col-span-2 table-header">Name</p>
+        <p class="col-span-4 table-header">Address</p>
+        <p class="col-span-1 table-header">Phone</p>
       </div>
     </template>
   </CustomTable>

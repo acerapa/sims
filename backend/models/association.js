@@ -18,6 +18,28 @@ const ProductToCategories = require("./junction/product-to-categories");
 const ProductDetails = require("./product-details");
 const ServiceDetails = require("./service-details");
 const StockTransferProducts = require("./junction/stock-transfer-products");
+const SalesOrder = require("./sales-order");
+const SalesOrderProduct = require("./junction/sales-order-product");
+
+// Sales Order, Product, Address and Sales Order Product Relations
+SalesOrder.belongsToMany(Product, {
+  through: SalesOrderProduct,
+  foreignKey: "sales_order_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(SalesOrder, {
+  through: SalesOrderProduct,
+  foreignKey: "product_id",
+  otherKey: "sales_order_id",
+  as: "sales_orders",
+});
+
+SalesOrder.belongsTo(Address, {
+  foreignKey: "shipment_address_id",
+  as: "shipment_address",
+});
 
 // Purchase Order, Purchase Order Product and Product Relations
 PurchaseOrder.belongsToMany(Product, {

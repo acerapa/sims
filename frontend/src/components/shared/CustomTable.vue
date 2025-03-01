@@ -1,6 +1,7 @@
 <template>
-  <div class="w-full relative">
+  <div class="relative overflow-x-hidden">
     <div class="table-wrapper w-full relative flex flex-col gap-4">
+      <!-- Table tools -->
       <div class="sticky top-0">
         <!-- filter -->
         <div ref="filter">
@@ -88,6 +89,8 @@
 
         <hr class="bg-gray-50 -mx-4 mt-3" v-if="props.hasTools" />
       </div>
+
+      <!-- Table body -->
       <div
         class="flex flex-col gap-7 w-full pb-5 overflow-x-auto overflow-y-hidden"
       >
@@ -136,6 +139,8 @@
           name="table_body"
         ></slot>
       </div>
+
+      <!-- Table pagination -->
       <Paginate
         class="ml-auto mr-0"
         v-if="props.hasPagination && items.length"

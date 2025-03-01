@@ -21,12 +21,12 @@
       New Purchase Order
     </RouterLink>
     <CustomTable
-      class="relative"
       :has-filter="true"
       :data="filteredData"
       :has-add-btn="false"
       :has-pagination="true"
       v-model:show-modal="showModal"
+      class="w-[calc(100vw_-_328px)]"
       v-model:search-text="searchText"
       :row-prop-init="purchaseOrderRowEvent"
       :table-row-component="PurchaseOrderRow"
