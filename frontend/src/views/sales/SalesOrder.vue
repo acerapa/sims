@@ -5,6 +5,7 @@
     :has-pagination="true"
     :row-prop-init="rowPropInit"
     @add-new-record="onAddNewRecord"
+    v-model:search-text="searchText"
     :table-row-component="SalesOrderRow"
     @view="onView"
   >
@@ -30,12 +31,14 @@ import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import SalesOrderRow from '../../components/sales/SalesOrderRow.vue'
 import { useSalesStore } from '@/stores/sales'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { SalesConst } from '@/const/route.constants'
 
 const router = useRouter()
 const salesStore = useSalesStore()
+
+const searchText = ref('')
 
 /** ================================================
  * EVENTS
@@ -51,7 +54,15 @@ Event.on(rowPropInit, (data) => {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return salesStore.salesOrders.filter((salesOrder) => salesOrder)
+  return salesStore.salesOrders
+    .filter((salesOrder) => salesOrder)
+    .filter((salesOrder) => {
+      const searchCondition =
+        `${salesOrder.type} ${parseFloat(salesOrder.total).toFixed(2)}  ${salesOrder.status} ${salesOrder.purchase_date} ${salesOrder.bill_due}`.toLowerCase()
+      return searchText.value
+        ? searchCondition.includes(searchText.value.toLowerCase())
+        : true
+    })
 })
 
 /** ================================================

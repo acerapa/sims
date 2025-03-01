@@ -200,6 +200,11 @@ const SalesOrderStatusMap = Object.freeze({
   },
 });
 
+const NotificationStatus = Object.freeze({
+  UNREAD: "unread",
+  READ: "read",
+});
+
 const ConsoleColors = {
   RED: "\x1b[31m",
   BLUE: "\x1b[34m",
@@ -224,6 +229,7 @@ module.exports = {
   PurchaseOrderType,
   PurchaseStatusMap,
   SalesOrderTypeMap,
+  NotificationStatus,
   StockTransferStatus,
   PurchaseOrderStatus,
   SalesOrderStatusMap,
