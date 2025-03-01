@@ -212,7 +212,7 @@ const defaultModel = {
     purchase_date: '',
     delivery_date: '',
     bill_due: '',
-    status: SalesOrderStatus.OPEN
+    status: 'open'
   },
   shipment_address: {
     address1: '',
