@@ -44,16 +44,13 @@ import { useRoute } from 'vue-router'
 import NotificationBell from '@/assets/icons/notification-bell.png'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
+import { useNotificationStore } from '@/stores/notification'
 
 const route = useRoute()
 const appStore = useAppStore()
+const { notifications } = useNotificationStore()
 
 const showNotifications = ref(false)
-
-const notifications = [
-  'Hello! we have some upcoming products!',
-  'Product a is almost out of stock'
-]
 
 /** ================================================
  * EVENTS
@@ -62,6 +59,9 @@ Event.on(EventEnum.GLOBAL_CLICK, () => {
   showNotifications.value = false
 })
 
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
 // currently changing the design, This part might to be usable in the next update
 const title = computed(() => {
   let t = route.meta.title
