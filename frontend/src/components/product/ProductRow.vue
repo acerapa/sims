@@ -43,7 +43,7 @@
         v-if="
           props.product.product_details.stock &&
           props.product.product_details.product_setting &&
-          props.product.product_details.stock <
+          props.product.product_details.stock <=
             props.product.product_details.product_setting.point
         "
         class="status text-sm bg-opacity-20 text-yellow-500 bg-yellow-500 flex-shrink-0"
