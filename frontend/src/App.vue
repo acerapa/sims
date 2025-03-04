@@ -10,10 +10,15 @@ import { RouterView } from 'vue-router'
 import { EventEnum } from './data/event'
 import PageLoader from './components/shared/PageLoader.vue'
 import { useAppStore } from './stores/app'
+import { useNotificationStore } from './stores/notification'
 
 const appStore = useAppStore()
 
-onMounted(() => {
+const notificationStore = useNotificationStore()
+
+onMounted(async () => {
+  await notificationStore.fetchNotifications()
+
   window.addEventListener('click', () => {
     Event.emit(EventEnum.GLOBAL_CLICK)
   })

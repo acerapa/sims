@@ -10,23 +10,14 @@ export const useNotificationStore = defineStore('notification', () => {
     const isSuccess = res.status < 400
 
     if (isSuccess) {
-      notifications.value = res.data
+      notifications.value = res.data.notifications
     }
 
     return isSuccess
   }
 
-  const getNotifications = async () => {
-    if (!notifications.value.length) {
-      await fetchNotifications()
-    }
-
-    return notifications.value
-  }
-
   return {
     notifications,
-    getNotifications,
     fetchNotifications
   }
 })
