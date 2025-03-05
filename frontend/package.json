@@ -20,6 +20,7 @@
     "pinia": "^2.1.7",
     "postcss": "^8.4.38",
     "shared": "file:../shared",
+    "socket.io-client": "^4.8.1",
     "tailwindcss": "^3.4.3",
     "vue": "^3.4.21",
     "vue-router": "^4.3.2"

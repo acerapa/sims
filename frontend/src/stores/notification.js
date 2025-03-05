@@ -21,6 +21,10 @@ export const useNotificationStore = defineStore('notification', () => {
     return isSuccess
   }
 
+  const notifFromSocket = (notification) => {
+    notifications.value.unshift(notification)
+  }
+
   const updateNotification = async (notification, id) => {
     if (Object.keys(notification).includes('id')) delete notification.id
     if (Object.keys(notification).includes('createdAt'))
@@ -50,6 +54,7 @@ export const useNotificationStore = defineStore('notification', () => {
     notifications,
     unreadNotifications,
 
+    notifFromSocket,
     fetchNotifications,
     updateNotification
   }
