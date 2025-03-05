@@ -1,6 +1,17 @@
 const express = require("express");
+const { createServer } = require("http");
+const { initializeSocket } = require("./socket");
+
 const app = express();
 const cors = require("cors");
+
+const server = createServer(app);
+initializeSocket(server);
+
+const { startNotificationSocketNamespace } = require("./socket/notification");
+
+// notification socket
+startNotificationSocketNamespace();
 
 // enable env config
 require("dotenv").config();
@@ -29,4 +40,4 @@ app.use(responseFormatter);
 const apiRoutes = require("./routes/apiRoutes");
 app.use("/api", apiRoutes);
 
-app.listen(port, console.log(`Server is running on port ${port}`));
+server.listen(port, console.log(`Server is running on port ${port}`));

@@ -49,20 +49,36 @@
 
 <script setup>
 import { useAppStore } from '@/stores/app'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import NotificationBell from '@/assets/icons/notification-bell.png'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { useNotificationStore } from '@/stores/notification'
 import { NotificationStatus } from 'shared'
+import { useNotificationSocket } from '@/composables/useNotifiacationSocket'
 
 const route = useRoute()
 const appStore = useAppStore()
-const { notifications, unreadNotifications, updateNotification } =
-  useNotificationStore()
+const {
+  notifications,
+  unreadNotifications,
+  notifFromSocket,
+  updateNotification
+} = useNotificationStore()
+
+const { socket } = useNotificationSocket()
 
 const showNotifications = ref(false)
+
+/** ================================================
+ * SOCKET EVENTS
+ ** ================================================*/
+const initializeSocketEvents = () => {
+  socket.value.on('new_notification', (notification) => {
+    notifFromSocket(notification)
+  })
+}
 
 /** ================================================
  * EVENTS
@@ -99,6 +115,13 @@ const onClickNotification = async (notification) => {
   notification.status = NotificationStatus.READ
   await updateNotification(notification, notification.id)
 }
+
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
+onMounted(() => {
+  initializeSocketEvents()
+})
 </script>
 
 <style scoped>
