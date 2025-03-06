@@ -7,10 +7,10 @@
         @click.stop="showNotifications = !showNotifications"
       >
         <span
-          v-if="unreadNotifications.length"
+          v-if="notificationStore.unreadNotification.length"
           class="absolute bg-red-500 text-white px-2 -top-1.5 right-0 rounded-lg"
         >
-          {{ unreadNotifications.length }}
+          {{ notificationStore.unreadNotification.length }}
         </span>
         <img class="w-8" :src="NotificationBell" alt="notification-icon.png" />
       </button>
@@ -34,7 +34,7 @@
           <div
             class="notification-row"
             :class="notif.status === NotificationStatus.UNREAD && 'bg-blue-200'"
-            v-for="notif in notifications"
+            v-for="notif in notificationStore.notifications"
             :key="notif"
             @click="onClickNotification(notif)"
           >
@@ -60,12 +60,7 @@ import { useNotificationSocket } from '@/composables/useNotifiacationSocket'
 
 const route = useRoute()
 const appStore = useAppStore()
-const {
-  notifications,
-  unreadNotifications,
-  notifFromSocket,
-  updateNotification
-} = useNotificationStore()
+const notificationStore = useNotificationStore()
 
 const { socket } = useNotificationSocket()
 
@@ -75,8 +70,8 @@ const showNotifications = ref(false)
  * SOCKET EVENTS
  ** ================================================*/
 const initializeSocketEvents = () => {
-  socket.value.on('new_notification', (notification) => {
-    notifFromSocket(notification)
+  socket.value.on('new-notification', (notification) => {
+    notificationStore.notifFromSocket(notification)
   })
 }
 
@@ -113,7 +108,7 @@ const title = computed(() => {
 const onClickNotification = async (notification) => {
   if (notification.status === NotificationStatus.READ) return
   notification.status = NotificationStatus.READ
-  await updateNotification(notification, notification.id)
+  await notificationStore.updateNotification(notification, notification.id)
 }
 
 /** ================================================

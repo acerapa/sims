@@ -6,7 +6,7 @@ import { computed, ref } from 'vue'
 export const useNotificationStore = defineStore('notification', () => {
   const notifications = ref([])
 
-  const unreadNotifications = computed(() =>
+  const unreadNotification = computed(() =>
     notifications.value.filter((n) => n.status === NotificationStatus.UNREAD)
   )
 
@@ -22,7 +22,7 @@ export const useNotificationStore = defineStore('notification', () => {
   }
 
   const notifFromSocket = (notification) => {
-    notifications.value.unshift(notification)
+    notifications.value = [notification, ...notifications.value]
   }
 
   const updateNotification = async (notification, id) => {
@@ -52,7 +52,7 @@ export const useNotificationStore = defineStore('notification', () => {
 
   return {
     notifications,
-    unreadNotifications,
+    unreadNotification,
 
     notifFromSocket,
     fetchNotifications,
