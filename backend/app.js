@@ -6,12 +6,14 @@ const app = express();
 const cors = require("cors");
 
 const server = createServer(app);
-initializeSocket(server);
+const io = initializeSocket(server);
 
-const { startNotificationSocketNamespace } = require("./socket/notification");
+const {
+  startNotificationSocketNamespace,
+} = require("./socket/namespaces/notification");
 
 // notification socket
-startNotificationSocketNamespace();
+startNotificationSocketNamespace(io);
 
 // enable env config
 require("dotenv").config();

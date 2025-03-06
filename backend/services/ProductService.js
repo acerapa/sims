@@ -6,6 +6,7 @@ const ProductDetails = require("../models/product-details");
 const ProductSettings = require("../models/product-setting");
 const Supplier = require("../models/supplier");
 const Notification = require("../models/notification");
+const { getNotificationSocket } = require("../socket/namespaces/notification");
 
 const groupCategories = (cts) => {
   const categories = [...cts];
@@ -71,10 +72,13 @@ const reorderingProductNotification = async (product, newStock) => {
   if (!product.product_details.product_setting) return;
 
   if (newStock <= product.product_details.product_setting.point) {
-    await Notification.create({
+    const notify = await Notification.create({
       title: `Product ${product.name} is runnning low`,
       description: "Please decide to reorder this product",
     });
+
+    const notificationSocket = getNotificationSocket();
+    notificationSocket.emit("new-notification", notify);
   }
 };
 

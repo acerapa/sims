@@ -1,4 +1,7 @@
-const router = require("express").Router();
+const { Router } = require("express");
+const router = Router();
+const testRoutes = Router();
+
 // start use routes
 const authRoutes = require("./AuthRoutes");
 router.use("/auth", authRoutes);
@@ -45,5 +48,12 @@ router.use("/customers", customerRoutes);
 const notificationRoutes = require("./NotificationRoutes");
 router.use("/notifications", notificationRoutes);
 // end use routes
+
+// testing
+const testingRoutes = require("./TestingRoutes");
+testRoutes.use(testingRoutes);
+
+// include test routes
+router.use("/test", testRoutes);
 
 module.exports = router;

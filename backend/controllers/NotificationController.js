@@ -3,7 +3,9 @@ const Notification = require("../models/notification");
 module.exports = {
   all: async (req, res) => {
     try {
-      const notifications = await Notification.findAll();
+      const notifications = await Notification.findAll({
+        order: [["createdAt", "DESC"]],
+      });
       res.sendResponse(
         { notifications },
         "Notification fetched successfully",
