@@ -1,19 +1,30 @@
 <template>
   <div class="pg-btn-wrapper">
-    <button class="pg-btn" @click="navigatePagination('prev')">&Lt;</button>
     <button
-      v-for="n in btnNums"
+      class="pg-btn border border-primary"
+      @click="navigatePagination('prev')"
+    >
+      &Lt;
+    </button>
+    <button
+      v-for="n in generatedPageBtn"
       :key="n"
-      @click="currentActivePage = n"
+      @click="currentActivePage = n != '...' ? n : currentActivePage"
       :class="n == currentActivePage ? 'pg-btn-active' : 'pg-btn'"
     >
       {{ n }}
     </button>
-    <button class="pg-btn" @click="navigatePagination('next')">&Gt;</button>
+    <button
+      class="pg-btn border border-primary"
+      @click="navigatePagination('next')"
+    >
+      &Gt;
+    </button>
   </div>
 </template>
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { GeneralHelpers } from 'shared'
 
 const props = defineProps({
   data: {
@@ -25,6 +36,8 @@ const props = defineProps({
     required: 0
   }
 })
+
+const maxBtnNum = 7
 
 const currentActivePage = ref(1)
 
@@ -43,6 +56,47 @@ const paginatedData = computed(() => {
   }
 
   return pgData
+})
+
+const generatedPageBtn = computed(() => {
+  let items = []
+  if (btnNums.value <= maxBtnNum) {
+    items = GeneralHelpers.getRange(1, btnNums.value + 1)
+  } else {
+    let pagiPadding = Math.ceil(maxBtnNum / 2)
+
+    // get left
+    if (currentActivePage.value <= pagiPadding) {
+      items.push(1, 2)
+    } else {
+      items.push(1, '...')
+    }
+
+    // get middle
+    let midItemNum = maxBtnNum - pagiPadding
+    if (currentActivePage.value <= midItemNum) {
+      items.push(...GeneralHelpers.getRange(3, 3 + midItemNum))
+    } else {
+      let base = currentActivePage.value - 1
+      let startPointStoper = btnNums.value - (1 + midItemNum)
+      let endPointStoper = btnNums.value - 1
+
+      let startPoint = base < startPointStoper ? base : startPointStoper
+      let endPoint =
+        base + midItemNum >= endPointStoper ? endPointStoper : base + midItemNum
+
+      items.push(...GeneralHelpers.getRange(startPoint, endPoint))
+    }
+
+    // get right
+    if (btnNums.value - currentActivePage.value >= pagiPadding) {
+      items.push('...', btnNums.value)
+    } else {
+      items.push(btnNums.value - 1, btnNums.value)
+    }
+  }
+
+  return items
 })
 
 const currentItems = defineModel('currentItems')
@@ -75,8 +129,7 @@ watch(
 </script>
 <style scoped>
 .pg-btn {
-  @apply border-primary
-    border text-primary
+  @apply text-primary
     rounded text-xs
     font-bold px-1
     hover:bg-primary
