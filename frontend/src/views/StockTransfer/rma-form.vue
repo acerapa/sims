@@ -12,6 +12,7 @@
     >
       <SelectStatusDropdown
         v-model="model.transfer.status"
+        :status-map="StockTransferStatusMap"
         :class="isCancelled || isCompleted ? 'pointer-events-none' : ''"
       />
       <button type="button" class="btn float-right">&#128438; Print</button>
@@ -147,7 +148,11 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { useVendorStore } from '@/stores/supplier'
 import { computed, onMounted, ref, watch } from 'vue'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
-import { StockTransferStatus, TransferType } from 'shared/enums'
+import {
+  StockTransferStatus,
+  StockTransferStatusMap,
+  TransferType
+} from 'shared/enums'
 import { useRoute, useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import { useAppStore } from '@/stores/app'

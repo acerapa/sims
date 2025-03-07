@@ -10,7 +10,16 @@
       class="flex items-center justify-end gap-3 absolute top-4 right-4"
       v-if="route.query.id"
     >
-      <SelectStatusDropdown v-model="model.transfer.status" />
+      <SelectStatusDropdown
+        v-model="model.transfer.status"
+        :status-map="StockTransferStatusMap"
+        :class="
+          transferStore.transfer &&
+          transferStore.transfer.status === StockTransferStatus.COMPLETED
+            ? 'pointer-events-none'
+            : ''
+        "
+      />
       <button type="button" class="btn float-right">&#128438; Print</button>
     </div>
     <p class="text-base font-bold">Fix asset form</p>
@@ -116,7 +125,11 @@ import ProductSelectRow from '@/components/stock-transfer/ProductSelectRow.vue'
 import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
-import { StockTransferStatus, TransferType } from 'shared/enums'
+import {
+  StockTransferStatus,
+  StockTransferStatusMap,
+  TransferType
+} from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useTransferStore } from '@/stores/transfer'
