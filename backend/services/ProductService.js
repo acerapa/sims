@@ -5,6 +5,8 @@ const ProductCategory = require("../models/product-category");
 const ProductDetails = require("../models/product-details");
 const ProductSettings = require("../models/product-setting");
 const Supplier = require("../models/supplier");
+const Notification = require("../models/notification");
+const { getNotificationSocket } = require("../socket/namespaces/notification");
 
 const groupCategories = (cts) => {
   const categories = [...cts];
@@ -66,7 +68,22 @@ const findProduct = async (id) => {
   });
 };
 
+const reorderingProductNotification = async (product, newStock) => {
+  if (!product.product_details.product_setting) return;
+
+  if (newStock <= product.product_details.product_setting.point) {
+    const notify = await Notification.create({
+      title: `Product ${product.name} is runnning low`,
+      description: "Please decide to reorder this product",
+    });
+
+    const notificationSocket = getNotificationSocket();
+    notificationSocket.emit("new-notification", notify);
+  }
+};
+
 module.exports = {
   findProduct,
   groupCategories,
+  reorderingProductNotification,
 };

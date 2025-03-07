@@ -7,6 +7,8 @@ const StockTransfer = require("../models/stock-transfer");
 const Supplier = require("../models/supplier");
 const User = require("../models/user");
 const { Op } = require("sequelize");
+const ProductSettings = require("../models/product-setting");
+const { reorderingProductNotification } = require("./ProductService");
 
 const findTransfer = async (id) => {
   return await StockTransfer.findOne({
@@ -140,11 +142,16 @@ const reflectStockTransferToStock = async (data) => {
           [Op.in]: data.products.map((p) => p.product_id),
         },
       },
-      attributes: ["id"],
+      attributes: ["id", "name"],
       include: {
         model: ProductDetails,
         as: "product_details",
         attributes: ["id", "stock"],
+        include: {
+          model: ProductSettings,
+          as: "product_setting",
+          attributes: ["point"],
+        },
       },
     });
 
@@ -152,23 +159,37 @@ const reflectStockTransferToStock = async (data) => {
       await Promise.all(
         products.map((p) => {
           const productData = data.products.find((pd) => pd.product_id == p.id);
-          return p.product_details.update({
-            stock: p.product_details.stock + productData.quantity,
-          });
+
+          // we can implement the notification here
+          const newProductStock =
+            p.product_details.stock + productData.quantity;
+
+          return Promise.all([
+            p.product_details.update({
+              stock: p.product_details.stock + productData.quantity,
+            }),
+            reorderingProductNotification(p, newProductStock),
+          ]);
         })
       );
     } else {
       await Promise.all(
         products.map((p) => {
           const productData = data.products.find((pd) => pd.product_id == p.id);
-          return p.product_details.update({
-            stock: p.product_details.stock - productData.quantity,
-          });
+
+          // we can implement the notification here
+          const newProductStock =
+            p.product_details.stock - productData.quantity;
+
+          return Promise.all([
+            p.product_details.update({
+              stock: p.product_details.stock - productData.quantity,
+            }),
+            reorderingProductNotification(p, newProductStock),
+          ]);
         })
       );
     }
-
-    // implement notification system here
   }
 };
 

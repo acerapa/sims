@@ -1,41 +1,4 @@
 <template>
-  <ModalWrapper
-    title="Update order status"
-    v-if="statusModal"
-    v-model="statusModal"
-    :save-btn="'Done'"
-    @submit="statusModal = false"
-  >
-    <form action="" method="post" class="mt-7">
-      <fieldset class="flex gap-4 justify-center">
-        <label
-          class="flex gap-3 items-center"
-          v-for="(st, ndx) in Object.values(PurchaseStatusMap).filter(
-            (s) => s.text !== 'Completed'
-          )"
-          :key="ndx"
-          :for="st.text"
-        >
-          <input
-            type="radio"
-            name="status"
-            :id="st.text"
-            class="cursor-pointer"
-            v-model="model.order.status"
-            :value="st.text.toLowerCase()"
-            @change="
-              () => {
-                selectedStatus = PurchaseStatusMap[model.order.status]
-                onSubmit()
-              }
-            "
-          />
-          <BadgeComponent :custom-class="st.class" :text="st.text" />
-        </label>
-      </fieldset>
-    </form>
-  </ModalWrapper>
-
   <VendorModal v-model="showVendorModal" v-if="showVendorModal" />
 
   <AlertComponent
@@ -61,28 +24,29 @@
           {{ isEdit ? 'Edit' : 'New' }} Purchase Order
         </p>
 
-        <div class="flex gap-3">
-          <div class="flex gap-3">
-            <BadgeComponent
-              v-if="isEdit && selectedStatus"
-              :custom-class="selectedStatus.class"
-              :text="selectedStatus.text"
-              title="Click to set status"
-              @click="
-                statusModal =
-                  model.order.status != PurchaseOrderStatus.CANCELLED &&
-                  model.order.status != PurchaseOrderStatus.COMPLETED &&
-                  model.order.status != PurchaseOrderStatus.CONFIRMED
-              "
-            />
-            <button
-              class="btn-green"
-              v-if="model.order.status == PurchaseOrderStatus.CONFIRMED"
-              @click="onReceiveOrder"
-            >
-              Receive Order
-            </button>
-          </div>
+        <div class="flex gap-3 items-center">
+          <SelectStatusDropdown
+            :status-map="purchaseOrderStatus"
+            v-model="model.order.status"
+            :class="
+              purchaseOrderStore.purchaseOrder &&
+              purchaseOrderStore.purchaseOrder.status ===
+                PurchaseOrderStatus.OPEN
+                ? ''
+                : 'pointer-events-none'
+            "
+          />
+          <button
+            class="btn-green"
+            v-if="
+              purchaseOrderStore.purchaseOrder &&
+              purchaseOrderStore.purchaseOrder.status ===
+                PurchaseOrderStatus.CONFIRMED
+            "
+            @click="onReceiveOrder"
+          >
+            Recevie Order
+          </button>
           <button type="button" class="btn float-right" @click="startPrint">
             &#128438; Print
           </button>
@@ -299,11 +263,10 @@
 </template>
 
 <script setup>
-import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 import PurchaseOrderFormRow from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormRow.vue'
 import PurchaseOrderFormHeader from '@/components/Inventory/PurchaseOrder/PurchaseOrderFormHeader.vue'
 import AddressForm from '@/components/shared/AddressForm.vue'
-import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import VendorModal from '@/components/Vendor/VendorModal.vue'
 import AlertComponent from '@/components/shared/AlertComponent.vue'
@@ -337,7 +300,6 @@ const router = useRouter()
 
 const isEdit = ref(false)
 const selectedStatus = ref()
-const statusModal = ref(false)
 const showVendorModal = ref(false)
 const modelErrors = ref({ products: [] })
 const status = ref(PurchaseOrderStatus.OPEN)
@@ -398,6 +360,17 @@ Event.on('custom-select-focus', function (data) {
 /** ================================================
  * COMPUTED
  ** ================================================*/
+const purchaseOrderStatus = computed(() => {
+  let statuses = ObjectHelpers.copyObj(PurchaseStatusMap)
+  Object.keys(statuses).forEach((key) => {
+    statuses[key].isShow =
+      key != PurchaseOrderStatus.CANCELLED &&
+      key != PurchaseOrderStatus.COMPLETED
+  })
+
+  return statuses
+})
+
 const supplierOptions = computed(() => {
   return supplierStore.suppliers.map((supplier) => {
     return {

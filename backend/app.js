@@ -1,9 +1,23 @@
 const express = require("express");
+const { createServer } = require("http");
+
 const app = express();
 const cors = require("cors");
 
+const server = createServer(app);
+
 // enable env config
 require("dotenv").config();
+
+const { initializeSocket } = require("./socket");
+const io = initializeSocket(server);
+
+const {
+  startNotificationSocketNamespace,
+} = require("./socket/namespaces/notification");
+
+// notification socket
+startNotificationSocketNamespace(io);
 
 const port = process.env.PORT || 3000;
 
@@ -29,4 +43,4 @@ app.use(responseFormatter);
 const apiRoutes = require("./routes/apiRoutes");
 app.use("/api", apiRoutes);
 
-app.listen(port, console.log(`Server is running on port ${port}`));
+server.listen(port, console.log(`Server is running on port ${port}`));

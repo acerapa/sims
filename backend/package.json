@@ -21,6 +21,7 @@
     "pg": "^8.12.0",
     "sequelize": "^6.37.3",
     "shared": "file:../shared",
+    "socket.io": "^4.8.1",
     "umzug": "^3.8.1"
   },
   "devDependencies": {

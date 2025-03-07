@@ -1,23 +1,26 @@
 <template>
-  <div class="bg-white shadow h-15 px-5 sticky top-0 z-20">
-    <div class="flex justify-between items-center h-full relative">
+  <div class="header-container">
+    <div class="header-wrap">
       <p class="text-xl font-bold">Ram Tech Ventures</p>
-      <button class="relative mr-5 px-3" @click.stop="showNotifications = true">
+      <button
+        class="notification-btn"
+        @click.stop="showNotifications = !showNotifications"
+      >
         <span
-          v-if="notifications.length"
+          v-if="notificationStore.unreadNotification.length"
           class="absolute bg-red-500 text-white px-2 -top-1.5 right-0 rounded-lg"
         >
-          {{ notifications.length }}
+          {{ notificationStore.unreadNotification.length }}
         </span>
         <img class="w-8" :src="NotificationBell" alt="notification-icon.png" />
       </button>
 
       <div
-        class="cont absolute right-0 top-20 !rounded min-w-96"
+        class="cont notification-dropdown"
         v-if="showNotifications"
         @click.stop
       >
-        <div class="flex justify-between items-start">
+        <div class="notification-header">
           <p>Notifications 🔔</p>
           <button
             class="text-xl leading-none"
@@ -27,10 +30,32 @@
           </button>
         </div>
 
-        <div
-          class="list text-sm mt-3 flex flex-col [&>p]:cursor-pointer [&>p]:py-2 [&>p]:border-t"
-        >
-          <p v-for="notif in notifications" :key="notif">{{ notif }}</p>
+        <div class="list text-sm mt-3 flex flex-col">
+          <div
+            class=""
+            v-for="timedNotifKey in Object.keys(timeBasedNotif)"
+            :key="timedNotifKey"
+          >
+            <p
+              class="text-xs text-gray-500 py-3 bg-gray-100 px-4 -mx-4"
+              v-if="timeBasedNotif[timedNotifKey].length"
+            >
+              {{ timedNotifKey }}
+            </p>
+            <div
+              v-if="timeBasedNotif[timedNotifKey].length"
+              class="notification-row"
+              :class="
+                notif.status === NotificationStatus.UNREAD && 'bg-blue-200'
+              "
+              v-for="notif in timeBasedNotif[timedNotifKey]"
+              :key="notif"
+              @click="onClickNotification(notif)"
+            >
+              <p class="text-sm font-semibold">{{ notif.title }}</p>
+              <span class="text-xs font-thin">{{ notif.description }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -39,21 +64,33 @@
 
 <script setup>
 import { useAppStore } from '@/stores/app'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import NotificationBell from '@/assets/icons/notification-bell.png'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
+import { useNotificationStore } from '@/stores/notification'
+import { NotificationStatus } from 'shared'
+import { useNotificationSocket } from '@/composables/useNotifiacationSocket'
+import { storeToRefs } from 'pinia'
 
 const route = useRoute()
 const appStore = useAppStore()
+const notificationStore = useNotificationStore()
+const { timeBasedNotif } = storeToRefs(notificationStore)
+
+const { socket } = useNotificationSocket()
 
 const showNotifications = ref(false)
 
-const notifications = [
-  'Hello! we have some upcoming products!',
-  'Product a is almost out of stock'
-]
+/** ================================================
+ * SOCKET EVENTS
+ ** ================================================*/
+const initializeSocketEvents = () => {
+  socket.value.on('new-notification', (notification) => {
+    notificationStore.notifFromSocket(notification)
+  })
+}
 
 /** ================================================
  * EVENTS
@@ -62,6 +99,9 @@ Event.on(EventEnum.GLOBAL_CLICK, () => {
   showNotifications.value = false
 })
 
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
 // currently changing the design, This part might to be usable in the next update
 const title = computed(() => {
   let t = route.meta.title
@@ -78,4 +118,50 @@ const title = computed(() => {
 
   return t
 })
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const onClickNotification = async (notification) => {
+  if (notification.status === NotificationStatus.READ) return
+  notification.status = NotificationStatus.READ
+  await notificationStore.updateNotification(notification, notification.id)
+}
+
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
+onMounted(() => {
+  initializeSocketEvents()
+})
+
+/** ================================================
+ * WATCHERS
+ * ================================================*/
 </script>
+
+<style scoped>
+.header-container {
+  @apply bg-white shadow h-15 px-5 sticky top-0 z-20;
+}
+
+.header-wrap {
+  @apply flex justify-between items-center h-full relative;
+}
+
+.notification-btn {
+  @apply relative mr-5 px-3;
+}
+
+.notification-header {
+  @apply flex justify-between items-start -mx-4 px-4 -mt-4 py-4 sticky top-0 bg-white;
+}
+
+.notification-dropdown {
+  @apply absolute right-0 top-20 !rounded !pt-0 min-w-96 max-h-[500px] overflow-y-auto;
+}
+
+.notification-row {
+  @apply py-1.5 border-b last:border-b-0 cursor-pointer hover:bg-blue-100 -mx-4 px-4;
+}
+</style>
