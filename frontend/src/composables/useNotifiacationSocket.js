@@ -5,7 +5,7 @@ export const useNotificationSocket = () => {
   const socket = ref(null)
 
   onMounted(() => {
-    socket.value = io('http://localhost:3000/notification')
+    socket.value = io(`${import.meta.env.VITE_SOCKET_SERVER}/notification`)
   })
 
   onUnmounted(() => {
