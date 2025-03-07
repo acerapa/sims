@@ -1,3 +1,8 @@
+const StartOftheWeek = Object.freeze({
+  SUNDAY: 0,
+  MONDAY: 1,
+});
+
 class DateHelpers {
   /**
    * Date formatter
@@ -149,6 +154,67 @@ class DateHelpers {
       return true;
     }
   };
+
+  /**
+   * Get the first day of the week.
+   * @param {*} date - date to get first day of the week. If not supplied date will be today
+   * @param {*} startOfTheWeek - start of the week. Default is Monday. You can use StartOftheWeek enum to get the first day of the week
+   * @returns Date
+   */
+  static getFirstDayOfWeek = (
+    date = new Date(),
+    startOfTheWeek = StartOftheWeek.MONDAY
+  ) => {
+    date = DateHelpers.startOfDay(date);
+
+    let posOfDate = date.getDay();
+    if (startOfTheWeek == StartOftheWeek.MONDAY) {
+      posOfDate = posOfDate - 1;
+      if (posOfDate < 0) {
+        posOfDate = 7;
+      }
+    }
+
+    return new Date(date.setDate(date.getDate() - posOfDate));
+  };
+
+  static getLastDayOfWeek = (
+    date = new Date(),
+    startOfTheWeek = StartOftheWeek.MONDAY
+  ) => {
+    date = DateHelpers.startOfDay(date);
+
+    let posOfDate = date.getDay();
+
+    if (startOfTheWeek == StartOftheWeek.MONDAY) {
+      posOfDate = posOfDate - 1;
+      if (posOfDate < 0) {
+        posOfDate = 7;
+      }
+    }
+
+    return new Date(date.setDate(date.getDate() + (6 - posOfDate)));
+  };
+
+  /**
+   * Get yesterday
+   * @returns Date
+   */
+  static yesterday = () => {
+    const today = new Date();
+    const yester = today.setDate(today.getDate() - 1);
+    return new Date(yester);
+  };
+
+  static startOfDay = (date) => {
+    const resetHours = new Date(date).setHours(0, 0, 0, 0);
+    return new Date(resetHours);
+  };
+
+  static endOfDay = (date) => {
+    const resetHours = new Date(date).setHours(23, 59, 59, 999);
+    return new Date(resetHours);
+  };
 }
 
-module.exports = { DateHelpers };
+module.exports = { DateHelpers, StartOftheWeek };
