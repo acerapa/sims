@@ -24,6 +24,7 @@
       >
         <SelectStatusDropdown
           v-model="model.transfer.status"
+          :status-map="StockTransferStatusMap"
           :class="isCancelled || isCompleted ? 'pointer-events-none' : ''"
         />
         <button type="button" class="btn float-right">&#128438; Print</button>
@@ -167,7 +168,11 @@ import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
-import { StockTransferStatus, TransferType } from 'shared/enums'
+import {
+  StockTransferStatus,
+  StockTransferStatusMap,
+  TransferType
+} from 'shared/enums'
 import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { StockTransferCreateSchema } from 'shared/validators'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
