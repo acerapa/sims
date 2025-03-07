@@ -20,7 +20,7 @@
         v-if="showNotifications"
         @click.stop
       >
-        <div class="flex justify-between items-start">
+        <div class="notification-header">
           <p>Notifications 🔔</p>
           <button
             class="text-xl leading-none"
@@ -32,14 +32,29 @@
 
         <div class="list text-sm mt-3 flex flex-col">
           <div
-            class="notification-row"
-            :class="notif.status === NotificationStatus.UNREAD && 'bg-blue-200'"
-            v-for="notif in notificationStore.notifications"
-            :key="notif"
-            @click="onClickNotification(notif)"
+            class=""
+            v-for="timedNotifKey in Object.keys(timeBasedNotif)"
+            :key="timedNotifKey"
           >
-            <p class="text-sm font-semibold">{{ notif.title }}</p>
-            <span class="text-xs font-thin">{{ notif.description }}</span>
+            <p
+              class="text-xs text-gray-500 py-3 bg-gray-100 px-4 -mx-4"
+              v-if="timeBasedNotif[timedNotifKey].length"
+            >
+              {{ timedNotifKey }}
+            </p>
+            <div
+              v-if="timeBasedNotif[timedNotifKey].length"
+              class="notification-row"
+              :class="
+                notif.status === NotificationStatus.UNREAD && 'bg-blue-200'
+              "
+              v-for="notif in timeBasedNotif[timedNotifKey]"
+              :key="notif"
+              @click="onClickNotification(notif)"
+            >
+              <p class="text-sm font-semibold">{{ notif.title }}</p>
+              <span class="text-xs font-thin">{{ notif.description }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -57,10 +72,12 @@ import { EventEnum } from '@/data/event'
 import { useNotificationStore } from '@/stores/notification'
 import { NotificationStatus } from 'shared'
 import { useNotificationSocket } from '@/composables/useNotifiacationSocket'
+import { storeToRefs } from 'pinia'
 
 const route = useRoute()
 const appStore = useAppStore()
 const notificationStore = useNotificationStore()
+const { timeBasedNotif } = storeToRefs(notificationStore)
 
 const { socket } = useNotificationSocket()
 
@@ -117,6 +134,10 @@ const onClickNotification = async (notification) => {
 onMounted(() => {
   initializeSocketEvents()
 })
+
+/** ================================================
+ * WATCHERS
+ * ================================================*/
 </script>
 
 <style scoped>
@@ -132,8 +153,12 @@ onMounted(() => {
   @apply relative mr-5 px-3;
 }
 
+.notification-header {
+  @apply flex justify-between items-start -mx-4 px-4 -mt-4 py-4 sticky top-0 bg-white;
+}
+
 .notification-dropdown {
-  @apply absolute right-0 top-20 !rounded min-w-96;
+  @apply absolute right-0 top-20 !rounded !pt-0 min-w-96 max-h-[500px] overflow-y-auto;
 }
 
 .notification-row {
