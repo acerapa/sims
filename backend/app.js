@@ -1,11 +1,15 @@
 const express = require("express");
 const { createServer } = require("http");
-const { initializeSocket } = require("./socket");
 
 const app = express();
 const cors = require("cors");
 
 const server = createServer(app);
+
+// enable env config
+require("dotenv").config();
+
+const { initializeSocket } = require("./socket");
 const io = initializeSocket(server);
 
 const {
@@ -14,9 +18,6 @@ const {
 
 // notification socket
 startNotificationSocketNamespace(io);
-
-// enable env config
-require("dotenv").config();
 
 const port = process.env.PORT || 3000;
 
