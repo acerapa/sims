@@ -4,8 +4,10 @@
       class="!w-auto"
       :data="filteredData"
       title="Payment Method list"
+      :row-prop-init="rowPropInit"
       :table-row-component="PaymentMethodRow"
       @add-new-record="onNewRecord"
+      @view="onView"
     >
       <template #table_header>
         <div class="grid gap-3 grid-cols-8">
@@ -18,7 +20,11 @@
       </template>
     </CustomTable>
   </div>
-  <PaymentMethodModal v-model="showModal" v-if="showModal" />
+  <PaymentMethodModal
+    :selected-id="selectedId"
+    v-model="showModal"
+    v-if="showModal"
+  />
 </template>
 
 <script setup>
@@ -27,10 +33,22 @@ import { usePaymentMethodStore } from '@/stores/payment-method'
 import PaymentMethodRow from '@/components/sales/payment-method/PaymentMethodRow.vue'
 import PaymentMethodModal from '@/components/sales/payment-method/PaymentMethodModal.vue'
 import { computed, onMounted, ref } from 'vue'
+import Event from '@/event'
 
 const paymentMethodStore = usePaymentMethodStore()
 
 const showModal = ref(false)
+const selectedId = ref(null)
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+const rowPropInit = 'payment-method-row-init'
+Event.on(rowPropInit, (data) => {
+  return {
+    paymentMethod: data
+  }
+})
 
 /** ================================================
  * COMPUTED
@@ -43,6 +61,12 @@ const filteredData = computed(() => {
  * METHODS
  ** ================================================*/
 const onNewRecord = () => {
+  selectedId.value = 0
+  showModal.value = true
+}
+
+const onView = (id) => {
+  selectedId.value = id
   showModal.value = true
 }
 
