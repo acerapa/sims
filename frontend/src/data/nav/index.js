@@ -81,6 +81,11 @@ export default [
         icon: outlineDot
       },
       {
+        text: 'Payment Methods',
+        route: SalesConst.PAYMENT_METHODS,
+        icon: outlineDot
+      },
+      {
         text: 'Item Details',
         route: SalesConst.ITEM_DETAILS,
         icon: outlineDot

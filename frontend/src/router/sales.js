@@ -43,6 +43,14 @@ export default [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/payment-methods',
+        name: SalesConst.PAYMENT_METHODS,
+        component: () => import('@/views/sales/PaymentMethod.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   }
