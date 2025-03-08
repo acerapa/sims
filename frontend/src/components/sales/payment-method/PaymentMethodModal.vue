@@ -1,5 +1,11 @@
 <template>
-  <ModalWrapper :title="title" v-model="showModal" @submit="onSubmit">
+  <ModalWrapper
+    :title="title"
+    v-model="showModal"
+    @submit="onSubmit"
+    @delete="onDelete"
+    :has-delete="props.selectedId ? true : false"
+  >
     <div class="flex mt-7 pb-5">
       <CustomInput
         type="text"
@@ -14,11 +20,18 @@
       />
     </div>
   </ModalWrapper>
+  <DeleteConfirmModal
+    v-if="showDeleteMessage"
+    v-model="showDeleteMessage"
+    :href="`payment-method/${props.selectedId}`"
+    @after-delete="onAfterDelete"
+  />
 </template>
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
 import Event from '@/event'
@@ -43,6 +56,7 @@ const title = props.selectedId
   : 'Create Payment Method'
 
 const showModal = defineModel()
+const showDeleteMessage = ref(false)
 
 /** ================================================
  * METHODS
@@ -88,6 +102,15 @@ const onSubmit = async () => {
       type: ToastTypes.ERROR
     })
   }
+}
+
+const onDelete = async () => {
+  showDeleteMessage.value = true
+}
+
+const onAfterDelete = () => {
+  showModal.value = false
+  paymentMethodStore.removePaymentMethod(props.selectedId)
 }
 
 /** ================================================

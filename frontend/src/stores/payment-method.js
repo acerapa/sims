@@ -79,6 +79,10 @@ export const usePaymentMethodStore = defineStore('payment-method', () => {
     return paymentMethod.value
   }
 
+  const removePaymentMethod = async (id) => {
+    paymentMethods.value = paymentMethods.value.filter((pm) => pm.id != id)
+  }
+
   return {
     paymentMethod,
     paymentMethods,
@@ -86,6 +90,7 @@ export const usePaymentMethodStore = defineStore('payment-method', () => {
     getPaymentMethods,
     fetchPaymentMethods,
     updatePaymentMethod,
+    removePaymentMethod,
     registerPaymentMethod
   }
 })

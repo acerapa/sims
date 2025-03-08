@@ -1,9 +1,11 @@
-const PaymentMenthod = require("../models/payment-method");
+const PaymentMethod = require("../models/payment-method");
 
 module.exports = {
   all: async (req, res) => {
     try {
-      const paymentMethods = await PaymentMenthod.findAll();
+      const paymentMethods = await PaymentMethod.findAll({
+        order: [["createdAt", "DESC"]],
+      });
       res.sendResponse({ paymentMethods }, "Payment methods");
     } catch (error) {
       res.sendError(error, "Something went wrong");
@@ -12,7 +14,7 @@ module.exports = {
 
   register: async (req, res) => {
     try {
-      const paymentMethod = await PaymentMenthod.create(req.body.validated);
+      const paymentMethod = await PaymentMethod.create(req.body.validated);
       res.sendResponse({ paymentMethod }, "Payment method created");
     } catch (error) {
       res.sendError(error, "Something went wrong");
@@ -21,7 +23,7 @@ module.exports = {
 
   getById: async (req, res) => {
     try {
-      const paymentMethod = await PaymentMenthod.findByPk(req.params.id);
+      const paymentMethod = await PaymentMethod.findByPk(req.params.id);
       res.sendResponse(
         { paymentMethod },
         "Successfully fetched payment method"
@@ -33,16 +35,25 @@ module.exports = {
 
   update: async (req, res) => {
     try {
-      await PaymentMenthod.update(req.body.validated, {
+      await PaymentMethod.update(req.body.validated, {
         where: { id: req.params.id },
       });
 
-      const paymentMethod = await PaymentMenthod.findByPk(req.params.id);
+      const paymentMethod = await PaymentMethod.findByPk(req.params.id);
 
       res.sendResponse(
         { paymentMethod },
         "Successfully updated payment method"
       );
+    } catch (error) {
+      res.sendError(error, "Something went wrong");
+    }
+  },
+
+  destroy: async (req, res) => {
+    try {
+      await PaymentMethod.destroy({ where: { id: req.params.id } });
+      res.sendResponse({}, "Successfully deleted payment method");
     } catch (error) {
       res.sendError(error, "Something went wrong");
     }
