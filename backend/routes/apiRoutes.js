@@ -47,6 +47,9 @@ router.use("/customers", customerRoutes);
 
 const notificationRoutes = require("./NotificationRoutes");
 router.use("/notifications", notificationRoutes);
+
+const paymentMethodRoutes = require("./PaymentMethodRoutes");
+router.use("/payment-method", paymentMethodRoutes);
 // end use routes
 
 // testing

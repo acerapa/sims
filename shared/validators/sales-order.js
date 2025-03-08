@@ -34,8 +34,13 @@ const SalesOrderCreateSchema = joi.object({
   shipment_address: AddressSchema,
 });
 
+const PaymentMethodSchema = joi.object({
+  name: joi.string().required(),
+});
+
 module.exports = {
   SalesOrderSchema,
+  PaymentMethodSchema,
   SalesOrderCreateSchema,
   SalesOrderProductSchema,
 };
