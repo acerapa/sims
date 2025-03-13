@@ -26,7 +26,7 @@ PurchaseOrder.init(
       allowNull: false,
     },
     amount: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     memo: {
