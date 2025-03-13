@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-8 items-center gap-3 min-w-[935px] gen-table-row"
+    class="grid grid-cols-10 items-center gap-3 min-w-[935px] gen-table-row"
     @click="emit('view', props.order.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
@@ -32,6 +32,7 @@
         })
       }}
     </p>
+    <p class="col-span-2 text-sm">{{ props.order.payment_method.name }}</p>
     <div class="col-span-1">
       <BadgeComponent
         :text="SalesOrderStatusMap[props.order.status].text"

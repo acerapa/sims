@@ -21,6 +21,7 @@ const StockTransferProducts = require("./junction/stock-transfer-products");
 const SalesOrder = require("./sales-order");
 const SalesOrderProduct = require("./junction/sales-order-product");
 const Invoice = require("./invoice");
+const PaymentMethod = require("./payment-method");
 const InvoiceToProducts = require("./junction/invoice-to-products");
 
 // Sales Order, Product, Address and Sales Order Product Relations
@@ -41,6 +42,11 @@ Product.belongsToMany(SalesOrder, {
 SalesOrder.belongsTo(Address, {
   foreignKey: "shipment_address_id",
   as: "shipment_address",
+});
+
+SalesOrder.belongsTo(PaymentMethod, {
+  foreignKey: "payment_method_id",
+  as: "payment_method",
 });
 
 // Purchase Order, Purchase Order Product and Product Relations
