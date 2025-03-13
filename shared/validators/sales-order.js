@@ -8,6 +8,7 @@ const SalesOrderSchema = joi.object({
   delivery_date: joi.date().allow("", null).optional(),
   bill_due: joi.date().allow("", null).optional(),
   customer_id: joi.number().required(),
+  payment_method_id: joi.number().required(),
   type: joi
     .string()
     .valid(...Object.values(SalesOrderType))
