@@ -20,6 +20,8 @@ const ServiceDetails = require("./service-details");
 const StockTransferProducts = require("./junction/stock-transfer-products");
 const SalesOrder = require("./sales-order");
 const SalesOrderProduct = require("./junction/sales-order-product");
+const Invoice = require("./invoice");
+const InvoiceToProducts = require("./junction/invoice-to-products");
 
 // Sales Order, Product, Address and Sales Order Product Relations
 SalesOrder.belongsToMany(Product, {
@@ -309,6 +311,49 @@ ServiceDetails.belongsTo(Product, {
   as: "product",
 });
 
+// Invoice, Product, InvoiceToProduct, Customer and User Relations
+Invoice.belongsToMany(Product, {
+  through: InvoiceToProducts,
+  foreignKey: "invoice_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(Invoice, {
+  through: InvoiceToProducts,
+  foreignKey: "product_id",
+  otherKey: "invoice_id",
+  as: "invoices",
+});
+
+Invoice.belongsTo(Customer, {
+  foreignKey: "customer_id",
+  as: "customer",
+});
+
+Customer.hasMany(Invoice, {
+  foreignKey: "customer_id",
+  as: "invoices",
+});
+
+Invoice.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "prepared_by",
+});
+
+User.hasMany(Invoice, {
+  foreignKey: "user_id",
+  as: "invoices",
+});
+
+Invoice.belongsTo(SalesOrder, {
+  foreignKey: "sales_order_id",
+  as: "sales_order",
+  onDelete: "SET NULL",
+  onUpdate: "SET NULL",
+});
+
+// Models that need to be exported for updated associations
 module.exports = {
   ProductCategory,
   Supplier,
