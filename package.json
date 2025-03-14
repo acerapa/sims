@@ -10,6 +10,8 @@
     "uninstall-shared": "yarn workspace backend uninstall-shared && yarn workspace frontend uninstall-shared",
     "seed-all": "yarn workspace backend sequelize db:seed:all",
     "seed-undo-all": "yarn workspace backend sequelize db:seed:undo:all",
+    "seed": "yarn workspace backend sequelize db:seed",
+    "seed-undo": "yarn workspace backend sequelize db:seed:undo",
     "migrate": "yarn workspace backend sequelize db:migrate",
     "migrate-undo": "yarn workspace backend sequelize db:migrate:undo",
     "migrate-undo-all": "yarn seed-undo-all && yarn workspace backend sequelize db:migrate:undo:all",
