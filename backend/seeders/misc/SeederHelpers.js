@@ -1,6 +1,7 @@
 const Seeder = require("../../models/misc/seeders");
 const fs = require("fs");
 const { dirname } = require("path");
+const { ConsoleColors } = require("shared/enums");
 
 const seederCachePath = dirname(__dirname) + "/cache/seeder.json";
 
@@ -20,15 +21,21 @@ const checkIfSeederExecuted = async (seeder_name) => {
     fs.writeFileSync(seederCachePath, JSON.stringify([]));
   }
 
-  if (!cache.length) {
-    const seeders = await Seeder.findAll({ attributes: ["name", "data"] });
+  try {
+    if (!cache.length) {
+      const seeders = await Seeder.findAll({ attributes: ["name", "data"] });
 
-    // after getting all the seeders from the database
-    // we will save the seeders to the cache
-    if (seeders.length) {
-      cache = seeders;
-      fs.writeFileSync(seederCachePath, JSON.stringify(cache));
+      // after getting all the seeders from the database
+      // we will save the seeders to the cache
+      if (seeders.length) {
+        cache = seeders;
+        fs.writeFileSync(seederCachePath, JSON.stringify(cache));
+      }
     }
+  } catch (error) {
+    console.log(
+      `${ConsoleColors.RED} Error: ${error.message} ${ConsoleColors.RESET}`
+    );
   }
 
   // check if the seeder has been executed
@@ -46,39 +53,51 @@ const registerSeederExecution = async (
     isExecuted = await checkIfSeederExecuted(seeder_name);
   }
 
-  if (!isExecuted) {
-    // if the seeder has not been executed
-    // we will create a new seeder
-    const seeder = await Seeder.create({ name: seeder_name, data: data });
+  try {
+    if (!isExecuted) {
+      // if the seeder has not been executed
+      // we will create a new seeder
+      const seeder = await Seeder.create({ name: seeder_name, data: data });
 
-    // update the cache
-    const cache = extractCache();
-    cache.push({ name: seeder_name, data: data });
+      // update the cache
+      const cache = extractCache();
+      cache.push({ name: seeder_name, data: data });
 
-    fs.writeFileSync(seederCachePath, JSON.stringify(cache));
+      fs.writeFileSync(seederCachePath, JSON.stringify(cache));
 
-    return seeder;
+      return seeder;
+    }
+  } catch (error) {
+    console.log(
+      `${ConsoleColors.RED} Error: ${error.message} ${ConsoleColors.RESET}`
+    );
   }
 };
 
 const removeSeederExecution = async (seeder_name) => {
   // check if the seeder has been executed
   const isExecuted = await checkIfSeederExecuted(seeder_name);
-  if (isExecuted) {
-    // if the seeder has been executed
-    // we will remove the seeder
-    const seeder = await Seeder.findOne({ where: { name: seeder_name } });
-    if (seeder) await seeder.destroy();
+  try {
+    if (isExecuted) {
+      // if the seeder has been executed
+      // we will remove the seeder
+      const seeder = await Seeder.findOne({ where: { name: seeder_name } });
+      if (seeder) await seeder.destroy();
 
-    // update the cache
-    const cache = extractCache();
-    const index = cache.findIndex((s) => s.name === seeder_name);
-    if (index > -1) {
-      cache.splice(index, 1);
-      fs.writeFileSync(seederCachePath, JSON.stringify(cache));
+      // update the cache
+      const cache = extractCache();
+      const index = cache.findIndex((s) => s.name === seeder_name);
+      if (index > -1) {
+        cache.splice(index, 1);
+        fs.writeFileSync(seederCachePath, JSON.stringify(cache));
+      }
+
+      return seeder;
     }
-
-    return seeder;
+  } catch (error) {
+    console.log(
+      `${ConsoleColors.RED} Error: ${error.message} ${ConsoleColors.RESET}`
+    );
   }
 };
 
@@ -87,23 +106,29 @@ const getSeederExecution = async (seeder_name) => {
   // check if the seeder is in cache
   const isExecuted = await checkIfSeederExecuted(seeder_name);
 
-  if (isExecuted) {
-    const cache = extractCache();
+  try {
+    if (isExecuted) {
+      const cache = extractCache();
 
-    const seedIndex = cache.findIndex((s) => s.name === seeder_name);
-    if (seedIndex > -1) {
-      seeder = cache[seedIndex];
-    } else {
-      seeder = await Seeder.findOne({
-        where: { name: seeder_name },
-        attributes: ["name", "data"],
-      });
+      const seedIndex = cache.findIndex((s) => s.name === seeder_name);
+      if (seedIndex > -1) {
+        seeder = cache[seedIndex];
+      } else {
+        seeder = await Seeder.findOne({
+          where: { name: seeder_name },
+          attributes: ["name", "data"],
+        });
 
-      if (seeder) {
-        cache.push(seeder);
-        fs.writeFileSync(seederCachePath, JSON.stringify(cache));
+        if (seeder) {
+          cache.push(seeder);
+          fs.writeFileSync(seederCachePath, JSON.stringify(cache));
+        }
       }
     }
+  } catch (error) {
+    console.log(
+      `${ConsoleColors.RED} Error: ${error.message} ${ConsoleColors.RESET}`
+    );
   }
 
   return seeder;
