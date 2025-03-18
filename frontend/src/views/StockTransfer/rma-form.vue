@@ -72,7 +72,7 @@
         <AddressForm v-model="address" :disabled="true" :has-label="true" />
       </div>
     </div>
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-3" ref="multiSelectTableWrap">
       <p class="font-bold">Select Products</p>
       <MultiSelectTable
         v-model="model.products"
@@ -169,6 +169,7 @@ import { ToastTypes } from '@/data/types'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
 import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const rowEventName = 'rma-product-event'
 
@@ -374,6 +375,8 @@ const setRMAFormPageState = () => {
   })
 }
 
+const multiSelectTableWrap = ref(null)
+useTableScroll(multiSelectTableWrap)
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/

@@ -2,7 +2,7 @@
   <div>
     <slot></slot>
     <div
-      class="grid gap-3 items-start min-w-[750px]"
+      class="grid gap-3 items-start min-w-[1033px]"
       :class="[props.isDisabled ? 'grid grid-cols-8' : 'grid-cols-9']"
     >
       <div class="col-span-2 flex gap-3">

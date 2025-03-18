@@ -112,16 +112,18 @@
     </div>
 
     <p class="font-semibold">Select Products</p>
-    <MultiSelectTable
-      :header-component="SalesOrderFormHeader"
-      :row-component="SalesOrderFormRow"
-      v-model="model.sales_order_products"
-      :format="{ ...productTransferModal }"
-      :row-event-name="rowEventName"
-      :row-props="{
-        selected: model.sales_order_products
-      }"
-    ></MultiSelectTable>
+    <div ref="multiSelectTable">
+      <MultiSelectTable
+        :header-component="SalesOrderFormHeader"
+        :row-component="SalesOrderFormRow"
+        v-model="model.sales_order_products"
+        :format="{ ...productTransferModal }"
+        :row-event-name="rowEventName"
+        :row-props="{
+          selected: model.sales_order_products
+        }"
+      ></MultiSelectTable>
+    </div>
 
     <!-- buttons -->
     <div
@@ -197,6 +199,7 @@ import { useCustomerStore } from '@/stores/customer'
 import { useSalesStore } from '@/stores/sales'
 import { ToastTypes } from '@/data/types'
 import { usePaymentMethodStore } from '@/stores/payment-method'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const route = useRoute()
 const router = useRouter()
@@ -353,9 +356,12 @@ const onAfterDelete = async () => {
     name: SalesConst.SALES_ORDER
   })
 }
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
+const multiSelectTable = ref(null)
+useTableScroll(multiSelectTable)
 onMounted(async () => {
   await customerStore.getCustomers()
   await paymentMethodStore.getPaymentMethods()

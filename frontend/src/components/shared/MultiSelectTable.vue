@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="main-table">
     <component
       :is="props.headerComponent"
       v-bind="{ isDisabled: props.isDisabled }"

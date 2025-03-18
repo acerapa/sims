@@ -83,7 +83,7 @@
           />
         </div>
       </div>
-      <div class="flex flex-col gap-3 mt-5">
+      <div class="flex flex-col gap-3 mt-5" ref="multiSelectTableWrap">
         <p class="text-base font-semibold">Select Product</p>
         <ProductMulitpleSelect
           v-model="model.products"
@@ -181,6 +181,7 @@ import { ToastTypes } from '@/data/types'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
 import { validateProductStocks } from '@/helper'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const rowEventName = 'str-product-row'
 
@@ -426,6 +427,8 @@ const setSTRFromPageState = () => {
   })
 }
 
+const multiSelectTableWrap = ref(null)
+useTableScroll(multiSelectTableWrap)
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
