@@ -85,7 +85,7 @@
           <AddressForm :has-label="true" v-model="address" :disabled="true" />
         </div>
       </div>
-      <div class="flex flex-col gap-3 mt-8">
+      <div class="flex flex-col gap-3 mt-8" ref="multiSelectTableWrap">
         <p class="font-semibold">Select Product</p>
         <MultiSelectTable
           v-model="model.products"
@@ -178,6 +178,7 @@ import { StockTransferCreateSchema } from 'shared/validators'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PageStateConst } from '@/const/state.constants'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const ibrrEventName = 'ibrr-product-row'
 
@@ -383,6 +384,8 @@ const setIBRRFormPageState = () => {
   })
 }
 
+const multiSelectTableWrap = ref(null)
+useTableScroll(multiSelectTableWrap)
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/

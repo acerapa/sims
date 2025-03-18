@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid gap-3 min-w-[750px] pb-2 border-b"
+    class="grid gap-3 min-w-[1033px] pb-2 border-b"
     :class="[props.isDisabled ? 'grid-cols-8' : 'grid-cols-9']"
   >
     <div class="col-span-2 flex gap-3 items-center">
