@@ -1,17 +1,3 @@
-// const UserEnum = require("./user");
-// const AccountEnum = require("./account");
-// const TransferEnum = require("./transfer");
-// const LocalStorageEnum = require("./local-storage");
-// const PurchaseOrderEnum = require("./purchase-order");
-
-// module.exports = {
-//   ...UserEnum,
-//   ...AccountEnum,
-//   ...TransferEnum,
-//   ...LocalStorageEnum,
-//   ...PurchaseOrderEnum,
-// };
-
 const UserType = Object.freeze({
   ADMIN: "admin",
   MANAGER: "manager",
@@ -213,6 +199,16 @@ const ConsoleColors = {
   YELLOW: "\x1b[33m",
 };
 
+const InvoiceStatus = Object.freeze({
+  UNPAID: "unpaid",
+  PAID: "paid",
+  PARTIALLY_PAID: "partially-paid",
+  OVERDUE: "overdue",
+  REFUNDED: "refunded",
+  FAILED: "failed",
+  DISPUTED: "disputed",
+});
+
 module.exports = {
   UserType,
   ItemType,
@@ -222,6 +218,7 @@ module.exports = {
   TransferType,
   ProductStatus,
   ConsoleColors,
+  InvoiceStatus,
   SalesOrderType,
   BranchStatusMap,
   LocalStorageKeys,
