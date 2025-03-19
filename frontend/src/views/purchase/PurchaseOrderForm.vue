@@ -194,33 +194,35 @@
         </div>
       </div>
 
-      <MultiSelectTable
-        :header-component="PurchaseOrderFormHeader"
-        :row-component="PurchaseOrderFormRow"
-        :format="productFormat"
-        v-model="model.products"
-        :is-disabled="
-          model.order.supplier_id &&
-          model.order.status != PurchaseOrderStatus.COMPLETED
-            ? false
-            : true
-        "
-        :row-props="{
-          sup_id: model.order.supplier_id.toString(),
-          selected: model.products
-        }"
-      >
-        <template #aggregate>
-          <p class="text-end w-full">
-            Total: &#8369;
-            {{
-              model.order.amount.toLocaleString('en', {
-                minimumFractionDigits: 2
-              })
-            }}
-          </p>
-        </template>
-      </MultiSelectTable>
+      <div ref="multiSelectTableWrap">
+        <MultiSelectTable
+          :header-component="PurchaseOrderFormHeader"
+          :row-component="PurchaseOrderFormRow"
+          :format="productFormat"
+          v-model="model.products"
+          :is-disabled="
+            model.order.supplier_id &&
+            model.order.status != PurchaseOrderStatus.COMPLETED
+              ? false
+              : true
+          "
+          :row-props="{
+            sup_id: model.order.supplier_id.toString(),
+            selected: model.products
+          }"
+        >
+          <template #aggregate>
+            <p class="text-end w-full">
+              Total: &#8369;
+              {{
+                model.order.amount.toLocaleString('en', {
+                  minimumFractionDigits: 2
+                })
+              }}
+            </p>
+          </template>
+        </MultiSelectTable>
+      </div>
 
       <!-- buttons -->
       <div
@@ -294,6 +296,7 @@ import { usePrint } from '@/use/usePrint'
 import { ToastTypes } from '@/data/types'
 import { InventoryConst, PurchaseConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const route = useRoute()
 const router = useRouter()
@@ -509,7 +512,13 @@ const setPurchaseOrderFormPageState = () => {
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
+const multiSelectTableWrap = ref(null)
+
+// composables
+useTableScroll(multiSelectTableWrap)
+
 onMounted(async () => {
+  // queries
   await supplierStore.getSuppliers()
   await productStore.getProducts()
   await settingStore.getBranches()

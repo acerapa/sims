@@ -57,7 +57,7 @@
       />
     </div>
 
-    <div class="flex flex-col gap-3 mt-8">
+    <div class="flex flex-col gap-3 mt-8" ref="multiSelectTableWrap">
       <p class="text-base font-semibold">Select Product</p>
       <MultiSelectTable
         v-model="model.products"
@@ -144,6 +144,7 @@ import { ToastTypes } from '@/data/types'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
 import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const rowEventName = 'fix-asset-row-event'
 
@@ -298,6 +299,8 @@ const setFixAssetPageState = () => {
   })
 }
 
+const multiSelectTableWrap = ref(null)
+useTableScroll(multiSelectTableWrap)
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/

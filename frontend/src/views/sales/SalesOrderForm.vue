@@ -63,16 +63,32 @@
             v-model="model.sales_order.bill_due"
           />
         </div>
-        <CustomInput
-          type="date"
-          class="flex-1"
-          :has-label="true"
-          name="delivery_date"
-          label="Delivery Date"
-          :error-has-text="true"
-          :error="modelErrors.delivery_date"
-          v-model="model.sales_order.delivery_date"
-        />
+        <div class="flex gap-3">
+          <CustomInput
+            type="date"
+            class="flex-1"
+            :has-label="true"
+            name="delivery_date"
+            label="Delivery Date"
+            :error-has-text="true"
+            :error="modelErrors.delivery_date"
+            v-model="model.sales_order.delivery_date"
+          />
+          <CustomInput
+            type="select"
+            class="flex-1"
+            :has-label="true"
+            :has-add-new="true"
+            label="Payment Method"
+            :error-has-text="true"
+            name="payment_method_id"
+            :options="paymentMethodOptions"
+            placeholder="Select Payment Method"
+            @add-new="paymentMethodModal = true"
+            :error="modelErrors.payment_method_id"
+            v-model="model.sales_order.payment_method_id"
+          />
+        </div>
         <CustomInput
           name="memo"
           label="Memo"
@@ -96,16 +112,18 @@
     </div>
 
     <p class="font-semibold">Select Products</p>
-    <MultiSelectTable
-      :header-component="SalesOrderFormHeader"
-      :row-component="SalesOrderFormRow"
-      v-model="model.sales_order_products"
-      :format="{ ...productTransferModal }"
-      :row-event-name="rowEventName"
-      :row-props="{
-        selected: model.sales_order_products
-      }"
-    ></MultiSelectTable>
+    <div ref="multiSelectTable">
+      <MultiSelectTable
+        :header-component="SalesOrderFormHeader"
+        :row-component="SalesOrderFormRow"
+        v-model="model.sales_order_products"
+        :format="{ ...productTransferModal }"
+        :row-event-name="rowEventName"
+        :row-props="{
+          selected: model.sales_order_products
+        }"
+      ></MultiSelectTable>
+    </div>
 
     <!-- buttons -->
     <div
@@ -152,6 +170,7 @@
       </div>
     </div>
   </div>
+  <PaymentMethodModal v-if="paymentMethodModal" v-model="paymentMethodModal" />
   <CustomerModal v-if="showCustomerModel" v-model="showCustomerModel" />
   <DeleteConfirmModal
     v-if="showDeleteModal && route.query.id"
@@ -166,12 +185,7 @@ import Event from '@/event'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
-import {
-  ObjectHelpers,
-  SalesOrderCreateSchema,
-  SalesOrderStatus,
-  SalesOrderType
-} from 'shared'
+import { ObjectHelpers, SalesOrderCreateSchema, SalesOrderType } from 'shared'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
@@ -179,10 +193,13 @@ import SalesOrderFormRow from '@/components/sales/SalesOrderFormRow.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
+import PaymentMethodModal from '@/components/sales/payment-method/PaymentMethodModal.vue'
 import { SalesConst } from '../../const/route.constants'
 import { useCustomerStore } from '@/stores/customer'
 import { useSalesStore } from '@/stores/sales'
 import { ToastTypes } from '@/data/types'
+import { usePaymentMethodStore } from '@/stores/payment-method'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const route = useRoute()
 const router = useRouter()
@@ -190,10 +207,12 @@ const router = useRouter()
 const isDisabled = ref(false)
 const showDeleteModal = ref(false)
 const showCustomerModel = ref(false)
+const paymentMethodModal = ref(false)
 const rowEventName = 'sales-order-row-event'
 
 const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
+const paymentMethodStore = usePaymentMethodStore()
 
 const productTransferModal = {
   product_id: '',
@@ -212,7 +231,8 @@ const defaultModel = {
     purchase_date: '',
     delivery_date: '',
     bill_due: '',
-    status: 'open'
+    status: 'open',
+    payment_method_id: ''
   },
   shipment_address: {
     address1: '',
@@ -242,6 +262,13 @@ const customerOptions = computed(() => {
     }
   })
 })
+
+const paymentMethodOptions = computed(() =>
+  paymentMethodStore.paymentMethods.map((pm) => ({
+    text: pm.name,
+    value: pm.id
+  }))
+)
 
 /** ================================================
  * METHODS
@@ -329,11 +356,15 @@ const onAfterDelete = async () => {
     name: SalesConst.SALES_ORDER
   })
 }
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
+const multiSelectTable = ref(null)
+useTableScroll(multiSelectTable)
 onMounted(async () => {
   await customerStore.getCustomers()
+  await paymentMethodStore.getPaymentMethods()
 
   if (route.query.id) {
     await salesStore.getSalesOrder(route.query.id)

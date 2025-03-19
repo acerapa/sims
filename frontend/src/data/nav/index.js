@@ -76,8 +76,19 @@ export default [
         includes_active: [SalesConst.SALES_ORDER_FORM]
       },
       {
+        text: 'Invoices',
+        route: SalesConst.INVOICES,
+        icon: outlineDot,
+        includes_active: [SalesConst.INVOICE_FORM]
+      },
+      {
         text: 'Customers',
         route: SalesConst.CUSTOMERS,
+        icon: outlineDot
+      },
+      {
+        text: 'Payment Methods',
+        route: SalesConst.PAYMENT_METHODS,
         icon: outlineDot
       },
       {

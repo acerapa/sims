@@ -83,7 +83,7 @@
           />
         </div>
       </div>
-      <div class="flex flex-col gap-3 mt-5">
+      <div class="flex flex-col gap-3 mt-5" ref="multiSelectTableWrap">
         <p class="text-base font-semibold">Select Product</p>
         <ProductMulitpleSelect
           v-model="model.products"
@@ -180,6 +180,8 @@ import { usePrint } from '@/use/usePrint'
 import { ToastTypes } from '@/data/types'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
+import { validateProductStocks } from '@/helper'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const rowEventName = 'str-product-row'
 
@@ -307,6 +309,12 @@ const onSubmit = async (saveAndNew = false) => {
     abortEarly: false
   })
 
+  // validate products stocks availability
+  const productAvailabilityError = validateProductStocks(
+    model.value.products,
+    await productStore.getProducts()
+  )
+
   if (error) {
     modelErrors.value.products = []
 
@@ -334,6 +342,23 @@ const onSubmit = async (saveAndNew = false) => {
     })
 
     // trigger event to show errors
+    Event.emit(rowEventName, modelErrors.value.products)
+    return
+  } else if (productAvailabilityError) {
+    // specific to product stocks availability
+    // TEMPORARY SOLUTION
+    modelErrors.value.products = []
+    const idWithError = Object.keys(productAvailabilityError)
+    model.value.products.forEach((p) => {
+      if (idWithError.includes(p.product_id.toString())) {
+        modelErrors.value.products.push({
+          quantity: productAvailabilityError[p.product_id]
+        })
+      } else {
+        modelErrors.value.products.push({})
+      }
+    })
+
     Event.emit(rowEventName, modelErrors.value.products)
     return
   }
@@ -402,6 +427,8 @@ const setSTRFromPageState = () => {
   })
 }
 
+const multiSelectTableWrap = ref(null)
+useTableScroll(multiSelectTableWrap)
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/

@@ -1,0 +1,58 @@
+module.exports = [
+  {
+    first_name: "Han",
+    last_name: "Solo",
+    address: {
+      address1: "123 Main St",
+      address2: "Apt 4B",
+      city: "Tatooine",
+      province: "Tatooine",
+      postal: "12345",
+    },
+    phone_number: "555-123-4567",
+    facebook_url: "https://www.facebook.com/han.solo",
+    viber: "555-123-4567",
+  },
+  {
+    first_name: "Leia",
+    last_name: "Organa",
+    address: {
+      address1: "456 Elm St",
+      address2: "Apt 5C",
+      city: "Alderaan",
+      province: "Alderaan",
+      postal: "67890",
+    },
+    phone_number: "555-987-6543",
+    facebook_url: "https://www.facebook.com/leia.organa",
+    viber: "555-987-6543",
+  },
+  {
+    first_name: "Luke",
+    last_name: "Skywalker",
+    address: {
+      address1: "789 Oak St",
+      address2: "Apt 6D",
+      city: "Tatooine",
+      province: "Tatooine",
+      postal: "12345",
+    },
+    phone_number: "555-987-6543",
+    facebook_url: "https://www.facebook.com/luke.skywalker",
+    viber: "555-987-6543",
+  },
+  {
+    first_name: "Rey",
+    last_name: "Skywalker",
+    address: {
+      address1: "789 Oak St",
+      address2: "Apt 6D",
+      city: "Tatooine",
+      province: "Tatooine",
+      postal: "12345",
+    },
+    phone_number: "555-987-6543",
+    facebook_url: "https://www.facebook.com/rey.skywalker",
+    viber: "555-987-6543",
+  },
+];

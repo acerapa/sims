@@ -1,6 +1,7 @@
 const { sequelize } = require("../models");
 const Address = require("../models/address");
 const SalesOrderProduct = require("../models/junction/sales-order-product");
+const PaymentMethod = require("../models/payment-method");
 const Product = require("../models/product");
 const SalesOrder = require("../models/sales-order");
 const {
@@ -21,6 +22,10 @@ module.exports = {
           {
             model: Product,
             as: "products",
+          },
+          {
+            model: PaymentMethod,
+            as: "payment_method",
           },
         ],
       });

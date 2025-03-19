@@ -2,6 +2,8 @@ const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
 const Customer = require("./customer");
 const Address = require("./address");
+const PaymentMethod = require("./payment-method");
+
 const { SalesOrderStatus, SalesOrderType } = require("shared/enums");
 
 class SalesOrder extends Model {}
@@ -50,6 +52,14 @@ SalesOrder.init(
       type: DataTypes.INTEGER,
       references: {
         model: Address,
+        key: "id",
+      },
+    },
+    payment_method_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: PaymentMethod,
         key: "id",
       },
     },

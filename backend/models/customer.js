@@ -1,4 +1,4 @@
-const { DataTypes, Model } = require("sequelize");
+const { DataTypes, Model, Op } = require("sequelize");
 const { sequelize } = require(".");
 const Address = require("./address");
 
@@ -41,9 +41,22 @@ Customer.init(
   },
   {
     sequelize,
-    paranoid: true,
     timestamps: true,
   }
 );
+
+Customer.beforeBulkDestroy(async (options) => {
+  const customers = await Customer.findAll({
+    where: options.where,
+    attributes: ["id", "address_id"],
+  });
+  await Address.destroy({
+    where: {
+      id: {
+        [Op.in]: customers.map((c) => c.address_id),
+      },
+    },
+  });
+});
 
 module.exports = Customer;

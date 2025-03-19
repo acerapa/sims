@@ -43,6 +43,30 @@ export default [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/payment-methods',
+        name: SalesConst.PAYMENT_METHODS,
+        component: () => import('@/views/sales/PaymentMethod.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/invoices',
+        name: SalesConst.INVOICES,
+        component: () => import('@/views/sales/Invoice.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/invoice-form',
+        name: SalesConst.INVOICE_FORM,
+        component: () => import('@/views/sales/InvoiceForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   }

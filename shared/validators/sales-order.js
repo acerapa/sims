@@ -8,6 +8,7 @@ const SalesOrderSchema = joi.object({
   delivery_date: joi.date().allow("", null).optional(),
   bill_due: joi.date().allow("", null).optional(),
   customer_id: joi.number().required(),
+  payment_method_id: joi.number().required(),
   type: joi
     .string()
     .valid(...Object.values(SalesOrderType))
@@ -34,8 +35,13 @@ const SalesOrderCreateSchema = joi.object({
   shipment_address: AddressSchema,
 });
 
+const PaymentMethodSchema = joi.object({
+  name: joi.string().required(),
+});
+
 module.exports = {
   SalesOrderSchema,
+  PaymentMethodSchema,
   SalesOrderCreateSchema,
   SalesOrderProductSchema,
 };

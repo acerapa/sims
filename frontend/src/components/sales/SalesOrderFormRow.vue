@@ -1,7 +1,7 @@
 <template>
   <div
-    class="grid gap-3"
-    :class="props.isDisabled ? 'grid-cols-9' : 'grid-cols-10'"
+    class="grid gap-3 min-w-[864px]"
+    :class="props.isDisabled ? 'grid-cols-8' : 'grid-cols-9'"
   >
     <CustomInput
       type="select"
@@ -44,15 +44,6 @@
       v-model="model.price"
       :error-has-text="false"
       :error="modelErrors.price"
-    />
-    <CustomInput
-      type="number"
-      name="discount"
-      class="col-span-1"
-      placeholder="Discount"
-      v-model="model.discount"
-      :error-has-text="false"
-      :error="modelErrors.discount"
     />
     <CustomInput
       type="number"

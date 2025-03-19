@@ -1,5 +1,7 @@
+@host = "https://sims-1gh9.onrender.com"
+
 ##### - [User Registration] success registration
-POST https://sims-1gh9.onrender.com/api/users/register
+POST {{host}}/api/users/register
 Accept: application/json
 Content-Type: application/json
 
@@ -12,3 +14,7 @@ Content-Type: application/json
 	"start_date": "2024-04-02",
 	"status": 1
 }
+
+
+### Notification testing
+GET {{host}}/api/test/notification
