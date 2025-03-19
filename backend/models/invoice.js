@@ -3,6 +3,7 @@ const Customer = require("./customer");
 const SalesOrder = require("./sales-order");
 const { sequelize } = require(".");
 const User = require("./user");
+const { InvoiceStatus } = require("shared/enums");
 
 class Invoice extends Model {}
 
@@ -28,6 +29,11 @@ Invoice.init(
         model: User,
         key: "id",
       },
+    },
+    status: {
+      type: DataTypes.ENUM,
+      values: Object.values(InvoiceStatus),
+      defaultValue: InvoiceStatus.UNPAID,
     },
     payment_method: {
       type: DataTypes.INTEGER,
