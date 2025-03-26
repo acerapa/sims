@@ -1,6 +1,6 @@
 import { authenticatedApi, Method } from '@/api'
 import { defineStore } from 'pinia'
-import { DateHelpers, NotificationStatus } from 'shared'
+import { DateHelpers, NotificationStatus, NotificationType } from 'shared'
 import { computed, ref } from 'vue'
 
 export const useNotificationStore = defineStore('notification', () => {
@@ -8,6 +8,10 @@ export const useNotificationStore = defineStore('notification', () => {
 
   const unreadNotification = computed(() =>
     notifications.value.filter((n) => n.status === NotificationStatus.UNREAD)
+  )
+
+  const productNotification = computed(() =>
+    notifications.value.filter((n) => n.type == NotificationType.PRODUCT)
   )
 
   const timeBasedNotif = computed(() => {
@@ -116,6 +120,7 @@ export const useNotificationStore = defineStore('notification', () => {
     notifications,
     timeBasedNotif,
     unreadNotification,
+    productNotification,
 
     notifFromSocket,
     fetchNotifications,

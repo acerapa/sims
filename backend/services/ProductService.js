@@ -1,4 +1,4 @@
-const { ProductType } = require("shared/enums");
+const { ProductType, NotificationType } = require("shared/enums");
 const Account = require("../models/account");
 const Product = require("../models/product");
 const ProductCategory = require("../models/product-category");
@@ -75,6 +75,7 @@ const reorderingProductNotification = async (product, newStock) => {
     const notify = await Notification.create({
       title: `Product ${product.name} is runnning low`,
       description: "Please decide to reorder this product",
+      type: NotificationType.PRODUCT,
     });
 
     const notificationSocket = getNotificationSocket();
