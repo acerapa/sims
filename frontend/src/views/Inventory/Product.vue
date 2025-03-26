@@ -93,17 +93,14 @@
         </div>
       </template>
     </CustomTable>
-    <div class="cont min-w-80 h-fit !py-0">
-      <p class="my-3">📣 Alerts and Notifications</p>
-      <hr class="-mx-4" />
-      <p class="text-sm text-center my-6">No Alerts and Notifications</p>
-    </div>
+    <ProductNotification />
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import ProductModal from '@/components/product/ProductModal.vue'
+import ProductNotification from '@/components/Notification/ProductNotification.vue'
 import ProductRow from '@/components/product/ProductRow.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
