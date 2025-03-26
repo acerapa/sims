@@ -191,6 +191,13 @@ const NotificationStatus = Object.freeze({
   READ: "read",
 });
 
+const NotificationType = Object.freeze({
+  GENERAL: "general",
+  PRODUCT: "product",
+  SALES_ORDER: "sales-order",
+  PURCHASE_ORDER: "purchase-order",
+});
+
 const ConsoleColors = {
   RED: "\x1b[31m",
   BLUE: "\x1b[34m",
@@ -223,6 +230,7 @@ module.exports = {
   BranchStatusMap,
   LocalStorageKeys,
   SalesOrderStatus,
+  NotificationType,
   PurchaseOrderType,
   PurchaseStatusMap,
   SalesOrderTypeMap,
