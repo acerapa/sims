@@ -48,6 +48,10 @@ SalesOrder.init(
       values: Object.values(SalesOrderStatus),
       defaultValue: SalesOrderStatus.OPEN,
     },
+    has_delivery: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
     shipment_address_id: {
       type: DataTypes.INTEGER,
       references: {
