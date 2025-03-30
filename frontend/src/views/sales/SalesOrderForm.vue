@@ -13,6 +13,7 @@
             :error-has-text="true"
             label="Select Customer"
             :options="customerOptions"
+            :disabled="route.query.id"
             placeholder="Select Customer"
             :error="modelErrors.customer_id"
             v-model="model.sales_order.customer_id"
@@ -63,32 +64,21 @@
             v-model="model.sales_order.bill_due"
           />
         </div>
-        <div class="flex gap-3">
-          <CustomInput
-            type="date"
-            class="flex-1"
-            :has-label="true"
-            name="delivery_date"
-            label="Delivery Date"
-            :error-has-text="true"
-            :error="modelErrors.delivery_date"
-            v-model="model.sales_order.delivery_date"
-          />
-          <CustomInput
-            type="select"
-            class="flex-1"
-            :has-label="true"
-            :has-add-new="true"
-            label="Payment Method"
-            :error-has-text="true"
-            name="payment_method_id"
-            :options="paymentMethodOptions"
-            placeholder="Select Payment Method"
-            @add-new="paymentMethodModal = true"
-            :error="modelErrors.payment_method_id"
-            v-model="model.sales_order.payment_method_id"
-          />
-        </div>
+
+        <CustomInput
+          type="select"
+          :has-label="true"
+          :has-add-new="true"
+          label="Payment Method"
+          :error-has-text="true"
+          name="payment_method_id"
+          :options="paymentMethodOptions"
+          placeholder="Select Payment Method"
+          @add-new="paymentMethodModal = true"
+          :error="modelErrors.payment_method_id"
+          v-model="model.sales_order.payment_method_id"
+        />
+
         <CustomInput
           name="memo"
           label="Memo"
@@ -101,13 +91,38 @@
         />
       </div>
       <div class="flex-1">
-        <p class="font-semibold mb-4">Shipment Address</p>
-        <AddressForm
-          :has-label="true"
-          class="flex-1"
-          v-model="model.shipment_address"
-          :address-errors="modelErrors.shipment_address"
-        />
+        <p class="font-semibold mb-1">Delivery Information</p>
+        <div class="flex flex-col gap-3 mt-3">
+          <CustomInput
+            type="checkbox"
+            :has-label="true"
+            name="has_delivery"
+            label="Has Delivery"
+            class="[&>div]:flex-row-reverse [&>div]:justify-end"
+            v-model="model.sales_order.has_delivery"
+          />
+          <CustomInput
+            type="date"
+            class="flex-1"
+            :has-label="true"
+            name="delivery_date"
+            label="Delivery Date"
+            :error-has-text="true"
+            :error="modelErrors.delivery_date"
+            v-if="model.sales_order.has_delivery"
+            v-model="model.sales_order.delivery_date"
+          />
+        </div>
+        <div v-if="model.sales_order.has_delivery">
+          <p class="font-semibold mb-4 mt-3">Shipment Address</p>
+          <AddressForm
+            :has-label="true"
+            class="flex-1"
+            :disabled="!model.sales_order.has_delivery"
+            v-model="model.shipment_address"
+            :address-errors="modelErrors.shipment_address"
+          />
+        </div>
       </div>
     </div>
 
@@ -182,7 +197,7 @@
 
 <script setup>
 import Event from '@/event'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import { ObjectHelpers, SalesOrderCreateSchema, SalesOrderType } from 'shared'
@@ -200,6 +215,7 @@ import { useSalesStore } from '@/stores/sales'
 import { ToastTypes } from '@/data/types'
 import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useTableScroll } from '@/use/useTableScroll'
+import { checkAddressIfHasValues } from '@/helper'
 
 const route = useRoute()
 const router = useRouter()
@@ -232,7 +248,8 @@ const defaultModel = {
     delivery_date: '',
     bill_due: '',
     status: 'open',
-    payment_method_id: ''
+    payment_method_id: '',
+    has_delivery: true
   },
   shipment_address: {
     address1: '',
@@ -357,6 +374,13 @@ const onAfterDelete = async () => {
   })
 }
 
+const populateShipmentAddress = (address) => {
+  model.value.shipment_address = ObjectHelpers.assignSameFields(
+    model.value.shipment_address,
+    address
+  )
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -390,10 +414,7 @@ onMounted(async () => {
       : ''
 
     // address
-    model.value.shipment_address = ObjectHelpers.assignSameFields(
-      model.value.shipment_address,
-      salesStore.salesOrder.shipment_address
-    )
+    populateShipmentAddress(salesStore.salesOrder.shipment_address)
 
     // products
     model.value.sales_order_products = salesStore.salesOrder.products.map(
@@ -409,4 +430,37 @@ onMounted(async () => {
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
+
+/** ================================================
+ * WATCHERS
+ * ================================================*/
+watch(
+  () => model.value.sales_order.customer_id,
+  async (val) => {
+    if (val && !route.query.id) {
+      const customer = await customerStore.getCustomer(val)
+      if (model.value.sales_order.has_delivery) {
+        populateShipmentAddress(customer.address)
+      }
+    }
+  }
+)
+
+watch(
+  () => model.value.sales_order.has_delivery,
+  async (val) => {
+    if (!val) {
+      model.value.shipment_address = ObjectHelpers.objectReset(
+        model.value.shipment_address
+      )
+    } else if (val && model.value.sales_order.customer_id) {
+      const customer = await customerStore.getCustomer(
+        model.value.sales_order.customer_id
+      )
+      if (customer) {
+        populateShipmentAddress(customer.address)
+      }
+    }
+  }
+)
 </script>
