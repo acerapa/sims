@@ -26,3 +26,8 @@ export function validateProductStocks(productsModel, products) {
 
   return Object.keys(errors).length > 0 ? errors : null
 }
+
+export function checkAddressIfHasValues(address) {
+  const values = Object.values(address)
+  return values.some((v) => v)
+}
