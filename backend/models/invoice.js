@@ -2,7 +2,6 @@ const { Model, DataTypes } = require("sequelize");
 const Customer = require("./customer");
 const SalesOrder = require("./sales-order");
 const { sequelize } = require(".");
-const User = require("./user");
 const { InvoiceStatus } = require("shared/enums");
 
 class Invoice extends Model {}
@@ -22,30 +21,10 @@ Invoice.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
-    },
     status: {
       type: DataTypes.ENUM,
       values: Object.values(InvoiceStatus),
       defaultValue: InvoiceStatus.UNPAID,
-    },
-    payment_method: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    customer_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Customer,
-        key: "id",
-      },
     },
     sales_order_id: {
       type: DataTypes.INTEGER,

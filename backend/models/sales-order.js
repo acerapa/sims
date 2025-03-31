@@ -1,10 +1,11 @@
 const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require(".");
 const Customer = require("./customer");
-const Address = require("./address");
+const User = require("./user");
 const PaymentMethod = require("./payment-method");
 
 const { SalesOrderStatus, SalesOrderType } = require("shared/enums");
+const Delivery = require("./delivery");
 
 class SalesOrder extends Model {}
 
@@ -23,14 +24,15 @@ SalesOrder.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    date_delivery: {
-      type: DataTypes.DATE,
-      allowNull: true,
+    user_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: User,
+        key: "id",
+      },
+      comment: "Sales Person",
     },
-    bill_due: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
+
     customer_id: {
       type: DataTypes.INTEGER,
       references: {
@@ -48,22 +50,19 @@ SalesOrder.init(
       values: Object.values(SalesOrderStatus),
       defaultValue: SalesOrderStatus.OPEN,
     },
-    has_delivery: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-    },
-    shipment_address_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: Address,
-        key: "id",
-      },
-    },
     payment_method_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: PaymentMethod,
+        key: "id",
+      },
+    },
+    delivery_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: Delivery,
         key: "id",
       },
     },
