@@ -1,5 +1,4 @@
 const { Model, DataTypes } = require("sequelize");
-const Customer = require("./customer");
 const SalesOrder = require("./sales-order");
 const { sequelize } = require(".");
 const { InvoiceStatus } = require("shared/enums");

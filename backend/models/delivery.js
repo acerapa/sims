@@ -1,6 +1,7 @@
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require(".");
 const { DeliveryStatus } = require("shared/enums");
+const Address = require("./address");
 
 class Delivery extends Model {}
 
@@ -24,6 +25,14 @@ Delivery.init(
       values: Object.values(DeliveryStatus),
       defaultValue: DeliveryStatus.PENDING,
     },
+    address_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Address,
+        key: "id",
+      }
+    }
   },
   {
     sequelize,
