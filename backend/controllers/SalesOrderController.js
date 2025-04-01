@@ -1,9 +1,12 @@
 const { sequelize } = require("../models");
 const Address = require("../models/address");
+const Customer = require("../models/customer");
+const Delivery = require("../models/delivery");
 const SalesOrderProduct = require("../models/junction/sales-order-product");
 const PaymentMethod = require("../models/payment-method");
 const Product = require("../models/product");
 const SalesOrder = require("../models/sales-order");
+const User = require("../models/user");
 const {
   findSalesOrder,
   updateSalesOrder,
@@ -22,6 +25,21 @@ module.exports = {
           {
             model: PaymentMethod,
             as: "payment_method",
+          },
+          {
+            model: User,
+            as: "sales_person",
+            attributes: ["id", "first_name", "last_name"],
+          },
+          {
+            model: Delivery,
+            as: "delivery",
+            attributes: ["id"],
+          },
+          {
+            model: Customer,
+            as: "customer",
+            attributes: ["id", "first_name", "last_name"],
           },
         ],
       });
@@ -48,6 +66,14 @@ module.exports = {
       let salesOrder = null;
 
       if (data.sales_order) {
+        /**
+         * Sets the user ID for the sales order to the current authenticated user's ID
+         * if no user ID is explicitly provided in the sales order data
+         */
+        if (!data.sales_order.user_id) {
+          data.sales_order.user_id = req.user_id;
+        }
+
         salesOrder = await SalesOrder.create(
           { ...data.sales_order },
           { transaction }

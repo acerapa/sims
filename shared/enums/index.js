@@ -140,14 +140,14 @@ const ProductStatus = Object.freeze({
 });
 
 const SalesOrderType = Object.freeze({
-  CASH: "cash",
+  ONE_TIME: "one-time",
   INSTALLMENT: "installment",
 });
 
 const SalesOrderTypeMap = Object.freeze({
-  [SalesOrderType.CASH]: {
-    text: "Cash",
-    class: "sales-types-cash",
+  [SalesOrderType.ONE_TIME]: {
+    text: "One-Time",
+    class: "sales-types-one-time",
   },
   [SalesOrderType.INSTALLMENT]: {
     text: "Installment",
@@ -157,10 +157,8 @@ const SalesOrderTypeMap = Object.freeze({
 
 const SalesOrderStatus = Object.freeze({
   OPEN: "open",
-  CONFIRMED: "confirmed",
-  COMPLETED: "completed",
+  INVOICED: "invoiced",
   CANCELLED: "cancelled",
-  OVERDUE: "overdue",
 });
 
 const SalesOrderStatusMap = Object.freeze({
@@ -168,21 +166,13 @@ const SalesOrderStatusMap = Object.freeze({
     text: "Open",
     class: "purchase-status-open",
   },
-  [SalesOrderStatus.CONFIRMED]: {
-    text: "Confirmed",
-    class: "purchase-status-confirmed",
-  },
-  [SalesOrderStatus.COMPLETED]: {
-    text: "Completed",
+  [SalesOrderStatus.INVOICED]: {
+    text: "Invoiced",
     class: "purchase-status-completed",
   },
   [SalesOrderStatus.CANCELLED]: {
     text: "Cancelled",
     class: "purchase-status-cancelled",
-  },
-  [SalesOrderStatus.OVERDUE]: {
-    text: "Overdue",
-    class: "purchase-status-overdue",
   },
 });
 

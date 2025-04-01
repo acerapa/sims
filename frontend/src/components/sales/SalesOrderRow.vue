@@ -13,8 +13,9 @@
         :custom-class="SalesOrderTypeMap[props.order.type].class"
       />
     </div>
-    <p class="col-span-1 text-sm">{{ parseFloat(total).toFixed(2) }}</p>
-    <p class="col-span-2 text-sm">
+    <p class="col-span-2 text-sm">{{ customerName }}</p>
+    <p class="col-span-2 text-sm">{{ salesPersonName }}</p>
+    <p class="col-span-1 text-sm">
       {{
         new Date(props.order.purchase_date).toLocaleString('default', {
           month: 'numeric',
@@ -23,16 +24,8 @@
         })
       }}
     </p>
-    <p class="col-span-2 text-sm">
-      {{
-        new Date(props.order.bill_due).toLocaleString('default', {
-          month: 'numeric',
-          day: '2-digit',
-          year: 'numeric'
-        })
-      }}
-    </p>
-    <p class="col-span-2 text-sm">{{ props.order.payment_method.name }}</p>
+    <p class="col-span-1 text-sm">{{ props.order.payment_method.name }}</p>
+    <p class="col-span-1 text-sm">{{ parseFloat(total).toFixed(2) }}</p>
     <div class="col-span-1">
       <BadgeComponent
         :text="SalesOrderStatusMap[props.order.status].text"
@@ -65,5 +58,15 @@ const total = computed(() => {
         .map((p) => parseInt(p.SalesOrderProduct.total))
         .reduce((a, b) => a + b, 0)
     : 0
+})
+
+const customerName = computed(() => {
+  const { first_name, last_name } = props.order.customer
+  return `${first_name} ${last_name}`
+})
+
+const salesPersonName = computed(() => {
+  const { first_name, last_name } = props.order.sales_person
+  return `${first_name} ${last_name}`
 })
 </script>

@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const router = Router();
 const testRoutes = Router();
+const { validateToken } = require("../middleware/authentication");
 
 // start use routes
 const authRoutes = require("./AuthRoutes");
@@ -28,7 +29,7 @@ const purchaseOrderRoutes = require("./PurchaseOrderRoutes");
 router.use("/purchase-order", purchaseOrderRoutes);
 
 const salesOrderRoutes = require("./SalesOrderRoutes");
-router.use("/sales-order", salesOrderRoutes);
+router.use("/sales-order", validateToken, salesOrderRoutes);
 
 const productSettingRoutes = require("./ProductSettingRoutes");
 router.use("/product-setting", productSettingRoutes);

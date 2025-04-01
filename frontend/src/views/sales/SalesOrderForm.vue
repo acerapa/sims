@@ -2,7 +2,16 @@
   <div class="cont flex flex-col gap-5">
     <div class="flex gap-3 max-lg:flex-col">
       <div class="flex flex-col gap-3 flex-1">
-        <p class="font-semibold mb-1">Sales Order Information</p>
+        <div class="flex justify-between items-center">
+          <p class="font-semibold mb-1">Sales Order Information</p>
+          <div class="flex gap-3">
+            <SelectStatusDropdown
+              v-model="model.sales_order.status"
+              :status-map="SalesOrderStatusMap"
+            />
+            <button class="btn-green">Generate Invoice</button>
+          </div>
+        </div>
 
         <div class="flex gap-3">
           <CustomInput
@@ -14,19 +23,19 @@
             :error-has-text="true"
             label="Select Customer"
             :options="customerOptions"
-            :disabled="route.query.id"
             placeholder="Select Customer"
             :error="modelErrors.customer_id"
-            v-model="model.sales_order.customer_id"
             @add-new="showCustomerModel = true"
+            v-model="model.sales_order.customer_id"
+            :disabled="route.query.id ? true : false"
           />
           <CustomInput
             type="select"
             class="flex-1"
             :options="[
               {
-                text: 'Cash',
-                value: SalesOrderType.CASH
+                text: 'One-Time',
+                value: SalesOrderType.ONE_TIME
               },
               {
                 text: 'Installment',
@@ -36,10 +45,10 @@
             :has-label="true"
             name="customer_id"
             label="Order Type"
-            v-model="model.sales_order.type"
-            placeholder="Order Type"
             :error-has-text="true"
+            placeholder="Order Type"
             :error="modelErrors.type"
+            v-model="model.sales_order.type"
           />
         </div>
 
@@ -72,16 +81,16 @@
 
         <CustomInput
           type="select"
-          class="max-w-[calc(50%_-_6px)]"
+          name="user_id"
           :has-label="true"
           :has-add-new="true"
           label="Prepared By"
           :error-has-text="true"
-          name="user_id"
-          :options="employeeOptions"
           placeholder="Prepared By"
-          v-model="model.sales_order.user_id"
+          :options="employeeOptions"
           :error="modelErrors.user_id"
+          class="max-w-[calc(50%_-_6px)]"
+          v-model="model.sales_order.user_id"
           @add-new="showEmployeeModal = true"
         />
 
@@ -211,11 +220,14 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import {
+  DeliverySchema,
   ObjectHelpers,
   SalesOrderCreateSchema,
   SalesOrderStatus,
+  SalesOrderStatusMap,
   SalesOrderType
 } from 'shared'
+
 import AddressForm from '@/components/shared/AddressForm.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
@@ -225,6 +237,8 @@ import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import PaymentMethodModal from '@/components/sales/payment-method/PaymentMethodModal.vue'
 import EmployeeModal from '@/components/Employee/EmployeeModal.vue'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
+
 import { SalesConst } from '../../const/route.constants'
 import { useCustomerStore } from '@/stores/customer'
 import { useSalesStore } from '@/stores/sales'
@@ -323,6 +337,18 @@ const employeeOptions = computed(() =>
 /** ================================================
  * METHODS
  ** ================================================*/
+
+const onSubmitDelivery = async () => {
+  // validation
+  const { error } = DeliverySchema.validate(deliveryModel.value, {
+    abortEarly: false
+  })
+
+  if (error) {
+    console.log(error)
+  }
+}
+
 const onSubmit = async (saveAndNew) => {
   // validation
   modelErrors.value = {}
@@ -465,33 +491,4 @@ onMounted(async () => {
 /** ================================================
  * WATCHERS
  * ================================================*/
-// watch(
-//   () => model.value.sales_order.customer_id,
-//   async (val) => {
-//     if (val && !route.query.id) {
-//       const customer = await customerStore.getCustomer(val)
-//       if (model.value.sales_order.has_delivery) {
-//         populateShipmentAddress(customer.address)
-//       }
-//     }
-//   }
-// )
-
-// watch(
-//   () => model.value.sales_order.has_delivery,
-//   async (val) => {
-//     if (!val) {
-//       model.value.shipment_address = ObjectHelpers.objectReset(
-//         model.value.shipment_address
-//       )
-//     } else if (val && model.value.sales_order.customer_id) {
-//       const customer = await customerStore.getCustomer(
-//         model.value.sales_order.customer_id
-//       )
-//       if (customer) {
-//         populateShipmentAddress(customer.address)
-//       }
-//     }
-//   }
-// )
 </script>
