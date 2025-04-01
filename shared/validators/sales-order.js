@@ -1,7 +1,5 @@
 const joi = require("joi");
-const { AddressSchema } = require("./user");
 const { SalesOrderStatus, SalesOrderType } = require("../enums/index");
-const { ValidatorHelpers } = require("../helpers/validators-helpers");
 
 const SalesOrderSchema = joi.object({
   memo: joi.string().allow("", null).optional(),
