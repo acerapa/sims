@@ -19,7 +19,6 @@ const SalesOrderSchema = joi.object({
   user_id: joi.number().allow("", null).optional(),
   customer_id: joi.number().required(),
   payment_mehtod_id: joi.number().required(),
-  delivery_id: joi.number().allow("", null).optional(),
 });
 
 const SalesOrderProductSchema = joi.object({

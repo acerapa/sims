@@ -25,14 +25,6 @@ Invoice.init(
       values: Object.values(InvoiceStatus),
       defaultValue: InvoiceStatus.UNPAID,
     },
-    sales_order_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: SalesOrder,
-        key: "id",
-      },
-    },
     memo: {
       type: DataTypes.TEXT,
       allowNull: true,
@@ -48,6 +40,14 @@ Invoice.init(
     total: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
+    },
+    sales_order_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: SalesOrder,
+        key: "id",
+      },
     },
   },
   {

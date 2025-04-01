@@ -14,6 +14,7 @@ const DeliverySchema = joi.object({
     otherwise:
       ValidatorHelpers.makeSchemaFieldOptional(AddressSchema).optional(),
   }),
+  sales_order_id: joi.number().required(),
 });
 
 module.exports = {

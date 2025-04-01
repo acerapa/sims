@@ -24,22 +24,6 @@ SalesOrder.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    user_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: User,
-        key: "id",
-      },
-      comment: "Sales Person",
-    },
-
-    customer_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: Customer,
-        key: "id",
-      },
-    },
     type: {
       type: DataTypes.ENUM,
       values: Object.values(SalesOrderType),
@@ -58,11 +42,18 @@ SalesOrder.init(
         key: "id",
       },
     },
-    delivery_id: {
+    user_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
       references: {
-        model: Delivery,
+        model: User,
+        key: "id",
+      },
+      comment: "Sales Person",
+    },
+    customer_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: Customer,
         key: "id",
       },
     },

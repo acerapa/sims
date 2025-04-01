@@ -16,10 +16,6 @@ module.exports = {
         order: [["createdAt", "DESC"]],
         include: [
           {
-            model: Address,
-            as: "shipment_address",
-          },
-          {
             model: Product,
             as: "products",
           },
@@ -51,16 +47,9 @@ module.exports = {
       const data = req.body.validated;
       let salesOrder = null;
 
-      let shipmentAddress = null;
-      if (data.shipment_address) {
-        shipmentAddress = await Address.create(data.shipment_address, {
-          transaction,
-        });
-      }
-
       if (data.sales_order) {
         salesOrder = await SalesOrder.create(
-          { ...data.sales_order, shipment_address_id: shipmentAddress.id },
+          { ...data.sales_order },
           { transaction }
         );
       }

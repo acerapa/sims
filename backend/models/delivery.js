@@ -2,6 +2,7 @@ const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require(".");
 const { DeliveryStatus } = require("shared/enums");
 const Address = require("./address");
+const SalesOrder = require("./sales-order");
 
 class Delivery extends Model {}
 
@@ -31,8 +32,16 @@ Delivery.init(
       references: {
         model: Address,
         key: "id",
-      }
-    }
+      },
+    },
+    sales_order_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: SalesOrder,
+        key: "id",
+      },
+    },
   },
   {
     sequelize,

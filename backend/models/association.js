@@ -22,8 +22,9 @@ const SalesOrder = require("./sales-order");
 const SalesOrderProduct = require("./junction/sales-order-product");
 const Invoice = require("./invoice");
 const PaymentMethod = require("./payment-method");
+const Delivery = require("./delivery");
 
-// Sales Order, Product, Address and Sales Order Product Relations
+// Sales Order, Product, Address, Invoice and Sales Order Product Relations
 SalesOrder.belongsToMany(Product, {
   through: SalesOrderProduct,
   foreignKey: "sales_order_id",
@@ -38,14 +39,49 @@ Product.belongsToMany(SalesOrder, {
   as: "sales_orders",
 });
 
-SalesOrder.belongsTo(Address, {
-  foreignKey: "shipment_address_id",
-  as: "shipment_address",
-});
-
 SalesOrder.belongsTo(PaymentMethod, {
   foreignKey: "payment_method_id",
   as: "payment_method",
+});
+
+SalesOrder.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "sales_person",
+});
+
+User.hasMany(SalesOrder, {
+  foreignKey: "user_id",
+  as: "sales_orders",
+});
+
+SalesOrder.belongsTo(Customer, {
+  foreignKey: "customer_id",
+  as: "customer",
+});
+
+Customer.hasMany(SalesOrder, {
+  foreignKey: "customer_id",
+  as: "sales_orders",
+});
+
+SalesOrder.hasOne(Delivery, {
+  foreignKey: "sales_order_id",
+  as: "delivery",
+});
+
+Delivery.belongsTo(SalesOrder, {
+  foreignKey: "sales_order_id",
+  as: "sales_order",
+});
+
+SalesOrder.hasOne(Invoice, {
+  foreignKey: "sales_order_id",
+  as: "invoice",
+});
+
+Invoice.belongsTo(SalesOrder, {
+  foreignKey: "sales_order_id",
+  as: "sales_order",
 });
 
 // Purchase Order, Purchase Order Product and Product Relations
@@ -314,34 +350,6 @@ ProductDetails.belongsTo(Product, {
 ServiceDetails.belongsTo(Product, {
   foreignKey: "product_id",
   as: "product",
-});
-
-// Invoice, Product, InvoiceToProduct, Customer and User Relations
-Invoice.belongsTo(Customer, {
-  foreignKey: "customer_id",
-  as: "customer",
-});
-
-Customer.hasMany(Invoice, {
-  foreignKey: "customer_id",
-  as: "invoices",
-});
-
-Invoice.belongsTo(User, {
-  foreignKey: "user_id",
-  as: "prepared_by",
-});
-
-User.hasMany(Invoice, {
-  foreignKey: "user_id",
-  as: "invoices",
-});
-
-Invoice.belongsTo(SalesOrder, {
-  foreignKey: "sales_order_id",
-  as: "sales_order",
-  onDelete: "SET NULL",
-  onUpdate: "SET NULL",
 });
 
 // Models that need to be exported for updated associations
