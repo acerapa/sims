@@ -3,6 +3,7 @@
     <div class="flex gap-3 max-lg:flex-col">
       <div class="flex flex-col gap-3 flex-1">
         <p class="font-semibold mb-1">Sales Order Information</p>
+
         <div class="flex gap-3">
           <CustomInput
             type="select"
@@ -54,29 +55,34 @@
             v-model="model.sales_order.purchase_date"
           />
           <CustomInput
-            type="date"
+            type="select"
             class="flex-1"
             :has-label="true"
-            name="bill_due"
-            label="Bill Due"
+            :has-add-new="true"
+            label="Payment Method"
             :error-has-text="true"
-            :error="modelErrors.bill_due"
-            v-model="model.sales_order.bill_due"
+            name="payment_method_id"
+            :options="paymentMethodOptions"
+            placeholder="Select Payment Method"
+            @add-new="paymentMethodModal = true"
+            :error="modelErrors.payment_method_id"
+            v-model="model.sales_order.payment_method_id"
           />
         </div>
 
         <CustomInput
           type="select"
+          class="max-w-[calc(50%_-_6px)]"
           :has-label="true"
           :has-add-new="true"
-          label="Payment Method"
+          label="Prepared By"
           :error-has-text="true"
-          name="payment_method_id"
-          :options="paymentMethodOptions"
-          placeholder="Select Payment Method"
-          @add-new="paymentMethodModal = true"
-          :error="modelErrors.payment_method_id"
-          v-model="model.sales_order.payment_method_id"
+          name="user_id"
+          :options="employeeOptions"
+          placeholder="Prepared By"
+          v-model="model.sales_order.user_id"
+          :error="modelErrors.user_id"
+          @add-new="showEmployeeModal = true"
         />
 
         <CustomInput
@@ -90,42 +96,45 @@
           v-model="model.sales_order.memo"
         />
       </div>
-      <div class="flex-1">
-        <p class="font-semibold mb-1">Delivery Information</p>
-        <div class="flex flex-col gap-3 mt-3">
-          <CustomInput
-            type="checkbox"
-            :has-label="true"
-            name="has_delivery"
-            label="Has Delivery"
-            class="[&>div]:flex-row-reverse [&>div]:justify-end"
-            v-model="model.sales_order.has_delivery"
-          />
-          <CustomInput
-            type="date"
-            class="flex-1"
-            :has-label="true"
-            name="delivery_date"
-            label="Delivery Date"
-            :error-has-text="true"
-            :error="modelErrors.delivery_date"
-            v-if="model.sales_order.has_delivery"
-            v-model="model.sales_order.delivery_date"
-          />
-        </div>
-        <div v-if="model.sales_order.has_delivery">
-          <p class="font-semibold mb-4 mt-3">Shipment Address</p>
-          <AddressForm
-            :has-label="true"
-            class="flex-1"
-            :disabled="!model.sales_order.has_delivery"
-            v-model="model.shipment_address"
-            :address-errors="modelErrors.shipment_address"
-          />
-        </div>
-      </div>
+    </div>
+  </div>
+
+  <div class="cont">
+    <p class="font-semibold">
+      Delivery Information <span class="italic font-thin">(Optional)</span>
+    </p>
+
+    <div class="flex gap-3 mt-3">
+      <CustomInput
+        type="date"
+        class="flex-1"
+        :has-label="true"
+        label="Delivery Date"
+        name="delivery_date"
+        :error-has-text="true"
+        :error="modelErrors.delivery_date"
+        v-model="deliveryModel.delivery_date"
+      />
+      <CustomInput
+        type="text"
+        class="flex-1"
+        name="courier"
+        label="Courier"
+        :has-label="true"
+        placeholder="Courier"
+        :error-has-text="true"
+        :error="modelErrors.courier"
+        v-model="deliveryModel.courier"
+      />
     </div>
 
+    <div class="mt-3 flex flex-col gap-1">
+      <p class="text-sm font-semibold">Shipment Address</p>
+      <AddressForm :has-label="true" v-model="deliveryModel.address" />
+    </div>
+  </div>
+
+  <div class="cont">
     <p class="font-semibold">Select Products</p>
     <div ref="multiSelectTable">
       <MultiSelectTable
@@ -187,6 +196,7 @@
   </div>
   <PaymentMethodModal v-if="paymentMethodModal" v-model="paymentMethodModal" />
   <CustomerModal v-if="showCustomerModel" v-model="showCustomerModel" />
+  <EmployeeModal v-if="showEmployeeModal" v-model="showEmployeeModal" />
   <DeleteConfirmModal
     v-if="showDeleteModal && route.query.id"
     v-model="showDeleteModal"
@@ -200,7 +210,12 @@ import Event from '@/event'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
-import { ObjectHelpers, SalesOrderCreateSchema, SalesOrderType } from 'shared'
+import {
+  ObjectHelpers,
+  SalesOrderCreateSchema,
+  SalesOrderStatus,
+  SalesOrderType
+} from 'shared'
 import AddressForm from '@/components/shared/AddressForm.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
@@ -209,13 +224,14 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import PaymentMethodModal from '@/components/sales/payment-method/PaymentMethodModal.vue'
+import EmployeeModal from '@/components/Employee/EmployeeModal.vue'
 import { SalesConst } from '../../const/route.constants'
 import { useCustomerStore } from '@/stores/customer'
 import { useSalesStore } from '@/stores/sales'
 import { ToastTypes } from '@/data/types'
 import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useTableScroll } from '@/use/useTableScroll'
-import { checkAddressIfHasValues } from '@/helper'
+import { useEmployeeStore } from '@/stores/employee'
 
 const route = useRoute()
 const router = useRouter()
@@ -223,11 +239,13 @@ const router = useRouter()
 const isDisabled = ref(false)
 const showDeleteModal = ref(false)
 const showCustomerModel = ref(false)
+const showEmployeeModal = ref(false)
 const paymentMethodModal = ref(false)
 const rowEventName = 'sales-order-row-event'
 
 const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
+const employeeStore = useEmployeeStore()
 const paymentMethodStore = usePaymentMethodStore()
 
 const productTransferModal = {
@@ -241,27 +259,33 @@ const productTransferModal = {
 
 const defaultModel = {
   sales_order: {
-    customer_id: '',
-    type: '',
     memo: '',
+    type: '',
+    user_id: '',
+    customer_id: '',
     purchase_date: '',
-    delivery_date: '',
-    bill_due: '',
-    status: 'open',
     payment_method_id: '',
-    has_delivery: true
+    status: SalesOrderStatus.OPEN
   },
-  shipment_address: {
+  sales_order_products: [{ ...productTransferModal }]
+}
+
+const deliveryDefaultModel = {
+  delivery_date: new Date(),
+  courier: '',
+  address_id: '',
+  address: {
     address1: '',
     address2: '',
     city: '',
     province: '',
     postal: ''
-  },
-  sales_order_products: [{ ...productTransferModal }]
+  }
 }
 
 const model = ref(ObjectHelpers.copyObj(defaultModel))
+const deliveryModel = ref(ObjectHelpers.copyObj(deliveryDefaultModel))
+
 const modelErrors = ref({})
 /** ================================================
  * EVENTS
@@ -285,6 +309,15 @@ const paymentMethodOptions = computed(() =>
     text: pm.name,
     value: pm.id
   }))
+)
+
+const employeeOptions = computed(() =>
+  employeeStore.employees.map((employee) => {
+    return {
+      text: `${employee.first_name} ${employee.last_name}`,
+      value: employee.id
+    }
+  })
 )
 
 /** ================================================
@@ -374,12 +407,12 @@ const onAfterDelete = async () => {
   })
 }
 
-const populateShipmentAddress = (address) => {
-  model.value.shipment_address = ObjectHelpers.assignSameFields(
-    model.value.shipment_address,
-    address
-  )
-}
+// const populateShipmentAddress = (address) => {
+//   model.value.shipment_address = ObjectHelpers.assignSameFields(
+//     model.value.shipment_address,
+//     address
+//   )
+// }
 
 /** ================================================
  * LIFE CYCLE HOOKS
@@ -388,6 +421,7 @@ const multiSelectTable = ref(null)
 useTableScroll(multiSelectTable)
 onMounted(async () => {
   await customerStore.getCustomers()
+  await employeeStore.getEmployees()
   await paymentMethodStore.getPaymentMethods()
 
   if (route.query.id) {
@@ -413,9 +447,6 @@ onMounted(async () => {
           .split('T')[0]
       : ''
 
-    // address
-    populateShipmentAddress(salesStore.salesOrder.shipment_address)
-
     // products
     model.value.sales_order_products = salesStore.salesOrder.products.map(
       (p) => {
@@ -434,33 +465,33 @@ onMounted(async () => {
 /** ================================================
  * WATCHERS
  * ================================================*/
-watch(
-  () => model.value.sales_order.customer_id,
-  async (val) => {
-    if (val && !route.query.id) {
-      const customer = await customerStore.getCustomer(val)
-      if (model.value.sales_order.has_delivery) {
-        populateShipmentAddress(customer.address)
-      }
-    }
-  }
-)
+// watch(
+//   () => model.value.sales_order.customer_id,
+//   async (val) => {
+//     if (val && !route.query.id) {
+//       const customer = await customerStore.getCustomer(val)
+//       if (model.value.sales_order.has_delivery) {
+//         populateShipmentAddress(customer.address)
+//       }
+//     }
+//   }
+// )
 
-watch(
-  () => model.value.sales_order.has_delivery,
-  async (val) => {
-    if (!val) {
-      model.value.shipment_address = ObjectHelpers.objectReset(
-        model.value.shipment_address
-      )
-    } else if (val && model.value.sales_order.customer_id) {
-      const customer = await customerStore.getCustomer(
-        model.value.sales_order.customer_id
-      )
-      if (customer) {
-        populateShipmentAddress(customer.address)
-      }
-    }
-  }
-)
+// watch(
+//   () => model.value.sales_order.has_delivery,
+//   async (val) => {
+//     if (!val) {
+//       model.value.shipment_address = ObjectHelpers.objectReset(
+//         model.value.shipment_address
+//       )
+//     } else if (val && model.value.sales_order.customer_id) {
+//       const customer = await customerStore.getCustomer(
+//         model.value.sales_order.customer_id
+//       )
+//       if (customer) {
+//         populateShipmentAddress(customer.address)
+//       }
+//     }
+//   }
+// )
 </script>

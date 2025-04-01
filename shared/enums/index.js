@@ -216,6 +216,12 @@ const InvoiceStatus = Object.freeze({
   DISPUTED: "disputed",
 });
 
+const DeliveryStatus = Object.freeze({
+  PENDING: "pending",
+  DELIVERED: "delivered",
+  CANCELLED: "cancelled",
+});
+
 module.exports = {
   UserType,
   ItemType,
@@ -227,6 +233,7 @@ module.exports = {
   ConsoleColors,
   InvoiceStatus,
   SalesOrderType,
+  DeliveryStatus,
   BranchStatusMap,
   LocalStorageKeys,
   SalesOrderStatus,

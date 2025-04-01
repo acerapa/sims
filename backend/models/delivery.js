@@ -1,7 +1,7 @@
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require(".");
-const Customer = require("./customer");
-const User = require("./user");
+const { DeliveryStatus } = require("shared/enums");
+const Address = require("./address");
 const SalesOrder = require("./sales-order");
 
 class Delivery extends Model {}
@@ -17,36 +17,29 @@ Delivery.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    customer_id: {
+    courier: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM,
+      values: Object.values(DeliveryStatus),
+      defaultValue: DeliveryStatus.PENDING,
+    },
+    address_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Customer,
+        model: Address,
         key: "id",
       },
     },
-    // TODO: to be add
-    // invoice_id: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   references: {
-    //     model: Invoice,
-    //     key: "id",
-    //   },
-    // },
     sales_order_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: SalesOrder,
         key: "id",
-      },
-    },
-    prepared_by: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: User,
       },
     },
   },

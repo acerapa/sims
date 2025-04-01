@@ -12,4 +12,12 @@ module.exports = {
       res.sendError({ error }, "Something went wrong!");
     }
   },
+
+  register: async (req, res) => {
+    try {
+      res.sendResponse({ done: true }, "Successfully registered!");
+    } catch (error) {
+      res.sendError({ error }, "Something went wrong!");
+    }
+  },
 };
