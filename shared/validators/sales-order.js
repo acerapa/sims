@@ -18,7 +18,7 @@ const SalesOrderSchema = joi.object({
   // references
   user_id: joi.number().allow("", null).optional(),
   customer_id: joi.number().required(),
-  payment_mehtod_id: joi.number().required(),
+  payment_method_id: joi.number().required(),
 });
 
 const SalesOrderProductSchema = joi.object({
@@ -31,7 +31,7 @@ const SalesOrderProductSchema = joi.object({
 });
 
 const SalesOrderCreateSchema = joi.object({
-  sales_order: SalesOrderSchema,
+  sales_order: SalesOrderSchema.required(),
   sales_order_products: joi
     .array()
     .items(SalesOrderProductSchema)

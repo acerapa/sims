@@ -5,7 +5,6 @@ const User = require("./user");
 const PaymentMethod = require("./payment-method");
 
 const { SalesOrderStatus, SalesOrderType } = require("shared/enums");
-const Delivery = require("./delivery");
 
 class SalesOrder extends Model {}
 

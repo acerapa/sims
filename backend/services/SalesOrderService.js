@@ -8,10 +8,6 @@ const findSalesOrder = async (id) => {
   return await SalesOrder.findByPk(id, {
     include: [
       {
-        model: Address,
-        as: "shipment_address",
-      },
-      {
         model: Product,
         as: "products",
       },
