@@ -1,8 +1,14 @@
 const jwt = require("jsonwebtoken");
 const validateToken = (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
+  const bearerToken = req.headers.authorization;
+  if (!bearerToken) {
+    res.sendError({ error: "Unauthorized" }, "Unauthorized", 401);
+    return;
+  }
+  const token = bearerToken.split(" ")[1];
+
   if (jwt.verify(token, process.env.SECRET_KEY)) {
-    console.log("token is valid");
+    req.user_id = jwt.decode(token).user_id;
     next();
   } else {
     console.log("token is invalid");

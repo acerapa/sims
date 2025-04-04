@@ -17,10 +17,11 @@
           <p class="table-header">#</p>
         </div>
         <p class="col-span-1 table-header">Type</p>
+        <p class="col-span-2 table-header">Customer</p>
+        <p class="col-span-2 table-header">Sales Person</p>
+        <p class="col-span-1 table-header">Purch Date</p>
+        <p class="col-span-1 table-header">Pay Mode</p>
         <p class="col-span-1 table-header">Total</p>
-        <p class="col-span-2 table-header">Purchase Date</p>
-        <p class="col-span-2 table-header">Bill Due</p>
-        <p class="col-span-2 table-header">Payment Method</p>
         <p class="col-span-1 table-header">Status</p>
       </div>
     </template>

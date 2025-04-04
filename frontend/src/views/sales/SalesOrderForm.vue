@@ -2,7 +2,16 @@
   <div class="cont flex flex-col gap-5">
     <div class="flex gap-3 max-lg:flex-col">
       <div class="flex flex-col gap-3 flex-1">
-        <p class="font-semibold mb-1">Sales Order Information</p>
+        <div class="flex justify-between items-center">
+          <p class="font-semibold mb-1">Sales Order Information</p>
+          <div class="flex gap-3">
+            <SelectStatusDropdown
+              v-model="model.sales_order.status"
+              :status-map="SalesOrderStatusMap"
+            />
+            <button class="btn-green">Generate Invoice</button>
+          </div>
+        </div>
 
         <div class="flex gap-3">
           <CustomInput
@@ -14,19 +23,19 @@
             :error-has-text="true"
             label="Select Customer"
             :options="customerOptions"
-            :disabled="route.query.id"
             placeholder="Select Customer"
-            :error="modelErrors.customer_id"
-            v-model="model.sales_order.customer_id"
             @add-new="showCustomerModel = true"
+            v-model="model.sales_order.customer_id"
+            :error="errors.sales_order?.customer_id"
+            :disabled="route.query.id ? true : false"
           />
           <CustomInput
             type="select"
             class="flex-1"
             :options="[
               {
-                text: 'Cash',
-                value: SalesOrderType.CASH
+                text: 'One-Time',
+                value: SalesOrderType.ONE_TIME
               },
               {
                 text: 'Installment',
@@ -36,10 +45,10 @@
             :has-label="true"
             name="customer_id"
             label="Order Type"
-            v-model="model.sales_order.type"
-            placeholder="Order Type"
             :error-has-text="true"
-            :error="modelErrors.type"
+            placeholder="Order Type"
+            v-model="model.sales_order.type"
+            :error="errors.sales_order?.type"
           />
         </div>
 
@@ -51,8 +60,8 @@
             name="purchase_date"
             label="Purchase Date"
             :error-has-text="true"
-            :error="modelErrors.purchase_date"
             v-model="model.sales_order.purchase_date"
+            :error="errors.sales_order?.purchase_date"
           />
           <CustomInput
             type="select"
@@ -65,24 +74,24 @@
             :options="paymentMethodOptions"
             placeholder="Select Payment Method"
             @add-new="paymentMethodModal = true"
-            :error="modelErrors.payment_method_id"
             v-model="model.sales_order.payment_method_id"
+            :error="errors.sales_order?.payment_method_id"
           />
         </div>
 
         <CustomInput
           type="select"
-          class="max-w-[calc(50%_-_6px)]"
+          name="user_id"
           :has-label="true"
           :has-add-new="true"
           label="Prepared By"
           :error-has-text="true"
-          name="user_id"
-          :options="employeeOptions"
           placeholder="Prepared By"
+          :options="employeeOptions"
+          class="max-w-[calc(50%_-_6px)]"
           v-model="model.sales_order.user_id"
-          :error="modelErrors.user_id"
           @add-new="showEmployeeModal = true"
+          :error="errors.sales_order?.user_id"
         />
 
         <CustomInput
@@ -92,8 +101,8 @@
           :has-label="true"
           placeholder="Memo"
           :error-has-text="true"
-          :error="modelErrors.memo"
           v-model="model.sales_order.memo"
+          :error="errors.sales_order?.memo"
         />
       </div>
     </div>
@@ -214,8 +223,10 @@ import {
   ObjectHelpers,
   SalesOrderCreateSchema,
   SalesOrderStatus,
+  SalesOrderStatusMap,
   SalesOrderType
 } from 'shared'
+
 import AddressForm from '@/components/shared/AddressForm.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
@@ -225,6 +236,8 @@ import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import PaymentMethodModal from '@/components/sales/payment-method/PaymentMethodModal.vue'
 import EmployeeModal from '@/components/Employee/EmployeeModal.vue'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
+
 import { SalesConst } from '../../const/route.constants'
 import { useCustomerStore } from '@/stores/customer'
 import { useSalesStore } from '@/stores/sales'
@@ -232,6 +245,7 @@ import { ToastTypes } from '@/data/types'
 import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useTableScroll } from '@/use/useTableScroll'
 import { useEmployeeStore } from '@/stores/employee'
+import { useValidation } from '@/composables/useValidation'
 
 const route = useRoute()
 const router = useRouter()
@@ -243,6 +257,7 @@ const showEmployeeModal = ref(false)
 const paymentMethodModal = ref(false)
 const rowEventName = 'sales-order-row-event'
 
+// stores
 const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
 const employeeStore = useEmployeeStore()
@@ -287,6 +302,12 @@ const model = ref(ObjectHelpers.copyObj(defaultModel))
 const deliveryModel = ref(ObjectHelpers.copyObj(deliveryDefaultModel))
 
 const modelErrors = ref({})
+
+// composables
+const { errors, validateData, hasErrors } = useValidation(
+  SalesOrderCreateSchema,
+  model.value
+)
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -323,55 +344,13 @@ const employeeOptions = computed(() =>
 /** ================================================
  * METHODS
  ** ================================================*/
+
 const onSubmit = async (saveAndNew) => {
   // validation
-  modelErrors.value = {}
-  Event.emit(rowEventName, modelErrors.value.sales_order_products)
+  validateData()
 
-  const { error } = SalesOrderCreateSchema.validate(model.value, {
-    abortEarly: false
-  })
-
-  if (error) {
-    error.details.forEach((err) => {
-      if (err.path.includes('sales_order_products')) {
-        if (
-          modelErrors.value[err.path[0]] &&
-          Object.keys(modelErrors.value[err.path[0]]).length
-        ) {
-          modelErrors.value[err.path[0]] = {
-            ...modelErrors.value[err.path[0]],
-            [err.context.key]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        } else {
-          modelErrors.value[err.path[0]] = {
-            [err.context.key]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        }
-      } else if (err.path.includes('shipment_address')) {
-        if (
-          modelErrors.value[err.path[0]] &&
-          Object.keys(modelErrors.value[err.path[0]])
-        ) {
-          modelErrors.value[err.path[0]] = {
-            ...modelErrors.value[err.path[0]],
-            [err.path[1]]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        } else {
-          modelErrors.value[err.path[0]] = {
-            [err.path[1]]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        }
-      } else {
-        modelErrors.value[err.context.key] = err.message.replace(
-          /"[^"]*"/g,
-          err.context.key
-        )
-      }
-    })
-
-    // trigger event to show errors in the products selection table
-    Event.emit(rowEventName, modelErrors.value.sales_order_products)
+  if (hasErrors) {
+    Event.emit(rowEventName, errors.value.sales_order_products)
     return
   }
 
@@ -406,13 +385,6 @@ const onAfterDelete = async () => {
     name: SalesConst.SALES_ORDER
   })
 }
-
-// const populateShipmentAddress = (address) => {
-//   model.value.shipment_address = ObjectHelpers.assignSameFields(
-//     model.value.shipment_address,
-//     address
-//   )
-// }
 
 /** ================================================
  * LIFE CYCLE HOOKS
@@ -465,33 +437,4 @@ onMounted(async () => {
 /** ================================================
  * WATCHERS
  * ================================================*/
-// watch(
-//   () => model.value.sales_order.customer_id,
-//   async (val) => {
-//     if (val && !route.query.id) {
-//       const customer = await customerStore.getCustomer(val)
-//       if (model.value.sales_order.has_delivery) {
-//         populateShipmentAddress(customer.address)
-//       }
-//     }
-//   }
-// )
-
-// watch(
-//   () => model.value.sales_order.has_delivery,
-//   async (val) => {
-//     if (!val) {
-//       model.value.shipment_address = ObjectHelpers.objectReset(
-//         model.value.shipment_address
-//       )
-//     } else if (val && model.value.sales_order.customer_id) {
-//       const customer = await customerStore.getCustomer(
-//         model.value.sales_order.customer_id
-//       )
-//       if (customer) {
-//         populateShipmentAddress(customer.address)
-//       }
-//     }
-//   }
-// )
 </script>

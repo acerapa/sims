@@ -3,6 +3,8 @@ const SalesOrderProduct = require("../models/junction/sales-order-product");
 const Product = require("../models/product");
 const SalesOrder = require("../models/sales-order");
 const { sequelize } = require("../models");
+const User = require("../models/user");
+const Delivery = require("../models/delivery");
 
 const findSalesOrder = async (id) => {
   return await SalesOrder.findByPk(id, {
@@ -10,6 +12,14 @@ const findSalesOrder = async (id) => {
       {
         model: Product,
         as: "products",
+      },
+      {
+        model: User,
+        as: "sales_person",
+      },
+      {
+        model: Delivery,
+        as: "delivery",
       },
     ],
   });
