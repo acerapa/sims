@@ -91,6 +91,24 @@ module.exports = {
         );
       }
 
+      if (data.delivery) {
+        await Delivery.create(
+          {
+            ...data.delivery,
+            sales_order_id: salesOrder.id,
+          },
+          {
+            include: [
+              {
+                model: Address,
+                as: "address",
+              },
+            ],
+            transaction,
+          }
+        );
+      }
+
       await transaction.commit();
 
       const order = await findSalesOrder(salesOrder.id);

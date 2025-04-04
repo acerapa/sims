@@ -101,9 +101,15 @@ const modelErrors = ref({})
 /** ================================================
  * EVENTS
  ** ================================================*/
-Event.on(props.eventName, (data) => {
-  modelErrors.value = data ? data : {}
-})
+Event.on(
+  props.eventName,
+  (data) => {
+    if (data && data[props.ndx]) {
+      modelErrors.value = data[props.ndx]
+    }
+  },
+  true
+)
 
 /** ================================================
  * COMPUTED

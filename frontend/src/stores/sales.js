@@ -17,7 +17,7 @@ export const useSalesStore = defineStore('sales', () => {
 
     if (isSuccess) {
       if (salesOrders.value.length) {
-        salesOrders.value.unshift(res.data.salesOrder)
+        salesOrders.value.unshift(res.data.order)
       } else {
         // call a method to fetch sales orders
         // Ex. await fetchSalesOrders()

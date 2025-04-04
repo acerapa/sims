@@ -1,13 +1,18 @@
 const joi = require("joi");
 const { SalesOrderStatus, SalesOrderType } = require("../enums/index");
+const { DeliverySchema } = require("./delivery");
 
 const SalesOrderSchema = joi.object({
   memo: joi.string().allow("", null).optional(),
-  purchase_date: joi.date().required(),
+  purchase_date: joi
+    .date()
+    .required()
+    .messages({ "*": "Purchase date is required" }),
   type: joi
     .string()
     .valid(...Object.values(SalesOrderType))
-    .required(),
+    .required()
+    .messages({ "*": "Type is required" }),
   status: joi
     .string()
     .valid(...Object.values(SalesOrderStatus))
@@ -15,8 +20,16 @@ const SalesOrderSchema = joi.object({
 
   // references
   user_id: joi.number().allow("", null).optional(),
-  customer_id: joi.number().required(),
-  payment_method_id: joi.number().required(),
+  customer_id: joi
+    .number()
+    .not(null)
+    .required()
+    .messages({ "*": "Customer is required" }),
+  payment_method_id: joi
+    .number()
+    .not(null)
+    .required()
+    .messages({ "*": "Payment method is required" }),
 });
 
 const SalesOrderProductSchema = joi.object({
@@ -35,6 +48,7 @@ const SalesOrderCreateSchema = joi.object({
     .items(SalesOrderProductSchema)
     .min(1)
     .required(),
+  delivery: DeliverySchema.optional(),
 });
 
 const PaymentMethodSchema = joi.object({

@@ -24,9 +24,9 @@
             label="Select Customer"
             :options="customerOptions"
             placeholder="Select Customer"
-            :error="modelErrors.customer_id"
             @add-new="showCustomerModel = true"
             v-model="model.sales_order.customer_id"
+            :error="errors.sales_order?.customer_id"
             :disabled="route.query.id ? true : false"
           />
           <CustomInput
@@ -47,8 +47,8 @@
             label="Order Type"
             :error-has-text="true"
             placeholder="Order Type"
-            :error="modelErrors.type"
             v-model="model.sales_order.type"
+            :error="errors.sales_order?.type"
           />
         </div>
 
@@ -60,8 +60,8 @@
             name="purchase_date"
             label="Purchase Date"
             :error-has-text="true"
-            :error="modelErrors.purchase_date"
             v-model="model.sales_order.purchase_date"
+            :error="errors.sales_order?.purchase_date"
           />
           <CustomInput
             type="select"
@@ -74,8 +74,8 @@
             :options="paymentMethodOptions"
             placeholder="Select Payment Method"
             @add-new="paymentMethodModal = true"
-            :error="modelErrors.payment_method_id"
             v-model="model.sales_order.payment_method_id"
+            :error="errors.sales_order?.payment_method_id"
           />
         </div>
 
@@ -88,10 +88,10 @@
           :error-has-text="true"
           placeholder="Prepared By"
           :options="employeeOptions"
-          :error="modelErrors.user_id"
           class="max-w-[calc(50%_-_6px)]"
           v-model="model.sales_order.user_id"
           @add-new="showEmployeeModal = true"
+          :error="errors.sales_order?.user_id"
         />
 
         <CustomInput
@@ -101,8 +101,8 @@
           :has-label="true"
           placeholder="Memo"
           :error-has-text="true"
-          :error="modelErrors.memo"
           v-model="model.sales_order.memo"
+          :error="errors.sales_order?.memo"
         />
       </div>
     </div>
@@ -220,7 +220,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import {
-  DeliverySchema,
   ObjectHelpers,
   SalesOrderCreateSchema,
   SalesOrderStatus,
@@ -246,6 +245,7 @@ import { ToastTypes } from '@/data/types'
 import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useTableScroll } from '@/use/useTableScroll'
 import { useEmployeeStore } from '@/stores/employee'
+import { useValidation } from '@/composables/useValidation'
 
 const route = useRoute()
 const router = useRouter()
@@ -257,6 +257,7 @@ const showEmployeeModal = ref(false)
 const paymentMethodModal = ref(false)
 const rowEventName = 'sales-order-row-event'
 
+// stores
 const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
 const employeeStore = useEmployeeStore()
@@ -301,6 +302,12 @@ const model = ref(ObjectHelpers.copyObj(defaultModel))
 const deliveryModel = ref(ObjectHelpers.copyObj(deliveryDefaultModel))
 
 const modelErrors = ref({})
+
+// composables
+const { errors, validateData, hasErrors } = useValidation(
+  SalesOrderCreateSchema,
+  model.value
+)
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -338,66 +345,12 @@ const employeeOptions = computed(() =>
  * METHODS
  ** ================================================*/
 
-const onSubmitDelivery = async () => {
-  // validation
-  const { error } = DeliverySchema.validate(deliveryModel.value, {
-    abortEarly: false
-  })
-
-  if (error) {
-    console.log(error)
-  }
-}
-
 const onSubmit = async (saveAndNew) => {
   // validation
-  modelErrors.value = {}
-  Event.emit(rowEventName, modelErrors.value.sales_order_products)
+  validateData()
 
-  const { error } = SalesOrderCreateSchema.validate(model.value, {
-    abortEarly: false
-  })
-
-  if (error) {
-    error.details.forEach((err) => {
-      if (err.path.includes('sales_order_products')) {
-        if (
-          modelErrors.value[err.path[0]] &&
-          Object.keys(modelErrors.value[err.path[0]]).length
-        ) {
-          modelErrors.value[err.path[0]] = {
-            ...modelErrors.value[err.path[0]],
-            [err.context.key]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        } else {
-          modelErrors.value[err.path[0]] = {
-            [err.context.key]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        }
-      } else if (err.path.includes('shipment_address')) {
-        if (
-          modelErrors.value[err.path[0]] &&
-          Object.keys(modelErrors.value[err.path[0]])
-        ) {
-          modelErrors.value[err.path[0]] = {
-            ...modelErrors.value[err.path[0]],
-            [err.path[1]]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        } else {
-          modelErrors.value[err.path[0]] = {
-            [err.path[1]]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        }
-      } else {
-        modelErrors.value[err.context.key] = err.message.replace(
-          /"[^"]*"/g,
-          err.context.key
-        )
-      }
-    })
-
-    // trigger event to show errors in the products selection table
-    Event.emit(rowEventName, modelErrors.value.sales_order_products)
+  if (hasErrors) {
+    Event.emit(rowEventName, errors.value.sales_order_products)
     return
   }
 
@@ -432,13 +385,6 @@ const onAfterDelete = async () => {
     name: SalesConst.SALES_ORDER
   })
 }
-
-// const populateShipmentAddress = (address) => {
-//   model.value.shipment_address = ObjectHelpers.assignSameFields(
-//     model.value.shipment_address,
-//     address
-//   )
-// }
 
 /** ================================================
  * LIFE CYCLE HOOKS
