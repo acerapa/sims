@@ -109,37 +109,58 @@
   </div>
 
   <div class="cont">
-    <p class="font-semibold">
-      Delivery Information <span class="italic font-thin">(Optional)</span>
-    </p>
-
-    <div class="flex gap-3 mt-3">
-      <CustomInput
-        type="date"
-        class="flex-1"
-        :has-label="true"
-        label="Delivery Date"
-        name="delivery_date"
-        :error-has-text="true"
-        :error="modelErrors.delivery_date"
-        v-model="deliveryModel.delivery_date"
+    <div class="flex gap-3">
+      <input
+        id="has-deliery"
+        type="checkbox"
+        v-model="deliveryFormState.show"
+        :change="
+          deliveryFormState.show ? (deliveryFormState.hideBody = false) : ''
+        "
       />
-      <CustomInput
-        type="text"
-        class="flex-1"
-        name="courier"
-        label="Courier"
-        :has-label="true"
-        placeholder="Courier"
-        :error-has-text="true"
-        :error="modelErrors.courier"
-        v-model="deliveryModel.courier"
-      />
+      <label for="has-delivery">Has Delivery?</label>
     </div>
+    <div
+      class="delivery-info"
+      v-if="!deliveryFormState.hideBody"
+      :class="deliveryFormState.show ? 'show' : 'hide'"
+      @animationend="deliveryFormState.hideBody = !deliveryFormState.show"
+    >
+      <p class="font-semibold mt-3">
+        Delivery Information <span class="italic font-thin">(Optional)</span>
+      </p>
+      <div class="flex gap-3 mt-3">
+        <CustomInput
+          type="date"
+          class="flex-1"
+          :has-label="true"
+          label="Delivery Date"
+          name="delivery_date"
+          :error-has-text="true"
+          v-model="model.delivery.delivery_date"
+          :error="errors.delivery?.delivery_date"
+        />
+        <CustomInput
+          type="text"
+          class="flex-1"
+          name="courier"
+          label="Courier"
+          :has-label="true"
+          placeholder="Courier"
+          :error-has-text="true"
+          v-model="deliveryModel.courier"
+          :error="errors.delivery?.courier"
+        />
+      </div>
 
-    <div class="mt-3 flex flex-col gap-1">
-      <p class="text-sm font-semibold">Shipment Address</p>
-      <AddressForm :has-label="true" v-model="deliveryModel.address" />
+      <div class="mt-3 flex flex-col gap-1">
+        <p class="text-sm font-semibold">Shipment Address</p>
+        <AddressForm
+          :has-label="true"
+          v-model="deliveryModel.address"
+          :address-errors="errors.delivery?.address"
+        />
+      </div>
     </div>
   </div>
 
@@ -216,7 +237,7 @@
 
 <script setup>
 import Event from '@/event'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import {
@@ -255,6 +276,10 @@ const showDeleteModal = ref(false)
 const showCustomerModel = ref(false)
 const showEmployeeModal = ref(false)
 const paymentMethodModal = ref(false)
+const deliveryFormState = reactive({
+  show: false,
+  hideBody: true
+})
 const rowEventName = 'sales-order-row-event'
 
 // stores
@@ -437,4 +462,31 @@ onMounted(async () => {
 /** ================================================
  * WATCHERS
  * ================================================*/
+watch(
+  () => deliveryFormState.show,
+  (show) => {
+    if (show) {
+      model.value.delivery = ObjectHelpers.copyObj(deliveryDefaultModel)
+    }
+  }
+)
+
+watch(
+  () => deliveryFormState.hideBody,
+  (hideBody) => {
+    if (hideBody) {
+      delete model.value.delivery
+    }
+  }
+)
 </script>
+
+<style scoped>
+.delivery-info.show {
+  animation: fade-in 0.5s ease-in-out forwards;
+}
+
+.delivery-info.hide {
+  animation: fade-out 0.5s ease-in-out forwards;
+}
+</style>
