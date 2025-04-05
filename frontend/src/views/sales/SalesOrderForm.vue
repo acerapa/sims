@@ -111,8 +111,9 @@
   <div class="cont">
     <div class="flex gap-3">
       <input
-        id="has-deliery"
         type="checkbox"
+        id="has-delivery"
+        name="has-delivery"
         v-model="deliveryFormState.show"
         :change="
           deliveryFormState.show ? (deliveryFormState.hideBody = false) : ''
@@ -241,6 +242,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import {
+  DateHelpers,
   ObjectHelpers,
   SalesOrderCreateSchema,
   SalesOrderStatus,
@@ -303,15 +305,14 @@ const defaultModel = {
     type: '',
     user_id: '',
     customer_id: '',
-    purchase_date: '',
     payment_method_id: '',
-    status: SalesOrderStatus.OPEN
+    status: SalesOrderStatus.OPEN,
+    purchase_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
   },
   sales_order_products: [{ ...productTransferModal }]
 }
 
 const deliveryDefaultModel = {
-  delivery_date: new Date(),
   courier: '',
   address_id: '',
   address: {
@@ -320,7 +321,8 @@ const deliveryDefaultModel = {
     city: '',
     province: '',
     postal: ''
-  }
+  },
+  delivery_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
 }
 
 const model = ref(ObjectHelpers.copyObj(defaultModel))
