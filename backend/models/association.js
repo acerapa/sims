@@ -84,6 +84,12 @@ Invoice.belongsTo(SalesOrder, {
   as: "sales_order",
 });
 
+// Delivery to Address Relations
+Delivery.belongsTo(Address, {
+  foreignKey: "address_id",
+  as: "address",
+});
+
 // Purchase Order, Purchase Order Product and Product Relations
 PurchaseOrder.belongsToMany(Product, {
   through: PurchaseOrderProducts,
