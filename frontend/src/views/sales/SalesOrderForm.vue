@@ -558,6 +558,11 @@ watch(
         model.value.delivery.address_id = customer.address_id
         populateAddress(customer.address)
       }
+    } else {
+      model.value.delivery.address_id = null
+      model.value.delivery.address = ObjectHelpers.copyObj(
+        deliveryDefaultModel.address
+      )
     }
   }
 )
@@ -568,7 +573,7 @@ watch(
     if (
       customerId &&
       model.value.delivery?.use_customer_address &&
-      deliveryFormState.show
+      model.value.sales_order.has_delivery
     ) {
       const customer = customerStore.customers.find((c) => c.id == customerId)
       if (customer) {
