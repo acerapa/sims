@@ -26,6 +26,10 @@ Delivery.init(
       values: Object.values(DeliveryStatus),
       defaultValue: DeliveryStatus.PENDING,
     },
+    use_customer_address: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     address_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

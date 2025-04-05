@@ -30,6 +30,7 @@ const SalesOrderSchema = joi.object({
     .not(null)
     .required()
     .messages({ "*": "Payment method is required" }),
+  has_delivery: joi.boolean(),
 });
 
 const SalesOrderProductSchema = joi.object({
