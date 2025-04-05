@@ -112,7 +112,8 @@ class ObjectHelpers {
 
   /**
    * This function will compare two objects and returns boolean
-   * Criteria for validating
+   *
+   * Criteria for validating:
    * 1. The number of keys must be the same
    * 2. The values of the keys must be the same
    *
@@ -153,7 +154,10 @@ class ObjectHelpers {
         if (typeof obj1[key] == "object") {
           if (Object.is(null, obj1[key]) != Object.is(null, obj2[key])) {
             return false;
-          } else if (Object.is(null, obj1[key]) == Object.is(null, obj2[key])) {
+          } else if (
+            Object.is(null, obj1[key]) == true &&
+            Object.is(null, obj2[key]) == true
+          ) {
             continue;
           } else if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) {
             if (!this.compareArrays(obj1[key], obj2[key])) return false;

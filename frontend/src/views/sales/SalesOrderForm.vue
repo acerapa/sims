@@ -261,7 +261,7 @@ import PaymentMethodModal from '@/components/sales/payment-method/PaymentMethodM
 import EmployeeModal from '@/components/Employee/EmployeeModal.vue'
 import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 
-import { SalesConst } from '../../const/route.constants'
+import { InventoryConst, SalesConst } from '../../const/route.constants'
 import { useCustomerStore } from '@/stores/customer'
 import { useSalesStore } from '@/stores/sales'
 import { ToastTypes } from '@/data/types'
@@ -269,6 +269,8 @@ import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useTableScroll } from '@/use/useTableScroll'
 import { useEmployeeStore } from '@/stores/employee'
 import { useValidation } from '@/composables/useValidation'
+import { useAppStore } from '@/stores/app'
+import { PageStateConst } from '@/const/state.constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -285,6 +287,7 @@ const deliveryFormState = reactive({
 const rowEventName = 'sales-order-row-event'
 
 // stores
+const appStore = useAppStore()
 const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
 const employeeStore = useEmployeeStore()
@@ -413,6 +416,13 @@ const onAfterDelete = async () => {
   })
 }
 
+const setSalesOrderFormPageState = () => {
+  appStore.setPageState(PageStateConst.SALES_ORDER_FORM, {
+    route_scope: [SalesConst.SALES_ORDER_FORM, InventoryConst.PRODUCT_FORM],
+    state: model.value
+  })
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -468,6 +478,23 @@ onMounted(async () => {
     )
   }
 
+  // get all the save state
+  if (appStore.isPageExist(PageStateConst.SALES_ORDER_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.SALES_ORDER_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.SALES_ORDER_FORM].state
+      )
+    }
+  } else {
+    setSalesOrderFormPageState()
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 
@@ -490,6 +517,14 @@ watch(
       delete model.value.delivery
     }
   }
+)
+
+watch(
+  () => model.value,
+  () => {
+    setSalesOrderFormPageState()
+  },
+  { deep: true }
 )
 </script>
 

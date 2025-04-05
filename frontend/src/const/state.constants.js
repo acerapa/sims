@@ -4,6 +4,7 @@ export const PageStateConst = Object.freeze({
   IBRR_FORM: 'ibrr_form',
   FIX_ASSET_FORM: 'fix_asset_form',
   PRODUCT_SETTINGS: 'product_settings',
+  SALES_ORDER_FORM: 'sales_order_form',
   PURCHASE_ORDER_FORM: 'purchase_order_form'
 })
 
