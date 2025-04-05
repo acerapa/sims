@@ -19,8 +19,7 @@ export const useSalesStore = defineStore('sales', () => {
       if (salesOrders.value.length) {
         salesOrders.value.unshift(res.data.order)
       } else {
-        // call a method to fetch sales orders
-        // Ex. await fetchSalesOrders()
+        await fetchSalesOrders()
       }
     }
 
@@ -71,28 +70,9 @@ export const useSalesStore = defineStore('sales', () => {
     const res = await authenticatedApi(`sales-order/${id}`)
     const isSuccess = res.status < 400
 
-    if (isSuccess) {
-      if (salesOrders.value && salesOrders.value.length) {
-        const index = salesOrders.value.findIndex((item) => item.id == id)
-        salesOrders.value[index] = res.data.order
-      }
-
-      salesOrder.value = res.data.order
-    }
+    if (isSuccess) salesOrder.value = res.data.order
 
     return isSuccess
-  }
-
-  const getSalesOrder = async (id) => {
-    if (!salesOrder.value || salesOrder.value.id != id) {
-      salesOrder.value = salesOrders.value.find((item) => item.id == id)
-
-      if (!salesOrder.value) {
-        await fetchSalesOrder(id)
-      }
-    }
-
-    return salesOrder.value
   }
 
   const removeSalesOrder = async (id) => {
@@ -106,7 +86,6 @@ export const useSalesStore = defineStore('sales', () => {
   return {
     salesOrder,
     salesOrders,
-    getSalesOrder,
     getSalesOrders,
     fetchSalesOrder,
     fetchSalesOrders,

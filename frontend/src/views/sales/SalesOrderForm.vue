@@ -148,7 +148,7 @@
           :has-label="true"
           placeholder="Courier"
           :error-has-text="true"
-          v-model="deliveryModel.courier"
+          v-model="model.delivery.courier"
           :error="errors.delivery?.courier"
         />
       </div>
@@ -157,7 +157,7 @@
         <p class="text-sm font-semibold">Shipment Address</p>
         <AddressForm
           :has-label="true"
-          v-model="deliveryModel.address"
+          v-model="model.delivery.address"
           :address-errors="errors.delivery?.address"
         />
       </div>
@@ -374,7 +374,7 @@ const onSubmit = async (saveAndNew) => {
   // validation
   validateData()
 
-  if (hasErrors) {
+  if (hasErrors.value) {
     Event.emit(rowEventName, errors.value.sales_order_products)
     return
   }
@@ -422,7 +422,7 @@ onMounted(async () => {
   await paymentMethodStore.getPaymentMethods()
 
   if (route.query.id) {
-    await salesStore.getSalesOrder(route.query.id)
+    await salesStore.fetchSalesOrder(route.query.id)
 
     model.value.sales_order = ObjectHelpers.assignSameFields(
       model.value.sales_order,
@@ -443,6 +443,16 @@ onMounted(async () => {
           .toISOString()
           .split('T')[0]
       : ''
+
+    // delivery
+    if (salesStore.salesOrder.delivery) {
+      deliveryFormState.show = true
+      deliveryFormState.hideBody = false
+      model.value.delivery = ObjectHelpers.assignSameFields(
+        deliveryDefaultModel,
+        salesStore.salesOrder.delivery
+      )
+    }
 
     // products
     model.value.sales_order_products = salesStore.salesOrder.products.map(

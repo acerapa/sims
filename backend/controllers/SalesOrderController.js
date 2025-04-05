@@ -10,6 +10,7 @@ const User = require("../models/user");
 const {
   findSalesOrder,
   updateSalesOrder,
+  findSalesOrderMinimal,
 } = require("../services/SalesOrderService");
 
 module.exports = {
@@ -21,10 +22,12 @@ module.exports = {
           {
             model: Product,
             as: "products",
+            attributes: ["id"],
           },
           {
             model: PaymentMethod,
             as: "payment_method",
+            attributes: ["id", "name"],
           },
           {
             model: User,
@@ -111,7 +114,7 @@ module.exports = {
 
       await transaction.commit();
 
-      const order = await findSalesOrder(salesOrder.id);
+      const order = await findSalesOrderMinimal(salesOrder.id);
       res.sendResponse({ order }, "Sales order created successfully", 200);
     } catch (error) {
       await transaction.rollback();
@@ -126,7 +129,7 @@ module.exports = {
       await updateSalesOrder(req.params.id, data, transaction);
       await transaction.commit();
 
-      const order = await findSalesOrder(req.params.id);
+      const order = await findSalesOrderMinimal(req.params.id);
       res.sendResponse({ order }, "Sales order updated successfully", 200);
     } catch (error) {
       await transaction.rollback();

@@ -5,13 +5,21 @@ const SalesOrder = require("../models/sales-order");
 const { sequelize } = require("../models");
 const User = require("../models/user");
 const Delivery = require("../models/delivery");
+const PaymentMethod = require("../models/payment-method");
+const Customer = require("../models/customer");
 
+/**
+ * Retrieves a sales order by its ID with selected related model attributes
+ * @param {number} id - The unique identifier of the sales order
+ * @returns {Promise<SalesOrder>} A sales order with associated products, sales person, and delivery details
+ */
 const findSalesOrder = async (id) => {
   return await SalesOrder.findByPk(id, {
     include: [
       {
         model: Product,
         as: "products",
+        attributes: ["id"],
       },
       {
         model: User,
@@ -20,11 +28,61 @@ const findSalesOrder = async (id) => {
       {
         model: Delivery,
         as: "delivery",
+        include: [
+          {
+            model: Address,
+            as: "address",
+          },
+        ],
       },
     ],
   });
 };
 
+/**
+ * Retrieves a minimal sales order by its ID with selected related model attributes
+ * @param {number} id - The unique identifier of the sales order
+ * @returns {Promise<SalesOrder>} A sales order with minimal associated data
+ */
+const findSalesOrderMinimal = async (id) => {
+  return await SalesOrder.findByPk(id, {
+    include: [
+      {
+        model: Product,
+        as: "products",
+        attributes: ["id"],
+      },
+      {
+        model: PaymentMethod,
+        as: "payment_method",
+        attributes: ["id", "name"],
+      },
+      {
+        model: User,
+        as: "sales_person",
+        attributes: ["id", "first_name", "last_name"],
+      },
+      {
+        model: Delivery,
+        as: "delivery",
+        attributes: ["id"],
+      },
+      {
+        model: Customer,
+        as: "customer",
+        attributes: ["id", "first_name", "last_name"],
+      },
+    ],
+  });
+};
+
+/**
+ * Updates a sales order and its associated data
+ * @param {number} id - The unique identifier of the sales order to update
+ * @param {Object} data - The data to update, which can include shipment address, sales order details, and sales order products
+ * @param {Object} transaction - The database transaction to use for the update operation
+ * @returns {Promise<void>} A promise that resolves when the update is complete
+ */
 const updateSalesOrder = async (id, data, transaction) => {
   if (data.shipment_address) {
     await Address.update(data.shipment_address, {
@@ -95,4 +153,5 @@ const updateSalesOrder = async (id, data, transaction) => {
 module.exports = {
   findSalesOrder,
   updateSalesOrder,
+  findSalesOrderMinimal,
 };
