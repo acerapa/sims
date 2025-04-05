@@ -18,7 +18,9 @@ const UserSchema = Joi.object({
 
 const AddressSchema = Joi.object({
   address1: Joi.string().required().messages({ "*": "Address 1 is required" }),
-  address2: Joi.string().optional().messages({ "*": "Address 2 is required" }),
+  address2: Joi.string()
+    .optional()
+    .messages({ "*": "Address 2 must be a string if provided" }),
   city: Joi.string().required().messages({ "*": "City is required" }),
   province: Joi.string().required().messages({ "*": "Province is required" }),
   postal: Joi.string().required().messages({ "*": "Postal is required" }),
