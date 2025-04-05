@@ -467,14 +467,6 @@ onMounted(async () => {
           .toISOString()
           .split('T')[0]
       : ''
-    model.value.sales_order.bill_due = salesStore.salesOrder.bill_due
-      ? new Date(salesStore.salesOrder.bill_due).toISOString().split('T')[0]
-      : ''
-    model.value.sales_order.delivery_date = salesStore.salesOrder.delivery_date
-      ? new Date(salesStore.salesOrder.delivery_date)
-          .toISOString()
-          .split('T')[0]
-      : ''
 
     // delivery
     if (salesStore.salesOrder.delivery) {
@@ -484,6 +476,15 @@ onMounted(async () => {
         deliveryDefaultModel,
         salesStore.salesOrder.delivery
       )
+
+      // address patches
+      model.value.delivery.address = {
+        address1: salesStore.salesOrder.delivery.address.address1,
+        address2: salesStore.salesOrder.delivery.address.address2,
+        city: salesStore.salesOrder.delivery.address.city,
+        province: salesStore.salesOrder.delivery.address.province,
+        postal: salesStore.salesOrder.delivery.address.postal
+      }
 
       // date patches
       model.value.delivery.delivery_date = DateHelpers.formatDate(

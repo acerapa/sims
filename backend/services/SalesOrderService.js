@@ -7,6 +7,11 @@ const User = require("../models/user");
 const Delivery = require("../models/delivery");
 const PaymentMethod = require("../models/payment-method");
 const Customer = require("../models/customer");
+const {
+  updateDelivery,
+  findDeliveryBySalesOrderId,
+  createDelivery,
+} = require("./DeliveryService");
 
 /**
  * Retrieves a sales order by its ID with selected related model attributes
@@ -84,22 +89,28 @@ const findSalesOrderMinimal = async (id) => {
  * @returns {Promise<void>} A promise that resolves when the update is complete
  */
 const updateSalesOrder = async (id, data, transaction) => {
-  if (data.shipment_address) {
-    await Address.update(data.shipment_address, {
-      where: {
-        id: sequelize.literal(
-          `(SELECT shipment_address_id FROM ${SalesOrder.tableName} WHERE id = ${id})`
-        ),
-      },
-      transaction,
-    });
-  }
-
   if (data.sales_order) {
     await SalesOrder.update(data.sales_order, {
       where: { id },
       transaction,
     });
+
+    // create, update or delete delivery
+    const delivery = await findDeliveryBySalesOrderId(id);
+    if (data.sales_order.has_delivery) {
+      if (delivery) {
+        await updateDelivery(delivery, data.delivery, transaction);
+      } else {
+        await createDelivery(
+          { ...data.delivery, sales_order_id: id },
+          transaction
+        );
+      }
+    } else {
+      if (delivery) {
+        await delivery.destroy({ transaction });
+      }
+    }
   }
 
   if (data.sales_order_products) {
