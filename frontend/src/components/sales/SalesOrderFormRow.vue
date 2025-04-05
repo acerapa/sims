@@ -10,7 +10,7 @@
       v-model="model.product_id"
       placeholder="Select Product"
       :has-add-new="true"
-      @add-new=""
+      @add-new="onAddNew"
       :options="productOptions"
       :error-has-text="false"
       :error="modelErrors.product_id"
@@ -73,6 +73,8 @@ import { useProductStore } from '@/stores/product'
 import CustomInput from '../shared/CustomInput.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import Event from '@/event'
+import { useRouter } from 'vue-router'
+import { InventoryConst, SalesConst } from '@/const/route.constants'
 
 const props = defineProps({
   ndx: {
@@ -93,6 +95,7 @@ const props = defineProps({
   }
 })
 
+const router = useRouter()
 const emit = defineEmits(['emit'])
 const productStore = useProductStore()
 const model = defineModel()
@@ -131,6 +134,18 @@ const productOptions = computed(() => {
 onMounted(async () => {
   await productStore.getProducts()
 })
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const onAddNew = () => {
+  router.push({
+    name: InventoryConst.PRODUCT_FORM,
+    query: {
+      redirect: SalesConst.SALES_ORDER_FORM
+    }
+  })
+}
 
 /** ================================================
  * WATCHERS
