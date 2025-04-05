@@ -7,6 +7,7 @@ const PaymentMethod = require("../models/payment-method");
 const Product = require("../models/product");
 const SalesOrder = require("../models/sales-order");
 const User = require("../models/user");
+const { createDelivery } = require("../services/DeliveryService");
 const {
   findSalesOrder,
   updateSalesOrder,
@@ -95,23 +96,12 @@ module.exports = {
       }
 
       if (data.delivery) {
-        const addressIncludes = [];
-        if (!data.delivery.address_id) {
-          addressIncludes.push({
-            model: Address,
-            as: "address",
-          });
-        }
-
-        await Delivery.create(
+        await createDelivery(
           {
             ...data.delivery,
             sales_order_id: salesOrder.id,
           },
-          {
-            include: addressIncludes,
-            transaction,
-          }
+          transaction
         );
       }
 
