@@ -56,6 +56,10 @@ SalesOrder.init(
         key: "id",
       },
     },
+    has_delivery: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     sequelize,

@@ -114,18 +114,22 @@
         type="checkbox"
         id="has-delivery"
         name="has-delivery"
-        v-model="deliveryFormState.show"
+        v-model="model.sales_order.has_delivery"
         :change="
-          deliveryFormState.show ? (deliveryFormState.hideBody = false) : ''
+          model.sales_order.has_delivery
+            ? (deliveryFormState.hideBody = false)
+            : ''
         "
       />
-      <label for="has-delivery">Has Delivery?</label>
+      <label for="has-delivery" class="text-sm">Has Delivery?</label>
     </div>
     <div
       class="delivery-info"
       v-if="!deliveryFormState.hideBody"
-      :class="deliveryFormState.show ? 'show' : 'hide'"
-      @animationend="deliveryFormState.hideBody = !deliveryFormState.show"
+      :class="model.sales_order.has_delivery ? 'show' : 'hide'"
+      @animationend="
+        deliveryFormState.hideBody = !model.sales_order.has_delivery
+      "
     >
       <p class="font-semibold mt-3">
         Delivery Information <span class="italic font-thin">(Optional)</span>
@@ -135,8 +139,8 @@
           type="date"
           class="flex-1"
           :has-label="true"
-          label="Delivery Date"
           name="delivery_date"
+          label="Delivery Date"
           :error-has-text="true"
           v-model="model.delivery.delivery_date"
           :error="errors.delivery?.delivery_date"
@@ -153,13 +157,24 @@
           :error="errors.delivery?.courier"
         />
       </div>
-
+      <div class="flex gap-3 mt-5">
+        <input
+          type="checkbox"
+          id="use-customer-address"
+          name="use-customer-address"
+          v-model="model.delivery.use_customer_address"
+        />
+        <label for="use-customer-address" class="text-sm">
+          Use customer address?
+        </label>
+      </div>
       <div class="mt-3 flex flex-col gap-1">
         <p class="text-sm font-semibold">Shipment Address</p>
         <AddressForm
           :has-label="true"
           v-model="model.delivery.address"
           :address-errors="errors.delivery?.address"
+          :disabled="model.delivery.use_customer_address"
         />
       </div>
     </div>
@@ -308,6 +323,7 @@ const defaultModel = {
     type: '',
     user_id: '',
     customer_id: '',
+    has_delivery: false,
     payment_method_id: '',
     status: SalesOrderStatus.OPEN,
     purchase_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
@@ -325,14 +341,11 @@ const deliveryDefaultModel = {
     province: '',
     postal: ''
   },
+  use_customer_address: false,
   delivery_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
 }
 
 const model = ref(ObjectHelpers.copyObj(defaultModel))
-const deliveryModel = ref(ObjectHelpers.copyObj(deliveryDefaultModel))
-
-const modelErrors = ref({})
-
 // composables
 const { errors, validateData, hasErrors } = useValidation(
   SalesOrderCreateSchema,
@@ -423,6 +436,13 @@ const setSalesOrderFormPageState = () => {
   })
 }
 
+const populateAddress = (address) => {
+  model.value.delivery.address = ObjectHelpers.assignSameFields(
+    model.value.delivery.address,
+    address
+  )
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -464,6 +484,12 @@ onMounted(async () => {
         deliveryDefaultModel,
         salesStore.salesOrder.delivery
       )
+
+      // date patches
+      model.value.delivery.delivery_date = DateHelpers.formatDate(
+        new Date(salesStore.salesOrder.delivery.delivery_date),
+        'YYYY-MM-DD'
+      )
     }
 
     // products
@@ -502,10 +528,12 @@ onMounted(async () => {
  * WATCHERS
  * ================================================*/
 watch(
-  () => deliveryFormState.show,
+  () => model.value.sales_order.has_delivery,
   (show) => {
     if (show) {
       model.value.delivery = ObjectHelpers.copyObj(deliveryDefaultModel)
+    } else {
+      model.value.delivery.use_customer_address = false
     }
   }
 )
@@ -515,6 +543,43 @@ watch(
   (hideBody) => {
     if (hideBody) {
       delete model.value.delivery
+    }
+  }
+)
+
+watch(
+  () => model.value.delivery?.use_customer_address,
+  (useCustomerAddress) => {
+    if (useCustomerAddress) {
+      const customer = customerStore.customers.find(
+        (c) => c.id == model.value.sales_order.customer_id
+      )
+      if (customer) {
+        model.value.delivery.address_id = customer.address_id
+        populateAddress(customer.address)
+      }
+    } else {
+      model.value.delivery.address_id = null
+      model.value.delivery.address = ObjectHelpers.copyObj(
+        deliveryDefaultModel.address
+      )
+    }
+  }
+)
+
+watch(
+  () => model.value.sales_order.customer_id,
+  (customerId) => {
+    if (
+      customerId &&
+      model.value.delivery?.use_customer_address &&
+      model.value.sales_order.has_delivery
+    ) {
+      const customer = customerStore.customers.find((c) => c.id == customerId)
+      if (customer) {
+        model.value.delivery.address_id = customer.address_id
+        populateAddress(customer.address)
+      }
     }
   }
 )

@@ -95,18 +95,21 @@ module.exports = {
       }
 
       if (data.delivery) {
+        const addressIncludes = [];
+        if (!data.delivery.address_id) {
+          addressIncludes.push({
+            model: Address,
+            as: "address",
+          });
+        }
+
         await Delivery.create(
           {
             ...data.delivery,
             sales_order_id: salesOrder.id,
           },
           {
-            include: [
-              {
-                model: Address,
-                as: "address",
-              },
-            ],
+            include: addressIncludes,
             transaction,
           }
         );
