@@ -40,6 +40,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useVendorStore } from '@/stores/supplier'
+import Event from '@/event'
+
 import CustomInput from '../shared/CustomInput.vue'
 import VendorModal from '../Vendor/VendorModal.vue'
 
@@ -65,6 +67,21 @@ const emit = defineEmits(['remove'])
 
 const model = defineModel()
 const modelErrors = ref({})
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+Event.on(
+  props.eventName,
+  (data) => {
+    if (data && data[props.ndx]) {
+      modelErrors.value = data[props.ndx]
+    } else {
+      modelErrors.value = {}
+    }
+  },
+  true
+)
 
 /** ================================================
  * COMPUTED

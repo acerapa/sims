@@ -3,16 +3,16 @@
     <form @submit.prevent="onSubmit" class="flex flex-col gap-3">
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Basic Informations</p>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-3">
           <CustomInput
             type="text"
-            name="product_name"
-            placeholder="*Name"
-            v-model="model.product.name"
-            :error="modelErrors.name"
-            :error-has-text="true"
             label="Name"
             :has-label="true"
+            name="product_name"
+            placeholder="*Name"
+            :error-has-text="true"
+            v-model="model.product.name"
+            :error="errors.product?.name"
           />
           <div class="flex gap-3">
             <CustomInput
@@ -28,7 +28,7 @@
               v-model="model.categories"
               label="Categories"
               :has-label="true"
-              :error="modelErrors.categories"
+              :error="errors.categories"
               :error-has-text="true"
             />
             <CustomInput
@@ -47,37 +47,37 @@
             <CustomInput
               type="select"
               class="flex-1"
+              :has-label="true"
               :has-add-new="true"
               name="income_account"
+              :error-has-text="true"
+              label="Income Account"
               :options="incomeAccounts"
-              v-model="model.product.income_account"
               @add-new="showAccountModal = true"
               placeholder="*Select Income Account"
-              label="Income Account"
-              :has-label="true"
-              :error="modelErrors.income_account"
-              :error-has-text="true"
+              v-model="model.product.income_account"
+              :error="errors.product?.income_account"
             />
             <CustomInput
               type="select"
               class="flex-1"
+              :has-label="true"
               :has-add-new="true"
               name="expense_account"
+              :error-has-text="true"
+              label="Expense Account"
               :options="expenseAccounts"
-              v-model="model.product.expense_account"
               @add-new="showAccountModal = true"
               placeholder="*Select Expense Account"
-              label="Expense Account"
-              :has-label="true"
-              :error="modelErrors.expense_account"
-              :error-has-text="true"
+              v-model="model.product.expense_account"
+              :error="errors.product?.expense_account"
             />
           </div>
         </div>
         <div class="flex flex-col gap-3">
           <p class="text-base font-semibold">Inventory and Sales information</p>
           <div class="flex gap-3">
-            <div class="flex flex-col gap-2 flex-1">
+            <div class="flex flex-col gap-5 flex-1">
               <CustomInput
                 type="number"
                 name="cost"
@@ -85,8 +85,8 @@
                 label="Cost Price"
                 :error-has-text="true"
                 placeholder="Cost Price"
-                :error="modelErrors.cost"
                 v-model="model.details.cost"
+                :error="errors.details?.cost"
                 :disabled="!model.details.is_manually_set_cost"
                 input-class="disabled:bg-gray-50 disabled:ring-1 disabled:ring-gray-200"
               />
@@ -105,10 +105,10 @@
               class="flex-1"
               :has-label="true"
               label="Sale Price"
-              v-model="model.product.price"
               :error-has-text="true"
               placeholder="Sale Price"
-              :error="modelErrors.price"
+              v-model="model.product.price"
+              :error="errors.product?.price"
             />
           </div>
           <div class="flex gap-3">
@@ -120,8 +120,8 @@
               name="quantity_in_stock"
               label="Quantity in stock"
               v-model="model.details.stock"
+              :error="errors.details?.stock"
               placeholder="Quantity in stock"
-              :error="modelErrors.quantity_in_stock"
             />
             <CustomInput
               type="text"
@@ -169,6 +169,7 @@
           <MultiSelectTable
             :header-component="SupplierSelectHeader"
             :row-component="SupplierSelectRow"
+            :row-event-name="rowEventName"
             :format="productSupplier"
             v-model="model.suppliers"
           />
@@ -216,7 +217,13 @@ import Event from '@/event'
 import { computed, onMounted, ref, watch } from 'vue'
 import { EventEnum } from '@/data/event'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { AccountTypes, ObjectHelpers, ProductStatus, ProductType } from 'shared'
+import {
+  AccountTypes,
+  ObjectHelpers,
+  ProductItemSchema,
+  ProductStatus,
+  ProductType
+} from 'shared'
 import { useSettingsStore } from '@/stores/settings'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AccountModal from '@/components/Settings/AccountModal.vue'
@@ -229,6 +236,7 @@ import { useRoute } from 'vue-router'
 import router from '@/router'
 import { ToastTypes } from '@/data/types'
 import { InventoryConst } from '@/const/route.constants'
+import { useValidation } from '@/composables/useValidation'
 
 const route = useRoute()
 const settingStore = useSettingsStore()
@@ -237,8 +245,6 @@ const productStore = useProductStore()
 const showAccountModal = ref(false)
 const showCategoryModal = ref(false)
 const showConfirmationModal = ref(false)
-
-Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 const productSupplier = {
   supplier_id: '',
@@ -268,6 +274,18 @@ const model = ref({
 })
 
 const modelErrors = ref({})
+
+// composables
+const { errors, validateData, hasErrors } = useValidation(
+  ProductItemSchema,
+  model.value
+)
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+const rowEventName = 'product-supplier-row-event'
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 /** ================================================
  * COMPUTED
@@ -327,11 +345,20 @@ const reorderingPointsOptions = computed(() => {
  * METHODS
  ** ================================================*/
 const onSubmit = async () => {
-  Event.emit(EventEnum.IS_PAGE_LOADING, true)
   const data = { ...model.value }
   if (!data.details.product_setting_id) {
     data.details.product_setting_id = null
   }
+
+  // validate data
+  validateData()
+
+  if (hasErrors) {
+    Event.emit(rowEventName, errors.value.suppliers)
+    return
+  }
+
+  Event.emit(EventEnum.IS_PAGE_LOADING, true)
   let isSuccess = false
 
   if (route.query.id) {

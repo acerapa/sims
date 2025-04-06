@@ -8,6 +8,7 @@ export function useValidation(schema, data) {
   })
 
   const validateData = () => {
+    errors.value = {}
     const { error } = schema.validate(data, { abortEarly: false })
     if (error) {
       error.details.forEach((e) => {
