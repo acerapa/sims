@@ -15,7 +15,7 @@
         class="flex-1"
         :has-label="true"
         label="Name"
-        :error="modelErrors.name"
+        :error="errors.name"
         :error-has-text="true"
       />
       <CustomInput
@@ -39,7 +39,7 @@
             value: 'asset'
           }
         ]"
-        :error="modelErrors.type"
+        :error="errors.type"
         :error-has-text="true"
       />
     </div>
@@ -62,6 +62,7 @@ import { AccountSchema } from 'shared/validators'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { useValidation } from '@/composables/useValidation'
 
 const showConfirmModal = ref(false)
 const settingsStore = useSettingsStore()
@@ -70,7 +71,11 @@ const model = ref({
   type: ''
 })
 
-const modelErrors = ref({})
+// composables
+const { errors, hasErrors, validateData } = useValidation(
+  AccountSchema,
+  model.value
+)
 
 const props = defineProps({
   selectedId: {
@@ -90,16 +95,9 @@ onMounted(() => {
 
 const onSubmit = async () => {
   // validation
-  const { error } = AccountSchema.options({ allowUnknown: true }).validate(
-    model.value,
-    { abortEarly: false }
-  )
-  if (error) {
-    error.details.forEach((err) => {
-      modelErrors.value[err.context.key] = err.message
-    })
-    return
-  }
+  validateData()
+
+  if (hasErrors.value) return
 
   let isSuccess = false
   if (props.selectedId) {

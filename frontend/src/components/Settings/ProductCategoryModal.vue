@@ -15,7 +15,7 @@
         v-model="model.name"
         label="Category Name"
         :error-has-text="true"
-        :error="modelError.name"
+        :error="errors.name"
         placeholder="Category Name"
       />
     </div>
@@ -37,6 +37,7 @@ import { CategorySchema } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { useValidation } from '@/composables/useValidation'
 
 const showModal = defineModel()
 const showConfirmModal = ref(false)
@@ -65,7 +66,12 @@ const model = ref({
   name: '',
   general_cat: props.general_cat
 })
-const modelError = ref({})
+
+// composables
+const { errors, hasErrors, validateData } = useValidation(
+  CategorySchema,
+  model.value
+)
 
 onMounted(async () => {
   if (props.selectedId) {
@@ -88,16 +94,8 @@ onMounted(async () => {
 
 const onSubmit = async () => {
   // validations
-  const { error } = CategorySchema.options({ allowUnknown: true }).validate(
-    model.value
-  )
-
-  if (error) {
-    error.details.forEach((err) => {
-      modelError.value[err.context.key] = err.message
-    })
-    return
-  }
+  validateData()
+  if (hasErrors.value) return
 
   let isSuccess = false
   if (props.selectedId) {
