@@ -46,7 +46,10 @@ const ProductDetailsSchema = Joi.object({
 });
 
 const ServiceDetailsSchema = Joi.object({
-  description: Joi.string().required(),
+  description: Joi.string().required().messages({
+    "string.base": "Description must be a string",
+    "*": "Description is required",
+  }),
 });
 
 const ProductSchema = Joi.object({

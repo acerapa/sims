@@ -353,7 +353,7 @@ const onSubmit = async () => {
   // validate data
   validateData()
 
-  if (hasErrors) {
+  if (hasErrors.value) {
     Event.emit(rowEventName, errors.value.suppliers)
     return
   }
