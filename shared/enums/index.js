@@ -212,6 +212,21 @@ const DeliveryStatus = Object.freeze({
   CANCELLED: "cancelled",
 });
 
+const DeliveryStatusMap = Object.freeze({
+  [DeliveryStatus.PENDING]: {
+    text: "Pending",
+    class: "delivery-status-pending",
+  },
+  [DeliveryStatus.DELIVERED]: {
+    text: "Delivered",
+    class: "delivery-status-delivered",
+  },
+  [DeliveryStatus.CANCELLED]: {
+    text: "Cancelled",
+    class: "delivery-status-cancelled",
+  },
+});
+
 module.exports = {
   UserType,
   ItemType,
@@ -229,6 +244,7 @@ module.exports = {
   SalesOrderStatus,
   NotificationType,
   PurchaseOrderType,
+  DeliveryStatusMap,
   PurchaseStatusMap,
   SalesOrderTypeMap,
   NotificationStatus,

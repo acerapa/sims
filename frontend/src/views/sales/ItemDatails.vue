@@ -1,4 +1,8 @@
 <template>
+  <div class="cont text-center">
+    <p>Comming soon 🎉!</p>
+    <small class="text-gray-500">We are currently working on it!</small>
+  </div>
   <div class="flex flex-col gap-6">
     <CustomTable
       :has-add-btn="false"

@@ -1,4 +1,8 @@
 <template>
+  <div class="cont text-center">
+    <p>Comming soon 🎉!</p>
+    <small class="text-gray-500">We are currently working on it!</small>
+  </div>
   <div>
     <CustomTable
       :is-nested="true"

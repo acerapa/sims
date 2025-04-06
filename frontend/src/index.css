@@ -116,18 +116,21 @@ select.input {
   background-color: rgba(63, 131, 248, 0.2);
 }
 
-.purchase-status-confirmed {
+.purchase-status-confirmed,
+.delivery-status-pending {
   color: var(--warning);
   background-color: rgb(194, 120, 3, 0.2);
 }
 
 .purchase-status-completed,
+.delivery-status-delivered,
 .done {
   color: var(--success);
   background-color: rgb(25, 190, 52, 0.2);
 }
 
-.purchase-status-cancelled {
+.purchase-status-cancelled,
+.delivery-status-cancelled {
   color: var(--danger);
   background-color: var(--danger-20);
 }

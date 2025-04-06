@@ -82,6 +82,11 @@ export default [
         includes_active: [SalesConst.INVOICE_FORM]
       },
       {
+        text: 'Deliveries',
+        route: SalesConst.DELIVERIES,
+        icon: outlineDot
+      },
+      {
         text: 'Customers',
         route: SalesConst.CUSTOMERS,
         icon: outlineDot
