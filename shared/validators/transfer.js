@@ -31,7 +31,9 @@ const BranchUpdateSchema = Joi.object({
 const StockTransferSchema = Joi.object({
   po_no: Joi.alternatives(Joi.string(), Joi.number()).when("type", {
     is: TransferType.FIX,
-    then: Joi.required(),
+    then: Joi.required().messages({
+      "*": "PO no. is required",
+    }),
     otherwise: Joi.allow(null, "").optional(),
   }),
   memo: Joi.string().allow(null, ""),
@@ -40,22 +42,32 @@ const StockTransferSchema = Joi.object({
   branch_to: Joi.number().when("type", {
     is: TransferType.RMA,
     then: Joi.allow(null, "").optional(),
-    otherwise: Joi.required(),
+    otherwise: Joi.required().messages({
+      "*": "Receiving Branch is required",
+    }),
   }),
   branch_from: Joi.number().when("type", {
     is: TransferType.FIX,
     then: Joi.allow(null, "").optional(),
-    otherwise: Joi.required(),
+    otherwise: Joi.required().messages({
+      "*": "Sending Branch is required",
+    }),
   }),
-  processed_by: Joi.number().required(),
+  processed_by: Joi.number().required().messages({
+    "*": "Processed By is required",
+  }),
   str_id: Joi.number().when("type", {
     is: TransferType.IBRR,
-    then: Joi.required(),
+    then: Joi.required().messages({
+      "*": "STR ID is required",
+    }),
     otherwise: Joi.allow(null, "").optional(),
   }),
   supplier_id: Joi.number().when("type", {
     is: TransferType.RMA,
-    then: Joi.required(),
+    then: Joi.required().messages({
+      "*": "Supplier is required",
+    }),
     otherwise: Joi.allow(null, "").optional(),
   }),
   status: Joi.string().valid(...Object.values(StockTransferStatus)),

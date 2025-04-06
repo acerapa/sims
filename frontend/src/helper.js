@@ -18,6 +18,7 @@ export function validateProductStocks(productsModel, products) {
 
   productsModel.forEach((pm) => {
     if (
+      productsInvolve.length > 0 &&
       pm.quantity > productsInvolve.find((p) => p.id == pm.product_id).stock
     ) {
       errors[pm.product_id] = 'Not enough stock'
