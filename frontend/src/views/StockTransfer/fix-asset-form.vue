@@ -32,8 +32,8 @@
           :has-label="true"
           placeholder="Ex. 123"
           :error-has-text="true"
-          :error="modelErrors.po_no"
           v-model="model.transfer.po_no"
+          :error="errors.transfer?.po_no"
           :disabled="isCompleted || isCancelled"
         />
         <CustomInput
@@ -145,6 +145,7 @@ import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
 import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 import { useTableScroll } from '@/use/useTableScroll'
+import { useValidation } from '@/composables/useValidation'
 
 const rowEventName = 'fix-asset-row-event'
 
@@ -181,7 +182,12 @@ const purchaseOrderStore = usePurchaseOrderStore()
 const authUser = ref()
 const router = useRouter()
 const model = ref(ObjectHelpers.copyObj(defaultValue))
-const modelErrors = ref({})
+
+// composables
+const { errors, hasErrors, validateData } = useValidation(
+  StockTransferCreateSchema,
+  model.value
+)
 
 /** ================================================
  * COMPUTED
@@ -217,38 +223,9 @@ const onSubmit = async (isAddNew) => {
     model.value.transfer.branch_to = currentBranch.value
 
     // validate model
-    const { error } = StockTransferCreateSchema.validate(model.value, {
-      abortEarly: false
-    })
-    if (error) {
-      modelErrors.value.products = []
-
-      error.details.forEach((err) => {
-        if (err.path.includes('products')) {
-          modelErrors.value.products.push(err)
-        } else {
-          modelErrors.value[err.context.key] = err.message
-        }
-      })
-
-      modelErrors.value.products = Object.groupBy(
-        modelErrors.value.products,
-        (err) => err.path[1]
-      )
-
-      const keys = Object.keys(modelErrors.value.products)
-      keys.forEach((key) => {
-        let prdErr = {}
-        modelErrors.value.products[key].forEach((item) => {
-          prdErr[item.context.key] = item.message
-        })
-
-        modelErrors.value.products[key] = prdErr
-      })
-
-      // trigger event to show errors
-      Event.emit(rowEventName, modelErrors.value.products)
-
+    validateData()
+    if (hasErrors.value) {
+      Event.emit(rowEventName, errors.value.products)
       return
     }
 
