@@ -42,8 +42,8 @@
             label="Select supplier"
             :options="supplierOptions"
             placeholder="Select supplier"
-            :error="modelErrors.supplier_id"
             v-model="model.transfer.supplier_id"
+            :error="errors.transfer?.supplier_id"
             :disabled="isCompleted || isCancelled"
           />
           <CustomInput
@@ -170,6 +170,7 @@ import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
 import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 import { useTableScroll } from '@/use/useTableScroll'
+import { useValidation } from '@/composables/useValidation'
 
 const rowEventName = 'rma-product-event'
 
@@ -218,7 +219,20 @@ const defualtValue = {
 }
 
 const model = ref(ObjectHelpers.copyObj(defualtValue))
-const modelErrors = ref({})
+
+// modify validation schema
+const RMAProductSchema = ProductTransferSchema.keys({
+  serial_number: Joi.string().required(),
+  problem: Joi.string().required()
+})
+const StockTransferSchema = StockTransferCreateSchema.keys({
+  products: Joi.array().items(RMAProductSchema).required()
+})
+
+const { errors, hasErrors, validateData } = useValidation(
+  StockTransferSchema,
+  model.value
+)
 
 /** ================================================
  * EVENTS
@@ -272,47 +286,9 @@ const populateAddress = () => {
 
 const onSubmit = async (saveAndNew) => {
   // validate model
-  // modify validation schema
-  const RMAProductSchema = ProductTransferSchema.keys({
-    serial_number: Joi.string().required(),
-    problem: Joi.string().required()
-  })
-  const StockTransferSchema = StockTransferCreateSchema.keys({
-    products: Joi.array().items(RMAProductSchema).required()
-  })
-
-  const { error } = StockTransferSchema.validate(model.value, {
-    abortEarly: false
-  })
-
-  if (error) {
-    modelErrors.value.products = []
-
-    error.details.forEach((err) => {
-      if (err.path.includes('products')) {
-        modelErrors.value.products.push(err)
-      } else {
-        modelErrors.value[err.context.key] = err.message
-      }
-    })
-
-    modelErrors.value.products = Object.groupBy(
-      modelErrors.value.products,
-      (err) => err.path[1]
-    )
-
-    const keys = Object.keys(modelErrors.value.products)
-    keys.forEach((key) => {
-      let prdErr = {}
-      modelErrors.value.products[key].forEach((item) => {
-        prdErr[item.context.key] = item.message
-      })
-
-      modelErrors.value.products[key] = prdErr
-    })
-
-    // trigger event to show errors
-    Event.emit(rowEventName, modelErrors.value.products)
+  validateData()
+  if (hasErrors.value) {
+    Event.emit(rowEventName, errors.value.products)
     return
   }
 

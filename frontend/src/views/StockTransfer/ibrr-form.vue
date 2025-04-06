@@ -51,8 +51,8 @@
               label="Str #"
               placeholder="Ex. 01"
               :error-has-text="true"
-              :error="modelErrors.str_id"
               v-model="model.transfer.str_id"
+              :error="errors.transfer?.str_id"
               :disabled="isCancelled || isCompleted"
             />
             <CustomInput
@@ -64,8 +64,8 @@
               :error-has-text="true"
               :options="branchOptions"
               placeholder="Select Branch"
-              :error="modelErrors.branch_from"
               v-model="model.transfer.branch_from"
+              :error="errors.transfer?.branch_from"
               :disabled="isCancelled || isCompleted"
             />
           </div>
@@ -179,6 +179,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PageStateConst } from '@/const/state.constants'
 import { useTableScroll } from '@/use/useTableScroll'
+import { useValidation } from '@/composables/useValidation'
 
 const ibrrEventName = 'ibrr-product-row'
 
@@ -217,8 +218,6 @@ const defaultValue = {
 
 const model = ref(ObjectHelpers.copyObj(defaultValue))
 
-const modelErrors = ref({})
-
 const address = ref({
   address1: '',
   address2: '',
@@ -226,6 +225,12 @@ const address = ref({
   city: '',
   postal: ''
 })
+
+const { errors, hasErrors, validateData } = useValidation(
+  StockTransferCreateSchema,
+  model.value
+)
+
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -295,38 +300,10 @@ const onSubmit = async (saveAndNew) => {
   clearInterval(timeInterval)
 
   // validate model
-  const { error } = StockTransferCreateSchema.validate(model.value, {
-    abortEarly: false
-  })
+  validateData()
 
-  if (error) {
-    modelErrors.value.products = []
-
-    error.details.forEach((err) => {
-      if (err.path.includes('products')) {
-        modelErrors.value.products.push(err)
-      } else {
-        modelErrors.value[err.context.key] = err.message
-      }
-    })
-
-    modelErrors.value.products = Object.groupBy(
-      modelErrors.value.products,
-      (err) => err.path[1]
-    )
-
-    const keys = Object.keys(modelErrors.value.products)
-    keys.forEach((key) => {
-      let prdErr = {}
-      modelErrors.value.products[key].forEach((item) => {
-        prdErr[item.context.key] = item.message
-      })
-
-      modelErrors.value.products[key] = prdErr
-    })
-
-    // trigger event to show error
-    Event.emit(ibrrEventName, modelErrors.value.products)
+  if (hasErrors.value) {
+    Event.emit(ibrrEventName, errors.value.products)
     return
   }
 
