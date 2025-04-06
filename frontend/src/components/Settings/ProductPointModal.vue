@@ -16,7 +16,7 @@
         label="Reordering Point"
         placeholder="Re-ordering Points"
         v-model="model.point"
-        :error="modelErrors.point"
+        :error="errors.point"
         :error-has-text="true"
       />
       <CustomInput
@@ -58,6 +58,7 @@ import { useRouter } from 'vue-router'
 import { InventoryConst, SettingConst } from '@/const/route.constants'
 import { useAppStore } from '@/stores/app'
 import { ModalStateConst } from '@/const/state.constants'
+import { useValidation } from '@/composables/useValidation'
 
 const props = defineProps({
   selectedId: {
@@ -81,6 +82,12 @@ const model = ref({
 
 const modelErrors = ref({})
 
+// composables
+const { errors, hasErrors, validateData } = useValidation(
+  ProductReorderSchema,
+  model.value
+)
+
 /** ================================================
  * COMPUTED
  ** ================================================*/
@@ -99,17 +106,8 @@ const productOptions = computed(() => {
  ** ================================================*/
 const onSubmit = async () => {
   // validations
-  const { error } = ProductReorderSchema.options({
-    allowUnknown: true
-  }).validate(model.value)
-
-  if (error) {
-    error.details.forEach((err) => {
-      modelErrors.value[err.context.key] = err.message
-    })
-
-    return
-  }
+  validateData()
+  if (hasErrors.value) return
 
   let isSuccess = false
   if (props.selectedId) {

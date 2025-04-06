@@ -17,7 +17,7 @@
           label="Branch Name"
           v-model="model.branch.name"
           placeholder="Ex. Masili Branch"
-          :error="modelErrors.name"
+          :error="errors.branch?.name"
           :error-has-text="true"
         />
         <CustomInput
@@ -31,7 +31,7 @@
           placeholder="Select Branch Manager"
           v-model="model.branch.branch_manager"
           @add-new="showEmployeeModal = true"
-          :error="modelErrors.branch_manager"
+          :error="errors.branch?.branch_manager"
           :error-has-text="true"
         />
       </div>
@@ -41,11 +41,11 @@
         name="status"
         label="Status"
         :has-label="true"
+        v-model="model.branch.status"
         :options="statusOptions"
         placeholder="Select status"
-        v-model="model.branch.status"
         class="w-[calc(50%_-_0.5rem)]"
-        :error="modelErrors.status"
+        :error="errors.branch?.status"
         :error-has-text="true"
       />
       <CustomInput
@@ -65,7 +65,7 @@
         :key="model.address"
         v-model="model.address"
         :address="model.address"
-        :address-errors="modelErrors"
+        :address-errors="errors.address"
       />
     </div>
   </ModalWrapper>
@@ -95,6 +95,7 @@ import { BranchStatus } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { useValidation } from '@/composables/useValidation'
 
 const props = defineProps({
   selectedId: {
@@ -116,7 +117,7 @@ const title = props.selectedId ? 'Edit Branch' : 'New Branch'
 const model = ref({
   branch: {
     name: '',
-    status: BranchStatus.ACTIVE,
+    status: '',
     is_current: false,
     branch_manager: ''
   },
@@ -129,20 +130,16 @@ const model = ref({
   }
 })
 
-const modelErrors = ref({})
+// composables
+const { errors, hasErrors, validateData } = useValidation(
+  BranchCreateSchema,
+  model.value
+)
 
 const onSubmit = async () => {
   // validations
-  const { error } = BranchCreateSchema.validate(model.value, {
-    abortEarly: false
-  })
-
-  if (error) {
-    error.details.forEach((err) => {
-      modelErrors.value[err.context.key] = err.message
-    })
-    return
-  }
+  validateData()
+  if (hasErrors.value) return
 
   let isSuccess = null
   if (!props.selectedId) {

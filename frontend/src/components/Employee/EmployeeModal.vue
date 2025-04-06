@@ -14,7 +14,7 @@
           class="flex-1"
           v-model="model.username"
           placeholder="Username"
-          :error="modelErrors.username"
+          :error="errors.username"
           :error-has-text="true"
           label="Username"
           :has-label="true"
@@ -29,7 +29,7 @@
           ]"
           placeholder="Status"
           v-model="model.status"
-          :error="modelErrors.status"
+          :error="errors.status"
           :error-has-text="true"
           label="Status"
           :has-label="true"
@@ -42,7 +42,7 @@
           name="first_name"
           placeholder="First Name"
           v-model="model.first_name"
-          :error="modelErrors.first_name"
+          :error="errors.first_name"
           :error-has-text="true"
           label="First Name"
           :has-label="true"
@@ -53,7 +53,7 @@
           class="flex-1"
           placeholder="Middle Name"
           v-model="model.middle_name"
-          :error="modelErrors.middle_name"
+          :error="errors.middle_name"
           :error-has-text="true"
           label="Middle Name"
           :has-label="true"
@@ -64,7 +64,7 @@
           class="flex-1"
           placeholder="Last Name"
           v-model="model.last_name"
-          :error="modelErrors.last_name"
+          :error="errors.last_name"
           :error-has-text="true"
           label="Last Name"
           :has-label="true"
@@ -78,7 +78,7 @@
           placeholder="Select Position"
           v-model="model.position"
           :options="positionOptions"
-          :error="modelErrors.position"
+          :error="errors.position"
           :error-has-text="true"
           label="Position"
           :has-label="true"
@@ -89,7 +89,7 @@
           name="date_started"
           placeholder="Date Started"
           v-model="model.date_started"
-          :error="modelErrors.date_started"
+          :error="errors.date_started"
           :error-has-text="true"
           label="Date Started"
           :has-label="true"
@@ -116,6 +116,7 @@ import { UserSchema } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { useValidation } from '@/composables/useValidation'
 
 const showConfirmModal = ref(false)
 
@@ -139,9 +140,14 @@ const model = ref({
   password: ''
 })
 
-const modelErrors = ref({})
-
 const showModal = defineModel()
+
+// modify schema
+const schema = props.selectedId
+  ? ValidatorHelpers.makeSchemaFieldOptional(UserSchema)
+  : UserSchema
+
+const { errors, hasErrors, validateData } = useValidation(schema, model.value)
 
 /** ================================================
  * COMPUTED
@@ -159,23 +165,13 @@ const positionOptions = computed(() => {
  ** ================================================*/
 const onSubmit = async () => {
   // validator
-  const schema = props.selectedId
-    ? ValidatorHelpers.makeSchemaFieldOptional(UserSchema)
-    : UserSchema
-  const { error } = schema.validate(model.value, {
-    abortEarly: false
-  })
 
   if (!props.selectedId) {
     model.value.password = `${model.value.username}-${new Date().getFullYear()}`
   }
 
-  if (error) {
-    error.details.forEach((err) => {
-      modelErrors.value[err.context.key] = err.message
-    })
-    return
-  }
+  validateData()
+  if (hasErrors.value) return
 
   let isSuccess = false
   if (props.selectedId) {

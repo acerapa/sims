@@ -109,6 +109,8 @@ Event.on(
   (data) => {
     if (data && data[props.ndx]) {
       modelErrors.value = data[props.ndx]
+    } else {
+      modelErrors.value = {}
     }
   },
   true

@@ -14,8 +14,10 @@
           :has-label="true"
           name="service_name"
           label="Service Name"
+          :error-has-text="true"
           placeholder="Service Name"
           v-model="model.service.name"
+          :error="errors.service?.name"
         />
         <CustomInput
           type="number"
@@ -24,7 +26,9 @@
           :has-label="true"
           placeholder="Price"
           name="service_price"
+          :error-has-text="true"
           v-model="model.service.price"
+          :error="errors.service?.price"
         />
       </div>
       <div class="flex gap-3">
@@ -35,9 +39,11 @@
           :has-add-new="true"
           name="income_account"
           label="Income Account"
+          :error-has-text="true"
           :options="incomeAccountOptions"
           placeholder="Select Income Account"
           v-model="model.service.income_account"
+          :error="errors.service?.income_account"
         />
         <CustomInput
           type="select"
@@ -45,10 +51,12 @@
           :has-label="true"
           :has-add-new="true"
           name="expense_account"
+          :error-has-text="true"
           label="Expense Account"
           :options="expenseAccountOptions"
           placeholder="Select Expense Account"
           v-model="model.service.expense_account"
+          :error="errors.service?.expense_account"
         />
       </div>
       <CustomInput
@@ -57,8 +65,10 @@
         :has-label="true"
         name="description"
         label="Description"
+        :error-has-text="true"
         placeholder="Description"
         v-model="model.details.description"
+        :error="errors.details?.description"
       />
     </div>
   </ModalWrapper>
@@ -75,12 +85,18 @@ import { computed, onMounted, ref } from 'vue'
 import CustomInput from '../shared/CustomInput.vue'
 import ModalWrapper from '../shared/ModalWrapper.vue'
 import DeleteConfirmModal from '../DeleteConfirmModal.vue'
-import { AccountTypes, ObjectHelpers, ProductType } from 'shared'
+import {
+  AccountTypes,
+  ObjectHelpers,
+  ProductType,
+  ServiceItemSchema
+} from 'shared'
 import { useSettingsStore } from '@/stores/settings'
 import { useServiceStore } from '@/stores/services'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { useValidation } from '@/composables/useValidation'
 
 const showDeleteModal = ref(false)
 
@@ -110,6 +126,12 @@ const model = ref({
     description: ''
   }
 })
+
+// composables
+const { errors, validateData, hasErrors } = useValidation(
+  ServiceItemSchema,
+  model.value
+)
 
 /** ================================================
  * COMPUTED
@@ -141,6 +163,11 @@ const expenseAccountOptions = computed(() => {
  * METHODS
  ** ================================================*/
 const onSubmit = async () => {
+  // validate data
+  validateData()
+
+  if (hasErrors.value) return
+
   let isSuccess = false
   if (props.selectedId) {
     isSuccess = await serviceStore.updateService(props.selectedId, model.value)

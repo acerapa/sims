@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-7 gen-table-row">
+  <div class="grid grid-cols-7 items-center gen-table-row">
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm"># {{ props.delivery.id }}</p>

@@ -7,18 +7,26 @@ const {
 } = require("shared/enums");
 
 const PurchaseOrderSchema = Joi.object({
-  ref_no: Joi.string().required(),
-  date: Joi.date().required(),
-  bill_due: Joi.date().required(),
-  amount: Joi.number().required(),
-  memo: Joi.string().optional(),
-  supplier_id: Joi.alternatives(Joi.string(), Joi.number()).required(),
-  type: Joi.string().valid("term", "cod").required(),
-  term_start: Joi.date().when("type", {
-    is: "term",
-    then: Joi.required(),
-    otherwise: Joi.allow(null, ""),
+  ref_no: Joi.string().required().messages({
+    "*": "Ref no. is required",
   }),
+  date: Joi.date().label("Date").required(),
+  bill_due: Joi.date().label("Bill due").required(),
+  amount: Joi.number().label("Amount").required(),
+  memo: Joi.string().allow("", null).optional(),
+  supplier_id: Joi.alternatives(Joi.string(), Joi.number())
+    .required()
+    .messages({
+      "*": "Supplier is required",
+    }),
+  type: Joi.string().label("Type").valid("term", "cod").required(),
+  term_start: Joi.date()
+    .label("Term Start")
+    .when("type", {
+      is: "term",
+      then: Joi.required(),
+      otherwise: Joi.allow(null, "").optional(),
+    }),
   status: Joi.string()
     .valid("open", "confirmed", "completed", "cancelled")
     .optional(),
