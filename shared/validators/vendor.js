@@ -12,11 +12,21 @@ const AddressSchema = Joi.object({
 });
 
 const VendorSchema = Joi.object({
-  company_name: Joi.string().required(),
-  annotation: Joi.string().required(),
-  first_name: Joi.string().required(),
-  last_name: Joi.string().required(),
-  phone: Joi.string().required(),
+  company_name: Joi.string().required().messages({
+    "*": "Company name is required",
+  }),
+  annotation: Joi.string().required().messages({
+    "*": "Annotation is required",
+  }),
+  first_name: Joi.string().required().messages({
+    "*": "First name is required",
+  }),
+  last_name: Joi.string().required().messages({
+    "*": "Last name is required",
+  }),
+  phone: Joi.string().required().messages({
+    "*": "Phone number is required",
+  }),
   email: Joi.string()
     .allow(null, "")
     .email({ tlds: { allow: false } })
