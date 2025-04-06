@@ -65,13 +65,13 @@
                   label="Suppliers"
                   :has-add-new="true"
                   name="select_supplier"
+                  :error-has-text="true"
                   :options="supplierOptions"
                   placeholder="*Select supplier"
+                  :disabled="isEdit || isDisabled"
                   v-model="model.order.supplier_id"
                   @add-new="showVendorModal = true"
-                  :disabled="isEdit || isDisabled"
-                  :error="modelErrors.supplier_id"
-                  :error-has-text="true"
+                  :error="errors.order?.supplier_id"
                 />
                 <CustomInput
                   type="select"
@@ -92,7 +92,7 @@
                     }
                   ]"
                   :disabled="isDisabled"
-                  :error="modelErrors.type"
+                  :error="errors.order?.type"
                   :error-has-text="true"
                 />
               </div>
@@ -105,7 +105,7 @@
                   label="Reference No."
                   placeholder="Ref. No."
                   :disabled="isDisabled"
-                  :error="modelErrors.ref_no"
+                  :error="errors.order?.ref_no"
                   v-model="model.order.ref_no"
                   :error-has-text="true"
                 />
@@ -134,7 +134,7 @@
                   v-model="model.order.date"
                   :disabled="isDisabled"
                   :error-has-text="true"
-                  :error="modelErrors.date"
+                  :error="errors.order?.date"
                 />
                 <CustomInput
                   type="date"
@@ -144,7 +144,7 @@
                   label="Bill due"
                   placeholder="Bill Due"
                   v-model="model.order.bill_due"
-                  :error="modelErrors.bill_due"
+                  :error="errors.order?.bill_due"
                   :error-has-text="true"
                   :disabled="isDisabled"
                 />
@@ -210,6 +210,7 @@
             sup_id: model.order.supplier_id.toString(),
             selected: model.products
           }"
+          :row-event-name="rowEventName"
         >
           <template #aggregate>
             <p class="text-end w-full">
@@ -297,6 +298,7 @@ import { ToastTypes } from '@/data/types'
 import { InventoryConst, PurchaseConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
 import { useTableScroll } from '@/use/useTableScroll'
+import { useValidation } from '@/composables/useValidation'
 
 const route = useRoute()
 const router = useRouter()
@@ -347,10 +349,15 @@ const modelDefualtValue = {
 
 const model = ref(ObjectHelpers.copyObj(modelDefualtValue))
 
+const { errors, hasErrors, validateData } = useValidation(
+  PurchaseOrderCreationSchema,
+  model.value
+)
+
 /** ================================================
  * EVENTS
  ** ================================================*/
-
+const rowEventName = 'purchase-order-row-event'
 // is page loading event
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
@@ -415,35 +422,11 @@ const onSubmit = async (isAddNew = false) => {
   }
 
   // validation
-  const { error } = PurchaseOrderCreationSchema.validate(model.value, {
-    abortEarly: false
-  })
-  if (error) {
-    modelErrors.value.products = Object.groupBy(
-      error.details.filter((item) => {
-        return item.path.includes('products')
-      }),
-      (err) => {
-        return err.path[1]
-      }
-    )
+  validateData()
+  if (hasErrors.value) {
+    console.log(errors.value)
 
-    const keys = Object.keys(modelErrors.value.products)
-    keys.forEach((key) => {
-      let prdErr = {}
-      modelErrors.value.products[key].forEach((item) => {
-        prdErr[item.context.key] = item.message
-      })
-
-      modelErrors.value.products[key] = prdErr
-    })
-
-    error.details.forEach((item) => {
-      if (!item.path.includes('products')) {
-        modelErrors.value[item.context.key] = item.message
-      }
-    })
-
+    Event.emit(rowEventName, errors.value.products)
     return
   }
 

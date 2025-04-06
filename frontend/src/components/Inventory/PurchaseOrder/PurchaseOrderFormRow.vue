@@ -20,7 +20,7 @@
         :has-add-new="true"
         @add-new="onNewProduct"
         v-model="product.product_id"
-        :error="props.errors.product_id"
+        :error="modelErrors.product_id"
         :key="product.product_id"
         :can-search="true"
         :disabled="props.isDisabled"
@@ -33,7 +33,7 @@
       placeholder="Description"
       :disabled="props.isDisabled"
       v-model="product.description"
-      :error="props.errors.description"
+      :error="modelErrors.description"
     />
     <CustomInput
       type="number"
@@ -42,7 +42,7 @@
       placeholder="quantity"
       v-model="product.quantity"
       :disabled="props.isDisabled"
-      :error="props.errors.quantity"
+      :error="modelErrors.quantity"
     />
     <CustomInput
       name="cost"
@@ -51,7 +51,7 @@
       placeholder="Cost"
       v-model="product.cost"
       :disabled="props.isDisabled"
-      :error="props.errors.cost"
+      :error="modelErrors.cost"
     />
     <CustomInput
       type="number"
@@ -60,7 +60,7 @@
       placeholder="Amount"
       v-model="product.amount"
       :disabled="props.isDisabled"
-      :error="props.errors.amount"
+      :error="modelErrors.amount"
     />
     <p
       class="col-span-1 text-sm pl-3 mt-[10px]"
@@ -83,6 +83,7 @@ import CustomInput from '@/components/shared/CustomInput.vue'
 import { getCost } from '@/helper'
 import { useRouter } from 'vue-router'
 import { InventoryConst, PurchaseConst } from '@/const/route.constants'
+import Event from '@/event'
 
 const props = defineProps({
   ndx: {
@@ -96,9 +97,8 @@ const props = defineProps({
   sup_id: {
     type: String
   },
-  errors: {
-    type: Object,
-    default: () => ({}),
+  eventName: {
+    type: String,
     required: false
   },
   selected: {
@@ -108,9 +108,25 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const modelErrors = ref({})
 const product = defineModel()
 const emit = defineEmits(['remove'])
 const productStore = useProductStore()
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+Event.on(props.eventName, (data) => {
+  if (data && data[props.ndx] && !props.isDisabled) {
+    modelErrors.value = data[props.ndx]
+  } else {
+    modelErrors.value = {}
+  }
+})
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
 const productOptions = computed(() => {
   return productStore.supplierProducts
     .map((product) => {
@@ -125,6 +141,9 @@ const productOptions = computed(() => {
     })
 })
 
+/** ================================================
+ * METHODS
+ ** ================================================*/
 const onNewProduct = () => {
   router.push({
     name: InventoryConst.PRODUCT_FORM,
@@ -134,10 +153,16 @@ const onNewProduct = () => {
   })
 }
 
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
 onMounted(async () => {
   await productStore.getProducts()
 })
 
+/** ================================================
+ * WATCHERS
+ * ================================================*/
 watch(
   () => product.value.product_id,
   (val) => {
