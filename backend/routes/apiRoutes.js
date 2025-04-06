@@ -54,6 +54,9 @@ router.use("/payment-method", paymentMethodRoutes);
 
 const invoiceRoutes = require("./InvoiceRoutes");
 router.use("/invoices", invoiceRoutes);
+
+const deliveryRoutes = require("./DeliveryRoutes");
+router.use("/deliveries", deliveryRoutes);
 // end use routes
 
 // testing

@@ -67,6 +67,14 @@ export default [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/deliveries',
+        name: SalesConst.DELIVERIES,
+        component: () => import('@/views/sales/Delivery.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   }
