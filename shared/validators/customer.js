@@ -3,8 +3,12 @@ const { AddressSchema } = require("./user");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
 
 const CustomerSchema = joi.object({
-  first_name: joi.string().required(),
-  last_name: joi.string().required(),
+  first_name: joi.string().required().messages({
+    "*": "First name is required",
+  }),
+  last_name: joi.string().required().messages({
+    "*": "Last name is required",
+  }),
   address: ValidatorHelpers.makeSchemaFieldOptional(AddressSchema).options({
     allowUnknown: true,
   }),

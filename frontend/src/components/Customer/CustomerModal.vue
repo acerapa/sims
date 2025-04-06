@@ -18,7 +18,7 @@
           name="first_name"
           placeholder="First Name"
           :error-has-text="true"
-          :error="modelErrors.first_name"
+          :error="errors.first_name"
           v-model="model.first_name"
         />
         <CustomInput
@@ -29,7 +29,7 @@
           name="last_name"
           placeholder="Last Name"
           :error-has-text="true"
-          :error="modelErrors.last_name"
+          :error="errors.last_name"
           v-model="model.last_name"
         />
       </div>
@@ -38,7 +38,7 @@
       <AddressForm
         class="mt-3"
         v-model="model.address"
-        :address-errors="modelErrors.address"
+        :address-errors="errors.address"
       />
 
       <p class="font-semibold mt-5">Contact Information</p>
@@ -51,7 +51,7 @@
           name="phone_number"
           placeholder="Phone Number"
           :error-has-text="true"
-          :error="modelErrors.phone_number"
+          :error="errors.phone_number"
           v-model="model.phone_number"
         />
         <CustomInput
@@ -62,7 +62,7 @@
           name="viber"
           placeholder="Viber"
           :error-has-text="true"
-          :error="modelErrors.viber"
+          :error="errors.viber"
           v-model="model.viber"
         />
       </div>
@@ -74,7 +74,7 @@
         name="facebook_url"
         placeholder="Facebook"
         :error-has-text="true"
-        :error="modelErrors.facebook_url"
+        :error="errors.facebook_url"
         v-model="model.facebook_url"
       />
     </div>
@@ -98,6 +98,7 @@ import { CustomerSchema, ObjectHelpers } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { useValidation } from '@/composables/useValidation'
 
 const showModal = defineModel()
 const showDeleteConfirmModal = ref(false)
@@ -127,25 +128,21 @@ const defaultModel = {
 }
 
 const model = ref(defaultModel)
-const modelErrors = ref({
-  address: {}
-})
 
+// composables
+const { errors, hasErrors, validateData } = useValidation(
+  CustomerSchema,
+  model.value
+)
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
 const onSubmit = async () => {
+  validateData()
+  if (hasErrors.value) return
+
   let isSuccess = false
-
-  // validate model
-  const validateCustomer = CustomerSchema.options({
-    allowUnknown: true
-  }).validate(model.value, { abortEarly: false })
-
-  if (validateCustomer.error) {
-    validateCustomer.error.details.forEach((error) => {
-      modelErrors.value[error.context.key] = error.message
-    })
-
-    return
-  }
 
   if (!props.selectedId) {
     isSuccess = await customerStore.createCustomer(model.value)
@@ -177,6 +174,9 @@ const onAfterDelete = async () => {
   await customerStore.fetchCustomers()
 }
 
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
 onMounted(async () => {
   if (props.selectedId) {
     await customerStore.getCustomer(props.selectedId)
