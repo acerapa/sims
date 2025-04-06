@@ -10,12 +10,18 @@ const { AddressSchema } = require("./user");
 
 const BranchSchema = Joi.object({
   name: Joi.string().required().messages({
-    "string.empty": "Branch name is required",
-    "any.required": "Branch name is required",
+    "*": "Branch name is required",
   }),
-  branch_manager: Joi.number().required(),
+  branch_manager: Joi.number().required().messages({
+    "*": "Branch manager is required",
+  }),
   is_current: Joi.boolean().optional(),
-  status: Joi.string().valid(...Object.values(BranchStatus)),
+  status: Joi.string()
+    .valid(...Object.values(BranchStatus))
+    .required()
+    .messages({
+      "*": "Status is required",
+    }),
 });
 
 const BranchCreateSchema = Joi.object({
