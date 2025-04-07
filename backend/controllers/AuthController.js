@@ -21,7 +21,7 @@ module.exports = {
       const { username, password } = req.body.validated;
       const payload = await authenticateUser(username, password);
 
-      // generate tokena
+      // generate tokens
       const accessToken = generateToken(payload);
       const refreshToken = generateToken(payload, true);
 
