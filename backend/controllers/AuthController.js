@@ -6,58 +6,57 @@ const Branch = require("../models/branch");
 
 // Validation Schema
 const { VerifyTokenSchema } = require("shared");
+const {
+  authenticateUser,
+  generateToken,
+  setTokenToCookies,
+  decodeToken,
+  clearTokens,
+} = require("../services/AuthService");
 
 module.exports = {
   login: async (req, res) => {
-    const validated = req.body.validated;
+    try {
+      // authentication
+      const { username, password } = req.body.validated;
+      const payload = await authenticateUser(username, password);
 
-    const user = await User.findOne({
-      where: { username: validated.username },
-      raw: true,
-      include: [
-        {
-          model: BranchMember,
-          as: "branch_member",
-          include: [
-            {
-              model: Branch,
-              as: "branch",
-            },
-          ],
-        },
-      ],
-    });
-    if (user) {
-      if (await bcryptJS.compare(validated.password, user.password)) {
-        // generate access token and refresh token
-        const accessToken = jwt.sign(
-          { user_id: user.id, refresh: false },
-          process.env.SECRET_KEY,
-          { expiresIn: process.env.TOKEN_EXP }
-        );
-        const refressToken = jwt.sign(
-          { user_id: user.id, refresh: true },
-          process.env.REFRESH_TOKEN_KEY,
-          { expiresIn: process.env.REFRESH_TOKEN_EXP }
-        );
+      // generate tokens
+      const accessToken = generateToken(payload);
+      const refreshToken = generateToken(payload, true);
 
-        // remove password
-        delete user.password;
-        res.sendResponse(
-          {
-            access: accessToken,
-            refresh: refressToken,
-            user: user,
-          },
-          "Successfully login!",
-          200
-        );
-      } else {
-        res.sendError({}, "Incorrect Credentials!", 401);
-      }
-    } else {
-      res.sendError({}, "Incorrect Credentials!", 404);
+      // set tokens to cookies
+      setTokenToCookies(res, accessToken);
+      setTokenToCookies(res, refreshToken, true);
+
+      res.sendResponse({}, "Successfully logged in", 200);
+    } catch (e) {
+      res.sendError({ ...e }, e.message, 401);
     }
+  },
+
+  authUser: async (req, res) => {
+    try {
+      const token = req.cookies.access_token;
+      const payload = decodeToken(token);
+
+      const allowedFields = Object.keys(User.getAttributes()).filter(
+        (key) => key !== "password"
+      );
+
+      const user = await User.findByPk(payload.user_id, {
+        attributes: allowedFields,
+      });
+
+      res.sendResponse({ user }, "Successfully fetched auth user", 200);
+    } catch (e) {
+      res.sendError({ ...e }, e.message, 401);
+    }
+  },
+
+  logout: (req, res) => {
+    clearTokens(res);
+    res.sendResponse({}, "Successfully logged out", 200);
   },
 
   verify: async (req, res) => {

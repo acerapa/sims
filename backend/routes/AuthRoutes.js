@@ -3,6 +3,8 @@ const { AuthSchema } = require("shared");
 const AuthController = require("../controllers/AuthController");
 const { validateBody } = require("../middleware/request-validator");
 
+router.get("/auth-user", AuthController.authUser);
+router.post("/logout", AuthController.logout);
 router.post("/login", validateBody(AuthSchema), AuthController.login);
 router.post("/token/verify", AuthController.verify);
 router.post("/token/refresh", AuthController.refresh);

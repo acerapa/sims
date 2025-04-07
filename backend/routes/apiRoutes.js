@@ -2,13 +2,14 @@ const { Router } = require("express");
 const router = Router();
 const testRoutes = Router();
 const { validateToken } = require("../middleware/authentication");
+const { validateUserAuth } = require("../middleware/auth");
 
 // start use routes
 const authRoutes = require("./AuthRoutes");
 router.use("/auth", authRoutes);
 
 const userRoutes = require("./UserRouters");
-router.use("/users", userRoutes);
+router.use("/users", validateUserAuth, userRoutes);
 
 const productCategoryRoutes = require("./ProuctCategoryRoutes");
 router.use("/product-category", productCategoryRoutes);

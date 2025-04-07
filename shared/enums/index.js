@@ -6,6 +6,11 @@ const UserType = Object.freeze({
   CASHIER: "cashier",
 });
 
+const UserStatus = Object.freeze({
+  ACTIVE: 1,
+  INACTIVE: 0,
+});
+
 const AccountTypes = Object.freeze({
   INCOME: "income",
   EXPENSE: "expense",
@@ -230,6 +235,7 @@ const DeliveryStatusMap = Object.freeze({
 module.exports = {
   UserType,
   ItemType,
+  UserStatus,
   ProductType,
   AccountTypes,
   BranchStatus,
