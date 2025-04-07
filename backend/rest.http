@@ -44,14 +44,17 @@ Content-Type: application/json
 }
 
 #### - [Authenticating Users] success response
-POST http://localhost:3000/api/auth/login
+POST http://localhost:3001/api/auth/login
 Accept: application/json
 Content-Type: application/json
 
 {
-	"username": "Master",
-	"password": "bluelock"
+	"username": "admin",
+	"password": "admin123"
 }
+
+### - [Authenticated Users] Logout
+POST http://localhost:3001/api/auth/logout
 
 #### - [Refresh Token] success response
 POST http://localhost:3000/api/auth/token/refresh
@@ -81,7 +84,7 @@ Content-Type: application/json
 }
 
 ### = [GET all users] success
-GET http://localhost:3000/api/users/all
+GET http://localhost:3001/api/users/all
 Accept: application/json
 
 
