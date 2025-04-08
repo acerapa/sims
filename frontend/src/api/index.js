@@ -13,7 +13,8 @@ const apiConfig = {
   }
 }
 
-const BASE_PATH = apiConfig.serverUrls[import.meta.env.MODE]
+// const BASE_PATH = apiConfig.serverUrls[import.meta.env.MODE]
+const BASE_PATH = `${window.location.origin}/api/` // this is temporary only
 
 export const Method = Object.freeze({
   GET: 'GET',
@@ -29,7 +30,13 @@ export const api = async (
   payload = null,
   hdrs = {}
 ) => {
-  const headers = { ...apiConfig.defaultHeaders, ...hdrs }
+  const listOfHeader = { ...apiConfig.defaultHeaders, ...hdrs }
+  const headers = new Headers()
+
+  Object.keys(listOfHeader).forEach((key) => {
+    headers.append(key, listOfHeader[key])
+  })
+
   const requestInit = { method, headers }
 
   // if method is GET no need for body

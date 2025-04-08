@@ -18,6 +18,11 @@ export default defineConfig({
         '**/.tmp/**' // Exclude .tmp
       ]
     }
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:3001/'
+    //   }
+    // }
   },
   plugins: [vue()],
   resolve: {

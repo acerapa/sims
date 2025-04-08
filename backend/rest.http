@@ -1,4 +1,4 @@
-@host = http://localhost:3000
+@host = http://localhost:3001
 
 ##### - [User Registration] success registration
 POST http://localhost:3000/api/users/register
@@ -52,6 +52,9 @@ Content-Type: application/json
 	"username": "admin",
 	"password": "admin123"
 }
+
+### = [Get Authenticated User]
+GET {{host}}/api/auth/me
 
 ### - [Authenticated Users] Logout
 POST http://localhost:3001/api/auth/logout

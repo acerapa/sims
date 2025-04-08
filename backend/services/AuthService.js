@@ -69,8 +69,10 @@ function setTokenToCookies(res, token, isRefresh = false) {
   res.cookie(name, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "none", // will be converted to 'strict' in production
+    sameSite: "lax", // will be converted to 'strict' in production
     maxAge: maxAge,
+    priority: "high",
+    path: "/api",
   });
 }
 
@@ -118,6 +120,7 @@ function validateAuthToken(req, res) {
   const accessToken = req.cookies.access_token;
   const refreshToken = req.cookies.refresh_token;
 
+  let user_id = null;
   const isAccessValid = verifyToken(accessToken);
   if (!isAccessValid) {
     const isRefreshValid = verifyToken(refreshToken, true);
@@ -130,6 +133,9 @@ function validateAuthToken(req, res) {
         position: decoded.position,
       };
 
+      // user_id is used to get user data
+      user_id = decoded.user_id;
+
       const newAccessToken = generateToken(payload);
       const newRefreshToken = generateToken(payload, true);
 
@@ -137,6 +143,13 @@ function validateAuthToken(req, res) {
       setTokenToCookies(res, newRefreshToken, true);
     }
   }
+
+  // set user_id to res
+  if (!user_id) {
+    const decoded = decodeToken(accessToken);
+    user_id = decoded.user_id;
+  }
+  res.user_id = user_id;
 }
 
 /**
@@ -148,14 +161,18 @@ function clearTokens(res) {
   res.clearCookie("access_token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "none", // will be converted to 'strict' in production
+    sameSite: "lax", // will be converted to 'strict' in production
     maxAge: 1000 * 60 * 15,
+    priority: "high",
+    path: "/api",
   });
   res.clearCookie("refresh_token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "none", // will be converted to 'strict' in production
+    sameSite: "lax", // will be converted to 'strict' in production
     maxAge: 1000 * 60 * 60 * 24 * 7,
+    priority: "high",
+    path: "/api",
   });
 }
 

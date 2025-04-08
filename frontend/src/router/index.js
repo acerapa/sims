@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { isAuthenticated } from '@/stores/auth'
+import { useAuth } from '@/composables/useAuth'
 
 import commonRoutes from './common'
 import reportRoutes from './report'
@@ -25,12 +25,13 @@ const router = createRouter({
   ]
 })
 
+const { getAuthUser } = useAuth()
+
 router.beforeEach(async (to, from, next) => {
   // Raise Event that route is changing
   Event.emit(EventEnum.ROUTE_CHANGE, { to, from })
 
-  const isAuth = await isAuthenticated()
-
+  const isAuth = await getAuthUser()
   if (to.meta.requiresAuth) {
     if (isAuth) {
       next()
