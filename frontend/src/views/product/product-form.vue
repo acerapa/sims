@@ -4,16 +4,6 @@
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Basic Informations</p>
         <div class="flex flex-col gap-3">
-          <CustomInput
-            type="text"
-            label="Name"
-            :has-label="true"
-            name="product_name"
-            placeholder="*Name"
-            :error-has-text="true"
-            v-model="model.product.name"
-            :error="errors.product?.name"
-          />
           <div class="flex gap-3">
             <CustomInput
               type="select"
@@ -131,8 +121,8 @@
               :has-label="true"
               :error-has-text="true"
               placeholder="Item Code"
-              :error="modelErrors.item_code"
               v-model="model.details.item_code"
+              :error="errors.details?.item_code"
             />
           </div>
           <div class="flex gap-3 items-start">
@@ -143,10 +133,10 @@
               :has-label="true"
               :error-has-text="true"
               name="purchase_description"
-              label="Purchase Description"
+              label="*Purchase Description"
               placeholder="Purchase Description"
               v-model="model.details.purchase_description"
-              :error="modelErrors.purchase_description"
+              :error="errors.details?.purchase_description"
             />
             <CustomInput
               :rows="5"
@@ -155,9 +145,9 @@
               :has-label="true"
               name="sale_description"
               label="Sales Description"
-              placeholder="Sales Description"
+              placeholder="*Sales Description"
               v-model="model.details.sales_description"
-              :error="modelErrors.sale_description"
+              :error="errors.details?.sales_description"
               :error-has-text="true"
             />
           </div>
@@ -253,7 +243,6 @@ const productSupplier = {
 
 const model = ref({
   product: {
-    name: '',
     price: '',
     type: ProductType.INVENTORY,
     income_account: '',

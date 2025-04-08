@@ -24,7 +24,7 @@
             <input type="checkbox" class="input" />
             <p class="table-header">#</p>
           </div>
-          <p class="col-span-3 table-header">Name</p>
+          <p class="col-span-3 table-header">Item Description</p>
           <p class="col-span-1 table-header">Item Code</p>
           <p class="col-span-1 table-header text-end">Price</p>
           <p class="col-span-1 table-header text-end pr-2">Stock</p>
@@ -188,7 +188,7 @@ const filteredData = computed(() => {
     )
     .filter((product) => {
       const searchCondition =
-        `${product.id} ${product.name} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
+        `${product.id} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
       return searchText.value
         ? searchCondition.includes(searchText.value.toLowerCase())
         : product

@@ -1,7 +1,6 @@
 const { Router } = require("express");
 const router = Router();
 const testRoutes = Router();
-const { validateToken } = require("../middleware/authentication");
 const { validateUserAuth } = require("../middleware/auth");
 
 const protectedRoutes = Router();
