@@ -60,6 +60,7 @@
         :disabled="props.disabled"
         :can-search="props.canSearch"
         :has-add-new="props.hasAddNew"
+        :input-class="props.inputClass"
         :placeholder="props.placeholder"
         :id="props.id ? props.id : props.name"
         :select-multiple="props.selectMultiple"

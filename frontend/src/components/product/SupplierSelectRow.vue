@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-6 gap-3">
+  <div
+    class="grid grid-cols-6 gap-3"
+    :class="isPreselected ? 'bg-gray-100' : ''"
+  >
     <CustomInput
       name="supplier"
       type="select"
@@ -8,10 +11,11 @@
       :error-has-text="false"
       :options="supplierOptions"
       v-model="model.supplier_id"
-      :disabled="props.isDisabled"
       placeholder="Select Supplier"
       :error="modelErrors.supplier_id"
       @add-new="showVendorModal = true"
+      :input-class="isPreselected ? '!bg-gray-100' : ''"
+      :disabled="props.isDisabled || isPreselected"
     />
     <CustomInput
       name="cost"
@@ -24,7 +28,7 @@
     />
     <p
       class="col-span-1 text-sm pl-3 mt-[10px] flex justify-end mr-4"
-      :class="[props.isDisabled ? 'hidden' : '']"
+      :class="[!props.isDisabled && !isPreselected ? '' : 'hidden']"
     >
       <img
         @click="emit('remove')"
@@ -60,6 +64,10 @@ const props = defineProps({
   isDisabled: {
     type: Boolean,
     default: false
+  },
+  preSelectedSups: {
+    type: Array,
+    default: []
   }
 })
 
@@ -93,6 +101,10 @@ const supplierOptions = computed(() => {
       value: supplier.id
     }
   })
+})
+
+const isPreselected = computed(() => {
+  return props.preSelectedSups.includes(model.value.supplier_id)
 })
 
 onMounted(async () => {

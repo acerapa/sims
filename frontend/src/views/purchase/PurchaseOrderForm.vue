@@ -318,8 +318,6 @@ const purchaseOrderStore = usePurchaseOrderStore()
 
 const productFormat = {
   product_id: '',
-  name: '',
-  description: '',
   quantity: '',
   cost: '',
   amount: ''
@@ -486,6 +484,8 @@ const setPurchaseOrderFormPageState = () => {
       InventoryConst.PRODUCT_FORM,
       PurchaseConst.PURCHASE_ORDER_FORM
     ],
+    source: route.name,
+    target: InventoryConst.PRODUCT_FORM,
     state: model.value
   })
 }
@@ -554,16 +554,9 @@ onMounted(async () => {
   }
 
   if (appStore.isPageExist(PageStateConst.PURCHASE_ORDER_FORM)) {
-    if (
-      !ObjectHelpers.compareObjects(
-        model.value,
-        appStore.pages[PageStateConst.PURCHASE_ORDER_FORM].state
-      )
-    ) {
-      model.value = ObjectHelpers.assignSameFields(
-        model.value,
-        appStore.pages[PageStateConst.PURCHASE_ORDER_FORM].state
-      )
+    const pageState = appStore.getPageState(PageStateConst.PURCHASE_ORDER_FORM)
+    if (!ObjectHelpers.compareObjects(model.value, pageState.state)) {
+      model.value = ObjectHelpers.assignSameFields(model.value, pageState.state)
     }
   } else {
     setPurchaseOrderFormPageState()

@@ -161,6 +161,9 @@
             :row-component="SupplierSelectRow"
             :row-event-name="rowEventName"
             :format="productSupplier"
+            :row-props="{
+              preSelectedSups: preselectedSupplier
+            }"
             v-model="model.suppliers"
           />
         </div>
@@ -227,11 +230,16 @@ import router from '@/router'
 import { ToastTypes } from '@/data/types'
 import { InventoryConst } from '@/const/route.constants'
 import { useValidation } from '@/composables/useValidation'
+import { useAppStore } from '@/stores/app'
+import { PageStateConst } from '@/const/state.constants'
 
+// injections and stores
 const route = useRoute()
+const appStore = useAppStore()
 const settingStore = useSettingsStore()
 const productStore = useProductStore()
 
+// flags
 const showAccountModal = ref(false)
 const showCategoryModal = ref(false)
 const showConfirmationModal = ref(false)
@@ -262,7 +270,7 @@ const model = ref({
   categories: []
 })
 
-const modelErrors = ref({})
+const preselectedSupplier = ref([])
 
 // composables
 const { errors, validateData, hasErrors } = useValidation(
@@ -416,6 +424,24 @@ onMounted(async () => {
     }
   } else {
     model.value.details.item_code = await productStore.getProductItemCode()
+
+    // for now per-selected supplier only comes from purchase order
+    // That said, we'll just check if there's a purchase order form page state
+    if (appStore.isPageExist(PageStateConst.PURCHASE_ORDER_FORM)) {
+      const pageState = appStore.getPageState(
+        PageStateConst.PURCHASE_ORDER_FORM
+      )
+      const purchaseOrder = pageState.state
+      preselectedSupplier.value.push(purchaseOrder.order.supplier_id)
+
+      // set to model manually
+      model.value.suppliers = preselectedSupplier.value.map((sup) => {
+        return {
+          supplier_id: sup,
+          cost: 0
+        }
+      })
+    }
   }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)

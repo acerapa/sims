@@ -5,6 +5,8 @@
   >
     <select
       class="input flex-1"
+      :class="[props.inputClass]"
+      :multiple="props.selectMultiple"
       v-model="selected"
       ref="select"
       v-if="!props.selectMultiple && !props.canSearch"
@@ -163,6 +165,10 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false
+  },
+  inputClass: {
+    type: String,
+    default: ''
   }
 })
 
