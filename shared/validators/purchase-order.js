@@ -34,8 +34,6 @@ const PurchaseOrderSchema = Joi.object({
 
 const PurchaseProductSchema = Joi.object({
   product_id: Joi.alternatives(Joi.string(), Joi.number()).required(),
-  name: Joi.string().required(),
-  description: Joi.string().optional(),
   quantity: Joi.number().required(),
   cost: Joi.number().required(),
   amount: Joi.number().required(),

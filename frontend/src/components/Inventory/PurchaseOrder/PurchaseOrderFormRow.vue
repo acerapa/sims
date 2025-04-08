@@ -4,7 +4,7 @@
     class="grid gap-3 items-start min-w-[750px]"
     :class="[props.isDisabled ? 'grid grid-cols-8' : 'grid-cols-9']"
   >
-    <div class="col-span-2 flex gap-3">
+    <div class="col-span-5 flex gap-3">
       <CustomInput
         type="checkbox"
         name="checkbox"
@@ -26,15 +26,6 @@
         :disabled="props.isDisabled"
       />
     </div>
-    <CustomInput
-      type="text"
-      class="col-span-3"
-      name="description"
-      placeholder="Description"
-      :disabled="props.isDisabled"
-      v-model="product.description"
-      :error="modelErrors.description"
-    />
     <CustomInput
       type="number"
       name="quantity"
@@ -131,7 +122,7 @@ const productOptions = computed(() => {
   return productStore.supplierProducts
     .map((product) => {
       return {
-        text: product.name,
+        text: product.product_details.purchase_description,
         value: product.id
       }
     })
@@ -169,10 +160,6 @@ watch(
     const prd = productStore.products.find((product) => product.id == val)
     if (prd) {
       product.value.product_id = prd.id
-      product.value.name = prd.name
-      product.value.description = product.value.description
-        ? product.value.description
-        : prd.product_details.purchase_description
       product.value.quantity = product.value.quantity
         ? product.value.quantity
         : 1 // will always set quantity upon create
