@@ -3,20 +3,11 @@
     class="grid grid-cols-5 gap-3 items-start min-w-[430px] gen-table-row"
     @click="emit('view', props.productReordering.id)"
   >
-    <div class="col-span-1 flex gap-3 items-center">
+    <div class="col-span-2 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.productReordering.id }}</p>
     </div>
-    <p class="col-span-1 text-sm">{{ props.productReordering.point }}</p>
-    <div class="col-span-3 text-sm flex flex-wrap gap-3">
-      <p
-        class="text-xs bg-blue-200 px-2 py-1 rounded"
-        v-for="(pd, ndx) in props.productReordering.product_details"
-        :key="ndx"
-      >
-        {{ pd.product.name }}
-      </p>
-    </div>
+    <p class="col-span-3 text-sm">{{ props.productReordering.point }}</p>
   </div>
 </template>
 

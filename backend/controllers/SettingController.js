@@ -34,37 +34,8 @@ module.exports = {
 
   register: async (req, res) => {
     try {
-      const orderingPoint = await ProductSettings.create({
+      const point = await ProductSettings.create({
         point: req.body.point,
-      });
-
-      if (req.body.products) {
-        await Promise.all(
-          req.body.products.map((p) =>
-            ProductDetails.update(
-              { product_setting_id: orderingPoint.id },
-              {
-                where: {
-                  product_id: p,
-                },
-              }
-            )
-          )
-        );
-      }
-
-      const point = await ProductSettings.findOne({
-        where: {
-          id: orderingPoint.dataValues.id,
-        },
-        include: {
-          model: ProductDetails,
-          as: "product_details",
-          include: {
-            model: Product,
-            as: "product",
-          },
-        },
       });
 
       res.sendResponse({ point }, "Successfully created!", 200);
@@ -84,65 +55,7 @@ module.exports = {
         }
       );
 
-      if (req.body.products) {
-        const products = await Product.findAll({
-          where: {
-            id: {
-              [Op.in]: sequelize.literal(
-                `(SELECT product_id FROM ${ProductDetails.getTableName()} WHERE product_setting_id=${req.params.id})`
-              ),
-            },
-          },
-          include: {
-            model: ProductDetails,
-            as: "product_details",
-            attributes: ["id", "product_setting_id"],
-          },
-        });
-
-        const toAdd = req.body.products.filter((product_id) => {
-          return !products.map((p) => p.id).includes(product_id);
-        });
-
-        const toRemove = products.filter((product) => {
-          return !req.body.products.includes(product.id);
-        });
-
-        await Promise.all([
-          ...toAdd.map((product_id) => {
-            return ProductDetails.update(
-              { product_setting_id: req.params.id },
-              {
-                where: {
-                  product_id: product_id,
-                },
-              }
-            );
-          }),
-          ...toRemove.map((product) => {
-            return product.product_details.update({ point: null });
-          }),
-        ]);
-      }
-
-      const point = await ProductSettings.findOne({
-        where: {
-          id: req.params.id,
-        },
-        include: {
-          model: ProductDetails,
-          as: "product_details",
-          include: {
-            model: Product,
-            as: "product",
-          },
-        },
-      });
-
-      // re arrange data
-      point.dataValues.products = point.dataValues.product_details.length
-        ? point.dataValues.product_details.map((pd) => pd.product)
-        : [];
+      const point = await ProductSettings.findByPk(req.params.id);
 
       res.sendResponse({ point }, "Successfully updated!", 200);
     } catch (e) {
