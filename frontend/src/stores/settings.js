@@ -11,31 +11,6 @@ export const useSettingsStore = defineStore('settings', () => {
   /*
    * PRODUCT REORDERING POINTS METHODS START
    */
-  const regulateProductReordering = (pointReordering) => {
-    const newPointProducts = pointReordering.product_details.map(
-      (pd) => pd.product.id
-    )
-
-    productReorderingPoints.value.forEach((prp) => {
-      newPointProducts.forEach((pointProduct) => {
-        if (prp.product_details.length) {
-          if (
-            prp.product_details
-              .map((pd) => pd.product.id)
-              .includes(pointProduct)
-          ) {
-            const index = prp.product_details.findIndex(
-              (pd) => pd.product.id == pointProduct
-            )
-            if (index > -1) {
-              prp.product_details.splice(index, 1)
-            }
-          }
-        }
-      })
-    })
-  }
-
   const fetchAllProductReorderingPoints = async () => {
     const res = await api('product-setting/all')
     if (res.status == 200) {
@@ -59,8 +34,6 @@ export const useSettingsStore = defineStore('settings', () => {
     const isSuccess = res.status < 400
     if (isSuccess) {
       if (productReorderingPoints.value.length) {
-        regulateProductReordering(res.data.point)
-
         productReorderingPoints.value.unshift(res.data.point)
       } else {
         await fetchAllProductCategories()
@@ -76,8 +49,6 @@ export const useSettingsStore = defineStore('settings', () => {
 
     if (isSuccess) {
       if (productReorderingPoints.value.length) {
-        regulateProductReordering(res.data.point)
-
         const index = productReorderingPoints.value.findIndex(
           (prp) => prp.id == id
         )

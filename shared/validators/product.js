@@ -17,7 +17,6 @@ const ProductReorderSchema = Joi.object({
     "number.empty": "point is required",
     "any.required": "point is required",
   }),
-  products: Joi.array().items(Joi.number()).optional(),
 });
 
 const ProductSupplierSchema = Joi.object({

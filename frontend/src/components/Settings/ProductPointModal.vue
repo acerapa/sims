@@ -19,21 +19,6 @@
         :error="errors.point"
         :error-has-text="true"
       />
-      <CustomInput
-        type="select"
-        :has-label="true"
-        label="Products"
-        name="included-products"
-        :options="productOptions"
-        v-model="model.products"
-        @add-new="onAddNewProduct"
-        placeholder="Select included products"
-        :has-add-new="true"
-        :can-search="true"
-        :select-multiple="true"
-        :error="modelErrors.products"
-        :error-has-text="true"
-      />
     </div>
   </ModalWrapper>
   <DeleteConfirmModal
@@ -47,17 +32,12 @@
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { onMounted, computed, ref, watch } from 'vue'
-import { useProductStore } from '@/stores/product'
+import { onMounted, ref } from 'vue'
 import { useSettingsStore } from '@/stores/settings'
-import { ObjectHelpers, ProductReorderSchema } from 'shared'
+import { ProductReorderSchema } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
-import { useRouter } from 'vue-router'
-import { InventoryConst, SettingConst } from '@/const/route.constants'
-import { useAppStore } from '@/stores/app'
-import { ModalStateConst } from '@/const/state.constants'
 import { useValidation } from '@/composables/useValidation'
 
 const props = defineProps({
@@ -70,17 +50,11 @@ const props = defineProps({
 const showModal = defineModel()
 const showConfirmModal = ref(false)
 
-const router = useRouter()
-const appStore = useAppStore()
-const productStore = useProductStore()
 const settingStore = useSettingsStore()
 
 const model = ref({
-  point: '',
-  products: []
+  point: ''
 })
-
-const modelErrors = ref({})
 
 // composables
 const { errors, hasErrors, validateData } = useValidation(
@@ -89,25 +63,14 @@ const { errors, hasErrors, validateData } = useValidation(
 )
 
 /** ================================================
- * COMPUTED
- ** ================================================*/
-
-const productOptions = computed(() => {
-  return productStore.products.map((product) => {
-    return {
-      value: product.id,
-      text: product.name
-    }
-  })
-})
-
-/** ================================================
  * METHODS
  ** ================================================*/
 const onSubmit = async () => {
   // validations
   validateData()
-  if (hasErrors.value) return
+  if (hasErrors.value) {
+    return
+  }
 
   let isSuccess = false
   if (props.selectedId) {
@@ -145,28 +108,11 @@ const onAfterDelete = async () => {
   await settingStore.fetchAllProductReorderingPoints()
 }
 
-const onAddNewProduct = () => {
-  router.push({
-    name: InventoryConst.PRODUCT_FORM,
-    query: {
-      redirect: 'product-settings'
-    }
-  })
-}
-
-const setPointModalState = () => {
-  appStore.setModalState(ModalStateConst.PRODUCT_POINT_MODAL, {
-    state: model.value,
-    route_scope: [SettingConst.PRODUCT_SETTINGS, InventoryConst.PRODUCT_FORM]
-  })
-}
-
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
 
 onMounted(async () => {
-  await productStore.fetchAllProducts()
   if (props.selectedId) {
     let orderingPoint = settingStore.productReorderingPoints.find(
       (point) => point.id == props.selectedId
@@ -174,37 +120,7 @@ onMounted(async () => {
 
     if (orderingPoint) {
       model.value.point = orderingPoint.point
-      model.value.products = orderingPoint.product_details.map(
-        (pd) => pd.product.id
-      )
     }
-  }
-
-  if (appStore.isModalExist(ModalStateConst.PRODUCT_POINT_MODAL)) {
-    if (
-      !ObjectHelpers.compareObjects(
-        model.value,
-        appStore.modals[ModalStateConst.PRODUCT_POINT_MODAL].state
-      )
-    ) {
-      model.value = ObjectHelpers.assignSameFields(
-        model.value,
-        appStore.modals[ModalStateConst.PRODUCT_POINT_MODAL].state
-      )
-    }
-  } else {
-    setPointModalState()
   }
 })
-
-/** ================================================
- * WATCHERS
- ** ================================================*/
-watch(
-  () => model.value,
-  () => {
-    setPointModalState()
-  },
-  { deep: true }
-)
 </script>
