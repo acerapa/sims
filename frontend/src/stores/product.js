@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useVendorStore } from './supplier'
@@ -22,11 +22,7 @@ export const useProductStore = defineStore('product', () => {
   })
 
   const registerProduct = async (product) => {
-    const res = await authenticatedApi(
-      'products/register',
-      Method.POST,
-      product
-    )
+    const res = await api('products/register', Method.POST, product)
 
     const isSuccess = res.status < 400
 
@@ -42,7 +38,7 @@ export const useProductStore = defineStore('product', () => {
   }
 
   const updateProduct = async (id, data) => {
-    const res = await authenticatedApi(`products/${id}`, Method.PUT, data)
+    const res = await api(`products/${id}`, Method.PUT, data)
 
     const isSuccess = res.status < 400
 
@@ -67,14 +63,14 @@ export const useProductStore = defineStore('product', () => {
   }
 
   const fetchAllProducts = async () => {
-    const res = await authenticatedApi('products')
+    const res = await api('products')
     if (res.status == 200) {
       products.value = res.data.products
     }
   }
 
   const fetchProduct = async (id) => {
-    const res = await authenticatedApi(`products/${id}`)
+    const res = await api(`products/${id}`)
     if (res.status < 400) {
       product.value = res.data.product
     }
@@ -111,7 +107,7 @@ export const useProductStore = defineStore('product', () => {
 
   const getProductItemCode = async () => {
     let itemCode = ''
-    const res = await authenticatedApi('products/item-code')
+    const res = await api('products/item-code')
     if (res.status == 200) {
       itemCode = res.data.item_code
     }

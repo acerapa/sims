@@ -18,7 +18,7 @@
   </ModalWrapper>
 </template>
 <script setup>
-import { Method, authenticatedApi } from '@/api'
+import { Method, api } from '@/api'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
@@ -39,7 +39,7 @@ const props = defineProps({
 const emit = defineEmits(['afterDelete'])
 
 const submit = async () => {
-  const res = await authenticatedApi(props.href, Method.DELETE, props.data)
+  const res = await api(props.href, Method.DELETE, props.data)
 
   if (res.status < 400) {
     Event.emit(EventEnum.TOAST_MESSAGE, {

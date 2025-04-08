@@ -183,6 +183,7 @@ import { PageStateConst } from '@/const/state.constants'
 import { validateProductStocks } from '@/helper'
 import { useTableScroll } from '@/use/useTableScroll'
 import { useValidation } from '@/composables/useValidation'
+import { useAuth } from '@/composables/useAuth'
 
 const rowEventName = 'str-product-row'
 
@@ -235,6 +236,9 @@ const { errors, hasErrors, validateData } = useValidation(
   StockTransferCreateSchema,
   model.value
 )
+
+const { getAuthUser } = useAuth()
+
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -314,7 +318,9 @@ const onSubmit = async (saveAndNew = false) => {
   validateData()
 
   if (hasErrors.value) {
-    Event.emit(rowEventName, errors.value.products)
+    if (errors.value?.products) {
+      Event.emit(rowEventName, errors.value.products)
+    }
     return
   }
 
@@ -327,19 +333,19 @@ const onSubmit = async (saveAndNew = false) => {
   if (productAvailabilityError) {
     // specific to product stocks availability
     // TEMPORARY SOLUTION
-    modelErrors.value.products = []
+    errors.value.products = []
     const idWithError = Object.keys(productAvailabilityError)
     model.value.products.forEach((p) => {
       if (idWithError.includes(p.product_id.toString())) {
-        modelErrors.value.products.push({
+        errors.value.products.push({
           quantity: productAvailabilityError[p.product_id]
         })
       } else {
-        modelErrors.value.products.push({})
+        errors.value.products.push({})
       }
     })
 
-    Event.emit(rowEventName, modelErrors.value.products)
+    Event.emit(rowEventName, errors.value.products)
     return
   }
 
@@ -363,7 +369,7 @@ const onSubmit = async (saveAndNew = false) => {
     if (saveAndNew) {
       model.value = ObjectHelpers.copyObj(defaultValue)
       setCurrentBranch()
-      setProccessedBy()
+      await setProccessedBy()
     } else {
       if (!isEdit.value) {
         router.push({
@@ -399,8 +405,9 @@ const setCurrentBranch = () => {
   }
 }
 
-const setProccessedBy = () => {
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+const setProccessedBy = async () => {
+  const user = await getAuthUser()
+  model.value.transfer.processed_by = user?.id
 }
 
 const setSTRFromPageState = () => {
@@ -461,7 +468,7 @@ onMounted(async () => {
   setCurrentBranch()
 
   // set processed by
-  setProccessedBy()
+  await setProccessedBy()
 
   // set page state
   if (appStore.isPageExist(PageStateConst.STR_FORM)) {

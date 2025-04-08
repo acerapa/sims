@@ -239,7 +239,7 @@
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { Method, authenticatedApi } from '@/api'
+import { Method, api } from '@/api'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
@@ -367,7 +367,7 @@ const reorderingPointOptions = computed(() => {
 })
 
 const generateItemCode = async () => {
-  const res = await authenticatedApi('products/item-code')
+  const res = await api('products/item-code')
   if (res.status == 200) {
     model.value.item_code = res.data.item_code
   }
@@ -418,7 +418,7 @@ const onSubmit = async () => {
     return
   }
 
-  await authenticatedApi(apiPath.value, Method.POST, model.value)
+  await api(apiPath.value, Method.POST, model.value)
   await productStore.fetchAllProducts()
   showModal.value = false
 }

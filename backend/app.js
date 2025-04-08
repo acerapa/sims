@@ -1,5 +1,6 @@
 const express = require("express");
 const { createServer } = require("http");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const cors = require("cors");
@@ -19,7 +20,7 @@ const {
 // notification socket
 startNotificationSocketNamespace(io);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 // setting ups
 app.use(
@@ -31,6 +32,7 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // trigger database connection
 require("./models");

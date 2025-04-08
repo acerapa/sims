@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -7,21 +7,21 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
   const purchaseOrder = ref(null)
 
   const fetchPurchaseOrders = async () => {
-    const res = await authenticatedApi('/purchase-order/all')
+    const res = await api('/purchase-order/all')
     if (res.status == 200) {
       purchaseOrders.value = res.data.orders
     }
   }
 
   const fetchPurchaseOrderById = async (id) => {
-    const res = await authenticatedApi('purchase-order/' + id)
+    const res = await api('purchase-order/' + id)
     if (res.status == 200) {
       purchaseOrder.value = res.data.order
     }
   }
 
   const receivePurchaseOrder = async (id, data) => {
-    const res = await authenticatedApi(
+    const res = await api(
       `purchase-order/${id}/receive-order`,
       Method.PUT,
       data
@@ -31,11 +31,7 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
   }
 
   const createPurchaseOrder = async (data) => {
-    const res = await authenticatedApi(
-      '/purchase-order/register',
-      Method.POST,
-      data
-    )
+    const res = await api('/purchase-order/register', Method.POST, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -50,7 +46,7 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
   }
 
   const updatePurchaseOrder = async (id, data) => {
-    const res = await authenticatedApi(`purchase-order/${id}`, Method.PUT, data)
+    const res = await api(`purchase-order/${id}`, Method.PUT, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {

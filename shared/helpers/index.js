@@ -1,6 +1,5 @@
 const { DateHelpers } = require("./date");
 const { ObjectHelpers } = require("./object");
-const FunctionCooldownManager = require("./fn-cooldown-manager");
 const { ValidatorHelpers } = require("./validators-helpers");
 
 class GeneralHelpers {
@@ -31,5 +30,4 @@ module.exports = {
   ObjectHelpers,
   GeneralHelpers,
   ValidatorHelpers,
-  FunctionCooldownManager,
 };

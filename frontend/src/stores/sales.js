@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -7,11 +7,7 @@ export const useSalesStore = defineStore('sales', () => {
   const salesOrder = ref()
 
   const createSalesOrder = async (data) => {
-    const res = await authenticatedApi(
-      'sales-order/register',
-      Method.POST,
-      data
-    )
+    const res = await api('sales-order/register', Method.POST, data)
 
     const isSuccess = res.status < 400
 
@@ -27,7 +23,7 @@ export const useSalesStore = defineStore('sales', () => {
   }
 
   const updateSalesOrder = async (id, data) => {
-    const res = await authenticatedApi(`sales-order/${id}`, Method.PUT, data)
+    const res = await `api`(`sales-order/${id}`, Method.PUT, data)
 
     const isSuccess = res.status < 400
 
@@ -48,7 +44,7 @@ export const useSalesStore = defineStore('sales', () => {
   }
 
   const fetchSalesOrders = async () => {
-    const res = await authenticatedApi('sales-order/all')
+    const res = await api('sales-order/all')
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -67,7 +63,7 @@ export const useSalesStore = defineStore('sales', () => {
   }
 
   const fetchSalesOrder = async (id) => {
-    const res = await authenticatedApi(`sales-order/${id}`)
+    const res = await api(`sales-order/${id}`)
     const isSuccess = res.status < 400
 
     if (isSuccess) salesOrder.value = res.data.order

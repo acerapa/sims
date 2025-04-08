@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { DateHelpers, NotificationStatus, NotificationType } from 'shared'
 import { computed, ref } from 'vue'
@@ -76,7 +76,7 @@ export const useNotificationStore = defineStore('notification', () => {
   })
 
   const fetchNotifications = async () => {
-    const res = await authenticatedApi('notifications/')
+    const res = await api('notifications/')
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -98,7 +98,7 @@ export const useNotificationStore = defineStore('notification', () => {
       route: notification.route
     }
 
-    const res = await authenticatedApi(
+    const res = await api(
       `notifications/${id}`,
       Method.PUT,
       notificationToUpdate

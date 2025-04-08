@@ -17,12 +17,6 @@ const AccountTypes = Object.freeze({
   ASSET: "asset",
 });
 
-const LocalStorageKeys = Object.freeze({
-  ACCESS: "sims-access",
-  REFRESH: "sims-refresh",
-  CURRENT_USER: "sims-current-user",
-});
-
 const PurchaseOrderStatus = Object.freeze({
   OPEN: "open",
   CONFIRMED: "confirmed",
@@ -246,7 +240,6 @@ module.exports = {
   SalesOrderType,
   DeliveryStatus,
   BranchStatusMap,
-  LocalStorageKeys,
   SalesOrderStatus,
   NotificationType,
   PurchaseOrderType,
