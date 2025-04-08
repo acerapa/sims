@@ -37,14 +37,11 @@ module.exports = {
 
   authUser: async (req, res) => {
     try {
-      const token = req.cookies.access_token;
-      const payload = decodeToken(token);
-
       const allowedFields = Object.keys(User.getAttributes()).filter(
         (key) => key !== "password"
       );
 
-      const user = await User.findByPk(payload.user_id, {
+      const user = await User.findByPk(res.user_id, {
         attributes: allowedFields,
       });
 
@@ -55,6 +52,7 @@ module.exports = {
   },
 
   logout: (req, res) => {
+    res.user_id = null;
     clearTokens(res);
     res.sendResponse({}, "Successfully logged out", 200);
   },

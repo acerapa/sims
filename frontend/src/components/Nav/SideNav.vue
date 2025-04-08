@@ -54,14 +54,16 @@ import navs from '@/data/nav'
 import { onMounted, ref, watch } from 'vue'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
-import { useAuthStore } from '@/stores/auth'
+import { useAuth } from '@/composables/useAuth'
 
 const route = useRoute()
 const router = useRouter()
 const targetRoutes = ref([])
 const appStore = useAppStore()
 const showDropdown = ref(false)
-const authStore = useAuthStore()
+
+// composables
+const { signOut } = useAuth()
 
 // Custom global event
 onMounted(() => {
@@ -75,7 +77,7 @@ onMounted(() => {
 })
 
 const onLogout = async () => {
-  await authStore.logout()
+  await signOut()
   router.go()
 }
 
