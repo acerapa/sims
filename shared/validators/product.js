@@ -26,14 +26,12 @@ const ProductSupplierSchema = Joi.object({
 });
 
 const ProductDetailsSchema = Joi.object({
-  purchase_description: Joi.string()
-    .label("Purchase Description")
-    .allow(null, "")
-    .optional(),
-  sales_description: Joi.string()
-    .label("Sales Description")
-    .allow(null, "")
-    .optional(),
+  purchase_description: Joi.string().required().messages({
+    "*": "Purchase Description is required",
+  }),
+  sales_description: Joi.string().required().messages({
+    "*": "Sales Description is required",
+  }),
   item_code: Joi.string().required(),
   cost: Joi.number().label("Cost").optional(),
   stock: Joi.number().required().messages({
@@ -53,8 +51,12 @@ const ServiceDetailsSchema = Joi.object({
 });
 
 const ProductSchema = Joi.object({
-  name: Joi.string().required().messages({
-    "*": "name is required",
+  name: Joi.string().when(Joi.ref("type"), {
+    is: ItemType.NON_INVENTORY,
+    then: Joi.required().messages({
+      "*": "Name is required",
+    }),
+    otherwise: Joi.allow(null, "").optional(),
   }),
   price: Joi.number().required().messages({
     "*": "Price is required",

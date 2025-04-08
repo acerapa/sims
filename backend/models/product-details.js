@@ -14,11 +14,11 @@ ProductDetails.init(
     },
     purchase_description: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: false,
     },
     sales_description: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: false,
     },
     item_code: {
       type: DataTypes.STRING,
