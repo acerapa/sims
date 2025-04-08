@@ -134,7 +134,6 @@ import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useTransferStore } from '@/stores/transfer'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 import { useSettingsStore } from '@/stores/settings'
 import { useAppStore } from '@/stores/app'
 import { StockTransferCreateSchema } from 'shared'
@@ -146,6 +145,7 @@ import { PageStateConst } from '@/const/state.constants'
 import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 import { useTableScroll } from '@/use/useTableScroll'
 import { useValidation } from '@/composables/useValidation'
+import { useAuth } from '@/composables/useAuth'
 
 const rowEventName = 'fix-asset-row-event'
 
@@ -173,13 +173,12 @@ const defaultValue = {
 const route = useRoute()
 const currentBranch = ref()
 const appStore = useAppStore()
-const authStore = useAuthStore()
 const showConfirmModal = ref(false)
 const settingStore = useSettingsStore()
 const transferStore = useTransferStore()
 const purchaseOrderStore = usePurchaseOrderStore()
 
-const authUser = ref()
+const authUser = ref(null)
 const router = useRouter()
 const model = ref(ObjectHelpers.copyObj(defaultValue))
 
@@ -188,6 +187,7 @@ const { errors, hasErrors, validateData } = useValidation(
   StockTransferCreateSchema,
   model.value
 )
+const { getAuthUser } = useAuth()
 
 /** ================================================
  * COMPUTED
@@ -285,7 +285,7 @@ onMounted(async () => {
   await purchaseOrderStore.fetchPurchaseOrders()
 
   await settingStore.getBranches()
-  authUser.value = await authStore.getAuthUser()
+  authUser.value = await getAuthUser()
   currentBranch.value = appStore.currentBranch.id
 
   if (route.query.id) {

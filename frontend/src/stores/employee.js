@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -7,7 +7,7 @@ export const useEmployeeStore = defineStore('employee', () => {
   const employees = ref([])
 
   const fetchAllEmployees = async () => {
-    const res = await authenticatedApi('users/all')
+    const res = await api('users/all')
     if (res.status == 200) {
       employees.value = res.data.users
     }
@@ -16,7 +16,7 @@ export const useEmployeeStore = defineStore('employee', () => {
   }
 
   const fetchEmployee = async (id) => {
-    const res = await authenticatedApi(`users/${id}`)
+    const res = await api(`users/${id}`)
     if (res.status == 200) {
       employee.value = res.data.user
     }
@@ -40,7 +40,7 @@ export const useEmployeeStore = defineStore('employee', () => {
   }
 
   const registerEmployee = async (employee) => {
-    const res = await authenticatedApi('users/register', Method.POST, employee)
+    const res = await api('users/register', Method.POST, employee)
     const isSuccess = res.status < 400
     if (isSuccess) {
       if (employees.value.length) {
@@ -53,7 +53,7 @@ export const useEmployeeStore = defineStore('employee', () => {
   }
 
   const updateEmployee = async (id, data) => {
-    const res = await authenticatedApi(`users/${id}/update`, Method.PUT, data)
+    const res = await api(`users/${id}/update`, Method.PUT, data)
 
     const isSuccess = res.status < 400
 

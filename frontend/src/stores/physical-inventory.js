@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -9,7 +9,7 @@ export const usePhysicalInventoryStore = defineStore(
     const physicalInventory = ref(null)
 
     const fetchAllPhysicalInventories = async () => {
-      const res = await authenticatedApi(`physical-inventory/all`)
+      const res = await api(`physical-inventory/all`)
 
       if (res.status == 200) {
         physicalInventories.value = res.data.physical_inventories
@@ -19,7 +19,7 @@ export const usePhysicalInventoryStore = defineStore(
     }
 
     const fetchOne = async (id) => {
-      const res = await authenticatedApi(`physical-inventory/${id}`)
+      const res = await api(`physical-inventory/${id}`)
       if (res.status == 200) {
         physicalInventory.value = res.data.physical_inventory
       }
@@ -28,15 +28,11 @@ export const usePhysicalInventoryStore = defineStore(
     }
 
     const register = async (model) => {
-      return await authenticatedApi(
-        `physical-inventory/register`,
-        Method.POST,
-        model
-      )
+      return await api(`physical-inventory/register`, Method.POST, model)
     }
 
     const update = async (id, model) => {
-      const res = await authenticatedApi(
+      const res = await api(
         `physical-inventory/update/${id}`,
         Method.POST,
         model
@@ -46,11 +42,7 @@ export const usePhysicalInventoryStore = defineStore(
     }
 
     const updateItem = async (id, model) => {
-      const res = await authenticatedApi(
-        `physical-inventory/item/${id}`,
-        Method.POST,
-        model
-      )
+      const res = await api(`physical-inventory/item/${id}`, Method.POST, model)
 
       return res
     }

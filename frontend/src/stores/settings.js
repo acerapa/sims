@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -37,7 +37,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const fetchAllProductReorderingPoints = async () => {
-    const res = await authenticatedApi('product-setting/all')
+    const res = await api('product-setting/all')
     if (res.status == 200) {
       productReorderingPoints.value = res.data.productReorderingPoints
     }
@@ -54,11 +54,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const registerReorderingPoint = async (model) => {
-    const res = await authenticatedApi(
-      'product-setting/register',
-      Method.POST,
-      model
-    )
+    const res = await api('product-setting/register', Method.POST, model)
 
     const isSuccess = res.status < 400
     if (isSuccess) {
@@ -75,11 +71,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const updateReorderingPoint = async (id, model) => {
-    const res = await authenticatedApi(
-      `product-setting/${id}`,
-      Method.PUT,
-      model
-    )
+    const res = await api(`product-setting/${id}`, Method.PUT, model)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -108,7 +100,7 @@ export const useSettingsStore = defineStore('settings', () => {
    * PRODUCT CATEGORIES METHODS START
    */
   const fetchAllProductCategories = async () => {
-    const res = await authenticatedApi('product-category/all')
+    const res = await api('product-category/all')
     if (res.status == 200) {
       productCategories.value = res.data.categories
     }
@@ -153,11 +145,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const registerProductCategory = async (model) => {
-    const res = await authenticatedApi(
-      'product-category/register',
-      Method.POST,
-      model
-    )
+    const res = await api('product-category/register', Method.POST, model)
 
     const isSuccess = res.status < 400
     if (isSuccess) {
@@ -172,11 +160,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const updateProductCategory = async (id, model) => {
-    const res = await authenticatedApi(
-      `product-category/${id}`,
-      Method.PUT,
-      model
-    )
+    const res = await api(`product-category/${id}`, Method.PUT, model)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -220,7 +204,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const fetchAllAccounts = async () => {
-    const res = await authenticatedApi('settings/accounts/all')
+    const res = await api('settings/accounts/all')
     if (res.status == 200) {
       accounts.value = res.data.accounts
     }
@@ -228,11 +212,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const createAccount = async (data) => {
-    const res = await authenticatedApi(
-      'settings/accounts/register',
-      Method.POST,
-      data
-    )
+    const res = await api('settings/accounts/register', Method.POST, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -247,11 +227,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const updateAccount = async (id, data) => {
-    const res = await authenticatedApi(
-      `settings/accounts/${id}`,
-      Method.PUT,
-      data
-    )
+    const res = await api(`settings/accounts/${id}`, Method.PUT, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -282,7 +258,7 @@ export const useSettingsStore = defineStore('settings', () => {
    * BRANCHES METHODS START
    */
   const fetchAllBranches = async () => {
-    const res = await authenticatedApi('branch/all')
+    const res = await api('branch/all')
 
     if (res.status == 200) {
       branches.value = res.data.branches
@@ -296,7 +272,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const createBranch = async (model) => {
-    const res = await authenticatedApi('branch/register', Method.POST, model)
+    const res = await api('branch/register', Method.POST, model)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -311,11 +287,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const updateBranch = async (id, model) => {
-    const res = await authenticatedApi(
-      `branch/update/${id}`,
-      Method.POST,
-      model
-    )
+    const res = await api(`branch/update/${id}`, Method.POST, model)
 
     const isSuccess = res.status < 400
 

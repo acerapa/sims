@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -7,7 +7,7 @@ export const useCustomerStore = defineStore('customer', () => {
   const customer = ref()
 
   const fetchCustomers = async () => {
-    const res = await authenticatedApi('customers/all')
+    const res = await api('customers/all')
 
     if (res.status < 400) {
       customers.value = res.data.customers
@@ -23,7 +23,7 @@ export const useCustomerStore = defineStore('customer', () => {
   }
 
   const createCustomer = async (model) => {
-    const res = await authenticatedApi('customers/register', Method.POST, model)
+    const res = await api('customers/register', Method.POST, model)
 
     const isSuccess = res.status < 400
 
@@ -39,11 +39,7 @@ export const useCustomerStore = defineStore('customer', () => {
   }
 
   const updateCustomer = async (id, model) => {
-    const res = await authenticatedApi(
-      `customers/${id}/update`,
-      Method.POST,
-      model
-    )
+    const res = await api(`customers/${id}/update`, Method.POST, model)
 
     const isSuccess = res.status < 400
 
@@ -62,7 +58,7 @@ export const useCustomerStore = defineStore('customer', () => {
   }
 
   const fetchCustomerById = async (id) => {
-    const res = await authenticatedApi(`customers/${id}`)
+    const res = await api(`customers/${id}`)
 
     if (res.status < 400) {
       customer.value = res.data.customer
