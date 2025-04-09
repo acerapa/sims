@@ -34,7 +34,6 @@
       <CustomTable
         :has-add-btn="true"
         :has-pagination="true"
-        @view="onViewCategory"
         :has-check-box="false"
         title="Product Categories"
         class="w-[calc(100vw_-_328px)]"
@@ -140,4 +139,7 @@ onMounted(async () => {
   await settingsStore.fetchAllProductReorderingPoints()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
+
+// lower event listeners
+Event.on(EventEnum.PRODUCT_CATEGORY_ROW, onViewCategory)
 </script>

@@ -1,8 +1,14 @@
 <template>
-  <div class="group pr-3 py-1" :class="[isExpand ? 'bg-blue-50 rounded' : '']">
+  <div
+    class="group pr-3 py-1"
+    :class="[
+      isExpand ? 'bg-blue-50 rounded' : '',
+      `test-${props.productCategory.id}`
+    ]"
+  >
     <div
       class="grid grid-cols-7 ml-3 gap-3 min-w-[550px] gen-table-row items-center"
-      @click="emit('view', props.productCategory.id)"
+      @click.stop="onClickCategory"
     >
       <div class="col-span-1 flex gap-3 items-center">
         <input v-if="props.hasCheckBox" type="checkbox" class="input" />
@@ -74,6 +80,8 @@
 import { DateHelpers } from 'shared'
 import ProductCategoryModal from './ProductCategoryModal.vue'
 import { ref } from 'vue'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
 
 const isExpand = ref(false)
 const showModal = ref(false)
@@ -98,4 +106,8 @@ const emit = defineEmits([
   'view',
   'openMenu' /* openMenu is temporary and will be remove in the future */
 ])
+
+const onClickCategory = () => {
+  Event.emit(EventEnum.PRODUCT_CATEGORY_ROW, props.productCategory.id)
+}
 </script>

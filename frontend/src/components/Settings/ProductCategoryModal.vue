@@ -74,20 +74,29 @@ const { errors, hasErrors, validateData } = useValidation(
 )
 
 onMounted(async () => {
+  await settingsStore.getProductCategories()
   if (props.selectedId) {
-    model.value = settingsStore.productCategories.find(
-      (pc) => pc.id == props.selectedId
-    )
-  }
-
-  if (props.general_cat) {
-    await settingsStore.getProductCategories()
-    const parentCat = settingsStore.getProductCategoryByIdSync(
-      props.general_cat
+    const category = await settingsStore.findCategoryInHierarchy(
+      props.selectedId
     )
 
-    if (parentCat) {
-      title.value = `New Sub Category for ${parentCat.name}`
+    if (category) {
+      model.value.name = category.name
+      model.value.general_cat = category.general_cat
+
+      if (category.general_cat) {
+        const parentCat = await settingsStore.findCategoryInHierarchy(
+          category.general_cat
+        )
+
+        if (parentCat) {
+          if (props.selectedId) {
+            title.value = `New Sub Category for ${parentCat.name}`
+          } else {
+            title.value = `Edit Sub Category for ${parentCat.name}`
+          }
+        }
+      }
     }
   }
 })
@@ -130,6 +139,9 @@ const onDelete = async () => {
 const onAfterDelete = async () => {
   showModal.value = false
   showConfirmModal.value = false
-  await settingsStore.fetchAllProductCategories()
+  await settingsStore.removeProductCategory({
+    id: props.selectedId,
+    general_cat: model.value.general_cat
+  })
 }
 </script>
