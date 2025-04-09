@@ -80,6 +80,17 @@ export const useVendorStore = defineStore('supplier', () => {
     return suppliers.value
   }
 
+  const removeSupplier = async (id) => {
+    if (suppliers.value.length) {
+      const index = suppliers.value.findIndex((sup) => sup.id == id)
+      if (index != -1) {
+        suppliers.value.splice(index, 1)
+      }
+    } else {
+      await fetchAllSuppliers()
+    }
+  }
+
   return {
     supplier,
     suppliers,
@@ -89,6 +100,7 @@ export const useVendorStore = defineStore('supplier', () => {
     // methods
     getSuppliers,
     updateSupplier,
+    removeSupplier,
     getSupplierById,
     registerSupplier,
     fetchSupplierById,

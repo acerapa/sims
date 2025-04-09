@@ -238,7 +238,7 @@ const onSubmit = async () => {
 
 const onAfterDelete = async () => {
   showModal.value = false
-  await supplierStore.fetchAllSuppliers()
+  await supplierStore.removeSupplier(props.selectedId)
 }
 
 /** ================================================
