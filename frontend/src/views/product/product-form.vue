@@ -125,7 +125,15 @@
               :error="errors.details?.item_code"
             />
           </div>
-          <div class="flex gap-3 items-start">
+          <CustomInput
+            type="checkbox"
+            :has-label="true"
+            v-model="isSameDescription"
+            name="is-the-same-description"
+            label="The same description?"
+            class="[&>div]:flex-row-reverse [&>div]:justify-end"
+          />
+          <div class="flex gap-3 items-end">
             <CustomInput
               :rows="5"
               class="flex-1"
@@ -133,11 +141,13 @@
               :has-label="true"
               :error-has-text="true"
               name="purchase_description"
-              label="*Purchase Description"
-              placeholder="Purchase Description"
+              label="Purchase Description"
+              placeholder="*Purchase Description"
+              @input="onInputPurchaseDescription"
               v-model="model.details.purchase_description"
               :error="errors.details?.purchase_description"
             />
+
             <CustomInput
               :rows="5"
               class="flex-1"
@@ -146,6 +156,7 @@
               name="sale_description"
               label="Sales Description"
               placeholder="*Sales Description"
+              @input="onInputSalesDescription"
               v-model="model.details.sales_description"
               :error="errors.details?.sales_description"
               :error-has-text="true"
@@ -212,10 +223,10 @@ import { EventEnum } from '@/data/event'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import {
   AccountTypes,
+  ItemType,
   ObjectHelpers,
   ProductItemSchema,
-  ProductStatus,
-  ProductType
+  ProductStatus
 } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
@@ -241,6 +252,7 @@ const productStore = useProductStore()
 
 // flags
 const showAccountModal = ref(false)
+const isSameDescription = ref(false)
 const showCategoryModal = ref(false)
 const showConfirmationModal = ref(false)
 
@@ -252,7 +264,7 @@ const productSupplier = {
 const model = ref({
   product: {
     price: '',
-    type: ProductType.INVENTORY,
+    type: ItemType.INVENTORY,
     income_account: '',
     expense_account: ''
   },
@@ -396,6 +408,23 @@ const onCancel = () =>
     name: route.query.redirect ? route.query.redirect : InventoryConst.PRODUCTS
   })
 
+const onInputPurchaseDescription = () => {
+  if (isSameDescription.value) {
+    model.value.details.sales_description =
+      model.value.details.purchase_description
+  }
+}
+
+const onInputSalesDescription = () => {
+  if (isSameDescription.value) {
+    model.value.details.purchase_description =
+      model.value.details.sales_description
+  }
+}
+
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
 onMounted(async () => {
   await settingStore.getAccounts()
   await settingStore.getReorderingPoints()
@@ -413,6 +442,14 @@ onMounted(async () => {
         model.value.details,
         product.product_details
       )
+
+      // product details description flags
+      if (
+        model.value.details.purchase_description ==
+        model.value.details.sales_description
+      ) {
+        isSameDescription.value = true
+      }
 
       model.value.categories = product.categories.map((cat) => cat.id)
       model.value.suppliers = product.suppliers.map((supplier) => {
