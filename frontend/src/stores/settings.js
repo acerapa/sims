@@ -40,7 +40,10 @@ export const useSettingsStore = defineStore('settings', () => {
       }
     }
 
-    return isSuccess
+    return {
+      is_success: isSuccess,
+      data: res.data
+    }
   }
 
   const updateReorderingPoint = async (id, model) => {
@@ -60,7 +63,10 @@ export const useSettingsStore = defineStore('settings', () => {
       }
     }
 
-    return isSuccess
+    return {
+      is_success: isSuccess,
+      data: res.data
+    }
   }
 
   /*
