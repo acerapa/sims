@@ -1,6 +1,13 @@
 import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
+import { ObjectHelpers } from 'shared'
 import { ref } from 'vue'
+
+const ProductCategoryAction = {
+  CREATE: 'create',
+  UPDATE: 'update',
+  DELETE: 'delete'
+}
 
 export const useSettingsStore = defineStore('settings', () => {
   const productCategories = ref([])
@@ -85,6 +92,15 @@ export const useSettingsStore = defineStore('settings', () => {
     return res.data.categories
   }
 
+  const fetchProductCategory = async (id) => {
+    let category = null
+    const res = await api(`product-category/${id}`)
+    if (res.status < 400) {
+      category = res.data.category
+    }
+    return category
+  }
+
   const getProductCategories = async () => {
     if (!productCategories.value.length) {
       await fetchAllProductCategories()
@@ -93,16 +109,25 @@ export const useSettingsStore = defineStore('settings', () => {
     return productCategories.value
   }
 
-  const getProductCategoryByIdSync = (id) => {
-    return productCategories.value.find((cat) => cat.id == id)
-  }
-
-  const getProductCategoryByIdAsync = async (id) => {
-    let category = getProductCategoryByIdSync(id)
-
-    if (!category) {
+  const findCategoryInHierarchy = async (id) => {
+    if (!productCategories.value.length) {
       await fetchAllProductCategories()
-      category = getProductCategoryByIdSync(id)
+    }
+
+    // inner function to find category in hierarchy
+    const findCategory = (categories, id) => {
+      for (const cat of categories) {
+        if (cat.id == id) {
+          return cat
+        } else if (cat.sub_categories) {
+          return findCategory(cat.sub_categories, id)
+        }
+      }
+    }
+
+    let category = findCategory(productCategories.value, id)
+    if (!category) {
+      category = await fetchProductCategory(id)
     }
 
     return category
@@ -126,11 +151,10 @@ export const useSettingsStore = defineStore('settings', () => {
 
     const isSuccess = res.status < 400
     if (isSuccess) {
-      if (productCategories.value.length) {
-        productCategories.value.unshift(res.data.category)
-      } else {
-        await fetchAllProductCategories()
-      }
+      await handleCategoryAction(
+        res.data.category,
+        ProductCategoryAction.CREATE
+      )
     }
 
     return isSuccess
@@ -141,28 +165,101 @@ export const useSettingsStore = defineStore('settings', () => {
     const isSuccess = res.status < 400
 
     if (isSuccess) {
-      if (productCategories.value.length) {
-        const index = productCategories.value.findIndex((pc) => pc.id == id)
-        if (index > -1) {
-          productCategories.value[index] = res.data.category
-        }
-      } else {
-        await fetchAllProductCategories()
-      }
+      await handleCategoryAction(
+        res.data.category,
+        ProductCategoryAction.UPDATE
+      )
     }
 
     return isSuccess
   }
 
-  const removeProductCategory = async (id) => {
-    if (productCategories.value.length) {
-      const index = productCategories.value.findIndex((pc) => pc.id == id)
-      if (index > -1) {
-        productCategories.value.splice(index, 1)
+  const removeProductCategory = async (category) => {
+    await handleCategoryAction(category, ProductCategoryAction.DELETE)
+  }
+
+  // private product category methods
+
+  /**
+   * Handles actions on product categories, either at the root level or within nested subcategories
+   * @param {Object} category - The product category to create, update, or delete
+   * @param {ProductCategoryAction} [action=ProductCategoryAction.CREATE] - The type of action to perform on the category
+   * @returns {Promise<void>} A promise that resolves when the category action is complete
+   */
+  const handleCategoryAction = async (
+    category,
+    action = ProductCategoryAction.CREATE
+  ) => {
+    if (!productCategories.value.length) {
+      await fetchAllProductCategories()
+      return
+    }
+
+    if (!category.general_cat) {
+      switch (action) {
+        case ProductCategoryAction.CREATE:
+          productCategories.value.unshift(category)
+          break
+        case ProductCategoryAction.UPDATE:
+          const index = productCategories.value.findIndex(
+            (pc) => pc.id == category.id
+          )
+          if (index > -1) {
+            productCategories.value[index] = ObjectHelpers.assignSameFields(
+              productCategories.value[index],
+              category
+            )
+          }
+          break
+        case ProductCategoryAction.DELETE:
+          productCategories.value = productCategories.value.filter(
+            (pc) => pc.id != category.id
+          )
+          break
       }
     } else {
-      await fetchAllProductCategories()
+      applyCategoryAction(productCategories.value, category, action)
     }
+  }
+
+  /**
+   * Recursively applies an action (create, update, or delete) to a nested category structure
+   * @param {Array} categories - The list of categories to search and modify
+   * @param {Object} category - The category to be created, updated, or deleted
+   * @param {ProductCategoryAction} action - The type of action to perform on the category
+   */
+  const applyCategoryAction = (categories, category, action) => {
+    categories.forEach((cat) => {
+      if (cat.id == category.general_cat) {
+        switch (action) {
+          case ProductCategoryAction.CREATE:
+            if (cat.sub_categories) {
+              cat.sub_categories = [category, ...cat.sub_categories]
+            } else {
+              cat.sub_categories = [category]
+            }
+            break
+          case ProductCategoryAction.UPDATE:
+            const index = cat.sub_categories.findIndex(
+              (sc) => sc.id == category.id
+            )
+            if (index > -1) {
+              cat.sub_categories[index] = ObjectHelpers.assignSameFields(
+                cat.sub_categories[index],
+                category
+              )
+            }
+            break
+          case ProductCategoryAction.DELETE:
+            cat.sub_categories = cat.sub_categories.filter(
+              (sc) => sc.id != category.id
+            )
+            break
+        }
+      } else if (cat.sub_categories) {
+        applyCategoryAction(cat.sub_categories, category, action)
+      }
+    })
   }
 
   /*
@@ -318,10 +415,9 @@ export const useSettingsStore = defineStore('settings', () => {
     removeProductCategory,
     updateReorderingPoint,
     registerProductCategory,
+    findCategoryInHierarchy,
     registerReorderingPoint,
     fetchAllProductCategories,
-    getProductCategoryByIdSync,
-    getProductCategoryByIdAsync,
     fetchAllProductReorderingPoints
   }
 })

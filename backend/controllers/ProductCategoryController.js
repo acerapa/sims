@@ -18,6 +18,11 @@ module.exports = {
     }
   },
 
+  byId: async (req, res) => {
+    const category = await ProductCategory.findByPk(req.params.id);
+    res.sendResponse({ category }, "Successfully fetched!", 200);
+  },
+
   register: async (req, res) => {
     try {
       const category = await ProductCategory.create(req.body);
