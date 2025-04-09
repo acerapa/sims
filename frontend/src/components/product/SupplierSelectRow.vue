@@ -68,6 +68,10 @@ const props = defineProps({
   preSelectedSups: {
     type: Array,
     default: []
+  },
+  selected: {
+    type: Array,
+    default: []
   }
 })
 
@@ -95,12 +99,19 @@ Event.on(
  * COMPUTED
  ** ================================================*/
 const supplierOptions = computed(() => {
-  return supplierStore.suppliers.map((supplier) => {
-    return {
-      text: supplier.company_name,
-      value: supplier.id
-    }
-  })
+  return supplierStore.suppliers
+    .map((supplier) => {
+      return {
+        text: supplier.company_name,
+        value: supplier.id
+      }
+    })
+    .filter((supplier) => {
+      if (model.value.supplier_id == supplier.value) return true
+      return !props.selected
+        .map((sup) => sup.supplier_id)
+        .includes(supplier.value)
+    })
 })
 
 const isPreselected = computed(() => {
