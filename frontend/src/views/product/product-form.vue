@@ -174,7 +174,8 @@
             :row-event-name="rowEventName"
             :format="productSupplier"
             :row-props="{
-              preSelectedSups: preselectedSupplier
+              preSelectedSups: preselectedSupplier,
+              selected: model.suppliers
             }"
             v-model="model.suppliers"
           />
