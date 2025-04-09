@@ -1,8 +1,7 @@
 const ProductSettings = require("../models/product-setting");
 const Product = require("../models/product");
 const ProductDetails = require("../models/product-details");
-const { Op } = require("sequelize");
-const { sequelize } = require("../models");
+const { UniqueConstraintError } = require("sequelize");
 
 module.exports = {
   all: async (req, res) => {
@@ -40,7 +39,20 @@ module.exports = {
 
       res.sendResponse({ point }, "Successfully created!", 200);
     } catch (e) {
-      res.sendError(e, "Something wen't wrong! => " + e.message, 400);
+      if (e instanceof UniqueConstraintError) {
+        res.sendError(
+          {
+            name: e.name,
+            error: e.message,
+            stack: e.stack,
+            message: "Point already exists!",
+          },
+          "Something went wrong!",
+          400
+        );
+      } else {
+        res.sendError(e, "Something wen't wrong! => " + e.message, 400);
+      }
     }
   },
 
@@ -59,7 +71,20 @@ module.exports = {
 
       res.sendResponse({ point }, "Successfully updated!", 200);
     } catch (e) {
-      res.sendError(e, "Something wen't wrong!", 400);
+      if (e instanceof UniqueConstraintError) {
+        res.sendError(
+          {
+            name: e.name,
+            error: e.message,
+            stack: e.stack,
+            message: "Point already exists!",
+          },
+          "Something went wrong!",
+          400
+        );
+      } else {
+        res.sendError(e, "Something wen't wrong!", 400);
+      }
     }
   },
 

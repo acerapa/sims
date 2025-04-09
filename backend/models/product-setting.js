@@ -12,8 +12,9 @@ ProductSettings.init(
     },
     point: {
       type: DataTypes.INTEGER,
+      unique: true,
       allowNull: false,
-    }
+    },
   },
   {
     sequelize,

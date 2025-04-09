@@ -72,17 +72,22 @@ const onSubmit = async () => {
     return
   }
 
-  let isSuccess = false
+  let res = {}
   if (props.selectedId) {
-    isSuccess = await settingStore.updateReorderingPoint(
+    res = await settingStore.updateReorderingPoint(
       props.selectedId,
       model.value
     )
   } else {
-    isSuccess = await settingStore.registerReorderingPoint(model.value)
+    res = await settingStore.registerReorderingPoint(model.value)
   }
 
-  if (isSuccess) {
+  // check for unique constraint error
+  if (res.data.name && res.data.name == 'SequelizeUniqueConstraintError') {
+    errors.value.point = res.data.message
+  }
+
+  if (res.is_success) {
     showModal.value = false
     Event.emit(EventEnum.TOAST_MESSAGE, {
       message: `Successfully ${props.selectedId ? 'updated' : 'created'} re-ordering point!`,
