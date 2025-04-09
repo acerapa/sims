@@ -168,7 +168,7 @@
           Use customer address?
         </label>
       </div>
-      <div class="mt-3 flex flex-col gap-1">
+      <div class="mt-3 flex flex-col gap-1 pb-10">
         <p class="text-sm font-semibold">Shipment Address</p>
         <AddressForm
           :has-label="true"

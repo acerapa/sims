@@ -5,7 +5,7 @@
   >
     <CustomInput
       type="select"
-      class="col-span-2"
+      class="col-span-5"
       name="product_id"
       v-model="model.product_id"
       placeholder="Select Product"
@@ -14,16 +14,6 @@
       :options="productOptions"
       :error-has-text="false"
       :error="modelErrors.product_id"
-    />
-
-    <CustomInput
-      type="text"
-      class="col-span-3"
-      name="description"
-      v-model="model.description"
-      placeholder="Item Description"
-      :error-has-text="false"
-      :error="modelErrors.description"
     />
 
     <CustomInput
@@ -123,7 +113,7 @@ const productOptions = computed(() => {
   return productStore.products
     .map((product) => {
       return {
-        text: product.name,
+        text: product.product_details.sales_description,
         value: product.id
       }
     })
@@ -157,7 +147,6 @@ watch(
   (val) => {
     const prd = productStore.products.find((p) => p.id == val)
     if (prd) {
-      model.value.description = prd.product_details.sales_description
       model.value.price = prd.price
       model.value.quantity = 1
     }

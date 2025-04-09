@@ -28,10 +28,6 @@ SalesOrderProduct.init(
         key: "id",
       },
     },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
