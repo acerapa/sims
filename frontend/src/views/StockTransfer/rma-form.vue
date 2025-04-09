@@ -194,7 +194,6 @@ const address = ref({
 
 const productDefaultValue = {
   product_id: '',
-  description: '',
   quantity: '',
   serial_number: '',
   problem: '',

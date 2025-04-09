@@ -151,7 +151,6 @@ const rowEventName = 'fix-asset-row-event'
 
 const productDefaultValue = {
   product_id: '',
-  description: '',
   quantity: '',
   cost: '',
   amount: ''

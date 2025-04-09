@@ -89,7 +89,6 @@ const ProductTransferSchema = Joi.object({
     .allow(null, ""),
   amount: Joi.number().required(),
   cost: Joi.number().required(),
-  description: Joi.string().allow(null, ""),
   serial_number: Joi.string().allow(null, "").optional(),
   problem: Joi.string().allow(null, "").optional(),
   remarks: Joi.string().allow(null, ""),

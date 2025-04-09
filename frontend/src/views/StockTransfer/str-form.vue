@@ -162,7 +162,6 @@ import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { useAppStore } from '@/stores/app'
-import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
@@ -191,7 +190,6 @@ const route = useRoute()
 const router = useRouter()
 const isEdit = ref(false)
 const appStore = useAppStore()
-const authStore = useAuthStore()
 const { startPrint } = usePrint()
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
@@ -199,7 +197,6 @@ const transferStore = useTransferStore()
 
 const productDefaultValue = {
   product_id: '',
-  description: '',
   quantity: '',
   cost: '',
   amount: ''
@@ -227,7 +224,6 @@ const defaultValue = {
 }
 
 const currentBranch = ref()
-const modelErrors = ref({ products: [] })
 const model = ref(ObjectHelpers.copyObj(defaultValue))
 const showConfirmModal = ref(false)
 

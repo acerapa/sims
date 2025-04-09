@@ -79,7 +79,7 @@ export const useProductStore = defineStore('product', () => {
   const productOptions = computed(() => {
     return products.value.map((product) => {
       return {
-        text: product.name,
+        text: product.product_details.purchase_description,
         value: product.id
       }
     })
