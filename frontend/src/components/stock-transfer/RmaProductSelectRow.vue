@@ -1,10 +1,10 @@
 <template>
   <div>
     <div
-      class="grid gap-3 items-start min-w-[750px]"
-      :class="[props.isDisabled ? 'grid grid-cols-10' : 'grid-cols-11']"
+      class="grid gap-3 items-start min-w-[1132px]"
+      :class="[props.isDisabled ? 'grid grid-cols-11' : 'grid-cols-12']"
     >
-      <div class="col-span-2 flex gap-3">
+      <div class="col-span-3 flex gap-3">
         <CustomInput
           type="checkbox"
           name="checkbox"
@@ -137,7 +137,6 @@ const onChange = () => {
     )
 
     if (product) {
-      model.value.description = product.purchase_description
       model.value.cost = product.price
       model.value.quantity = 1
       model.value.amount = 0
@@ -146,7 +145,6 @@ const onChange = () => {
     model.value.serial_number = ''
     model.value.problem = ''
     model.value.product_id = ''
-    model.value.description = ''
     model.value.quantity = ''
     model.value.cost = ''
   }

@@ -5,7 +5,7 @@
       class="grid gap-3 items-start min-w-[1033px]"
       :class="[props.isDisabled ? 'grid grid-cols-8' : 'grid-cols-9']"
     >
-      <div class="col-span-2 flex gap-3">
+      <div class="col-span-5 flex gap-3">
         <CustomInput
           type="checkbox"
           name="checkbox"
@@ -28,16 +28,6 @@
           @change="onChange"
         />
       </div>
-      <CustomInput
-        type="text"
-        class="col-span-3"
-        name="description"
-        :error-has-text="false"
-        placeholder="Description"
-        :disabled="props.isDisabled"
-        v-model="model.description"
-        :error="modelErrors.description"
-      />
       <CustomInput
         type="number"
         name="quantity"
@@ -136,7 +126,6 @@ const onChange = () => {
     )
 
     if (product) {
-      model.value.description = product.product_details.purchase_description
       model.value.cost = product.price
       model.value.quantity = 1
     }

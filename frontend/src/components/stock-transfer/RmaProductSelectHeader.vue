@@ -1,9 +1,9 @@
 <template>
   <div
-    class="grid gap-3 min-w-[750px] pb-2 border-b"
-    :class="[props.isDisabled ? 'grid-cols-10' : 'grid-cols-11']"
+    class="grid gap-3 min-w-[1132px] pb-2 border-b"
+    :class="[props.isDisabled ? 'grid-cols-11' : 'grid-cols-12']"
   >
-    <div class="col-span-2 flex gap-3 items-center">
+    <div class="col-span-3 flex gap-3 items-center">
       <input type="checkbox" class="input" v-if="!props.isDisabled" />
       <p class="table-header pl-3">Item</p>
     </div>

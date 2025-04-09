@@ -195,7 +195,6 @@ const transferStore = useTransferStore()
 
 const productDefaultValue = {
   product_id: '',
-  description: '',
   cost: '',
   quantity: '',
   amount: ''
