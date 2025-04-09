@@ -30,6 +30,7 @@
               label="Reordering Point"
               :options="reorderingPointsOptions"
               placeholder="Select re-ordering point"
+              @add-new="showProductPointModal = true"
               v-model="model.details.product_setting_id"
             />
           </div>
@@ -208,6 +209,10 @@
     "
   />
   <AccountModal v-model="showAccountModal" v-if="showAccountModal" />
+  <ProductPointModal
+    v-model="showProductPointModal"
+    v-if="showProductPointModal"
+  />
   <DeleteConfirmModal
     :href="`products/${route.query.id}`"
     v-model="showConfirmationModal"
@@ -229,12 +234,15 @@ import {
   ProductStatus
 } from 'shared'
 import { useSettingsStore } from '@/stores/settings'
+
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AccountModal from '@/components/Settings/AccountModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SupplierSelectRow from '@/components/product/SupplierSelectRow.vue'
 import SupplierSelectHeader from '@/components/product/SupplierSelectHeader.vue'
+import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
+
 import { useProductStore } from '@/stores/product'
 import { useRoute } from 'vue-router'
 import router from '@/router'
@@ -254,6 +262,7 @@ const productStore = useProductStore()
 const showAccountModal = ref(false)
 const isSameDescription = ref(false)
 const showCategoryModal = ref(false)
+const showProductPointModal = ref(false)
 const showConfirmationModal = ref(false)
 
 const productSupplier = {
