@@ -123,6 +123,11 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  const checkProductItemCodeExist = async (itemCode) => {
+    const res = await api(`products/check-item-code/${itemCode}`, Method.POST)
+    return res.data.is_exist
+  }
+
   return {
     product,
     products,
@@ -135,6 +140,7 @@ export const useProductStore = defineStore('product', () => {
     removeProduct,
     registerProduct,
     fetchAllProducts,
-    getProductItemCode
+    getProductItemCode,
+    checkProductItemCodeExist
   }
 })

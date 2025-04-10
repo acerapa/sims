@@ -8,6 +8,7 @@ const {
   productItemCode,
   getProduct,
   updateProduct,
+  checkItemCodeExist,
 } = require("../controllers/Product/ProductController");
 const { ProductItemSchema } = require("shared");
 const { validateBody } = require("../middleware/request-validator");
@@ -21,6 +22,7 @@ router.put("/:id", validateBody(ProductItemSchema.optional()), updateProduct);
 
 router.get("/stock-status", inventoryStockStatus);
 router.get("/item-code", productItemCode);
+router.post("/check-item-code/:item_code", checkItemCodeExist);
 router.get("/:id", getProduct);
 router.get("/", getProducts);
 
