@@ -59,40 +59,13 @@ GET {{host}}/api/auth/me
 ### - [Authenticated Users] Logout
 POST {{host}}/api/auth/logout
 
-#### - [Refresh Token] success response
-POST {{host}}/api/auth/token/refresh
-Accept: application/json
-Content-Type: application/json
-
-{
-	"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjp0cnVlLCJpYXQiOjE3MTY1NzM0NDgsImV4cCI6MTcxNzE3ODI0OH0.YVJEuDsEEZqacPdI--ypfPJqOa8cNaCTcmS54n4O8OU"
-}
-
-#### - [Refresh Token] failed response
-POST {{host}}/api/auth/token/refresh
-Accept: application/json
-Content-Type: application/json
-
-{
-	"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjpmYWxzZSwiaWF0IjoxNzE2NTczNDgyLCJleHAiOjE3MTY1NzQzODJ9.68J7EqN6ss3Rano4MEWuIWp6ExSKZTK-Gx9FzxhwdNw"
-}
-
-#### - [Verify access token] failed/success response
-POST {{host}}/api/auth/token/verify
-Accept: application/json
-Content-Type: application/json
-
-{
-	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyZWZyZXNoIjpmYWxzZSwiaWF0IjoxNzE2NzQyOTYzLCJleHAiOjE3MTY3NDI5ODN9.u4fyq3zdijY_xwxkDK00oFCac88RD2uGZVkBOua5yXU"
-}
-
 ### = [GET all users] success
 GET {{host}}/api/users/all
 Accept: application/json
 
 
 ### = [UPDATE a user] success
-POST http://localhost:3000/api/users/10/update
+POST {{host}}/api/users/10/update
 Accept: application/json
 Content-Type: application/json
 
@@ -102,7 +75,7 @@ Content-Type: application/json
 }
 
 ### = [UPDATE a user] failed
-POST http://localhost:3000/api/users/update
+POST {{host}}/api/users/update
 Accept: application/json
 Content-Type: application/json
 
@@ -110,7 +83,7 @@ Content-Type: application/json
 }
 
 ### = [Add new Product Category] success
-POST http://localhost:3000/api/product-category/register
+POST {{host}}/api/product-category/register
 Accept: application/json
 Content-Type: application/json
 
@@ -119,7 +92,7 @@ Content-Type: application/json
 }
 
 ### = [Add new Product Category] failed
-POST http://localhost:3000/api/product-category/register
+POST {{host}}/api/product-category/register
 Accept: application/json
 Content-Type: application/json
 
@@ -127,23 +100,23 @@ Content-Type: application/json
 }
 
 ### = [Get all Product Category] success
-GET http://localhost:3000/api/product-category/all
+GET {{host}}/api/product-category/all
 Accept: application/json
 Content-Type: application/json
 
 
 ### = [Get all accounts] success
-GET http://localhost:3000/api/settings/accounts/all
+GET {{host}}/api/settings/accounts/all
 Accept: application/json
 Content-Type: application/json
 
 ### = [Get all suppliers] success
-GET http://localhost:3000/api/suppliers/all
+GET {{host}}/api/suppliers/all
 Accept: application/json
 Content-Type: application/json
 
 ### = [Add new suppliers] success
-POST http://localhost:3000/api/suppliers/register
+POST {{host}}/api/suppliers/register
 Accept: application/json
 Content-Type: application/json
 
@@ -161,7 +134,7 @@ Content-Type: application/json
 }
 
 ### = [Update supplier] success
-POST http://localhost:3000/api/suppliers/update
+POST {{host}}/api/suppliers/update
 Accept: application/json
 Content-Type: application/json
 
@@ -181,7 +154,7 @@ Content-Type: application/json
 }
 
 ### = [DELETE supplier] success
-DELETE  http://localhost:3000/api/suppliers/delete
+DELETE  {{host}}/api/suppliers/delete
 Accept: application/json
 Content-Type: application/json
 
@@ -196,12 +169,15 @@ Accept: application/json
 Content-Type: application/json
 
 ### = [GET all product item codes] success
-GET http://localhost:3000/api/products/item-code
+GET {{host}}/api/products/item-code
 Accept: application/json
 Content-Type: application/json
 
+###
+POST {{host}}/api/products/check-item-code/82af894a
+
 ### = [Register product] success
-POST http://localhost:3000/api/products/register
+POST {{host}}/api/products/register
 Accept: application/json
 Content-Type: application/json
 
@@ -224,7 +200,7 @@ Content-Type: application/json
 }
 
 ### = [Update product] success
-POST http://localhost:3000/api/products/update
+POST {{host}}/api/products/update
 Accept: application/json
 Content-Type: application/json
 
@@ -234,7 +210,7 @@ Content-Type: application/json
 }
 
 ### = [Delete product] success
-DELETE http://localhost:3000/api/products/delete
+DELETE {{host}}/api/products/delete
 Accept: application/json
 Content-Type: application/json
 
@@ -243,12 +219,12 @@ Content-Type: application/json
 }
 
 ### - [All Product Setting] success
-GET http://localhost:3000/api/product-setting/all
+GET {{host}}/api/product-setting/all
 Accept: application/json
 Content-Type: application/json
 
 ### - [Register Product Setting] Error
-POST http://localhost:3000/api/product-setting/register
+POST {{host}}/api/product-setting/register
 Accept: application/json
 Content-Type: application/json
 
@@ -258,7 +234,7 @@ Content-Type: application/json
 }
 
 ### - [Update Product Setting] success
-POST http://localhost:3000/api/product-setting/update
+POST {{host}}/api/product-setting/update
 Accept: application/json
 Content-Type: application/json
 
@@ -269,7 +245,7 @@ Content-Type: application/json
 }
 
 ### - [Delete Product Setting] success
-DELETE http://localhost:3000/api/product-setting/delete
+DELETE {{host}}/api/product-setting/delete
 Accept: application/json
 Content-Type: application/json
 
@@ -278,7 +254,7 @@ Content-Type: application/json
 }
 
 ### - [Purchase Order Register] success
-POST http://localhost:3000/api/purchase-order/register
+POST {{host}}/api/purchase-order/register
 Accept: application/json
 Content-Type: application/json
 
@@ -309,11 +285,11 @@ Content-Type: application/json
 }
 
 ### [Get all purchase Orders]
-GET HTTP://localhost:3000/api/purchase-order/all
+GET {{host}}/api/purchase-order/all
 
 
 ### [Update Purchase order]
-POST HTTP://localhost:3000/api/purchase-order/11/update
+POST {{host}}/api/purchase-order/11/update
 Accept: application/json
 Content-Type: application/json
 
@@ -333,13 +309,13 @@ Content-Type: application/json
 }
 
 ### [Physical Inventory Routes all]
-GET http://localhost:3000/api/physical-inventory/all
+GET {{host}}/api/physical-inventory/all
 
 ### [Physical Inventory Routes get one]
-GET http://localhost:3000/api/physical-inventory/1
+GET {{host}}/api/physical-inventory/1
 
 ### [Physical Inventory Routes register]
-POST http://localhost:3000/api/physical-inventory/register
+POST {{host}}/api/physical-inventory/register
 Content-Type: application/json
 Accept: application/json
 
@@ -349,7 +325,7 @@ Accept: application/json
 }
 
 ### [Physical Inventory Routes delete]
-DELETE http://localhost:3000/api/physical-inventory/delete
+DELETE {{host}}/api/physical-inventory/delete
 Content-Type: application/json
 Accept: application/json
 
@@ -359,16 +335,16 @@ Accept: application/json
 
 
 ### [Inventory Stock Status]
-GET http://localhost:3000/api/products/stock-status
+GET {{host}}/api/products/stock-status
 Accept: application/json
 
 
 ### [Branches Get all routes]
-GET http://localhost:3000/api/branch/all
+GET {{host}}/api/branch/all
 Accept: application/json
 
 ### [Branches register]
-POST http://localhost:3000/api/branch/register
+POST {{host}}/api/branch/register
 Accept: application/json
 Content-Type: application/json
 
@@ -377,11 +353,11 @@ Content-Type: application/json
 }
 
 ### [Branch delete]
-DELETE http://localhost:3000/api/branch/delete/4
+DELETE {{host}}/api/branch/delete/4
 Accept: application/json
 
 ### [Branch Transfer]
-POST http://localhost:3000/api/transfer/register
+POST {{host}}/api/transfer/register
 Accept: application/json
 Content-Type: application/json
 

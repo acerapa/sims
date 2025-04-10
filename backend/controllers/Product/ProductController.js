@@ -374,7 +374,9 @@ module.exports = {
         },
       });
 
-      while (itemCodes.map((p) => p.item_code).includes(itemCode)) {
+      while (
+        itemCodes.map((p) => p.product_details.item_code).includes(itemCode)
+      ) {
         itemCode = crypto.randomBytes(4).toString("hex");
       }
 
@@ -383,7 +385,22 @@ module.exports = {
       res.sendError(e, "Something went wrong! => " + e.message);
     }
   },
+  checkItemCodeExist: async (req, res) => {
+    const itemCode = req.params.item_code;
+    let itemCodes = await Product.findAll({
+      attributes: ["id"],
+      include: {
+        model: ProductDetails,
+        as: "product_details",
+        attributes: ["item_code"],
+      },
+    });
 
+    let isExist = itemCodes
+      .map((p) => p.product_details.item_code)
+      .includes(itemCode);
+    res.sendResponse({ is_exist: isExist }, "Item code checked!");
+  },
   inventoryStockStatus: async (req, res) => {
     try {
       const products = await Product.findAll({

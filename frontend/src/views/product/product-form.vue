@@ -266,6 +266,9 @@ const showCategoryModal = ref(false)
 const showProductPointModal = ref(false)
 const showConfirmationModal = ref(false)
 
+// data
+const itemCodeGenerated = ref('')
+
 const productSupplier = {
   supplier_id: '',
   cost: 0
@@ -383,6 +386,19 @@ const onSubmit = async () => {
   if (route.query.id) {
     isSuccess = await productStore.updateProduct(route.query.id, data)
   } else {
+    // backend validation for product item code
+    if (model.value.details.item_code != itemCodeGenerated.value) {
+      const isItemCodeExists = await productStore.checkProductItemCodeExist(
+        model.value.details.item_code
+      )
+      if (isItemCodeExists) {
+        if (!errors.details) errors.value.details = {}
+        errors.value.details.item_code = 'Item code already exists!'
+
+        return
+      }
+    }
+
     isSuccess = await productStore.registerProduct(data)
   }
 
@@ -471,6 +487,7 @@ onMounted(async () => {
     }
   } else {
     model.value.details.item_code = await productStore.getProductItemCode()
+    itemCodeGenerated.value = model.value.details.item_code // keeping a copy of the generated item code
 
     // for now per-selected supplier only comes from purchase order
     // That said, we'll just check if there's a purchase order form page state
