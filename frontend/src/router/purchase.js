@@ -29,7 +29,7 @@ export default [
       {
         path: '/purchase-receive-order/:id',
         name: PurchaseConst.PURCHASE_RECEIVE_ORDER,
-        component: () => import('@/views/purchase/ReceiveOrder.vue'),
+        component: () => import('@/views/purchase/ReceivingOrder.vue'),
         meta: {
           title: 'Receive Order',
           requiresAuth: true

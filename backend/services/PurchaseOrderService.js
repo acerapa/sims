@@ -4,6 +4,7 @@ const Product = require("../models/product");
 const PurchaseOrder = require("../models/purchase-order");
 const Supplier = require("../models/supplier");
 const { sequelize } = require("../models");
+const ProductDetails = require("../models/product-details");
 
 /**
  * This function will return a purchase order promise containing the purchase order and its related products by purchase order id
@@ -30,6 +31,10 @@ const findOrder = async (id) => {
             model: Supplier,
             as: "suppliers",
             attributes: ["id"],
+          },
+          {
+            model: ProductDetails,
+            as: "product_details",
           },
         ],
       },

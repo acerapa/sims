@@ -1,6 +1,6 @@
 <template>
-  <div class="table-wrapper" v-if="purchaseOrderStore.purchaseOrder">
-    <div class="flex flex-col gap-0">
+  <div class="table-wrapper">
+    <div class="flex flex-col gap-0" v-if="purchaseOrderStore.purchaseOrder">
       <p><b>PO #:</b> {{ purchaseOrderStore.purchaseOrder.id }}</p>
       <p>
         <b>Date Ordered #:</b>
@@ -12,59 +12,28 @@
       </p>
     </div>
     <hr class="-mx-4" />
-    <div class="w-full">
-      <div class="grid grid-cols-9 gap-3">
-        <p class="table-header col-span-2">Product Name</p>
-        <p class="table-header col-span-1">Cost</p>
-        <p class="table-header col-span-1">Ord Qty</p>
-        <p class="table-header col-span-1">Amount</p>
-        <p class="table-header col-span-1">Recv Qty</p>
-        <p class="table-header col-span-2">Remarks</p>
-        <p class="table-header col-span-1">status</p>
-      </div>
-      <div class="mt-6 flex flex-col gap-3">
-        <div
-          class="grid grid-cols-9 gap-3 items-center"
-          v-for="(product, ndx) in model.products"
-          :key="ndx"
-        >
-          <p class="text-sm col-span-2 h-[38px] py-2">
-            {{ product.name }}
-          </p>
-          <p class="text-sm col-span-1 h-[38px] py-2">
-            {{ product.cost }}
-          </p>
-          <p class="text-sm col-span-1 h-[38px] py-2">
-            {{ product.quantity }}
-          </p>
-          <p class="text-sm col-span-1 h-[38px] py-2">
-            {{ product.amount }}
-          </p>
-          <CustomInput
-            type="number"
-            name="quantity_received"
-            class="col-span-1"
-            v-model="product.quantity_received"
-          />
-          <CustomInput
-            :rows="1"
-            name="remarks"
-            type="textarea"
-            class="col-span-2"
-            placeholder="Remarks"
-            v-model="product.remarks"
-          />
-          <CustomInput
-            type="select"
-            name="status"
-            v-model="product.status"
-            class="w-full [&>select]:w-full"
-            :options="productOrderStatusOptions"
-            placeholder="Select Ordered Product Status"
-          />
-        </div>
-      </div>
+    <div class="" ref="tableWrapper">
+      <MultiSelectTable
+        v-model="model.products"
+        :has-add-new-item="false"
+        :row-component="ReceivingOrderRow"
+        :header-component="ReceivingOrderHeader"
+        :format="{}"
+      >
+        <template #>
+          <div class="grid grid-cols-9 gap-3 min-w-[1106px]">
+            <p class="table-header col-span-2">Item Description</p>
+            <p class="table-header col-span-1">Cost</p>
+            <p class="table-header col-span-1">Ord Qty</p>
+            <p class="table-header col-span-1">Amount</p>
+            <p class="table-header col-span-1">Recv Qty</p>
+            <p class="table-header col-span-2">Remarks</p>
+            <p class="table-header col-span-1">status</p>
+          </div>
+        </template>
+      </MultiSelectTable>
     </div>
+
     <div class="flex gap-3 mt-5 w-fit ml-auto mr-0">
       <button
         class="btn-outline !border-danger !text-danger w-fit mx-auto"
@@ -80,7 +49,6 @@
 </template>
 
 <script setup>
-import CustomInput from '@/components/shared/CustomInput.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { getCost } from '@/helper'
@@ -95,29 +63,22 @@ import { DateHelpers, ObjectHelpers } from 'shared/helpers'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ToastTypes } from '@/data/types'
+import { useTableScroll } from '@/use/useTableScroll'
+
+import ReceivingOrderHeader from '@/components/Inventory/ReceiveOrder/ReceivingOrderHeader.vue'
+import ReceivingOrderRow from '@/components/Inventory/ReceiveOrder/ReceivingOrderRow.vue'
+import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 
 const route = useRoute()
 const router = useRouter()
 const purchaseOrderStore = usePurchaseOrderStore()
 
-const productOrderStatusOptions = [
-  {
-    text: 'Open',
-    value: ProductOrderedStatus.OPEN
-  },
-  {
-    text: 'Complete',
-    value: ProductOrderedStatus.COMPLETE
-  },
-  {
-    text: 'Incomplete',
-    value: ProductOrderedStatus.INCOMPLETE
-  },
-  {
-    text: 'Not Received',
-    value: ProductOrderedStatus.NOT_RECEIVED
-  }
-]
+const tableWrapper = ref(null)
+
+// composables
+useTableScroll(tableWrapper)
+
+const products = ref([])
 
 const modelDefualtValue = {
   order: {
@@ -245,7 +206,7 @@ onMounted(async () => {
       ...purchaseOrderStore.purchaseOrder.products.map((product) => {
         return {
           product_id: product.id,
-          name: product.name,
+          name: product.product_details.purchase_description,
           remarks: product.PurchaseOrderProducts.remarks,
           description: product.PurchaseOrderProducts.description
             ? product.PurchaseOrderProducts.description

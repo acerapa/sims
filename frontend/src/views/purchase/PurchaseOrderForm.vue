@@ -404,8 +404,6 @@ const addNewProduct = () => {
   if (!isDisabled.value) {
     model.value.products.push({
       product_id: '',
-      name: '',
-      description: '',
       quantity: '',
       cost: '',
       amount: ''
@@ -422,6 +420,7 @@ const onSubmit = async (isAddNew = false) => {
   // validation
   validateData()
   if (hasErrors.value) {
+    console.log(errors.value)
     Event.emit(rowEventName, errors.value.products)
     return
   }
@@ -529,10 +528,6 @@ onMounted(async () => {
       ...order.products.map((product) => {
         return {
           product_id: product.id,
-          name: product.name,
-          description: product.PurchaseOrderProducts.description
-            ? product.PurchaseOrderProducts.description
-            : product.purchase_description,
           quantity: product.PurchaseOrderProducts.quantity,
           cost: getCost(
             product.PurchaseOrderProducts.cost,
