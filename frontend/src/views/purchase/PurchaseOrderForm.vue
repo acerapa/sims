@@ -470,7 +470,7 @@ const onSubmit = async (isAddNew = false) => {
 
 const onReceiveOrder = () => {
   router.push({
-    name: PurchaseConst.PURCHASE_RECEIVE_ORDER,
+    name: PurchaseConst.PURCHASE_RECEIVING_ORDER,
     params: {
       id: route.query.id
     }

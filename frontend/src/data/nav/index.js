@@ -54,7 +54,7 @@ export default [
         icon: outlineDot,
         includes_active: [
           PurchaseConst.PURCHASE_ORDER_FORM,
-          PurchaseConst.PURCHASE_RECEIVE_ORDER
+          PurchaseConst.PURCHASE_RECEIVING_ORDER
         ]
       },
       {

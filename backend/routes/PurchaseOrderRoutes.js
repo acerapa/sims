@@ -11,6 +11,7 @@ const { validateBody } = require("../middleware/request-validator");
 const {
   PurchaseOrderCreationSchema,
   PurchaseOrderUpdateSchema,
+  ReceivePurchaseOrderSchema,
 } = require("shared");
 
 Router.get("/all", all);
@@ -20,7 +21,7 @@ Router.put("/:id", validateBody(PurchaseOrderUpdateSchema), update);
 Router.post("/register", validateBody(PurchaseOrderCreationSchema), register);
 Router.put(
   "/:id/receive-order",
-  validateBody(PurchaseOrderUpdateSchema),
+  validateBody(ReceivePurchaseOrderSchema),
   receiveOrder
 );
 

@@ -1,9 +1,12 @@
 <template>
-  <div class="grid grid-cols-9 gap-3 min-w-[1106px]">
-    <p class="col-span-2 text-sm">{{ product.name }}</p>
-    <p class="col-span-1 text-sm">{{ product.cost }}</p>
-    <p class="col-span-1 text-sm">{{ product.quantity }}</p>
-    <p class="col-span-1 text-sm">{{ product.amount }}</p>
+  <div
+    class="grid grid-cols-9 gap-3 min-w-[1106px]"
+    v-if="purchaseProductDetails"
+  >
+    <p class="col-span-2 text-sm">{{ purchaseProductDetails.name }}</p>
+    <p class="col-span-1 text-sm">{{ purchaseProductDetails.cost }}</p>
+    <p class="col-span-1 text-sm">{{ purchaseProductDetails.quantity }}</p>
+    <p class="col-span-1 text-sm">{{ purchaseProductDetails.amount }}</p>
     <CustomInput
       class="col-span-1"
       type="number"
@@ -31,15 +34,17 @@
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
+import { usePurchaseOrderStore } from '@/stores/purchase-order'
+import { storeToRefs } from 'pinia'
 import { ProductOrderedStatus } from 'shared'
+import { computed } from 'vue'
+
+const purchaseOrderStore = usePurchaseOrderStore()
+const { purchaseOrder } = storeToRefs(purchaseOrderStore)
 
 const product = defineModel()
 
 const productOrderStatusOptions = [
-  {
-    text: 'Open',
-    value: ProductOrderedStatus.OPEN
-  },
   {
     text: 'Complete',
     value: ProductOrderedStatus.COMPLETE
@@ -53,4 +58,21 @@ const productOrderStatusOptions = [
     value: ProductOrderedStatus.NOT_RECEIVED
   }
 ]
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+/**
+ * Computes details of a specific purchase product from the current purchase order
+ * @returns {Object} Purchase product details including name and purchase order product properties
+ */
+const purchaseProductDetails = computed(() => {
+  const purchaseProduct = purchaseOrder.value?.products.find(
+    (p) => p.PurchaseOrderProducts.id == product.value.id
+  )
+  return {
+    name: purchaseProduct?.product_details.purchase_description,
+    ...purchaseProduct?.PurchaseOrderProducts
+  }
+})
 </script>

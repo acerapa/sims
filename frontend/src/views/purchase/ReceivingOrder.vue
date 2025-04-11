@@ -1,15 +1,27 @@
 <template>
   <div class="table-wrapper">
-    <div class="flex flex-col gap-0" v-if="purchaseOrderStore.purchaseOrder">
-      <p><b>PO #:</b> {{ purchaseOrderStore.purchaseOrder.id }}</p>
+    <div class="flex flex-col gap-2" v-if="purchaseOrder">
+      <p><b>PO #:</b> {{ purchaseOrder.id }}</p>
       <p>
         <b>Date Ordered #:</b>
-        {{ DateHelpers.formatDate(purchaseOrderStore.purchaseOrder.date) }}
+        {{ DateHelpers.formatDate(purchaseOrder.date) }}
       </p>
       <p>
         <b>Supplier:</b>
-        {{ purchaseOrderStore.purchaseOrder.supplier.company_name }}
+        {{ purchaseOrder.supplier.company_name }}
       </p>
+      <div class="flex items-center gap-2">
+        <p><b>Delivery Number:</b></p>
+        <CustomInput
+          type="text"
+          class="w-fit"
+          :error-has-text="true"
+          name="delivery_number"
+          placeholder="Delivery Number"
+          v-model="model.order.delivery_number"
+          :error="errors.order?.delivery_number"
+        />
+      </div>
     </div>
     <hr class="-mx-4" />
     <div class="" ref="tableWrapper">
@@ -51,20 +63,23 @@
 <script setup>
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
-import { getCost } from '@/helper'
 import { PurchaseConst } from '@/const/route.constants'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import {
   ProductOrderedStatus,
   PurchaseOrderStatus,
-  PurchaseOrderType
+  PurchaseOrderType,
+  ReceivePurchaseOrderSchema
 } from 'shared'
-import { DateHelpers, ObjectHelpers } from 'shared/helpers'
+import { DateHelpers } from 'shared/helpers'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ToastTypes } from '@/data/types'
 import { useTableScroll } from '@/use/useTableScroll'
+import { storeToRefs } from 'pinia'
+import { useValidation } from '@/composables/useValidation'
 
+import CustomInput from '@/components/shared/CustomInput.vue'
 import ReceivingOrderHeader from '@/components/Inventory/ReceiveOrder/ReceivingOrderHeader.vue'
 import ReceivingOrderRow from '@/components/Inventory/ReceiveOrder/ReceivingOrderRow.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
@@ -72,38 +87,21 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 const route = useRoute()
 const router = useRouter()
 const purchaseOrderStore = usePurchaseOrderStore()
+const { purchaseOrder } = storeToRefs(purchaseOrderStore)
 
 const tableWrapper = ref(null)
 
 // composables
 useTableScroll(tableWrapper)
 
-const products = ref([])
-
 const modelDefualtValue = {
   order: {
-    supplier_id: '',
-    ref_no: '',
-    date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
-    bill_due: '',
-    type: PurchaseOrderType.COD,
-    memo: '',
-    amount: 0
-  },
-  address: {
-    address1: '',
-    address2: '',
-    city: '',
-    postal: ''
+    status: PurchaseOrderStatus.COMPLETED,
+    delivery_number: ''
   },
   products: [
     {
-      product_id: '',
-      name: '',
-      description: '',
-      quantity: '',
-      cost: '',
-      amount: '',
+      id: '',
       remarks: '',
       status: '',
       quantity_received: ''
@@ -112,6 +110,12 @@ const modelDefualtValue = {
 }
 
 const model = ref({ ...modelDefualtValue })
+
+// use validation composable
+const { errors, hasErrors, validateData } = useValidation(
+  ReceivePurchaseOrderSchema,
+  model.value
+)
 
 /** ================================================
  * EVENTS
@@ -128,6 +132,11 @@ const onCancel = () => {
 }
 
 const onReceiveOrder = async () => {
+  validateData()
+  if (hasErrors.value) {
+    return
+  }
+
   const isSuccess = await purchaseOrderStore.receivePurchaseOrder(
     route.params.id,
     model.value
@@ -180,48 +189,15 @@ onMounted(async () => {
       return
     }
 
-    model.value.order = ObjectHelpers.assignSameFields(
-      model.value.order,
-      purchaseOrderStore.purchaseOrder
-    )
-
-    // few modification
-    model.value.order.bill_due = DateHelpers.formatDate(
-      model.value.order.bill_due,
-      'YYYY-MM-DD'
-    )
-    model.value.order.date = DateHelpers.formatDate(
-      model.value.order.date,
-      'YYYY-MM-DD'
-    )
-
-    model.value.address = ObjectHelpers.assignSameFields(
-      model.value.address,
-      purchaseOrderStore.purchaseOrder.address
-    )
-
-    model.value.order.status = PurchaseOrderStatus.COMPLETED
-
     model.value.products = [
       ...purchaseOrderStore.purchaseOrder.products.map((product) => {
         return {
-          product_id: product.id,
-          name: product.product_details.purchase_description,
+          id: product.PurchaseOrderProducts.id,
           remarks: product.PurchaseOrderProducts.remarks,
-          description: product.PurchaseOrderProducts.description
-            ? product.PurchaseOrderProducts.description
-            : product.purchase_description,
-          quantity: product.PurchaseOrderProducts.quantity,
           quantity_received: product.PurchaseOrderProducts.quantity,
           status: product.PurchaseOrderProducts.status
             ? product.PurchaseOrderProducts.status
-            : PurchaseOrderProductsedStatus.OPEN,
-          cost: getCost(
-            product.PurchaseOrderProducts.cost,
-            product,
-            purchaseOrderStore.purchaseOrder.supplier_id
-          ),
-          amount: product.PurchaseOrderProducts.amount
+            : PurchaseOrderProductsedStatus.OPEN
         }
       })
     ]

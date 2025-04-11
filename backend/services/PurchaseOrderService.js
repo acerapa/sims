@@ -117,7 +117,42 @@ const updateOrder = async (id, data, transaction) => {
   }
 };
 
+/**
+ * Receives a purchase order by updating its status, product details, and preparing for stock update
+ * @param {number} id - The unique identifier of the purchase order
+ * @param {Object} data - The data containing order and product update information
+ * @param {Object} transaction - The database transaction for ensuring data consistency
+ */
+const orderReceive = async (id, data, transaction) => {
+  if (data.order) {
+    await PurchaseOrder.update(data.order, {
+      where: { id },
+      transaction,
+    });
+
+    if (data.products) {
+      await Promise.all(
+        data.products.map((p) =>
+          PurchaseOrderProducts.update(
+            {
+              quantity_received: p.quantity_received,
+              remarks: p.remarks,
+              status: p.status,
+            },
+            {
+              where: { id: p.id },
+              transaction,
+            }
+          )
+        )
+      );
+    }
+
+    // TODO: Update products stock
+  }
+};
+
 module.exports = {
   findOrder,
-  updateOrder,
+  orderReceive,
 };

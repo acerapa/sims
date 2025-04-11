@@ -58,6 +58,10 @@ PurchaseOrder.init(
       values: Object.values(PurchaseOrderStatus),
       defaultValue: PurchaseOrderStatus.OPEN,
     },
+    delivery_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     address_id: {
       type: DataTypes.INTEGER,
       references: {

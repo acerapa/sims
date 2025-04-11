@@ -28,7 +28,7 @@ export default [
       },
       {
         path: '/purchase-receive-order/:id',
-        name: PurchaseConst.PURCHASE_RECEIVE_ORDER,
+        name: PurchaseConst.PURCHASE_RECEIVING_ORDER,
         component: () => import('@/views/purchase/ReceivingOrder.vue'),
         meta: {
           title: 'Receive Order',
