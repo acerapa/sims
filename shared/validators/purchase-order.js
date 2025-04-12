@@ -74,6 +74,9 @@ const ReceivePurchaseProductSchema = Joi.object({
   id: Joi.number().required().messages({
     "*": "Id is required",
   }),
+  product_id: Joi.number().required().messages({
+    "*": "Product id is required",
+  }),
   quantity_received: Joi.number().required().messages({
     "*": "Quantity received is required",
   }),
@@ -82,7 +85,8 @@ const ReceivePurchaseProductSchema = Joi.object({
     .valid(
       ProductOrderedStatus.COMPLETE,
       ProductOrderedStatus.INCOMPLETE,
-      ProductOrderedStatus.NOT_RECEIVED
+      ProductOrderedStatus.NOT_RECEIVED,
+      ProductOrderedStatus.SURPLUS
     )
     .required()
     .messages({

@@ -106,32 +106,6 @@ module.exports = {
     try {
       const data = req.body.validated;
       await orderReceive(req.params.id, data, transaction);
-
-      // reflect products stock basing form the quantity received
-      const products = await Product.findAll({
-        where: {
-          id: {
-            [Op.in]: data.products.map((p) => p.product_id),
-          },
-          type: ItemType.INVENTORY,
-        },
-        attributes: ["id"],
-        include: {
-          model: ProductDetails,
-          as: "product_details",
-          attributes: ["id", "stock"],
-        },
-      });
-
-      await Promise.all(
-        products.map((p) => {
-          const productData = data.products.find((dp) => dp.product_id == p.id);
-          return p.product_details.update({
-            stock: p.product_details.stock + productData.quantity_received,
-          });
-        })
-      );
-
       await transaction.commit();
       res.sendResponse({}, "Successfully received!");
     } catch (error) {

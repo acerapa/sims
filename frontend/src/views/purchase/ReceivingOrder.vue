@@ -28,6 +28,7 @@
       <MultiSelectTable
         v-model="model.products"
         :has-add-new-item="false"
+        :row-event-name="rowEventName"
         :row-component="ReceivingOrderRow"
         :header-component="ReceivingOrderHeader"
         :format="{}"
@@ -53,9 +54,7 @@
       >
         Cancel
       </button>
-      <button class="btn w-fit mx-auto" @click="onReceiveOrder">
-        Receive Order
-      </button>
+      <button class="btn w-fit mx-auto" @click="onSubmit">Receive Order</button>
     </div>
   </div>
 </template>
@@ -65,12 +64,7 @@ import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { PurchaseConst } from '@/const/route.constants'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
-import {
-  ProductOrderedStatus,
-  PurchaseOrderStatus,
-  PurchaseOrderType,
-  ReceivePurchaseOrderSchema
-} from 'shared'
+import { PurchaseOrderStatus, ReceivePurchaseOrderSchema } from 'shared'
 import { DateHelpers } from 'shared/helpers'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -90,6 +84,7 @@ const purchaseOrderStore = usePurchaseOrderStore()
 const { purchaseOrder } = storeToRefs(purchaseOrderStore)
 
 const tableWrapper = ref(null)
+const rowEventName = 'receiving-order-row'
 
 // composables
 useTableScroll(tableWrapper)
@@ -102,8 +97,9 @@ const modelDefualtValue = {
   products: [
     {
       id: '',
-      remarks: '',
       status: '',
+      remarks: '',
+      product_id: '',
       quantity_received: ''
     }
   ]
@@ -131,9 +127,12 @@ const onCancel = () => {
   router.back()
 }
 
-const onReceiveOrder = async () => {
+const onSubmit = async () => {
   validateData()
   if (hasErrors.value) {
+    if (errors.value.products) {
+      Event.emit(rowEventName, errors.value.products)
+    }
     return
   }
 
@@ -197,7 +196,8 @@ onMounted(async () => {
           quantity_received: product.PurchaseOrderProducts.quantity,
           status: product.PurchaseOrderProducts.status
             ? product.PurchaseOrderProducts.status
-            : PurchaseOrderProductsedStatus.OPEN
+            : PurchaseOrderProductsedStatus.OPEN,
+          product_id: product.id
         }
       })
     ]

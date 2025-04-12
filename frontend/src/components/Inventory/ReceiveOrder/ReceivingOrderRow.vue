@@ -24,6 +24,8 @@
     <CustomInput
       type="select"
       name="status"
+      :error-has-text="true"
+      :error="errors.status"
       v-model="product.status"
       class="w-full [&>select]:w-full"
       :options="productOrderStatusOptions"
@@ -37,7 +39,8 @@ import CustomInput from '@/components/shared/CustomInput.vue'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import { storeToRefs } from 'pinia'
 import { ProductOrderedStatus } from 'shared'
-import { computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import Event from '@/event'
 
 const purchaseOrderStore = usePurchaseOrderStore()
 const { purchaseOrder } = storeToRefs(purchaseOrderStore)
@@ -56,8 +59,37 @@ const productOrderStatusOptions = [
   {
     text: 'Not Received',
     value: ProductOrderedStatus.NOT_RECEIVED
+  },
+  {
+    text: 'Surplus',
+    value: ProductOrderedStatus.SURPLUS
   }
 ]
+
+const props = defineProps({
+  ndx: {
+    type: Number
+  },
+  isDisabled: {
+    type: Boolean,
+    default: false
+  },
+  eventName: {
+    type: String,
+    required: false
+  }
+})
+
+const errors = ref({})
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+Event.on(props.eventName, (data) => {
+  if (typeof props.ndx != 'undefined') {
+    errors.value = data[props.ndx] ? data[props.ndx] : {}
+  }
+})
 
 /** ================================================
  * COMPUTED
@@ -75,4 +107,26 @@ const purchaseProductDetails = computed(() => {
     ...purchaseProduct?.PurchaseOrderProducts
   }
 })
+
+const fillStatus = () => {
+  const quantityReceived = parseFloat(product.value.quantity_received)
+  const quantityOrdered = parseFloat(purchaseProductDetails.value.quantity)
+  if (quantityReceived > quantityOrdered) {
+    product.value.status = ProductOrderedStatus.SURPLUS
+  } else if (quantityReceived < quantityOrdered) {
+    product.value.status = ProductOrderedStatus.INCOMPLETE
+  } else {
+    product.value.status = ProductOrderedStatus.COMPLETE
+  }
+}
+
+onMounted(() => {
+  fillStatus()
+})
+
+// Auto-fill status
+watch(
+  () => product.value.quantity_received,
+  () => fillStatus()
+)
 </script>
