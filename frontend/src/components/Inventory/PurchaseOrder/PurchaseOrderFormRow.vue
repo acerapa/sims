@@ -139,7 +139,8 @@ const onNewProduct = () => {
   router.push({
     name: InventoryConst.PRODUCT_FORM,
     query: {
-      redirect: PurchaseConst.PURCHASE_ORDER_FORM
+      redirect: PurchaseConst.PURCHASE_ORDER_FORM,
+      sup_id: props.sup_id
     }
   })
 }

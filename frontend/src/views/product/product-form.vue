@@ -252,6 +252,7 @@ import { InventoryConst } from '@/const/route.constants'
 import { useValidation } from '@/composables/useValidation'
 import { useAppStore } from '@/stores/app'
 import { PageStateConst } from '@/const/state.constants'
+import { useRetainPageStateOnReload } from '@/composables/useRetainPageStateOnReload'
 
 // injections and stores
 const route = useRoute()
@@ -302,6 +303,10 @@ const { errors, validateData, hasErrors } = useValidation(
   ProductItemSchema,
   model.value
 )
+
+if (route.query.redirect) {
+  useRetainPageStateOnReload(PageStateConst.PURCHASE_ORDER_FORM, route.name)
+}
 
 /** ================================================
  * EVENTS
@@ -491,12 +496,8 @@ onMounted(async () => {
 
     // for now per-selected supplier only comes from purchase order
     // That said, we'll just check if there's a purchase order form page state
-    if (appStore.isPageExist(PageStateConst.PURCHASE_ORDER_FORM)) {
-      const pageState = appStore.getPageState(
-        PageStateConst.PURCHASE_ORDER_FORM
-      )
-      const purchaseOrder = pageState.state
-      preselectedSupplier.value.push(purchaseOrder.order.supplier_id)
+    if (route.query.sup_id) {
+      preselectedSupplier.value.push(route.query.sup_id)
 
       // set to model manually
       model.value.suppliers = preselectedSupplier.value.map((sup) => {
