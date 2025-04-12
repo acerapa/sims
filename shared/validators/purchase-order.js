@@ -4,6 +4,7 @@ const { ValidatorHelpers } = require("../helpers/validators-helpers");
 const {
   ProductOrderedStatus,
   PhysicalInventoryStatus,
+  PurchaseOrderStatus,
 } = require("shared/enums");
 
 const PurchaseOrderSchema = Joi.object({
@@ -56,6 +57,48 @@ const PurchaseOrderUpdateSchema = Joi.object({
   ),
 });
 
+// receiving purchase orders
+const ReceiveOrderSchema = Joi.object({
+  status: Joi.string()
+    .valid(...Object.values(PurchaseOrderStatus))
+    .required()
+    .messages({
+      "*": "Status is required",
+    }),
+  delivery_number: Joi.string().required().messages({
+    "*": "Delivery number is required",
+  }),
+});
+
+const ReceivePurchaseProductSchema = Joi.object({
+  id: Joi.number().required().messages({
+    "*": "Id is required",
+  }),
+  product_id: Joi.number().required().messages({
+    "*": "Product id is required",
+  }),
+  quantity_received: Joi.number().required().messages({
+    "*": "Quantity received is required",
+  }),
+  remarks: Joi.string().allow(null, "").optional(),
+  status: Joi.string()
+    .valid(
+      ProductOrderedStatus.COMPLETE,
+      ProductOrderedStatus.INCOMPLETE,
+      ProductOrderedStatus.NOT_RECEIVED,
+      ProductOrderedStatus.SURPLUS
+    )
+    .required()
+    .messages({
+      "*": "Status is required",
+    }),
+});
+
+const ReceivePurchaseOrderSchema = Joi.object({
+  order: ReceiveOrderSchema.required(),
+  products: Joi.array().items(ReceivePurchaseProductSchema).min(1).required(),
+});
+
 // Physical Inventory
 const PhysicalInventorySchema = Joi.object({
   date_started: Joi.date().required(),
@@ -94,6 +137,7 @@ module.exports = {
   PurchaseProductSchema,
   PhysicalInventorySchema,
   PurchaseOrderUpdateSchema,
+  ReceivePurchaseOrderSchema,
   PurchaseOrderCreationSchema,
   PhysicalInventoryItemSchema,
   PhysicalInventoryUpdateSchema,
