@@ -496,8 +496,12 @@ onMounted(async () => {
 
     // for now per-selected supplier only comes from purchase order
     // That said, we'll just check if there's a purchase order form page state
-    if (route.query.sup_id) {
-      preselectedSupplier.value.push(route.query.sup_id)
+    if (appStore.isPageExist(PageStateConst.PURCHASE_ORDER_FORM)) {
+      const pageState = appStore.getPageState(
+        PageStateConst.PURCHASE_ORDER_FORM
+      )
+
+      preselectedSupplier.value.push(pageState.state.order.supplier_id)
 
       // set to model manually
       model.value.suppliers = preselectedSupplier.value.map((sup) => {
