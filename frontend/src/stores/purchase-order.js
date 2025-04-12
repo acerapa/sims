@@ -1,10 +1,12 @@
 import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useProductStore } from './product'
 
 export const usePurchaseOrderStore = defineStore('purchase-order', () => {
   const purchaseOrders = ref([])
   const purchaseOrder = ref(null)
+  const { fetchProductByIds } = useProductStore()
 
   const fetchPurchaseOrders = async () => {
     const res = await api('/purchase-order/all')
@@ -26,6 +28,9 @@ export const usePurchaseOrderStore = defineStore('purchase-order', () => {
       Method.PUT,
       data
     )
+
+    const productIds = data.products.map((p) => p.product_id)
+    await fetchProductByIds(productIds)
 
     return res.status < 400
   }

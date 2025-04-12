@@ -52,6 +52,7 @@ module.exports = {
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
     }
   },
+
   getProducts: async (req, res) => {
     try {
       const products = await Product.findAll({
@@ -96,6 +97,7 @@ module.exports = {
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
     }
   },
+
   getProduct: async (req, res) => {
     try {
       const product = await findProduct(req.params.id);
@@ -104,6 +106,54 @@ module.exports = {
       res.sendError(e, "Something wen't wrong! =>" + e.message, 400);
     }
   },
+
+  getProductByIds: async (req, res) => {
+    try {
+      const products = await Product.findAll({
+        where: {
+          id: {
+            [Op.in]: req.query.ids,
+          },
+        },
+        include: [
+          {
+            model: Supplier,
+            as: "suppliers",
+            attributes: ["id"],
+            through: { attributes: ["cost"] },
+          },
+          {
+            model: Account,
+            as: "income",
+            attributes: ["id"],
+          },
+          {
+            model: Account,
+            as: "expense",
+            attributes: ["id"],
+          },
+          {
+            model: ProductCategory,
+            as: "categories",
+            attributes: ["id", "name"],
+          },
+          {
+            model: ProductDetails,
+            as: "product_details",
+            include: {
+              model: ProductSettings,
+              as: "product_setting",
+            },
+          },
+        ],
+      });
+
+      res.sendResponse({ products }, "Successfully fetched!");
+    } catch (error) {
+      res.sendError({ error }, "Something wen't wrong!", 400);
+    }
+  },
+
   register: async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
@@ -385,6 +435,7 @@ module.exports = {
       res.sendError(e, "Something went wrong! => " + e.message);
     }
   },
+
   checkItemCodeExist: async (req, res) => {
     const itemCode = req.params.item_code;
     let itemCodes = await Product.findAll({
@@ -401,6 +452,7 @@ module.exports = {
       .includes(itemCode);
     res.sendResponse({ is_exist: isExist }, "Item code checked!");
   },
+
   inventoryStockStatus: async (req, res) => {
     try {
       const products = await Product.findAll({

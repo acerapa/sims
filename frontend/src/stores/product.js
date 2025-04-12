@@ -76,6 +76,28 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  const fetchProductByIds = async (ids) => {
+    const params = new URLSearchParams()
+    ids.forEach((param, index) => {
+      params.append(`ids[${index}]`, param)
+    })
+    const res = await api(`products/by-ids?${params.toString()}`)
+
+    if (res.status < 400) {
+      if (products.value.length) {
+        res.data.products.forEach((p) => {
+          const index = products.value.findIndex((prd) => prd.id == p.id)
+
+          if (index > -1) {
+            products.value[index] = p
+          }
+        })
+      } else {
+        await fetchAllProducts()
+      }
+    }
+  }
+
   const productOptions = computed(() => {
     return products.value.map((product) => {
       return {
@@ -140,6 +162,7 @@ export const useProductStore = defineStore('product', () => {
     removeProduct,
     registerProduct,
     fetchAllProducts,
+    fetchProductByIds,
     getProductItemCode,
     checkProductItemCodeExist
   }
