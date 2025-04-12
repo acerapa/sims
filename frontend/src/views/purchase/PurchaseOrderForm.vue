@@ -420,7 +420,6 @@ const onSubmit = async (isAddNew = false) => {
   // validation
   validateData()
   if (hasErrors.value) {
-    console.log(errors.value)
     Event.emit(rowEventName, errors.value.products)
     return
   }
