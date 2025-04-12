@@ -286,6 +286,7 @@ import { useEmployeeStore } from '@/stores/employee'
 import { useValidation } from '@/composables/useValidation'
 import { useAppStore } from '@/stores/app'
 import { PageStateConst } from '@/const/state.constants'
+import { useAuth } from '@/composables/useAuth'
 
 const route = useRoute()
 const router = useRouter()
@@ -307,6 +308,9 @@ const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
 const employeeStore = useEmployeeStore()
 const paymentMethodStore = usePaymentMethodStore()
+
+// composables
+const { getAuthUser } = useAuth()
 
 const productTransferModal = {
   product_id: '',
@@ -452,6 +456,12 @@ onMounted(async () => {
   await customerStore.getCustomers()
   await employeeStore.getEmployees()
   await paymentMethodStore.getPaymentMethods()
+
+  // set default prepared by
+  const authUser = await getAuthUser()
+  if (authUser) {
+    model.value.sales_order.user_id = authUser.id
+  }
 
   if (route.query.id) {
     await salesStore.fetchSalesOrder(route.query.id)
