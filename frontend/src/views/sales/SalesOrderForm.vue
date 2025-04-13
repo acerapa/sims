@@ -4,7 +4,7 @@
       <div class="flex flex-col gap-3 flex-1">
         <div class="flex justify-between items-center">
           <p class="font-semibold mb-1">Sales Order Information</p>
-          <div class="flex gap-3">
+          <div class="flex gap-3 items-center" v-if="isEdit">
             <SelectStatusDropdown
               v-model="model.sales_order.status"
               :status-map="SalesOrderStatusMap"
@@ -363,6 +363,7 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
 /** ================================================
  * COMPUTED
  ** ================================================*/
+const isEdit = computed(() => (route.query.id ? true : false))
 const customerOptions = computed(() => {
   return customerStore.customers.map((customer) => {
     return {

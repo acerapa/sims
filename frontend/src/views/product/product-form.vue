@@ -252,6 +252,7 @@ import { InventoryConst } from '@/const/route.constants'
 import { useValidation } from '@/composables/useValidation'
 import { useAppStore } from '@/stores/app'
 import { PageStateConst } from '@/const/state.constants'
+import { useRetainPageStateOnReload } from '@/composables/useRetainPageStateOnReload'
 
 // injections and stores
 const route = useRoute()
@@ -302,6 +303,10 @@ const { errors, validateData, hasErrors } = useValidation(
   ProductItemSchema,
   model.value
 )
+
+if (route.query.redirect) {
+  useRetainPageStateOnReload(PageStateConst.PURCHASE_ORDER_FORM, route.name)
+}
 
 /** ================================================
  * EVENTS
@@ -495,8 +500,8 @@ onMounted(async () => {
       const pageState = appStore.getPageState(
         PageStateConst.PURCHASE_ORDER_FORM
       )
-      const purchaseOrder = pageState.state
-      preselectedSupplier.value.push(purchaseOrder.order.supplier_id)
+
+      preselectedSupplier.value.push(pageState.state.order.supplier_id)
 
       // set to model manually
       model.value.suppliers = preselectedSupplier.value.map((sup) => {

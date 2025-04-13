@@ -8,7 +8,9 @@
         props.type != 'multi-string'
       "
     >
-      <small v-if="props.hasLabel">{{ props.label }}</small>
+      <small v-if="props.hasLabel" :class="props.labelCss">{{
+        props.label
+      }}</small>
       <input
         :type="props.type"
         :name="props.name"
@@ -30,7 +32,9 @@
       <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'textarea'">
-      <small v-if="props.hasLabel">{{ props.label }}</small>
+      <small v-if="props.hasLabel" :class="props.labelCss">{{
+        props.label
+      }}</small>
       <textarea
         :name="props.name"
         :id="props.id ? props.id : props.name"
@@ -53,7 +57,9 @@
       <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'select'">
-      <small v-if="props.hasLabel">{{ props.label }}</small>
+      <small v-if="props.hasLabel" :class="props.labelCss">{{
+        props.label
+      }}</small>
       <CustomSelectInput
         :name="props.name"
         :options="props.options"
@@ -83,7 +89,9 @@
       class="flex flex-col gap-1 relative"
       v-if="props.type == 'multi-string'"
     >
-      <small v-if="props.hasLabel">{{ props.label }}</small>
+      <small v-if="props.hasLabel" :class="props.labelCss">{{
+        props.label
+      }}</small>
       <MultiStringInput
         :name="props.name"
         :disabled="props.disabled"
@@ -133,6 +141,10 @@ const props = defineProps({
   hasLabel: {
     type: Boolean,
     default: false
+  },
+  labelCss: {
+    type: String,
+    default: ''
   },
   label: {
     type: String,

@@ -25,6 +25,23 @@ module.exports = {
       res.sendError({ e }, "Something wen't wrong!", 400);
     }
   },
+  getCurrentBranch: async (req, res) => {
+    try {
+      const branch = await Branch.findOne({
+        where: {
+          is_current: true,
+        },
+        include: {
+          model: Address,
+          as: "address",
+        },
+      });
+
+      res.sendResponse({ branch }, "Successfully fetched", 200);
+    } catch (error) {
+      res.sendError({ error }, "Something wen't wrong!", 400);
+    }
+  },
   register: async (req, res) => {
     const transaction = await sequelize.transaction();
     try {

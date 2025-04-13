@@ -6,6 +6,24 @@ const UserType = Object.freeze({
   CASHIER: "cashier",
 });
 
+const UserTypeMap = Object.freeze({
+  [UserType.ADMIN]: {
+    text: "Admin",
+  },
+  [UserType.MANAGER]: {
+    text: "Manager",
+  },
+  [UserType.SALES_MAN]: {
+    text: "Sales Man",
+  },
+  [UserType.INVENTORY]: {
+    text: "Inventory",
+  },
+  [UserType.CASHIER]: {
+    text: "Cashier",
+  },
+});
+
 const UserStatus = Object.freeze({
   ACTIVE: 1,
   INACTIVE: 0,
@@ -231,6 +249,7 @@ module.exports = {
   UserType,
   ItemType,
   UserStatus,
+  UserTypeMap,
   ProductType,
   AccountTypes,
   BranchStatus,
