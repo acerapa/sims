@@ -388,6 +388,19 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
+  const getCurrentBranch = async () => {
+    let current = branches.value.find((b) => b.is_current)
+    if (!current) {
+      const res = await api('branch/current')
+      if (res.status < 400) {
+        current = res.data.branch
+        branches.value.push(current)
+      }
+    }
+
+    return current
+  }
+
   /*
    * BRANCHES METHODS END
    */
@@ -409,6 +422,7 @@ export const useSettingsStore = defineStore('settings', () => {
     categoryOption,
     fetchAllBranches,
     fetchAllAccounts,
+    getCurrentBranch,
     getReorderingPoints,
     getProductCategories,
     updateProductCategory,
