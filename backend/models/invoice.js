@@ -2,6 +2,8 @@ const { Model, DataTypes } = require("sequelize");
 const SalesOrder = require("./sales-order");
 const { sequelize } = require(".");
 const { InvoiceStatus } = require("shared/enums");
+const Customer = require("./customer");
+const User = require("./user");
 
 class Invoice extends Model {}
 
@@ -40,6 +42,22 @@ Invoice.init(
     total: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
+    },
+    customer_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: Customer,
+        key: "id",
+      },
+    },
+    employee_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: User,
+        key: "id",
+      },
     },
     sales_order_id: {
       type: DataTypes.INTEGER,

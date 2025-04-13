@@ -3,6 +3,7 @@ const UserValidators = require("./user");
 const VendorValidators = require("./vendor");
 const ProductValidators = require("./product");
 const AccountValidators = require("./account");
+const InvoiceValidators = require("./invoice");
 const TransferValidators = require("./transfer");
 const CustomerValidators = require("./customer");
 const DeliveryValidators = require("./delivery");
@@ -19,6 +20,7 @@ module.exports = {
   ...VendorValidators,
   ...AccountValidators,
   ...ProductValidators,
+  ...InvoiceValidators,
   ...TransferValidators,
   ...CustomerValidators,
   ...DeliveryValidators,

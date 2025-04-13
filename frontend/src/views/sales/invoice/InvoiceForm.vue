@@ -6,7 +6,8 @@
         type="date"
         :has-label="true"
         name="invoice_date"
-        label="Invoice Date: "
+        label="Issue Date: "
+        v-model="model.invoice.issue_date"
         label-css="text-sm font-bold text-gray-500"
         class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
       />
@@ -22,9 +23,9 @@
             :can-search="true"
             name="employee_id"
             :options="employeeOptions"
-            v-model="model.employee_id"
             placeholder="Select Employee"
             class="[&>div>div]:ml-2 w-fit"
+            v-model="model.invoice.employee_id"
           />
           <div
             v-if="employeeInfo && currentBranch.address"
@@ -58,9 +59,9 @@
             name="customer_id"
             :has-add-new="true"
             :options="customerOptions"
-            v-model="model.customer_id"
             placeholder="Select Customer"
             class="[&>div>div]:ml-2 w-fit"
+            v-model="model.invoice.customer_id"
             @add-new="showCustomerModal = true"
           />
           <div v-if="customerInfo" class="ml-5 text-sm text-gray-600">
@@ -91,6 +92,9 @@
         v-model="model.products"
         :header-component="InvoiceFormHeader"
         :row-component="InvoiceFormRow"
+        :row-props="{
+          selected: model.products
+        }"
       />
     </div>
   </div>
@@ -104,8 +108,8 @@
         type="textarea"
         :rows="6"
         :has-label="true"
-        v-model="model.memo"
         input-class="resize-none"
+        v-model="model.invoice.memo"
         placeholder="Add other notes here ..."
       />
       <div class="flex-1 flex items-end">
@@ -135,7 +139,7 @@
     <hr class="mt-3" />
     <div class="flex gap-3 justify-end">
       <button class="btn-danger-outline">Cancel</button>
-      <button class="btn">Submit</button>
+      <button class="btn" @click="onSubmit">Submit</button>
     </div>
   </div>
   <CustomerModal v-if="showCustomerModal" v-model="showCustomerModal" />
@@ -154,8 +158,9 @@ import { storeToRefs } from 'pinia'
 import { useCustomerStore } from '@/stores/customer'
 import { useEmployeeStore } from '@/stores/employee'
 import { useSettingsStore } from '@/stores/settings'
-import { UserTypeMap } from 'shared'
+import { DateHelpers, InvoiceWithProductsSchema, UserTypeMap } from 'shared'
 import { useTableScroll } from '@/use/useTableScroll'
+import { useValidation } from '@/composables/useValidation'
 
 const customerStore = useCustomerStore()
 const { customers } = storeToRefs(customerStore)
@@ -178,14 +183,22 @@ const invoiceProductModel = {
 }
 
 const model = ref({
-  memo: '',
-  customer_id: null,
-  employee_id: null,
+  invoice: {
+    employee_id: '',
+    customer_id: '',
+    memo: '',
+    issue_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
+    due_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
+  },
   products: [{ ...invoiceProductModel }]
 })
 
 // composables
 useTableScroll(multiSelectWrap)
+const { errors, hasErrors, validateData } = useValidation(
+  InvoiceWithProductsSchema,
+  model.value
+)
 
 /** ================================================
  * COMPUTED
@@ -209,12 +222,25 @@ const employeeOptions = computed(() => {
 })
 
 const customerInfo = computed(() => {
-  return customers.value.find((c) => c.id == model.value.customer_id)
+  return customers.value.find((c) => c.id == model.value.invoice.customer_id)
 })
 
 const employeeInfo = computed(() => {
-  return employees.value.find((e) => e.id == model.value.employee_id)
+  return employees.value.find((e) => e.id == model.value.invoice.employee_id)
 })
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const onSubmit = async () => {
+  // validation
+  validateData()
+
+  if (hasErrors.value) {
+    console.log(errors.value, model.value)
+    return
+  }
+}
 
 /** ================================================
  * LIFECYCLE HOOKS

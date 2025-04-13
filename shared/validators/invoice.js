@@ -21,6 +21,23 @@ const InvoiceSchema = joi.object({
   total: joi.number().required().messages({
     "*": "Total is required",
   }),
+
+  // with condition fields
+  customer_id: joi.when("sales_order_id", {
+    is: joi.exist(),
+    then: joi.forbidden(),
+    otherwise: joi.number().required().messages({
+      "*": "Customer id is required",
+    }),
+  }),
+
+  employee_id: joi.when("sales_order_id", {
+    is: joi.exist(),
+    then: joi.forbidden(),
+    otherwise: joi.number().required().messages({
+      "*": "Employee id is required",
+    }),
+  }),
 });
 
 const InvoiceProductSchema = joi.object({
@@ -43,10 +60,10 @@ const InvoiceProductSchema = joi.object({
 
 const InvoiceWithProductsSchema = joi.object({
   invoice: InvoiceSchema.required(),
-  products: joi.when(joi.ref("invoice.sales_order_id"), {
+  products: joi.when("invoice.sales_order_id", {
     is: joi.exist(),
-    then: joi.array().items(InvoiceProductSchema).min(1).required(),
-    otherwise: joi.forbidden(),
+    then: joi.forbidden(),
+    otherwise: joi.array().items(InvoiceProductSchema).min(1).required(),
   }),
 });
 
