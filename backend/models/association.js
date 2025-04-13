@@ -23,6 +23,22 @@ const SalesOrderProduct = require("./junction/sales-order-product");
 const Invoice = require("./invoice");
 const PaymentMethod = require("./payment-method");
 const Delivery = require("./delivery");
+const InvoiceProducts = require("./junction/invoice-products");
+
+// invoice to products
+Invoice.belongsToMany(Product, {
+  through: InvoiceProducts,
+  foreignKey: "invoice_id",
+  otherKey: "product_id",
+  as: "products",
+});
+
+Product.belongsToMany(Invoice, {
+  through: InvoiceProducts,
+  foreignKey: "product_id",
+  otherKey: "invoice_id",
+  as: "invoices",
+});
 
 // Sales Order, Product, Address, Invoice and Sales Order Product Relations
 SalesOrder.belongsToMany(Product, {
