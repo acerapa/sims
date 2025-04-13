@@ -2,19 +2,55 @@ const joi = require("joi");
 const { InvoiceStatus } = require("../enums");
 
 const InvoiceSchema = joi.object({
-  issue_date: joi.date().required(),
-  due_date: joi.date().required(),
+  issue_date: joi.date().required().messages({
+    "*": "Issue date is required",
+  }),
+  due_date: joi.date().required().messages({
+    "*": "Due date is required",
+  }),
   status: joi
     .string()
     .valid(...Object.values(InvoiceStatus))
     .default(InvoiceStatus.UNPAID),
-  sales_order_id: joi.number().required(),
+  sales_order_id: joi.number().allow(null).optional(),
   memo: joi.string().allow("", null).optional(),
   discount: joi.number().allow("", null).optional(),
-  sub_total: joi.number().required(),
-  total: joi.number().required(),
+  sub_total: joi.number().required().messages({
+    "*": "Sub total is required",
+  }),
+  total: joi.number().required().messages({
+    "*": "Total is required",
+  }),
+});
+
+const InvoiceProductSchema = joi.object({
+  product_id: joi.number().required().messages({
+    "*": "Product id is required",
+  }),
+  quantity: joi.number().required().messages({
+    "*": "Quantity is required",
+  }),
+  price: joi.number().required().messages({
+    "*": "Price is required",
+  }),
+  sub_total: joi.number().required().messages({
+    "*": "Sub total is required",
+  }),
+  total: joi.number().required().messages({
+    "*": "Total is required",
+  }),
+});
+
+const InvoiceWithProductsSchema = joi.object({
+  invoice: InvoiceSchema.required(),
+  products: joi.when(joi.ref("invoice.sales_order_id"), {
+    is: joi.exist(),
+    then: joi.array().items(InvoiceProductSchema).min(1).required(),
+    otherwise: joi.forbidden(),
+  }),
 });
 
 module.exports = {
   InvoiceSchema,
+  InvoiceWithProductsSchema,
 };
