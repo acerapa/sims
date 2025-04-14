@@ -12,6 +12,7 @@
       v-if="!props.selectMultiple && !props.canSearch"
       :disabled="props.disabled"
       @change="emit('change')"
+      @focus="emit('focus')"
     >
       <option value="" v-if="props.placeholder" selected disabled>
         {{ props.placeholder }}
@@ -43,6 +44,7 @@
         ref="singleDropdown"
         v-model="search"
         :disabled="props.disabled"
+        @focus="emit('focus')"
         @blur="onBlurSelect"
       />
       <div
@@ -139,7 +141,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 
-const emit = defineEmits(['addNew', 'change'])
+const emit = defineEmits(['addNew', 'change', 'focus'])
 
 const props = defineProps({
   placeholder: {

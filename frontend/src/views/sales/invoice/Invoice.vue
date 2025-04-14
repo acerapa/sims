@@ -1,5 +1,5 @@
 <template>
-  <CustomTable @add-new-record="onAddNew">
+  <CustomTable @add-new-record="onAddNew" class="w-[calc(100vw_-_328px)]">
     <template #table_header>
       <div class="grid gap-3 grid-cols-7 min-w-[985px]">
         <div class="col-span-1 flex gap-3 items-center">

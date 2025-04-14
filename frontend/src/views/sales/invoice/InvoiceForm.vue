@@ -22,14 +22,17 @@
             :has-label="true"
             :can-search="true"
             name="employee_id"
+            :error-has-text="true"
             :options="employeeOptions"
             placeholder="Select Employee"
-            class="[&>div>div]:ml-2 w-fit"
             v-model="model.invoice.employee_id"
+            :error="errors.invoice?.employee_id"
+            class="[&>div>div]:ml-2 w-fit [&>div>.error]:ml-2"
+            @focus="() => onFocusResetError('invoice.employee_id')"
           />
           <div
             v-if="employeeInfo && currentBranch.address"
-            class="ml-5 text-sm text-gray-600"
+            class="ml-5 mt-3.5 text-sm text-gray-600"
           >
             <p class="font-bold">
               {{ UserTypeMap[employeeInfo.position].text }}
@@ -58,13 +61,16 @@
             :can-search="true"
             name="customer_id"
             :has-add-new="true"
+            :error-has-text="true"
             :options="customerOptions"
             placeholder="Select Customer"
-            class="[&>div>div]:ml-2 w-fit"
             v-model="model.invoice.customer_id"
             @add-new="showCustomerModal = true"
+            :error="errors.invoice?.customer_id"
+            @focus="onFocusResetError('invoice.customer_id')"
+            class="[&>div>div]:ml-2 w-fit [&>div>.error]:ml-2"
           />
-          <div v-if="customerInfo" class="ml-5 text-sm text-gray-600">
+          <div v-if="customerInfo" class="ml-5 mt-3.5 text-sm text-gray-600">
             <p class="mt-2">{{ customerInfo.address.address1 }}</p>
             <p v-if="customerInfo.address.address2">
               {{ customerInfo.address.address2 }}
@@ -92,6 +98,7 @@
         v-model="model.products"
         :header-component="InvoiceFormHeader"
         :row-component="InvoiceFormRow"
+        :row-event-name="rowEventName"
         :row-props="{
           selected: model.products
         }"
@@ -100,7 +107,7 @@
   </div>
   <div class="cont flex flex-col gap-5 mb-10">
     <p class="text-lg font-normal">Notes & Summary</p>
-    <div class="flex gap-3 justify-between">
+    <div class="flex gap-8 justify-between">
       <CustomInput
         name="memo"
         label="Memo"
@@ -116,22 +123,33 @@
         <div class="grid grid-cols-2 gap-5 ml-auto mr-0">
           <!-- Sub total -->
           <p class="flex-1 text-sm text-start">Sub total:</p>
-          <p class="flex-1 text-sm text-end font-bold whitespace-nowrap">
-            ₱ 1000.00
+          <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
+            ₱ {{ model.invoice.sub_total.toFixed(2) }}
           </p>
 
           <!-- Discount -->
           <p class="flex-1 text-sm text-start">Discount:</p>
-          <p class="flex-1 text-sm text-end font-bold whitespace-nowrap">
+          <!-- <p class="flex-1 text-sm text-end font-bold whitespace-nowrap">
             ₱ 0.00
-          </p>
+          </p> -->
+          <div class="flex items-center gap-2">
+            <p>₱</p>
+            <CustomInput
+              type="number"
+              class="w-full"
+              name="discount"
+              placeholder="0.00"
+              input-class="text-end w-full"
+              v-model="model.invoice.discount"
+            />
+          </div>
 
           <hr class="col-span-2" />
 
           <!-- Total -->
           <p class="flex-1 text-sm text-start">Total:</p>
-          <p class="flex-1 text-sm text-end font-bold whitespace-nowrap">
-            ₱ 1000.00
+          <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
+            ₱ {{ model.invoice.total.toFixed(2) }}
           </p>
         </div>
       </div>
@@ -146,7 +164,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
@@ -161,25 +179,27 @@ import { useSettingsStore } from '@/stores/settings'
 import { DateHelpers, InvoiceWithProductsSchema, UserTypeMap } from 'shared'
 import { useTableScroll } from '@/use/useTableScroll'
 import { useValidation } from '@/composables/useValidation'
+import Event from '@/event'
+import { useInvoiceStore } from '@/stores/invoice'
 
 const customerStore = useCustomerStore()
 const { customers } = storeToRefs(customerStore)
 const employeeStore = useEmployeeStore()
 const { employees } = storeToRefs(employeeStore)
 const { getCurrentBranch } = useSettingsStore()
+const { createInvoice } = useInvoiceStore()
 
 const showCustomerModal = ref(false)
 
 const currentBranch = ref(null)
 const multiSelectWrap = ref(null)
+const rowEventName = ref('invoice-form-row-event')
 
 const invoiceProductModel = {
   product_id: '',
-  description: '',
   quantity: 0,
   price: 0,
-  total: 0,
-  discount: 0
+  total: 0
 }
 
 const model = ref({
@@ -188,7 +208,10 @@ const model = ref({
     customer_id: '',
     memo: '',
     issue_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
-    due_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
+    due_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
+    discount: 0.0,
+    sub_total: 0.0,
+    total: 0.0
   },
   products: [{ ...invoiceProductModel }]
 })
@@ -237,8 +260,39 @@ const onSubmit = async () => {
   validateData()
 
   if (hasErrors.value) {
-    console.log(errors.value, model.value)
+    console.log('errors', errors.value)
+    if (errors.value.products) {
+      Event.emit(rowEventName.value, errors.value.products)
+    }
     return
+  }
+
+  // create invoice
+  let isSuccess = false
+  isSuccess = await createInvoice(model.value)
+
+  if (!isSuccess) return
+  console.log('invoice created')
+}
+
+const onFocusResetError = (path) => {
+  if (!errors.value) return
+  const keys = path.split('.')
+
+  if (keys.length == 1) {
+    errors.value[keys[0]] = ''
+  } else {
+    let val = errors.value
+    for (let key of keys) {
+      if (!val[key]) break
+
+      if (val[key] && typeof val[key] === 'string') {
+        val[key] = ''
+        break
+      } else {
+        val = val[key]
+      }
+    }
   }
 }
 
@@ -251,4 +305,26 @@ onMounted(async () => {
 
   currentBranch.value = await getCurrentBranch()
 })
+
+/** ================================================
+ * WATCHERS
+ * ================================================*/
+watch(
+  () => model.value.products,
+  () => {
+    model.value.invoice.sub_total = model.value.products
+      .filter((p) => p.product_id && p.total)
+      .map((p) => (p.total ? parseFloat(p.total) : 0.0))
+      .reduce((acc, curr) => acc + curr, 0)
+  },
+  { deep: true }
+)
+
+watch(
+  () => [model.value.invoice.discount, model.value.invoice.sub_total],
+  () => {
+    model.value.invoice.total =
+      model.value.invoice.sub_total - model.value.invoice.discount
+  }
+)
 </script>
