@@ -224,6 +224,37 @@ const InvoiceStatus = Object.freeze({
   DISPUTED: "disputed",
 });
 
+const InvoiceStatusMap = Object.freeze({
+  [InvoiceStatus.UNPAID]: {
+    text: "Unpaid",
+    class: "invoice-unpaid",
+  },
+  [InvoiceStatus.PAID]: {
+    text: "Paid",
+    class: "invoice-paid",
+  },
+  [InvoiceStatus.PARTIALLY_PAID]: {
+    text: "Partially Paid",
+    class: "invoice-partially-paid",
+  },
+  [InvoiceStatus.OVERDUE]: {
+    text: "Overdue",
+    class: "invoice-overdue",
+  },
+  [InvoiceStatus.REFUNDED]: {
+    text: "Refunded",
+    class: "invoice-refunded",
+  },
+  [InvoiceStatus.FAILED]: {
+    text: "Failed",
+    class: "invoice-failed",
+  },
+  [InvoiceStatus.DISPUTED]: {
+    text: "Disputed",
+    class: "invoice-disputed",
+  },
+});
+
 const DeliveryStatus = Object.freeze({
   PENDING: "pending",
   DELIVERED: "delivered",
@@ -262,6 +293,7 @@ module.exports = {
   BranchStatusMap,
   SalesOrderStatus,
   NotificationType,
+  InvoiceStatusMap,
   PurchaseOrderType,
   DeliveryStatusMap,
   PurchaseStatusMap,
