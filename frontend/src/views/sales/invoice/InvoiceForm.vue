@@ -129,9 +129,6 @@
 
           <!-- Discount -->
           <p class="flex-1 text-sm text-start">Discount:</p>
-          <!-- <p class="flex-1 text-sm text-end font-bold whitespace-nowrap">
-            ₱ 0.00
-          </p> -->
           <div class="flex items-center gap-2">
             <p>₱</p>
             <CustomInput
@@ -260,7 +257,6 @@ const onSubmit = async () => {
   validateData()
 
   if (hasErrors.value) {
-    console.log('errors', errors.value)
     if (errors.value.products) {
       Event.emit(rowEventName.value, errors.value.products)
     }
