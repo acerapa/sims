@@ -178,7 +178,12 @@ import { useTableScroll } from '@/use/useTableScroll'
 import { useValidation } from '@/composables/useValidation'
 import Event from '@/event'
 import { useInvoiceStore } from '@/stores/invoice'
+import { EventEnum } from '@/data/event'
+import { SalesConst } from '@/const/route.constants'
+import { ToastTypes } from '@/data/types'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const customerStore = useCustomerStore()
 const { customers } = storeToRefs(customerStore)
 const employeeStore = useEmployeeStore()
@@ -221,6 +226,11 @@ const { errors, hasErrors, validateData } = useValidation(
 )
 
 /** ================================================
+ * EVENTS
+ ** ================================================*/
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
+
+/** ================================================
  * COMPUTED
  ** ================================================*/
 const customerOptions = computed(() => {
@@ -257,6 +267,10 @@ const onSubmit = async () => {
   validateData()
 
   if (hasErrors.value) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Failed to create invoice. Please check your inputs'
+    })
     if (errors.value.products) {
       Event.emit(rowEventName.value, errors.value.products)
     }
@@ -267,8 +281,19 @@ const onSubmit = async () => {
   let isSuccess = false
   isSuccess = await createInvoice(model.value)
 
-  if (!isSuccess) return
-  console.log('invoice created')
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.SUCCESS,
+      message: 'Invoice created successfully'
+    })
+
+    router.push({ name: SalesConst.INVOICES })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Failed to create invoice'
+    })
+  }
 }
 
 const onFocusResetError = (path) => {
@@ -300,6 +325,8 @@ onMounted(async () => {
   await employeeStore.getEmployees()
 
   currentBranch.value = await getCurrentBranch()
+
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 
 /** ================================================

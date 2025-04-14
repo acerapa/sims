@@ -29,6 +29,8 @@ export const useInvoiceStore = defineStore('invoice', () => {
         await fetchInvoices()
       }
     }
+
+    return isSuccess
   }
 
   return {

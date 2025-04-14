@@ -1,5 +1,8 @@
 <template>
-  <div class="grid gap-3 grid-cols-9 min-w-[985px]">
+  <div
+    class="grid gap-3 grid-cols-9 min-w-[985px] gen-table-row"
+    @click="emit('view', props.invoice.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.invoice.id }}</p>
@@ -48,6 +51,8 @@ const customerStore = useCustomerStore()
 const { customers } = storeToRefs(customerStore)
 const employeeStore = useEmployeeStore()
 const { employees } = storeToRefs(employeeStore)
+
+const emit = defineEmits(['view'])
 
 const props = defineProps({
   invoice: {

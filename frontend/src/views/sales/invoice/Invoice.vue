@@ -7,6 +7,7 @@
     :data="filteredData"
     :row-prop-init="rowEventName"
     :has-pagination="true"
+    @view="onView"
   >
     <template #table_header>
       <div class="grid gap-3 grid-cols-9 min-w-[985px]">
@@ -37,6 +38,7 @@ import { computed, onMounted } from 'vue'
 import Event from '@/event'
 import { useCustomerStore } from '@/stores/customer'
 import { useEmployeeStore } from '@/stores/employee'
+import { EventEnum } from '@/data/event'
 
 const invoiceStore = useInvoiceStore()
 const { invoices } = storeToRefs(invoiceStore)
@@ -48,6 +50,8 @@ const router = useRouter()
 /** ================================================
  * EVENTS
  ** ================================================*/
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
+
 const rowEventName = 'invoice-row-init-event'
 Event.on(rowEventName, (data) => {
   return { invoice: data }
@@ -69,6 +73,13 @@ const onAddNew = () => {
   })
 }
 
+const onView = (id) => {
+  router.push({
+    name: SalesConst.INVOICE_FORM,
+    query: { id }
+  })
+}
+
 /** ================================================
  * LIFECYCLE HOOKS
  ** ================================================*/
@@ -76,5 +87,7 @@ onMounted(async () => {
   await invoiceStore.fetchInvoices()
   await getCustomers()
   await getEmployees()
+
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>
