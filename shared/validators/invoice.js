@@ -44,16 +44,13 @@ const InvoiceProductSchema = joi.object({
   product_id: joi.number().required().messages({
     "*": "Product id is required",
   }),
-  quantity: joi.number().required().messages({
+  quantity: joi.number().min(1).required().messages({
     "*": "Quantity is required",
   }),
-  price: joi.number().required().messages({
+  price: joi.number().min(0.01).required().messages({
     "*": "Price is required",
   }),
-  sub_total: joi.number().required().messages({
-    "*": "Sub total is required",
-  }),
-  total: joi.number().required().messages({
+  total: joi.number().min(0.01).required().messages({
     "*": "Total is required",
   }),
 });

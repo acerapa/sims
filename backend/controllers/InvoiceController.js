@@ -36,9 +36,10 @@ module.exports = {
           );
         }
       }
-
+      await transaction.commit();
       res.sendResponse({ done: true }, "Successfully registered!");
     } catch (error) {
+      await transaction.rollback();
       res.sendError({ error }, "Something went wrong!");
     }
   },
