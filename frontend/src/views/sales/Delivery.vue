@@ -1,7 +1,9 @@
 <template>
   <CustomTable
-    :row-prop-init="rowPropInit"
     :data="filteredData"
+    :has-pagination="true"
+    :row-prop-init="rowPropInit"
+    @view="onView"
     :table-row-component="DeliveryRow"
   >
     <template #table_header>
@@ -18,18 +20,22 @@
       </div>
     </template>
   </CustomTable>
+  <DeliveryModal v-if="showModal" v-model="showModal" />
 </template>
 
 <script setup>
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { useDeliveryStore } from '@/stores/delivery'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
+import DeliveryModal from '@/components/sales/DeliveryModal.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import DeliveryRow from '@/components/sales/DeliveryRow.vue'
 
 const deliveryStore = useDeliveryStore()
+
+const showModal = ref(false)
 
 /** ================================================
  * EVENTS
@@ -49,6 +55,13 @@ Event.on(rowPropInit, (data) => {
 const filteredData = computed(() => {
   return deliveryStore.deliveries
 })
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const onView = (id) => {
+  showModal.value = true
+}
 
 /** ================================================
  * LIFECYCLE HOOKS
