@@ -5,7 +5,7 @@
     <p class="table-header col-span-1 pl-3">Qty</p>
     <p class="table-header col-span-1 pl-3">Discount</p>
     <p class="table-header col-span-1 pl-3">Price</p>
-    <p class="table-header col-span-1 pl-3">Total</p>
+    <p class="table-header col-span-1 pl-3">Amount</p>
     <p class="table-header col-span-1 pl-3">Action</p>
   </div>
 </template>

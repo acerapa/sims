@@ -32,7 +32,6 @@
           name="user_id"
           class="flex-1"
           :has-label="true"
-          :can-search="true"
           :has-add-new="true"
           :error-has-text="true"
           placeholder="Prepared By"
@@ -44,12 +43,11 @@
         <CustomInput
           type="select"
           class="flex-1"
+          label="Customer"
           :has-label="true"
           :has-add-new="true"
           name="customer_id"
-          :can-search="true"
           :error-has-text="true"
-          label="Select Customer"
           :options="customerOptions"
           placeholder="Select Customer"
           @add-new="showCustomerModel = true"
@@ -209,13 +207,13 @@
           <!-- Sub total -->
           <p class="flex-1 text-sm text-start">Sub total:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.sales_order.sub_total.toFixed(2) }}
+            ₱ {{ model.sales_order.sub_total }}
           </p>
 
           <!-- Total Discount -->
           <p class="flex-1 text-sm text-start">Total Discount:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.sales_order.total_discount.toFixed(2) }}
+            ₱ {{ model.sales_order.total_discount }}
           </p>
 
           <hr class="col-span-2" />
@@ -639,6 +637,32 @@ watch(
   () => model.value,
   () => {
     setSalesOrderFormPageState()
+  },
+  { deep: true }
+)
+
+// watch for the sales order products
+watch(
+  () => model.value.sales_order_products,
+  () => {
+    if (model.value.sales_order_products.length) {
+      const amount = model.value.sales_order_products
+        .filter((p) => p.total)
+        .map((p) => parseFloat(p.total))
+
+      const discount = model.value.sales_order_products
+        .filter((p) => p.discount)
+        .map((p) => parseFloat(p.discount))
+
+      const subTotal = amount.length ? amount.reduce((a, b) => a + b) : 0.0
+      const totalDiscount = discount.length
+        ? discount.reduce((a, b) => a + b)
+        : 0.0
+
+      model.value.sales_order.sub_total = subTotal
+      model.value.sales_order.total_discount = totalDiscount
+      model.value.sales_order.total = subTotal - totalDiscount
+    }
   },
   { deep: true }
 )
