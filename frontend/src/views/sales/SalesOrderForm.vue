@@ -571,10 +571,12 @@ watch(
         populateAddress(customer.address)
       }
     } else {
-      model.value.delivery.address_id = null
-      model.value.delivery.address = ObjectHelpers.copyObj(
-        deliveryDefaultModel.address
-      )
+      if (model.value.delivery) {
+        model.value.delivery.address_id = null
+        model.value.delivery.address = ObjectHelpers.copyObj(
+          deliveryDefaultModel.address
+        )
+      }
     }
   }
 )
