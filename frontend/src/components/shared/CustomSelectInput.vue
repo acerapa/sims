@@ -3,6 +3,7 @@
     class="flex flex-col relative"
     :class="props.disabled ? 'pointer-events-none' : ''"
   >
+    <!-- The normal select element -->
     <select
       class="input flex-1"
       :class="[props.inputClass]"
@@ -30,6 +31,7 @@
       </option>
     </select>
 
+    <!-- Can't select multiple element with search -->
     <div
       class="relative flex flex-col group"
       v-if="!props.selectMultiple && props.canSearch"
@@ -81,6 +83,7 @@
       </div>
     </div>
 
+    <!-- Can select multiple and can search too -->
     <div class="relative group z-10" tabindex="0">
       <div
         class="min-h-[38px] relative z-10"
@@ -237,6 +240,10 @@ watch(
       emit('addNew')
       selected.value = ''
       select.value.selectedIndex = 0
+    }
+
+    if (props.canSearch && val && !props.selectMultiple) {
+      search.value = getName(val)
     }
   }
 )
