@@ -4,7 +4,11 @@ const Supplier = require("../models/supplier");
 const Product = require("../models/product");
 const { sequelize } = require("../models");
 const PurchaseOrderProducts = require("../models/junction/purchase-order-products");
-const { findOrder, updateOrder } = require("../services/PurchaseOrderService");
+const {
+  findOrder,
+  updateOrder,
+  orderReceive,
+} = require("../services/PurchaseOrderService");
 const { Op } = require("sequelize");
 const { ItemType } = require("shared/enums");
 const ProductDetails = require("../models/product-details");
@@ -101,33 +105,7 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      await updateOrder(req.params.id, data, transaction);
-
-      // reflect products stock basing form the quantity received
-      const products = await Product.findAll({
-        where: {
-          id: {
-            [Op.in]: data.products.map((p) => p.product_id),
-          },
-          type: ItemType.INVENTORY,
-        },
-        attributes: ["id"],
-        include: {
-          model: ProductDetails,
-          as: "product_details",
-          attributes: ["id", "stock"],
-        },
-      });
-
-      await Promise.all(
-        products.map((p) => {
-          const productData = data.products.find((dp) => dp.product_id == p.id);
-          return p.product_details.update({
-            stock: p.product_details.stock + productData.quantity_received,
-          });
-        })
-      );
-
+      await orderReceive(req.params.id, data, transaction);
       await transaction.commit();
       res.sendResponse({}, "Successfully received!");
     } catch (error) {

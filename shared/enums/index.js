@@ -6,16 +6,33 @@ const UserType = Object.freeze({
   CASHIER: "cashier",
 });
 
+const UserTypeMap = Object.freeze({
+  [UserType.ADMIN]: {
+    text: "Admin",
+  },
+  [UserType.MANAGER]: {
+    text: "Manager",
+  },
+  [UserType.SALES_MAN]: {
+    text: "Sales Man",
+  },
+  [UserType.INVENTORY]: {
+    text: "Inventory",
+  },
+  [UserType.CASHIER]: {
+    text: "Cashier",
+  },
+});
+
+const UserStatus = Object.freeze({
+  ACTIVE: 1,
+  INACTIVE: 0,
+});
+
 const AccountTypes = Object.freeze({
   INCOME: "income",
   EXPENSE: "expense",
   ASSET: "asset",
-});
-
-const LocalStorageKeys = Object.freeze({
-  ACCESS: "sims-access",
-  REFRESH: "sims-refresh",
-  CURRENT_USER: "sims-current-user",
 });
 
 const PurchaseOrderStatus = Object.freeze({
@@ -28,6 +45,7 @@ const PurchaseOrderStatus = Object.freeze({
 
 const ProductOrderedStatus = Object.freeze({
   OPEN: "open",
+  SURPLUS: "surplus",
   COMPLETE: "complete",
   INCOMPLETE: "incomplete",
   NOT_RECEIVED: "not-received",
@@ -140,14 +158,14 @@ const ProductStatus = Object.freeze({
 });
 
 const SalesOrderType = Object.freeze({
-  CASH: "cash",
+  ONE_TIME: "one-time",
   INSTALLMENT: "installment",
 });
 
 const SalesOrderTypeMap = Object.freeze({
-  [SalesOrderType.CASH]: {
-    text: "Cash",
-    class: "sales-types-cash",
+  [SalesOrderType.ONE_TIME]: {
+    text: "One-Time",
+    class: "sales-types-one-time",
   },
   [SalesOrderType.INSTALLMENT]: {
     text: "Installment",
@@ -157,10 +175,8 @@ const SalesOrderTypeMap = Object.freeze({
 
 const SalesOrderStatus = Object.freeze({
   OPEN: "open",
-  CONFIRMED: "confirmed",
-  COMPLETED: "completed",
+  INVOICED: "invoiced",
   CANCELLED: "cancelled",
-  OVERDUE: "overdue",
 });
 
 const SalesOrderStatusMap = Object.freeze({
@@ -168,27 +184,26 @@ const SalesOrderStatusMap = Object.freeze({
     text: "Open",
     class: "purchase-status-open",
   },
-  [SalesOrderStatus.CONFIRMED]: {
-    text: "Confirmed",
-    class: "purchase-status-confirmed",
-  },
-  [SalesOrderStatus.COMPLETED]: {
-    text: "Completed",
+  [SalesOrderStatus.INVOICED]: {
+    text: "Invoiced",
     class: "purchase-status-completed",
   },
   [SalesOrderStatus.CANCELLED]: {
     text: "Cancelled",
     class: "purchase-status-cancelled",
   },
-  [SalesOrderStatus.OVERDUE]: {
-    text: "Overdue",
-    class: "purchase-status-overdue",
-  },
 });
 
 const NotificationStatus = Object.freeze({
   UNREAD: "unread",
   READ: "read",
+});
+
+const NotificationType = Object.freeze({
+  GENERAL: "general",
+  PRODUCT: "product",
+  SALES_ORDER: "sales-order",
+  PURCHASE_ORDER: "purchase-order",
 });
 
 const ConsoleColors = {
@@ -209,9 +224,63 @@ const InvoiceStatus = Object.freeze({
   DISPUTED: "disputed",
 });
 
+const InvoiceStatusMap = Object.freeze({
+  [InvoiceStatus.UNPAID]: {
+    text: "Unpaid",
+    class: "invoice-unpaid",
+  },
+  [InvoiceStatus.PAID]: {
+    text: "Paid",
+    class: "invoice-paid",
+  },
+  [InvoiceStatus.PARTIALLY_PAID]: {
+    text: "Partially Paid",
+    class: "invoice-partially-paid",
+  },
+  [InvoiceStatus.OVERDUE]: {
+    text: "Overdue",
+    class: "invoice-overdue",
+  },
+  [InvoiceStatus.REFUNDED]: {
+    text: "Refunded",
+    class: "invoice-refunded",
+  },
+  [InvoiceStatus.FAILED]: {
+    text: "Failed",
+    class: "invoice-failed",
+  },
+  [InvoiceStatus.DISPUTED]: {
+    text: "Disputed",
+    class: "invoice-disputed",
+  },
+});
+
+const DeliveryStatus = Object.freeze({
+  PENDING: "pending",
+  DELIVERED: "delivered",
+  CANCELLED: "cancelled",
+});
+
+const DeliveryStatusMap = Object.freeze({
+  [DeliveryStatus.PENDING]: {
+    text: "Pending",
+    class: "delivery-status-pending",
+  },
+  [DeliveryStatus.DELIVERED]: {
+    text: "Delivered",
+    class: "delivery-status-delivered",
+  },
+  [DeliveryStatus.CANCELLED]: {
+    text: "Cancelled",
+    class: "delivery-status-cancelled",
+  },
+});
+
 module.exports = {
   UserType,
   ItemType,
+  UserStatus,
+  UserTypeMap,
   ProductType,
   AccountTypes,
   BranchStatus,
@@ -220,10 +289,13 @@ module.exports = {
   ConsoleColors,
   InvoiceStatus,
   SalesOrderType,
+  DeliveryStatus,
   BranchStatusMap,
-  LocalStorageKeys,
   SalesOrderStatus,
+  NotificationType,
+  InvoiceStatusMap,
   PurchaseOrderType,
+  DeliveryStatusMap,
   PurchaseStatusMap,
   SalesOrderTypeMap,
   NotificationStatus,

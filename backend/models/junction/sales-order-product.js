@@ -28,10 +28,6 @@ SalesOrderProduct.init(
         key: "id",
       },
     },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -43,6 +39,15 @@ SalesOrderProduct.init(
     total: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
+    },
+    discount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0.0,
+    },
+    serial_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

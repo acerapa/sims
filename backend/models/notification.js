@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require("./index");
-const { NotificationStatus } = require("shared/enums");
+const { NotificationStatus, NotificationType } = require("shared/enums");
 
 class Notification extends Model {}
 
@@ -27,6 +27,11 @@ Notification.init(
     route: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    type: {
+      type: DataTypes.ENUM,
+      values: Object.values(NotificationType),
+      defaultValue: NotificationType.GENERAL,
     },
     // We should add a user type specific notification here
   },

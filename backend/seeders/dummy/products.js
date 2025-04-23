@@ -34,15 +34,14 @@ module.exports = {
 
     return [
       {
-        name: "Dell Latitude 5320",
         type: ProductType.INVENTORY,
         price: 25000,
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
         product_details: {
           stock: 60,
-          purchase_description: "This is a sample description",
-          sales_description: "This is a sample description",
+          purchase_description: "Dell Latitude 5320",
+          sales_description: "Dell Latitude 5320",
           status: ProductStatus.ACTIVE,
           is_manually_set_cost: true,
           cost: 20000,
@@ -59,19 +58,42 @@ module.exports = {
         }),
       },
       {
-        name: "A4 Tech mouse",
         type: ProductType.INVENTORY,
         price: 650,
         expense_account: expense[getRandomDigitBetween(0, expense.length)],
         income_account: income[getRandomDigitBetween(0, income.length)],
         product_details: {
           stock: 30,
-          purchase_description: "This is a sample description",
-          sales_description: "This is a sample description",
+          purchase_description: "A4 Tech mouse",
+          sales_description: "A4 Tech mouse",
           status: ProductStatus.ACTIVE,
           is_manually_set_cost: true,
           cost: 500,
           item_code: "qwertyu3",
+          product_setting_id:
+            product_settings[getRandomDigitBetween(0, product_settings.length)],
+        },
+        categories: [computers],
+        suppliers: suppliers.map((sup) => {
+          return {
+            id: sup.id,
+            cost: 450,
+          };
+        }),
+      },
+      {
+        type: ProductType.INVENTORY,
+        price: 650,
+        expense_account: expense[getRandomDigitBetween(0, expense.length)],
+        income_account: income[getRandomDigitBetween(0, income.length)],
+        product_details: {
+          stock: 30,
+          purchase_description: "Zeus keyboard RGB",
+          sales_description: "Zeus keyboard RGB",
+          status: ProductStatus.ACTIVE,
+          is_manually_set_cost: true,
+          cost: 500,
+          item_code: "qwertyu4",
           product_setting_id:
             product_settings[getRandomDigitBetween(0, product_settings.length)],
         },

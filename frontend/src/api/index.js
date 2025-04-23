@@ -1,6 +1,3 @@
-import { LocalStorageKeys } from 'shared'
-import { FunctionCooldownManager } from 'shared'
-
 const apiConfig = {
   serverUrls: {
     development: import.meta.env.VITE_DEV_SERVER,
@@ -13,7 +10,8 @@ const apiConfig = {
   }
 }
 
-const BASE_PATH = apiConfig.serverUrls[import.meta.env.MODE]
+// const BASE_PATH = apiConfig.serverUrls[import.meta.env.MODE]
+const BASE_PATH = `${window.location.origin}/api/` // this is temporary only
 
 export const Method = Object.freeze({
   GET: 'GET',
@@ -29,7 +27,13 @@ export const api = async (
   payload = null,
   hdrs = {}
 ) => {
-  const headers = { ...apiConfig.defaultHeaders, ...hdrs }
+  const listOfHeader = { ...apiConfig.defaultHeaders, ...hdrs }
+  const headers = new Headers()
+
+  Object.keys(listOfHeader).forEach((key) => {
+    headers.append(key, listOfHeader[key])
+  })
+
   const requestInit = { method, headers }
 
   // if method is GET no need for body
@@ -62,71 +66,4 @@ export const api = async (
   }
 
   return responseData
-}
-
-export const authenticatedApi = async (
-  url,
-  method = Method.GET,
-  payload = null,
-  hdrs = {}
-) => {
-  const verifyToken = await verifyAccessToken()
-  if (!verifyToken) {
-    await getRefreshToken()
-  }
-
-  const token = getPersistedTokens().access
-
-  hdrs = { ...hdrs, Authorization: `Bearer ${token}` }
-  return await api(url, method, payload, hdrs)
-}
-
-export const verifyAccessToken = async () => {
-  let isValid = false
-
-  const manager = new FunctionCooldownManager('verifyAccessToken', 10000)
-  isValid = await manager.executeAsync(async () => {
-    let iV = false
-    const tokens = getPersistedTokens()
-    if (Object.keys(tokens).length) {
-      const res = await api('auth/token/verify', Method.POST, {
-        token: tokens.access
-      })
-      if (res.status == 200 && res.data) iV = res.data.isValid
-    }
-    return iV
-  })
-
-  return isValid
-}
-
-export const getRefreshToken = async () => {
-  const res = await api('auth/token/refresh', Method.POST, {
-    refresh: getPersistedTokens().refresh
-  })
-
-  const resCopy = { ...res }
-
-  if ((res.status = 200 && res.data)) {
-    // manually set tokens to localstorage
-    localStorage.setItem(LocalStorageKeys.ACCESS, res.data.access)
-    localStorage.setItem(LocalStorageKeys.REFRESH, res.data.refresh)
-    localStorage.setItem(
-      LocalStorageKeys.CURRENT_USER,
-      JSON.stringify(res.data.user)
-    )
-  }
-
-  return resCopy
-}
-
-export const getPersistedTokens = () => {
-  const access = localStorage.getItem(LocalStorageKeys.ACCESS)
-  const refresh = localStorage.getItem(LocalStorageKeys.REFRESH)
-
-  const token = {}
-  if (access) token.access = access
-  if (refresh) token.refresh = refresh
-
-  return token
 }

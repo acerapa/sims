@@ -24,7 +24,7 @@
             <input type="checkbox" class="input" />
             <p class="table-header">#</p>
           </div>
-          <p class="col-span-3 table-header">Name</p>
+          <p class="col-span-3 table-header">Item Description</p>
           <p class="col-span-1 table-header">Item Code</p>
           <p class="col-span-1 table-header text-end">Price</p>
           <p class="col-span-1 table-header text-end pr-2">Stock</p>
@@ -93,17 +93,14 @@
         </div>
       </template>
     </CustomTable>
-    <div class="cont min-w-80 h-fit !py-0">
-      <p class="my-3">📣 Alerts and Notifications</p>
-      <hr class="-mx-4" />
-      <p class="text-sm text-center my-6">No Alerts and Notifications</p>
-    </div>
+    <ProductNotification />
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import ProductModal from '@/components/product/ProductModal.vue'
+import ProductNotification from '@/components/Notification/ProductNotification.vue'
 import ProductRow from '@/components/product/ProductRow.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
@@ -191,7 +188,7 @@ const filteredData = computed(() => {
     )
     .filter((product) => {
       const searchCondition =
-        `${product.id} ${product.name} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
+        `${product.id} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
       return searchText.value
         ? searchCondition.includes(searchText.value.toLowerCase())
         : product

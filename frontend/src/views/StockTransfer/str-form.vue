@@ -45,7 +45,7 @@
               placeholder="Select Branch"
               label="Select Receiving Branch"
               v-model="model.transfer.branch_to"
-              :error="modelErrors.branch_to"
+              :error="errors.transfer?.branch_to"
               :error-has-text="true"
               :disabled="isCompleted || isCancelled"
             />
@@ -67,7 +67,7 @@
             name="memo"
             v-model="model.transfer.memo"
             placeholder="Write Something"
-            :error="modelErrors.memo"
+            :error="errors.transfer?.memo"
             :error-has-text="true"
             :disabled="isCompleted || isCancelled"
           />
@@ -79,7 +79,7 @@
             v-model="address"
             :has-label="true"
             :disabled="true"
-            :address-errors="modelErrors"
+            :address-errors="errors.address"
           />
         </div>
       </div>
@@ -162,7 +162,6 @@ import ProductSelectHeader from '@/components/stock-transfer/ProductSelectHeader
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { useAppStore } from '@/stores/app'
-import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
@@ -182,6 +181,8 @@ import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
 import { validateProductStocks } from '@/helper'
 import { useTableScroll } from '@/use/useTableScroll'
+import { useValidation } from '@/composables/useValidation'
+import { useAuth } from '@/composables/useAuth'
 
 const rowEventName = 'str-product-row'
 
@@ -189,7 +190,6 @@ const route = useRoute()
 const router = useRouter()
 const isEdit = ref(false)
 const appStore = useAppStore()
-const authStore = useAuthStore()
 const { startPrint } = usePrint()
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
@@ -197,7 +197,6 @@ const transferStore = useTransferStore()
 
 const productDefaultValue = {
   product_id: '',
-  description: '',
   quantity: '',
   cost: '',
   amount: ''
@@ -225,9 +224,16 @@ const defaultValue = {
 }
 
 const currentBranch = ref()
-const modelErrors = ref({ products: [] })
 const model = ref(ObjectHelpers.copyObj(defaultValue))
 const showConfirmModal = ref(false)
+
+// composables
+const { errors, hasErrors, validateData } = useValidation(
+  StockTransferCreateSchema,
+  model.value
+)
+
+const { getAuthUser } = useAuth()
 
 /** ================================================
  * EVENTS
@@ -305,9 +311,14 @@ const onSubmit = async (saveAndNew = false) => {
   clearInterval(timeInterval)
 
   // validate model
-  const { error } = StockTransferCreateSchema.validate(model.value, {
-    abortEarly: false
-  })
+  validateData()
+
+  if (hasErrors.value) {
+    if (errors.value?.products) {
+      Event.emit(rowEventName, errors.value.products)
+    }
+    return
+  }
 
   // validate products stocks availability
   const productAvailabilityError = validateProductStocks(
@@ -315,57 +326,31 @@ const onSubmit = async (saveAndNew = false) => {
     await productStore.getProducts()
   )
 
-  if (error) {
-    modelErrors.value.products = []
-
-    error.details.forEach((err) => {
-      if (err.path.includes('products')) {
-        modelErrors.value.products.push(err)
-      } else {
-        modelErrors.value[err.context.key] = err.message
-      }
-    })
-
-    modelErrors.value.products = Object.groupBy(
-      modelErrors.value.products,
-      (err) => err.path[1]
-    )
-
-    const keys = Object.keys(modelErrors.value.products)
-    keys.forEach((key) => {
-      let prdErr = {}
-      modelErrors.value.products[key].forEach((item) => {
-        prdErr[item.context.key] = item.message
-      })
-
-      modelErrors.value.products[key] = prdErr
-    })
-
-    // trigger event to show errors
-    Event.emit(rowEventName, modelErrors.value.products)
-    return
-  } else if (productAvailabilityError) {
+  if (productAvailabilityError) {
     // specific to product stocks availability
     // TEMPORARY SOLUTION
-    modelErrors.value.products = []
+    errors.value.products = []
     const idWithError = Object.keys(productAvailabilityError)
     model.value.products.forEach((p) => {
       if (idWithError.includes(p.product_id.toString())) {
-        modelErrors.value.products.push({
+        errors.value.products.push({
           quantity: productAvailabilityError[p.product_id]
         })
       } else {
-        modelErrors.value.products.push({})
+        errors.value.products.push({})
       }
     })
 
-    Event.emit(rowEventName, modelErrors.value.products)
+    Event.emit(rowEventName, errors.value.products)
     return
   }
 
   let isSuccess = false
   if (!isEdit.value) {
-    model.value.transfer.when = new Date()
+    model.value.transfer.when = DateHelpers.formatDate(
+      new Date(),
+      'YYYY-MM-DDTHH:II-A'
+    )
     isSuccess = await transferStore.createTransfer(model.value)
   } else {
     isSuccess = await transferStore.updateTransfer(model.value, route.query.id)
@@ -380,7 +365,7 @@ const onSubmit = async (saveAndNew = false) => {
     if (saveAndNew) {
       model.value = ObjectHelpers.copyObj(defaultValue)
       setCurrentBranch()
-      setProccessedBy()
+      await setProccessedBy()
     } else {
       if (!isEdit.value) {
         router.push({
@@ -416,8 +401,9 @@ const setCurrentBranch = () => {
   }
 }
 
-const setProccessedBy = () => {
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+const setProccessedBy = async () => {
+  const user = await getAuthUser()
+  model.value.transfer.processed_by = user?.id
 }
 
 const setSTRFromPageState = () => {
@@ -478,7 +464,7 @@ onMounted(async () => {
   setCurrentBranch()
 
   // set processed by
-  setProccessedBy()
+  await setProccessedBy()
 
   // set page state
   if (appStore.isPageExist(PageStateConst.STR_FORM)) {

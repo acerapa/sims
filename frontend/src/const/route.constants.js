@@ -17,7 +17,7 @@ export const PurchaseConst = Object.freeze({
   PURCHASE: 'purchase',
   PURCHASE_ORDER: 'purchase-order',
   PURCHASE_ORDER_FORM: 'purchase-order-form',
-  PURCHASE_RECEIVE_ORDER: 'purchase-receive-order',
+  PURCHASE_RECEIVING_ORDER: 'purchase-receiving-order',
   VENDORS: 'vendors'
 })
 
@@ -29,7 +29,8 @@ export const SalesConst = Object.freeze({
   ITEM_DETAILS: 'item-details',
   PAYMENT_METHODS: 'payment-methods',
   INVOICES: 'invoices',
-  INVOICE_FORM: 'invoice-form'
+  INVOICE_FORM: 'invoice-form',
+  DELIVERIES: 'deliveries'
 })
 
 export const TransferConst = Object.freeze({

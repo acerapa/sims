@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -7,14 +7,14 @@ export const useServiceStore = defineStore('service', () => {
   const service = ref(null)
 
   const fetchServices = async () => {
-    const res = await authenticatedApi('services')
+    const res = await api('services')
     if (res.status < 400) {
       services.value = res.data.services
     }
   }
 
   const fetchService = async (id) => {
-    const res = await authenticatedApi(`services/${id}`)
+    const res = await api(`services/${id}`)
     if (res.status < 400) {
       service.value = res.data.service
     }
@@ -37,11 +37,7 @@ export const useServiceStore = defineStore('service', () => {
   }
 
   const registerService = async (service) => {
-    const res = await authenticatedApi(
-      'services/register',
-      Method.POST,
-      service
-    )
+    const res = await api('services/register', Method.POST, service)
 
     const isSuccess = res.status < 400
 
@@ -57,7 +53,7 @@ export const useServiceStore = defineStore('service', () => {
   }
 
   const updateService = async (id, data) => {
-    const res = await authenticatedApi(`services/${id}`, Method.PUT, data)
+    const res = await api(`services/${id}`, Method.PUT, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {

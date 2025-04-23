@@ -93,6 +93,7 @@
       <!-- Table body -->
       <div
         class="flex flex-col gap-7 w-full pb-5 overflow-x-auto overflow-y-hidden"
+        :class="props.hasTools ? '' : '-mt-4'"
       >
         <!-- Default slot -->
         <slot></slot>

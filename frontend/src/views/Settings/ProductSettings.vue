@@ -1,14 +1,14 @@
 <template>
   <div>
     <ProductCategoryModal
-      v-model="pageState.showCategoyModal"
-      v-if="pageState.showCategoyModal"
-      :selected-id="pageState.selectedCategoryId"
+      v-model="showCategoryModal"
+      v-if="showCategoryModal"
+      :selected-id="selectedCategoryId"
     />
     <ProductPointModal
-      v-model="pageState.showReorderingModal"
-      v-if="pageState.showReorderingModal"
-      :selected-id="pageState.selectedReorderingId"
+      v-model="showReorderingPointModal"
+      v-if="showReorderingPointModal"
+      :selected-id="selectedReorderingId"
     />
     <div class="flex flex-col gap-6">
       <CustomTable
@@ -23,19 +23,17 @@
       >
         <template #table_header>
           <div class="grid grid-cols-5 gap-3 min-w-[430px]">
-            <div class="col-span-1 flex gap-3 items-center">
+            <div class="col-span-2 flex gap-3 items-center">
               <input type="checkbox" class="input" />
               <p class="table-header">#</p>
             </div>
-            <p class="table-header col-span-1">Points</p>
-            <p class="table-header col-span-3">Products</p>
+            <p class="table-header col-span-3">Points</p>
           </div>
         </template>
       </CustomTable>
       <CustomTable
         :has-add-btn="true"
         :has-pagination="true"
-        @view="onViewCategory"
         :has-check-box="false"
         title="Product Categories"
         class="w-[calc(100vw_-_328px)]"
@@ -60,7 +58,7 @@
   </div>
 </template>
 <script setup>
-import { computed, onMounted, reactive, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
 import ProductCategoryRow from '@/components/Settings/ProductCategoryRow.vue'
@@ -69,19 +67,14 @@ import CustomTable from '@/components/shared/CustomTable.vue'
 import ProductReorderingPointRow from '@/components/Settings/ProductReorderingPointRow.vue'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
-import { useAppStore } from '@/stores/app'
-import { ObjectHelpers } from 'shared'
-import { InventoryConst, SettingConst } from '@/const/route.constants'
-import { PageStateConst } from '@/const/state.constants'
 
-const appStore = useAppStore()
 const settingsStore = useSettingsStore()
-const pageState = reactive({
-  selectedCategoryId: -1,
-  showCategoyModal: false,
-  selectedReorderingId: -1,
-  showReorderingModal: false
-})
+
+const selectedReorderingId = ref(0)
+const showReorderingPointModal = ref(false)
+
+const selectedCategoryId = ref(0)
+const showCategoryModal = ref(false)
 
 /** ================================================
  * EVENTS
@@ -118,30 +111,23 @@ const filteredReorderingPoints = computed(() => {
  * METHODS
  ** ================================================*/
 const onViewCategory = (id) => {
-  pageState.selectedCategoryId = id
-  pageState.showCategoyModal = true
+  selectedCategoryId.value = id
+  showCategoryModal.value = true
 }
 
 const onViewReOrdering = (id) => {
-  pageState.selectedReorderingId = id
-  pageState.showReorderingModal = true
+  selectedReorderingId.value = id
+  showReorderingPointModal.value = true
 }
 
 const onNewReorderingPoint = () => {
-  pageState.selectedReorderingId = 0
-  pageState.showReorderingModal = true
+  selectedReorderingId.value = 0
+  showReorderingPointModal.value = true
 }
 
 const onNewProductCategory = () => {
-  pageState.selectedCategoryId = 0
-  pageState.showCategoyModal = true
-}
-
-const setProductSettingPageState = () => {
-  appStore.setPageState(PageStateConst.PRODUCT_SETTINGS, {
-    state: pageState,
-    route_scope: [SettingConst.PRODUCT_SETTINGS, InventoryConst.PRODUCT_FORM]
-  })
+  selectedCategoryId.value = 0
+  showCategoryModal.value = true
 }
 
 /** ================================================
@@ -152,39 +138,8 @@ onMounted(async () => {
   await settingsStore.getProductCategories()
   await settingsStore.fetchAllProductReorderingPoints()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
-
-  if (appStore.isPageExist(PageStateConst.PRODUCT_SETTINGS)) {
-    if (
-      !ObjectHelpers.compareObjects(
-        pageState,
-        appStore.pages[PageStateConst.PRODUCT_SETTINGS]
-      )
-    ) {
-      let {
-        selectedCategoryId,
-        selectedReorderingId,
-        showCategoyModal,
-        showReorderingModal
-      } = appStore.pages[PageStateConst.PRODUCT_SETTINGS].state
-
-      pageState.selectedCategoryId = selectedCategoryId
-      pageState.selectedReorderingId = selectedReorderingId
-      pageState.showCategoyModal = showCategoyModal
-      pageState.showReorderingModal = showReorderingModal
-    }
-  } else {
-    setProductSettingPageState()
-  }
 })
 
-/** ================================================
- * WATCHERS
- ** ================================================*/
-watch(
-  () => pageState,
-  () => {
-    setProductSettingPageState()
-  },
-  { deep: true }
-)
+// lower event listeners
+Event.on(EventEnum.PRODUCT_CATEGORY_ROW, onViewCategory)
 </script>

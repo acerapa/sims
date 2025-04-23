@@ -3,17 +3,7 @@
     <form @submit.prevent="onSubmit" class="flex flex-col gap-3">
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Basic Informations</p>
-        <div class="flex flex-col gap-2">
-          <CustomInput
-            type="text"
-            name="product_name"
-            placeholder="*Name"
-            v-model="model.product.name"
-            :error="modelErrors.name"
-            :error-has-text="true"
-            label="Name"
-            :has-label="true"
-          />
+        <div class="flex flex-col gap-3">
           <div class="flex gap-3">
             <CustomInput
               type="select"
@@ -28,7 +18,7 @@
               v-model="model.categories"
               label="Categories"
               :has-label="true"
-              :error="modelErrors.categories"
+              :error="errors.categories"
               :error-has-text="true"
             />
             <CustomInput
@@ -40,6 +30,7 @@
               label="Reordering Point"
               :options="reorderingPointsOptions"
               placeholder="Select re-ordering point"
+              @add-new="showProductPointModal = true"
               v-model="model.details.product_setting_id"
             />
           </div>
@@ -47,37 +38,37 @@
             <CustomInput
               type="select"
               class="flex-1"
+              :has-label="true"
               :has-add-new="true"
               name="income_account"
+              :error-has-text="true"
+              label="Income Account"
               :options="incomeAccounts"
-              v-model="model.product.income_account"
               @add-new="showAccountModal = true"
               placeholder="*Select Income Account"
-              label="Income Account"
-              :has-label="true"
-              :error="modelErrors.income_account"
-              :error-has-text="true"
+              v-model="model.product.income_account"
+              :error="errors.product?.income_account"
             />
             <CustomInput
               type="select"
               class="flex-1"
+              :has-label="true"
               :has-add-new="true"
               name="expense_account"
+              :error-has-text="true"
+              label="Expense Account"
               :options="expenseAccounts"
-              v-model="model.product.expense_account"
               @add-new="showAccountModal = true"
               placeholder="*Select Expense Account"
-              label="Expense Account"
-              :has-label="true"
-              :error="modelErrors.expense_account"
-              :error-has-text="true"
+              v-model="model.product.expense_account"
+              :error="errors.product?.expense_account"
             />
           </div>
         </div>
         <div class="flex flex-col gap-3">
           <p class="text-base font-semibold">Inventory and Sales information</p>
           <div class="flex gap-3">
-            <div class="flex flex-col gap-2 flex-1">
+            <div class="flex flex-col gap-5 flex-1">
               <CustomInput
                 type="number"
                 name="cost"
@@ -85,8 +76,8 @@
                 label="Cost Price"
                 :error-has-text="true"
                 placeholder="Cost Price"
-                :error="modelErrors.cost"
                 v-model="model.details.cost"
+                :error="errors.details?.cost"
                 :disabled="!model.details.is_manually_set_cost"
                 input-class="disabled:bg-gray-50 disabled:ring-1 disabled:ring-gray-200"
               />
@@ -105,10 +96,10 @@
               class="flex-1"
               :has-label="true"
               label="Sale Price"
-              v-model="model.product.price"
               :error-has-text="true"
               placeholder="Sale Price"
-              :error="modelErrors.price"
+              v-model="model.product.price"
+              :error="errors.product?.price"
             />
           </div>
           <div class="flex gap-3">
@@ -120,8 +111,8 @@
               name="quantity_in_stock"
               label="Quantity in stock"
               v-model="model.details.stock"
+              :error="errors.details?.stock"
               placeholder="Quantity in stock"
-              :error="modelErrors.quantity_in_stock"
             />
             <CustomInput
               type="text"
@@ -131,11 +122,19 @@
               :has-label="true"
               :error-has-text="true"
               placeholder="Item Code"
-              :error="modelErrors.item_code"
               v-model="model.details.item_code"
+              :error="errors.details?.item_code"
             />
           </div>
-          <div class="flex gap-3 items-start">
+          <CustomInput
+            type="checkbox"
+            :has-label="true"
+            v-model="isSameDescription"
+            name="is-the-same-description"
+            label="The same description?"
+            class="[&>div]:flex-row-reverse [&>div]:justify-end"
+          />
+          <div class="flex gap-3 items-end">
             <CustomInput
               :rows="5"
               class="flex-1"
@@ -144,10 +143,12 @@
               :error-has-text="true"
               name="purchase_description"
               label="Purchase Description"
-              placeholder="Purchase Description"
+              placeholder="*Purchase Description"
+              @input="onInputPurchaseDescription"
               v-model="model.details.purchase_description"
-              :error="modelErrors.purchase_description"
+              :error="errors.details?.purchase_description"
             />
+
             <CustomInput
               :rows="5"
               class="flex-1"
@@ -155,9 +156,10 @@
               :has-label="true"
               name="sale_description"
               label="Sales Description"
-              placeholder="Sales Description"
+              placeholder="*Sales Description"
+              @input="onInputSalesDescription"
               v-model="model.details.sales_description"
-              :error="modelErrors.sale_description"
+              :error="errors.details?.sales_description"
               :error-has-text="true"
             />
           </div>
@@ -169,7 +171,12 @@
           <MultiSelectTable
             :header-component="SupplierSelectHeader"
             :row-component="SupplierSelectRow"
+            :row-event-name="rowEventName"
             :format="productSupplier"
+            :row-props="{
+              preSelectedSups: preselectedSupplier,
+              selected: model.suppliers
+            }"
             v-model="model.suppliers"
           />
         </div>
@@ -203,6 +210,10 @@
     "
   />
   <AccountModal v-model="showAccountModal" v-if="showAccountModal" />
+  <ProductPointModal
+    v-model="showProductPointModal"
+    v-if="showProductPointModal"
+  />
   <DeleteConfirmModal
     :href="`products/${route.query.id}`"
     v-model="showConfirmationModal"
@@ -216,29 +227,48 @@ import Event from '@/event'
 import { computed, onMounted, ref, watch } from 'vue'
 import { EventEnum } from '@/data/event'
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { AccountTypes, ObjectHelpers, ProductStatus, ProductType } from 'shared'
+import {
+  AccountTypes,
+  ItemType,
+  ObjectHelpers,
+  ProductItemSchema,
+  ProductStatus
+} from 'shared'
 import { useSettingsStore } from '@/stores/settings'
+
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import AccountModal from '@/components/Settings/AccountModal.vue'
 import ProductCategoryModal from '@/components/Settings/ProductCategoryModal.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SupplierSelectRow from '@/components/product/SupplierSelectRow.vue'
 import SupplierSelectHeader from '@/components/product/SupplierSelectHeader.vue'
+import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
+
 import { useProductStore } from '@/stores/product'
 import { useRoute } from 'vue-router'
 import router from '@/router'
 import { ToastTypes } from '@/data/types'
 import { InventoryConst } from '@/const/route.constants'
+import { useValidation } from '@/composables/useValidation'
+import { useAppStore } from '@/stores/app'
+import { PageStateConst } from '@/const/state.constants'
+import { useRetainPageStateOnReload } from '@/composables/useRetainPageStateOnReload'
 
+// injections and stores
 const route = useRoute()
+const appStore = useAppStore()
 const settingStore = useSettingsStore()
 const productStore = useProductStore()
 
+// flags
 const showAccountModal = ref(false)
+const isSameDescription = ref(false)
 const showCategoryModal = ref(false)
+const showProductPointModal = ref(false)
 const showConfirmationModal = ref(false)
 
-Event.emit(EventEnum.IS_PAGE_LOADING, true)
+// data
+const itemCodeGenerated = ref('')
 
 const productSupplier = {
   supplier_id: '',
@@ -247,9 +277,8 @@ const productSupplier = {
 
 const model = ref({
   product: {
-    name: '',
     price: '',
-    type: ProductType.INVENTORY,
+    type: ItemType.INVENTORY,
     income_account: '',
     expense_account: ''
   },
@@ -267,7 +296,23 @@ const model = ref({
   categories: []
 })
 
-const modelErrors = ref({})
+const preselectedSupplier = ref([])
+
+// composables
+const { errors, validateData, hasErrors } = useValidation(
+  ProductItemSchema,
+  model.value
+)
+
+if (route.query.redirect) {
+  useRetainPageStateOnReload(PageStateConst.PURCHASE_ORDER_FORM, route.name)
+}
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+const rowEventName = 'product-supplier-row-event'
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 /** ================================================
  * COMPUTED
@@ -327,16 +372,38 @@ const reorderingPointsOptions = computed(() => {
  * METHODS
  ** ================================================*/
 const onSubmit = async () => {
-  Event.emit(EventEnum.IS_PAGE_LOADING, true)
   const data = { ...model.value }
   if (!data.details.product_setting_id) {
     data.details.product_setting_id = null
   }
+
+  // validate data
+  validateData()
+
+  if (hasErrors.value) {
+    Event.emit(rowEventName, errors.value.suppliers)
+    return
+  }
+
+  Event.emit(EventEnum.IS_PAGE_LOADING, true)
   let isSuccess = false
 
   if (route.query.id) {
     isSuccess = await productStore.updateProduct(route.query.id, data)
   } else {
+    // backend validation for product item code
+    if (model.value.details.item_code != itemCodeGenerated.value) {
+      const isItemCodeExists = await productStore.checkProductItemCodeExist(
+        model.value.details.item_code
+      )
+      if (isItemCodeExists) {
+        if (!errors.details) errors.value.details = {}
+        errors.value.details.item_code = 'Item code already exists!'
+
+        return
+      }
+    }
+
     isSuccess = await productStore.registerProduct(data)
   }
 
@@ -372,6 +439,23 @@ const onCancel = () =>
     name: route.query.redirect ? route.query.redirect : InventoryConst.PRODUCTS
   })
 
+const onInputPurchaseDescription = () => {
+  if (isSameDescription.value) {
+    model.value.details.sales_description =
+      model.value.details.purchase_description
+  }
+}
+
+const onInputSalesDescription = () => {
+  if (isSameDescription.value) {
+    model.value.details.purchase_description =
+      model.value.details.sales_description
+  }
+}
+
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
 onMounted(async () => {
   await settingStore.getAccounts()
   await settingStore.getReorderingPoints()
@@ -390,6 +474,14 @@ onMounted(async () => {
         product.product_details
       )
 
+      // product details description flags
+      if (
+        model.value.details.purchase_description ==
+        model.value.details.sales_description
+      ) {
+        isSameDescription.value = true
+      }
+
       model.value.categories = product.categories.map((cat) => cat.id)
       model.value.suppliers = product.suppliers.map((supplier) => {
         return {
@@ -400,6 +492,25 @@ onMounted(async () => {
     }
   } else {
     model.value.details.item_code = await productStore.getProductItemCode()
+    itemCodeGenerated.value = model.value.details.item_code // keeping a copy of the generated item code
+
+    // for now per-selected supplier only comes from purchase order
+    // That said, we'll just check if there's a purchase order form page state
+    if (appStore.isPageExist(PageStateConst.PURCHASE_ORDER_FORM)) {
+      const pageState = appStore.getPageState(
+        PageStateConst.PURCHASE_ORDER_FORM
+      )
+
+      preselectedSupplier.value.push(pageState.state.order.supplier_id)
+
+      // set to model manually
+      model.value.suppliers = preselectedSupplier.value.map((sup) => {
+        return {
+          supplier_id: sup,
+          cost: 0
+        }
+      })
+    }
   }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)

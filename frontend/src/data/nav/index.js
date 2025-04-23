@@ -54,7 +54,7 @@ export default [
         icon: outlineDot,
         includes_active: [
           PurchaseConst.PURCHASE_ORDER_FORM,
-          PurchaseConst.PURCHASE_RECEIVE_ORDER
+          PurchaseConst.PURCHASE_RECEIVING_ORDER
         ]
       },
       {
@@ -80,6 +80,11 @@ export default [
         route: SalesConst.INVOICES,
         icon: outlineDot,
         includes_active: [SalesConst.INVOICE_FORM]
+      },
+      {
+        text: 'Deliveries',
+        route: SalesConst.DELIVERIES,
+        icon: outlineDot
       },
       {
         text: 'Customers',

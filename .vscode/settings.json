@@ -1,6 +1,6 @@
 {
   "editor.tabSize": 2,
-  "editor.fontSize": 16,
+  "editor.fontSize": 14,
   "editor.insertSpaces": false,
   "path-autocomplete.pathMappings": {
     "@": "${workspaceFolder}/src"

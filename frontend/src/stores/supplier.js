@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
@@ -9,7 +9,7 @@ export const useVendorStore = defineStore('supplier', () => {
   const selectedSupplier = ref()
 
   const registerSupplier = async (data) => {
-    const res = await authenticatedApi('suppliers/register', Method.POST, data)
+    const res = await api('suppliers/register', Method.POST, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -24,7 +24,7 @@ export const useVendorStore = defineStore('supplier', () => {
   }
 
   const updateSupplier = async (id, data) => {
-    const res = await authenticatedApi(`suppliers/${id}`, Method.PUT, data)
+    const res = await api(`suppliers/${id}`, Method.PUT, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -51,14 +51,14 @@ export const useVendorStore = defineStore('supplier', () => {
   })
 
   const fetchAllSuppliers = async () => {
-    const res = await authenticatedApi('suppliers/all')
+    const res = await api('suppliers/all')
     if (res.status == 200) {
       suppliers.value = res.data.suppliers
     }
   }
 
   const fetchSupplierById = async (id) => {
-    const res = await authenticatedApi(`suppliers/${id}`)
+    const res = await api(`suppliers/${id}`)
     if (res.status == 200) {
       supplier.value = res.data.supplier
     }
@@ -80,6 +80,17 @@ export const useVendorStore = defineStore('supplier', () => {
     return suppliers.value
   }
 
+  const removeSupplier = async (id) => {
+    if (suppliers.value.length) {
+      const index = suppliers.value.findIndex((sup) => sup.id == id)
+      if (index != -1) {
+        suppliers.value.splice(index, 1)
+      }
+    } else {
+      await fetchAllSuppliers()
+    }
+  }
+
   return {
     supplier,
     suppliers,
@@ -89,6 +100,7 @@ export const useVendorStore = defineStore('supplier', () => {
     // methods
     getSuppliers,
     updateSupplier,
+    removeSupplier,
     getSupplierById,
     registerSupplier,
     fetchSupplierById,

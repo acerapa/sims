@@ -111,38 +111,48 @@ select.input {
 }
 
 /* Dev defined classes for special used */
-.purchase-status-open {
+.purchase-status-open,
+.invoice-partially-paid {
   color: var(--open);
   background-color: rgba(63, 131, 248, 0.2);
 }
 
-.purchase-status-confirmed {
+.purchase-status-confirmed,
+.delivery-status-pending,
+.invoice-unpaid {
   color: var(--warning);
   background-color: rgb(194, 120, 3, 0.2);
 }
 
 .purchase-status-completed,
-.done {
+.delivery-status-delivered,
+.done,
+.invoice-paid {
   color: var(--success);
   background-color: rgb(25, 190, 52, 0.2);
 }
 
-.purchase-status-cancelled {
+.purchase-status-cancelled,
+.delivery-status-cancelled,
+.invoice-overdue {
   color: var(--danger);
   background-color: var(--danger-20);
 }
 
-.draft {
+.draft,
+.invoice-failed {
   color: var(--draft);
   background-color: rgb(107, 114, 128, 0.2);
 }
 
-.sales-types-cash {
+.sales-types-one-time,
+.invoice-disputed {
   color: #008080;
   background-color: rgba(0, 128, 128, 0.2);
 }
 
-.sales-types-installment {
+.sales-types-installment,
+.invoice-refunded {
   color: #800080;
   background-color: rgba(128, 0, 128, 0.2);
 }

@@ -16,6 +16,25 @@ module.exports = {
     }
   },
 
+  ByType: async (req, res) => {
+    try {
+      const notifications = await Notification.findAll({
+        where: {
+          type: req.params.type,
+        },
+        order: [["createdAt", "DESC"]],
+      });
+
+      res.sendResponse(
+        { notifications },
+        "Notification fetched successfully",
+        200
+      );
+    } catch (error) {
+      res.sendError(error, "Error fetching notifications", 500);
+    }
+  },
+
   register: async (req, res) => {
     try {
       const data = req.body.valodated;

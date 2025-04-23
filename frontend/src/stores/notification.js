@@ -1,6 +1,6 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
-import { DateHelpers, NotificationStatus } from 'shared'
+import { DateHelpers, NotificationStatus, NotificationType } from 'shared'
 import { computed, ref } from 'vue'
 
 export const useNotificationStore = defineStore('notification', () => {
@@ -8,6 +8,10 @@ export const useNotificationStore = defineStore('notification', () => {
 
   const unreadNotification = computed(() =>
     notifications.value.filter((n) => n.status === NotificationStatus.UNREAD)
+  )
+
+  const productNotification = computed(() =>
+    notifications.value.filter((n) => n.type == NotificationType.PRODUCT)
   )
 
   const timeBasedNotif = computed(() => {
@@ -72,7 +76,7 @@ export const useNotificationStore = defineStore('notification', () => {
   })
 
   const fetchNotifications = async () => {
-    const res = await authenticatedApi('notifications/')
+    const res = await api('notifications/')
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -94,7 +98,7 @@ export const useNotificationStore = defineStore('notification', () => {
       route: notification.route
     }
 
-    const res = await authenticatedApi(
+    const res = await api(
       `notifications/${id}`,
       Method.PUT,
       notificationToUpdate
@@ -116,6 +120,7 @@ export const useNotificationStore = defineStore('notification', () => {
     notifications,
     timeBasedNotif,
     unreadNotification,
+    productNotification,
 
     notifFromSocket,
     fetchNotifications,

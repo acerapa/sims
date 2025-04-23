@@ -10,6 +10,10 @@ export const useAppStore = defineStore('app', () => {
     settingsStore.branches.find((branch) => branch.is_current)
   )
 
+  // Localstorage keys
+  const pageState = 'page-state'
+  const modalState = 'modal-state'
+
   const pages = ref({})
   const modals = ref({})
 
@@ -19,6 +23,14 @@ export const useAppStore = defineStore('app', () => {
 
   const setModalState = (modal, state) => {
     modals.value[modal] = state
+  }
+
+  const getPageState = (page) => {
+    return pages.value[page]
+  }
+
+  const getModalState = (modal) => {
+    return modals.value[modal]
   }
 
   const isPageExist = (page) => {
@@ -47,6 +59,17 @@ export const useAppStore = defineStore('app', () => {
     })
   }
 
+  // private methods
+  const getPageStateFromLS = () => {
+    const strPages = localStorage.getItem(pageState)
+    if (strPages) pages.value = JSON.parse(strPages)
+  }
+
+  const getModalStateFromLS = () => {
+    const strModals = localStorage.getItem(modalState)
+    if (strModals) modals.value = JSON.parse(strModals)
+  }
+
   const removePage = (page) => {
     delete pages.value[page]
   }
@@ -61,12 +84,12 @@ export const useAppStore = defineStore('app', () => {
     currentNav,
     currentBranch,
 
-    removePage,
-    removeModal,
     isPageExist,
     isModalExist,
     setPageState,
+    getPageState,
     setModalState,
+    getModalState,
     evaluatePageScopes,
     evaluateModalScopes
   }

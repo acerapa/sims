@@ -56,6 +56,7 @@
               <span class="text-xs font-thin">{{ notif.description }}</span>
             </div>
           </div>
+          <p v-if="!notifications.length">Nothing to show</p>
         </div>
       </div>
     </div>
@@ -77,7 +78,7 @@ import { storeToRefs } from 'pinia'
 const route = useRoute()
 const appStore = useAppStore()
 const notificationStore = useNotificationStore()
-const { timeBasedNotif } = storeToRefs(notificationStore)
+const { timeBasedNotif, notifications } = storeToRefs(notificationStore)
 
 const { socket } = useNotificationSocket()
 

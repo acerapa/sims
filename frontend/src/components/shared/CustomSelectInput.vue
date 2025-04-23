@@ -3,13 +3,17 @@
     class="flex flex-col relative"
     :class="props.disabled ? 'pointer-events-none' : ''"
   >
+    <!-- The normal select element -->
     <select
       class="input flex-1"
+      :class="[props.inputClass]"
+      :multiple="props.selectMultiple"
       v-model="selected"
       ref="select"
       v-if="!props.selectMultiple && !props.canSearch"
       :disabled="props.disabled"
       @change="emit('change')"
+      @focus="emit('focus')"
     >
       <option value="" v-if="props.placeholder" selected disabled>
         {{ props.placeholder }}
@@ -27,6 +31,7 @@
       </option>
     </select>
 
+    <!-- Can't select multiple element with search -->
     <div
       class="relative flex flex-col group"
       v-if="!props.selectMultiple && props.canSearch"
@@ -41,6 +46,7 @@
         ref="singleDropdown"
         v-model="search"
         :disabled="props.disabled"
+        @focus="emit('focus')"
         @blur="onBlurSelect"
       />
       <div
@@ -77,6 +83,7 @@
       </div>
     </div>
 
+    <!-- Can select multiple and can search too -->
     <div class="relative group z-10" tabindex="0">
       <div
         class="min-h-[38px] relative z-10"
@@ -137,7 +144,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 
-const emit = defineEmits(['addNew', 'change'])
+const emit = defineEmits(['addNew', 'change', 'focus'])
 
 const props = defineProps({
   placeholder: {
@@ -163,6 +170,10 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false
+  },
+  inputClass: {
+    type: String,
+    default: ''
   }
 })
 
@@ -229,6 +240,10 @@ watch(
       emit('addNew')
       selected.value = ''
       select.value.selectedIndex = 0
+    }
+
+    if (props.canSearch && val && !props.selectMultiple) {
+      search.value = getName(val)
     }
   }
 )

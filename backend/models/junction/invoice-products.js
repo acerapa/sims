@@ -1,24 +1,17 @@
 const { Model, DataTypes } = require("sequelize");
-const { sequelize } = require("../");
-const Invoice = require("../invoice");
 const Product = require("../product");
+const Invoice = require("../invoice");
+const { sequelize } = require("../");
 
-class InvoiceToProducts extends Model {}
+class InvoiceProducts extends Model {}
 
-InvoiceToProducts.init(
+InvoiceProducts.init(
   {
     id: {
       type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    invoice_id: {
-      type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: Invoice,
-        key: "id",
-      },
+      primaryKey: true,
+      autoIncrement: true,
     },
     product_id: {
       type: DataTypes.INTEGER,
@@ -28,9 +21,13 @@ InvoiceToProducts.init(
         key: "id",
       },
     },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: true,
+    invoice_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Invoice,
+        key: "id",
+      },
     },
     quantity: {
       type: DataTypes.INTEGER,
@@ -47,8 +44,8 @@ InvoiceToProducts.init(
   },
   {
     sequelize,
-    timestamps: true,
+    timestamps: false,
   }
 );
 
-module.exports = InvoiceToProducts;
+module.exports = InvoiceProducts;

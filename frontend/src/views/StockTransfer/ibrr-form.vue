@@ -51,8 +51,8 @@
               label="Str #"
               placeholder="Ex. 01"
               :error-has-text="true"
-              :error="modelErrors.str_id"
               v-model="model.transfer.str_id"
+              :error="errors.transfer?.str_id"
               :disabled="isCancelled || isCompleted"
             />
             <CustomInput
@@ -64,8 +64,8 @@
               :error-has-text="true"
               :options="branchOptions"
               placeholder="Select Branch"
-              :error="modelErrors.branch_from"
               v-model="model.transfer.branch_from"
+              :error="errors.transfer?.branch_from"
               :disabled="isCancelled || isCompleted"
             />
           </div>
@@ -164,7 +164,6 @@ import { ToastTypes } from '@/data/types'
 import Event from '@/event'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { useAppStore } from '@/stores/app'
-import { useAuthStore } from '@/stores/auth'
 import { useProductStore } from '@/stores/product'
 import { useSettingsStore } from '@/stores/settings'
 import { useTransferStore } from '@/stores/transfer'
@@ -179,6 +178,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PageStateConst } from '@/const/state.constants'
 import { useTableScroll } from '@/use/useTableScroll'
+import { useValidation } from '@/composables/useValidation'
+import { useAuth } from '@/composables/useAuth'
 
 const ibrrEventName = 'ibrr-product-row'
 
@@ -187,7 +188,6 @@ const isEdit = ref(false)
 const router = useRouter()
 const currentBranch = ref()
 const appStore = useAppStore()
-const authStore = useAuthStore()
 const showConfirmModal = ref(false)
 const productStore = useProductStore()
 const settingStore = useSettingsStore()
@@ -195,7 +195,6 @@ const transferStore = useTransferStore()
 
 const productDefaultValue = {
   product_id: '',
-  description: '',
   cost: '',
   quantity: '',
   amount: ''
@@ -217,8 +216,6 @@ const defaultValue = {
 
 const model = ref(ObjectHelpers.copyObj(defaultValue))
 
-const modelErrors = ref({})
-
 const address = ref({
   address1: '',
   address2: '',
@@ -226,6 +223,13 @@ const address = ref({
   city: '',
   postal: ''
 })
+
+const { errors, hasErrors, validateData } = useValidation(
+  StockTransferCreateSchema,
+  model.value
+)
+const { getAuthUser } = useAuth()
+
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -295,38 +299,12 @@ const onSubmit = async (saveAndNew) => {
   clearInterval(timeInterval)
 
   // validate model
-  const { error } = StockTransferCreateSchema.validate(model.value, {
-    abortEarly: false
-  })
+  validateData()
 
-  if (error) {
-    modelErrors.value.products = []
-
-    error.details.forEach((err) => {
-      if (err.path.includes('products')) {
-        modelErrors.value.products.push(err)
-      } else {
-        modelErrors.value[err.context.key] = err.message
-      }
-    })
-
-    modelErrors.value.products = Object.groupBy(
-      modelErrors.value.products,
-      (err) => err.path[1]
-    )
-
-    const keys = Object.keys(modelErrors.value.products)
-    keys.forEach((key) => {
-      let prdErr = {}
-      modelErrors.value.products[key].forEach((item) => {
-        prdErr[item.context.key] = item.message
-      })
-
-      modelErrors.value.products[key] = prdErr
-    })
-
-    // trigger event to show error
-    Event.emit(ibrrEventName, modelErrors.value.products)
+  if (hasErrors.value) {
+    if (errors.value?.products) {
+      Event.emit(ibrrEventName, errors.value.products)
+    }
     return
   }
 
@@ -343,7 +321,7 @@ const onSubmit = async (saveAndNew) => {
     if (saveAndNew) {
       model.value = ObjectHelpers.copyObj(defaultValue)
       setCurrentBranch()
-      setProccessedBy()
+      await setProccessedBy()
     } else {
       if (!isEdit.value) {
         router.push({ name: TransferConst.IBRR_LIST })
@@ -373,8 +351,9 @@ const setCurrentBranch = () => {
   }
 }
 
-const setProccessedBy = () => {
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+const setProccessedBy = async () => {
+  const user = await getAuthUser()
+  model.value.transfer.processed_by = user?.id
 }
 
 const setIBRRFormPageState = () => {
@@ -427,7 +406,7 @@ onMounted(async () => {
   setCurrentBranch()
 
   // set proccessed by
-  setProccessedBy()
+  await setProccessedBy()
 
   // set page state
   if (appStore.isPageExist(PageStateConst.IBRR_FORM)) {

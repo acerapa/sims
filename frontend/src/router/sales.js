@@ -55,7 +55,7 @@ export default [
       {
         path: '/invoices',
         name: SalesConst.INVOICES,
-        component: () => import('@/views/sales/Invoice.vue'),
+        component: () => import('@/views/sales/invoice/Invoice.vue'),
         meta: {
           requiresAuth: true
         }
@@ -63,7 +63,15 @@ export default [
       {
         path: '/invoice-form',
         name: SalesConst.INVOICE_FORM,
-        component: () => import('@/views/sales/InvoiceForm.vue'),
+        component: () => import('@/views/sales/invoice/InvoiceForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/deliveries',
+        name: SalesConst.DELIVERIES,
+        component: () => import('@/views/sales/Delivery.vue'),
         meta: {
           requiresAuth: true
         }

@@ -18,6 +18,7 @@ export function validateProductStocks(productsModel, products) {
 
   productsModel.forEach((pm) => {
     if (
+      productsInvolve.length > 0 &&
       pm.quantity > productsInvolve.find((p) => p.id == pm.product_id).stock
     ) {
       errors[pm.product_id] = 'Not enough stock'
@@ -25,4 +26,9 @@ export function validateProductStocks(productsModel, products) {
   })
 
   return Object.keys(errors).length > 0 ? errors : null
+}
+
+export function checkAddressIfHasValues(address) {
+  const values = Object.values(address)
+  return values.some((v) => v)
 }

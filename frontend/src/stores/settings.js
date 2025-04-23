@@ -1,6 +1,13 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
+import { ObjectHelpers } from 'shared'
 import { ref } from 'vue'
+
+const ProductCategoryAction = {
+  CREATE: 'create',
+  UPDATE: 'update',
+  DELETE: 'delete'
+}
 
 export const useSettingsStore = defineStore('settings', () => {
   const productCategories = ref([])
@@ -11,33 +18,8 @@ export const useSettingsStore = defineStore('settings', () => {
   /*
    * PRODUCT REORDERING POINTS METHODS START
    */
-  const regulateProductReordering = (pointReordering) => {
-    const newPointProducts = pointReordering.product_details.map(
-      (pd) => pd.product.id
-    )
-
-    productReorderingPoints.value.forEach((prp) => {
-      newPointProducts.forEach((pointProduct) => {
-        if (prp.product_details.length) {
-          if (
-            prp.product_details
-              .map((pd) => pd.product.id)
-              .includes(pointProduct)
-          ) {
-            const index = prp.product_details.findIndex(
-              (pd) => pd.product.id == pointProduct
-            )
-            if (index > -1) {
-              prp.product_details.splice(index, 1)
-            }
-          }
-        }
-      })
-    })
-  }
-
   const fetchAllProductReorderingPoints = async () => {
-    const res = await authenticatedApi('product-setting/all')
+    const res = await api('product-setting/all')
     if (res.status == 200) {
       productReorderingPoints.value = res.data.productReorderingPoints
     }
@@ -54,38 +36,29 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const registerReorderingPoint = async (model) => {
-    const res = await authenticatedApi(
-      'product-setting/register',
-      Method.POST,
-      model
-    )
+    const res = await api('product-setting/register', Method.POST, model)
 
     const isSuccess = res.status < 400
     if (isSuccess) {
       if (productReorderingPoints.value.length) {
-        regulateProductReordering(res.data.point)
-
         productReorderingPoints.value.unshift(res.data.point)
       } else {
         await fetchAllProductCategories()
       }
     }
 
-    return isSuccess
+    return {
+      is_success: isSuccess,
+      data: res.data
+    }
   }
 
   const updateReorderingPoint = async (id, model) => {
-    const res = await authenticatedApi(
-      `product-setting/${id}`,
-      Method.PUT,
-      model
-    )
+    const res = await api(`product-setting/${id}`, Method.PUT, model)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
       if (productReorderingPoints.value.length) {
-        regulateProductReordering(res.data.point)
-
         const index = productReorderingPoints.value.findIndex(
           (prp) => prp.id == id
         )
@@ -97,7 +70,10 @@ export const useSettingsStore = defineStore('settings', () => {
       }
     }
 
-    return isSuccess
+    return {
+      is_success: isSuccess,
+      data: res.data
+    }
   }
 
   /*
@@ -108,12 +84,21 @@ export const useSettingsStore = defineStore('settings', () => {
    * PRODUCT CATEGORIES METHODS START
    */
   const fetchAllProductCategories = async () => {
-    const res = await authenticatedApi('product-category/all')
+    const res = await api('product-category/all')
     if (res.status == 200) {
       productCategories.value = res.data.categories
     }
 
     return res.data.categories
+  }
+
+  const fetchProductCategory = async (id) => {
+    let category = null
+    const res = await api(`product-category/${id}`)
+    if (res.status < 400) {
+      category = res.data.category
+    }
+    return category
   }
 
   const getProductCategories = async () => {
@@ -124,16 +109,25 @@ export const useSettingsStore = defineStore('settings', () => {
     return productCategories.value
   }
 
-  const getProductCategoryByIdSync = (id) => {
-    return productCategories.value.find((cat) => cat.id == id)
-  }
-
-  const getProductCategoryByIdAsync = async (id) => {
-    let category = getProductCategoryByIdSync(id)
-
-    if (!category) {
+  const findCategoryInHierarchy = async (id) => {
+    if (!productCategories.value.length) {
       await fetchAllProductCategories()
-      category = getProductCategoryByIdSync(id)
+    }
+
+    // inner function to find category in hierarchy
+    const findCategory = (categories, id) => {
+      for (const cat of categories) {
+        if (cat.id == id) {
+          return cat
+        } else if (cat.sub_categories) {
+          return findCategory(cat.sub_categories, id)
+        }
+      }
+    }
+
+    let category = findCategory(productCategories.value, id)
+    if (!category) {
+      category = await fetchProductCategory(id)
     }
 
     return category
@@ -153,55 +147,119 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const registerProductCategory = async (model) => {
-    const res = await authenticatedApi(
-      'product-category/register',
-      Method.POST,
-      model
-    )
+    const res = await api('product-category/register', Method.POST, model)
 
     const isSuccess = res.status < 400
     if (isSuccess) {
-      if (productCategories.value.length) {
-        productCategories.value.unshift(res.data.category)
-      } else {
-        await fetchAllProductCategories()
-      }
+      await handleCategoryAction(
+        res.data.category,
+        ProductCategoryAction.CREATE
+      )
     }
 
     return isSuccess
   }
 
   const updateProductCategory = async (id, model) => {
-    const res = await authenticatedApi(
-      `product-category/${id}`,
-      Method.PUT,
-      model
-    )
+    const res = await api(`product-category/${id}`, Method.PUT, model)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
-      if (productCategories.value.length) {
-        const index = productCategories.value.findIndex((pc) => pc.id == id)
-        if (index > -1) {
-          productCategories.value[index] = res.data.category
-        }
-      } else {
-        await fetchAllProductCategories()
-      }
+      await handleCategoryAction(
+        res.data.category,
+        ProductCategoryAction.UPDATE
+      )
     }
 
     return isSuccess
   }
 
-  const removeProductCategory = async (id) => {
-    if (productCategories.value.length) {
-      const index = productCategories.value.findIndex((pc) => pc.id == id)
-      if (index > -1) {
-        productCategories.value.splice(index, 1)
+  const removeProductCategory = async (category) => {
+    await handleCategoryAction(category, ProductCategoryAction.DELETE)
+  }
+
+  // private product category methods
+
+  /**
+   * Handles actions on product categories, either at the root level or within nested subcategories
+   * @param {Object} category - The product category to create, update, or delete
+   * @param {ProductCategoryAction} [action=ProductCategoryAction.CREATE] - The type of action to perform on the category
+   * @returns {Promise<void>} A promise that resolves when the category action is complete
+   */
+  const handleCategoryAction = async (
+    category,
+    action = ProductCategoryAction.CREATE
+  ) => {
+    if (!productCategories.value.length) {
+      await fetchAllProductCategories()
+      return
+    }
+
+    if (!category.general_cat) {
+      switch (action) {
+        case ProductCategoryAction.CREATE:
+          productCategories.value.unshift(category)
+          break
+        case ProductCategoryAction.UPDATE:
+          const index = productCategories.value.findIndex(
+            (pc) => pc.id == category.id
+          )
+          if (index > -1) {
+            productCategories.value[index] = ObjectHelpers.assignSameFields(
+              productCategories.value[index],
+              category
+            )
+          }
+          break
+        case ProductCategoryAction.DELETE:
+          productCategories.value = productCategories.value.filter(
+            (pc) => pc.id != category.id
+          )
+          break
       }
     } else {
-      await fetchAllProductCategories()
+      applyCategoryAction(productCategories.value, category, action)
     }
+  }
+
+  /**
+   * Recursively applies an action (create, update, or delete) to a nested category structure
+   * @param {Array} categories - The list of categories to search and modify
+   * @param {Object} category - The category to be created, updated, or deleted
+   * @param {ProductCategoryAction} action - The type of action to perform on the category
+   */
+  const applyCategoryAction = (categories, category, action) => {
+    categories.forEach((cat) => {
+      if (cat.id == category.general_cat) {
+        switch (action) {
+          case ProductCategoryAction.CREATE:
+            if (cat.sub_categories) {
+              cat.sub_categories = [category, ...cat.sub_categories]
+            } else {
+              cat.sub_categories = [category]
+            }
+            break
+          case ProductCategoryAction.UPDATE:
+            const index = cat.sub_categories.findIndex(
+              (sc) => sc.id == category.id
+            )
+            if (index > -1) {
+              cat.sub_categories[index] = ObjectHelpers.assignSameFields(
+                cat.sub_categories[index],
+                category
+              )
+            }
+            break
+          case ProductCategoryAction.DELETE:
+            cat.sub_categories = cat.sub_categories.filter(
+              (sc) => sc.id != category.id
+            )
+            break
+        }
+      } else if (cat.sub_categories) {
+        applyCategoryAction(cat.sub_categories, category, action)
+      }
+    })
   }
 
   /*
@@ -220,7 +278,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const fetchAllAccounts = async () => {
-    const res = await authenticatedApi('settings/accounts/all')
+    const res = await api('settings/accounts/all')
     if (res.status == 200) {
       accounts.value = res.data.accounts
     }
@@ -228,11 +286,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const createAccount = async (data) => {
-    const res = await authenticatedApi(
-      'settings/accounts/register',
-      Method.POST,
-      data
-    )
+    const res = await api('settings/accounts/register', Method.POST, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -247,11 +301,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const updateAccount = async (id, data) => {
-    const res = await authenticatedApi(
-      `settings/accounts/${id}`,
-      Method.PUT,
-      data
-    )
+    const res = await api(`settings/accounts/${id}`, Method.PUT, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -282,7 +332,7 @@ export const useSettingsStore = defineStore('settings', () => {
    * BRANCHES METHODS START
    */
   const fetchAllBranches = async () => {
-    const res = await authenticatedApi('branch/all')
+    const res = await api('branch/all')
 
     if (res.status == 200) {
       branches.value = res.data.branches
@@ -296,7 +346,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const createBranch = async (model) => {
-    const res = await authenticatedApi('branch/register', Method.POST, model)
+    const res = await api('branch/register', Method.POST, model)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -311,11 +361,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   const updateBranch = async (id, model) => {
-    const res = await authenticatedApi(
-      `branch/update/${id}`,
-      Method.POST,
-      model
-    )
+    const res = await api(`branch/update/${id}`, Method.POST, model)
 
     const isSuccess = res.status < 400
 
@@ -342,6 +388,19 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
+  const getCurrentBranch = async () => {
+    let current = branches.value.find((b) => b.is_current)
+    if (!current) {
+      const res = await api('branch/current')
+      if (res.status < 400) {
+        current = res.data.branch
+        branches.value.push(current)
+      }
+    }
+
+    return current
+  }
+
   /*
    * BRANCHES METHODS END
    */
@@ -363,16 +422,16 @@ export const useSettingsStore = defineStore('settings', () => {
     categoryOption,
     fetchAllBranches,
     fetchAllAccounts,
+    getCurrentBranch,
     getReorderingPoints,
     getProductCategories,
     updateProductCategory,
     removeProductCategory,
     updateReorderingPoint,
     registerProductCategory,
+    findCategoryInHierarchy,
     registerReorderingPoint,
     fetchAllProductCategories,
-    getProductCategoryByIdSync,
-    getProductCategoryByIdAsync,
     fetchAllProductReorderingPoints
   }
 })

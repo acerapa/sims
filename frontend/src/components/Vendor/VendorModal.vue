@@ -19,7 +19,7 @@
             :has-label="true"
             label="Company Name"
             :error-has-text="true"
-            :error="modelErrors.company_name"
+            :error="errors.vendor?.company_name"
             v-model="model.vendor.company_name"
           />
           <CustomInput
@@ -30,7 +30,7 @@
             label="Annotation"
             :error-has-text="true"
             v-model="model.vendor.annotation"
-            :error="modelErrors.annotation"
+            :error="errors.vendor?.annotation"
             placeholder="Select annotation"
             :options="[
               { text: 'Mr.', value: 'Mr.' },
@@ -48,7 +48,7 @@
             label="First Name"
             :error-has-text="true"
             placeholder="First Name"
-            :error="modelErrors.first_name"
+            :error="errors.vendor?.first_name"
             v-model="model.vendor.first_name"
           />
           <CustomInput
@@ -59,7 +59,7 @@
             label="Last Name"
             :error-has-text="true"
             placeholder="Last Name"
-            :error="modelErrors.last_name"
+            :error="errors.vendor?.last_name"
             v-model="model.vendor.last_name"
           />
         </div>
@@ -75,7 +75,7 @@
             label="Phone"
             :has-label="true"
             :error-has-text="true"
-            :error="modelErrors.phone"
+            :error="errors.vendor?.phone"
             placeholder="Mobile Number"
             v-model="model.vendor.phone"
           />
@@ -87,7 +87,7 @@
             :has-label="true"
             :error-has-text="true"
             placeholder="Telephone Number"
-            :error="modelErrors.telephone"
+            :error="errors.vendor?.telephone"
             v-model="model.vendor.telephone"
           />
         </div>
@@ -100,7 +100,7 @@
             :has-label="true"
             placeholder="Email"
             :error-has-text="true"
-            :error="modelErrors.email"
+            :error="errors.vendor?.email"
             v-model="model.vendor.email"
           />
           <CustomInput
@@ -111,7 +111,7 @@
             :has-label="true"
             placeholder="Fax"
             :error-has-text="true"
-            :error="modelErrors.fax"
+            :error="errors.vendor?.fax"
             v-model="model.vendor.fax"
           />
         </div>
@@ -121,7 +121,7 @@
           name="fb_profile"
           class="w-[50%-12px]"
           :error-has-text="true"
-          :error="modelErrors.fb_profile"
+          :error="errors.vendor?.fb_profile"
           v-model="model.vendor.fb_profile"
           label="Facebook\Messenger Profile"
           placeholder="Facebook/Messenger Profile"
@@ -133,7 +133,7 @@
         <AddressForm
           :has-label="true"
           v-model="model.address"
-          :address-errors="modelErrors"
+          :address-errors="errors"
         />
       </div>
     </div>
@@ -158,6 +158,7 @@ import { ObjectHelpers } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { useValidation } from '@/composables/useValidation'
 
 const showModal = defineModel()
 const showDeleteConfirmModal = ref(false)
@@ -173,9 +174,7 @@ const supplierStore = useVendorStore()
 const title = ref(
   props.selectedId ? 'Edit Vendor/Supplier' : 'New Vendor/Supplier'
 )
-const apiPath = ref(
-  props.selectedId ? `suppliers/${props.selectedId}` : 'suppliers/register'
-)
+
 const model = ref({
   vendor: {
     company_name: '',
@@ -197,20 +196,19 @@ const model = ref({
   }
 })
 
-const modelErrors = ref({})
+// composables
+const { errors, hasErrors, validateData } = useValidation(
+  VendorCreateSchema,
+  model.value
+)
 
+/** ================================================
+ * METHODS
+ ** ================================================*/
 const onSubmit = async () => {
   // validation
-  const { error } = VendorCreateSchema.validate(model.value, {
-    abortEarly: false
-  })
-
-  if (error) {
-    error.details.forEach((err) => {
-      modelErrors.value[err.context.key] = err.message
-    })
-    return
-  }
+  validateData()
+  if (hasErrors.value) return
 
   let isSuccess = false
   if (props.selectedId) {
@@ -240,9 +238,12 @@ const onSubmit = async () => {
 
 const onAfterDelete = async () => {
   showModal.value = false
-  await supplierStore.fetchAllSuppliers()
+  await supplierStore.removeSupplier(props.selectedId)
 }
 
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
 onMounted(async () => {
   if (props.selectedId) {
     const supplier = await supplierStore.getSupplierById(props.selectedId)

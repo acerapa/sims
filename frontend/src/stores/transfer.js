@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { TransferType } from 'shared/enums'
 import { computed, ref } from 'vue'
@@ -24,7 +24,7 @@ export const useTransferStore = defineStore('tranfer', function () {
   })
 
   const fetchTransfers = async () => {
-    const res = await authenticatedApi(`stock-transfer`)
+    const res = await api(`stock-transfer`)
 
     if (res.status == 200) {
       transfers.value = res.data.transfers
@@ -40,11 +40,7 @@ export const useTransferStore = defineStore('tranfer', function () {
   }
 
   const createTransfer = async (model) => {
-    const res = await authenticatedApi(
-      `stock-transfer/register`,
-      Method.POST,
-      model
-    )
+    const res = await api(`stock-transfer/register`, Method.POST, model)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -59,11 +55,7 @@ export const useTransferStore = defineStore('tranfer', function () {
   }
 
   const updateTransfer = async (model, id) => {
-    const res = await authenticatedApi(
-      `stock-transfer/${id}`,
-      Method.PUT,
-      model
-    )
+    const res = await api(`stock-transfer/${id}`, Method.PUT, model)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -87,7 +79,7 @@ export const useTransferStore = defineStore('tranfer', function () {
   }
 
   const fetchById = async (id) => {
-    const res = await authenticatedApi(`stock-transfer/${id}`)
+    const res = await api(`stock-transfer/${id}`)
 
     if (res.status == 200) {
       transfer.value = res.data.transfer

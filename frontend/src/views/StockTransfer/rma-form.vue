@@ -42,8 +42,8 @@
             label="Select supplier"
             :options="supplierOptions"
             placeholder="Select supplier"
-            :error="modelErrors.supplier_id"
             v-model="model.transfer.supplier_id"
+            :error="errors.transfer?.supplier_id"
             :disabled="isCompleted || isCancelled"
           />
           <CustomInput
@@ -157,7 +157,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import { useAppStore } from '@/stores/app'
 import { useSettingsStore } from '@/stores/settings'
-import { useAuthStore } from '@/stores/auth'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import {
@@ -170,6 +169,8 @@ import { InventoryConst, TransferConst } from '@/const/route.constants'
 import { PageStateConst } from '@/const/state.constants'
 import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
 import { useTableScroll } from '@/use/useTableScroll'
+import { useValidation } from '@/composables/useValidation'
+import { useAuth } from '@/composables/useAuth'
 
 const rowEventName = 'rma-product-event'
 
@@ -178,7 +179,6 @@ const isEdit = ref(false)
 const router = useRouter()
 const appStore = useAppStore()
 const currentBranch = ref(null)
-const authStore = useAuthStore() // this is temporary
 const showConfirmModal = ref(false)
 const transferStore = useTransferStore()
 const settingsStore = useSettingsStore() // this is temporaru
@@ -194,7 +194,6 @@ const address = ref({
 
 const productDefaultValue = {
   product_id: '',
-  description: '',
   quantity: '',
   serial_number: '',
   problem: '',
@@ -218,7 +217,22 @@ const defualtValue = {
 }
 
 const model = ref(ObjectHelpers.copyObj(defualtValue))
-const modelErrors = ref({})
+
+// modify validation schema
+const RMAProductSchema = ProductTransferSchema.keys({
+  serial_number: Joi.string().required(),
+  problem: Joi.string().required()
+})
+const StockTransferSchema = StockTransferCreateSchema.keys({
+  products: Joi.array().items(RMAProductSchema).required()
+})
+
+const { errors, hasErrors, validateData } = useValidation(
+  StockTransferSchema,
+  model.value
+)
+
+const { getAuthUser } = useAuth()
 
 /** ================================================
  * EVENTS
@@ -272,47 +286,11 @@ const populateAddress = () => {
 
 const onSubmit = async (saveAndNew) => {
   // validate model
-  // modify validation schema
-  const RMAProductSchema = ProductTransferSchema.keys({
-    serial_number: Joi.string().required(),
-    problem: Joi.string().required()
-  })
-  const StockTransferSchema = StockTransferCreateSchema.keys({
-    products: Joi.array().items(RMAProductSchema).required()
-  })
-
-  const { error } = StockTransferSchema.validate(model.value, {
-    abortEarly: false
-  })
-
-  if (error) {
-    modelErrors.value.products = []
-
-    error.details.forEach((err) => {
-      if (err.path.includes('products')) {
-        modelErrors.value.products.push(err)
-      } else {
-        modelErrors.value[err.context.key] = err.message
-      }
-    })
-
-    modelErrors.value.products = Object.groupBy(
-      modelErrors.value.products,
-      (err) => err.path[1]
-    )
-
-    const keys = Object.keys(modelErrors.value.products)
-    keys.forEach((key) => {
-      let prdErr = {}
-      modelErrors.value.products[key].forEach((item) => {
-        prdErr[item.context.key] = item.message
-      })
-
-      modelErrors.value.products[key] = prdErr
-    })
-
-    // trigger event to show errors
-    Event.emit(rowEventName, modelErrors.value.products)
+  validateData()
+  if (hasErrors.value) {
+    if (errors.value?.products) {
+      Event.emit(rowEventName, errors.value.products)
+    }
     return
   }
 
@@ -332,7 +310,7 @@ const onSubmit = async (saveAndNew) => {
     if (saveAndNew) {
       model.value = ObjectHelpers.copyObj(defualtValue)
       setCurrentBranch()
-      setProccessedBy()
+      await setProccessedBy()
     } else {
       router.push({
         name: TransferConst.RMA_LIST
@@ -364,8 +342,9 @@ const setCurrentBranch = () => {
     : ''
 }
 
-const setProccessedBy = () => {
-  model.value.transfer.processed_by = authStore.getAuthUser().id
+const setProccessedBy = async () => {
+  const user = await getAuthUser()
+  model.value.transfer.processed_by = user?.id
 }
 
 const setRMAFormPageState = () => {
@@ -388,7 +367,7 @@ onMounted(async () => {
   setCurrentBranch()
 
   // set proccessed by
-  setProccessedBy()
+  await setProccessedBy()
 
   if (route.query.id) {
     const rma = await transferStore.getById(route.query.id)

@@ -1,30 +1,72 @@
 <template>
   <div class="cont flex flex-col gap-5">
-    <div class="flex gap-3 max-lg:flex-col">
+    <div class="flex justify-between items-center py-3">
+      <h1 class="text-2xl font-bold">Sales Order</h1>
+      <CustomInput
+        type="date"
+        :has-label="true"
+        name="purchase_date"
+        label="Purchase Date:"
+        :error-has-text="true"
+        v-model="model.sales_order.purchase_date"
+        :error="errors.sales_order?.purchase_date"
+        class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
+      />
+    </div>
+    <hr />
+    <div class="flex justify-between items-center">
+      <p class="text-lg font-normal mb-1">Sales Order Information</p>
+      <div class="flex gap-3 items-center" v-if="isEdit">
+        <SelectStatusDropdown
+          v-model="model.sales_order.status"
+          :status-map="SalesOrderStatusMap"
+        />
+        <button class="btn-green">Generate Invoice</button>
+      </div>
+    </div>
+    <div class="flex flex-col gap-4 py-4">
+      <div class="flex gap-3">
+        <CustomInput
+          label="From"
+          type="select"
+          name="user_id"
+          class="flex-1"
+          :has-label="true"
+          :can-search="true"
+          :has-add-new="true"
+          :error-has-text="true"
+          placeholder="Prepared By"
+          :options="employeeOptions"
+          v-model="model.sales_order.user_id"
+          @add-new="showEmployeeModal = true"
+          :error="errors.sales_order?.user_id"
+        />
+        <CustomInput
+          type="select"
+          class="flex-1"
+          label="Customer"
+          :has-label="true"
+          :has-add-new="true"
+          name="customer_id"
+          :can-search="true"
+          :error-has-text="true"
+          :options="customerOptions"
+          placeholder="Select Customer"
+          @add-new="showCustomerModel = true"
+          v-model="model.sales_order.customer_id"
+          :error="errors.sales_order?.customer_id"
+          :disabled="route.query.id ? true : false"
+        />
+      </div>
       <div class="flex flex-col gap-3 flex-1">
-        <p class="font-semibold mb-1">Sales Order Information</p>
         <div class="flex gap-3">
-          <CustomInput
-            type="select"
-            class="flex-1"
-            :has-label="true"
-            :has-add-new="true"
-            name="customer_id"
-            :error-has-text="true"
-            label="Select Customer"
-            :options="customerOptions"
-            placeholder="Select Customer"
-            :error="modelErrors.customer_id"
-            v-model="model.sales_order.customer_id"
-            @add-new="showCustomerModel = true"
-          />
           <CustomInput
             type="select"
             class="flex-1"
             :options="[
               {
-                text: 'Cash',
-                value: SalesOrderType.CASH
+                text: 'One-Time',
+                value: SalesOrderType.ONE_TIME
               },
               {
                 text: 'Installment',
@@ -34,45 +76,10 @@
             :has-label="true"
             name="customer_id"
             label="Order Type"
-            v-model="model.sales_order.type"
+            :error-has-text="true"
             placeholder="Order Type"
-            :error-has-text="true"
-            :error="modelErrors.type"
-          />
-        </div>
-
-        <div class="flex gap-3">
-          <CustomInput
-            type="date"
-            class="flex-1"
-            :has-label="true"
-            name="purchase_date"
-            label="Purchase Date"
-            :error-has-text="true"
-            :error="modelErrors.purchase_date"
-            v-model="model.sales_order.purchase_date"
-          />
-          <CustomInput
-            type="date"
-            class="flex-1"
-            :has-label="true"
-            name="bill_due"
-            label="Bill Due"
-            :error-has-text="true"
-            :error="modelErrors.bill_due"
-            v-model="model.sales_order.bill_due"
-          />
-        </div>
-        <div class="flex gap-3">
-          <CustomInput
-            type="date"
-            class="flex-1"
-            :has-label="true"
-            name="delivery_date"
-            label="Delivery Date"
-            :error-has-text="true"
-            :error="modelErrors.delivery_date"
-            v-model="model.sales_order.delivery_date"
+            v-model="model.sales_order.type"
+            :error="errors.sales_order?.type"
           />
           <CustomInput
             type="select"
@@ -85,33 +92,88 @@
             :options="paymentMethodOptions"
             placeholder="Select Payment Method"
             @add-new="paymentMethodModal = true"
-            :error="modelErrors.payment_method_id"
             v-model="model.sales_order.payment_method_id"
+            :error="errors.sales_order?.payment_method_id"
           />
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cont">
+    <div class="flex gap-3">
+      <input
+        type="checkbox"
+        id="has-delivery"
+        name="has-delivery"
+        v-model="model.sales_order.has_delivery"
+        :change="
+          model.sales_order.has_delivery
+            ? (deliveryFormState.hideBody = false)
+            : ''
+        "
+      />
+      <label for="has-delivery" class="text-sm">Has Delivery?</label>
+    </div>
+    <div
+      class="delivery-info"
+      v-if="!deliveryFormState.hideBody"
+      :class="model.sales_order.has_delivery ? 'show' : 'hide'"
+      @animationend="
+        deliveryFormState.hideBody = !model.sales_order.has_delivery
+      "
+    >
+      <p class="font-semibold mt-3">
+        Delivery Information <span class="italic font-thin">(Optional)</span>
+      </p>
+      <div class="flex gap-3 mt-3">
         <CustomInput
-          name="memo"
-          label="Memo"
-          type="textarea"
+          type="date"
+          class="flex-1"
           :has-label="true"
-          placeholder="Memo"
+          name="delivery_date"
+          label="Delivery Date"
           :error-has-text="true"
-          :error="modelErrors.memo"
-          v-model="model.sales_order.memo"
+          v-model="model.delivery.delivery_date"
+          :error="errors.delivery?.delivery_date"
+        />
+        <CustomInput
+          type="text"
+          class="flex-1"
+          name="courier"
+          label="Courier"
+          :has-label="true"
+          placeholder="Courier"
+          :error-has-text="true"
+          v-model="model.delivery.courier"
+          :error="errors.delivery?.courier"
         />
       </div>
-      <div class="flex-1">
-        <p class="font-semibold mb-4">Shipment Address</p>
+      <div class="flex gap-3 mt-5">
+        <input
+          type="checkbox"
+          id="use-customer-address"
+          name="use-customer-address"
+          v-model="model.delivery.use_customer_address"
+        />
+        <label for="use-customer-address" class="text-sm">
+          Use customer address?
+        </label>
+      </div>
+      <div class="mt-3 flex flex-col gap-1 pb-10">
+        <p class="text-sm font-semibold">Shipment Address</p>
         <AddressForm
           :has-label="true"
-          class="flex-1"
-          v-model="model.shipment_address"
-          :address-errors="modelErrors.shipment_address"
+          v-model="model.delivery.address"
+          :address-errors="errors.delivery?.address"
+          :disabled="model.delivery.use_customer_address"
         />
       </div>
     </div>
+  </div>
 
-    <p class="font-semibold">Select Products</p>
+  <div class="cont flex flex-col gap-5">
+    <p class="text-lg font-normal">Select Products</p>
     <div ref="multiSelectTable">
       <MultiSelectTable
         :header-component="SalesOrderFormHeader"
@@ -124,8 +186,49 @@
         }"
       ></MultiSelectTable>
     </div>
+  </div>
 
-    <!-- buttons -->
+  <div class="cont flex flex-col gap-5 mb-10">
+    <p class="text-lg font-normal">Notes & Summary</p>
+    <div class="flex gap-8 justify-between">
+      <CustomInput
+        :rows="6"
+        name="memo"
+        label="Memo"
+        class="flex-1"
+        type="textarea"
+        :has-label="true"
+        :error-has-text="true"
+        input-class="resize-none"
+        v-model="model.sales_order.memo"
+        :error="errors.sales_order?.memo"
+        placeholder="Add other notes here ..."
+      />
+      <div class="flex-1 flex items-end">
+        <div class="grid grid-cols-2 gap-5 ml-auto mr-0">
+          <!-- Sub total -->
+          <p class="flex-1 text-sm text-start">Sub total:</p>
+          <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
+            ₱ {{ model.sales_order.sub_total }}
+          </p>
+
+          <!-- Total Discount -->
+          <p class="flex-1 text-sm text-start">Total Discount:</p>
+          <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
+            ₱ {{ model.sales_order.total_discount }}
+          </p>
+
+          <hr class="col-span-2" />
+
+          <!-- Total -->
+          <p class="flex-1 text-sm text-start">Total:</p>
+          <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
+            ₱ {{ model.sales_order.total.toFixed(2) }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr />
     <div
       class="flex gap-3 mt-6"
       :class="route.query.id ? 'justify-between' : 'justify-end'"
@@ -172,6 +275,7 @@
   </div>
   <PaymentMethodModal v-if="paymentMethodModal" v-model="paymentMethodModal" />
   <CustomerModal v-if="showCustomerModel" v-model="showCustomerModel" />
+  <EmployeeModal v-if="showEmployeeModal" v-model="showEmployeeModal" />
   <DeleteConfirmModal
     v-if="showDeleteModal && route.query.id"
     v-model="showDeleteModal"
@@ -182,10 +286,18 @@
 
 <script setup>
 import Event from '@/event'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
-import { ObjectHelpers, SalesOrderCreateSchema, SalesOrderType } from 'shared'
+import {
+  DateHelpers,
+  ObjectHelpers,
+  SalesOrderCreateSchema,
+  SalesOrderStatus,
+  SalesOrderStatusMap,
+  SalesOrderType
+} from 'shared'
+
 import AddressForm from '@/components/shared/AddressForm.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
@@ -194,12 +306,20 @@ import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import SalesOrderFormHeader from '@/components/sales/SalesOrderFormHeader.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
 import PaymentMethodModal from '@/components/sales/payment-method/PaymentMethodModal.vue'
-import { SalesConst } from '../../const/route.constants'
+import EmployeeModal from '@/components/Employee/EmployeeModal.vue'
+import SelectStatusDropdown from '@/components/stock-transfer/SelectStatusDropdown.vue'
+
+import { InventoryConst, SalesConst } from '../../const/route.constants'
 import { useCustomerStore } from '@/stores/customer'
 import { useSalesStore } from '@/stores/sales'
 import { ToastTypes } from '@/data/types'
 import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useTableScroll } from '@/use/useTableScroll'
+import { useEmployeeStore } from '@/stores/employee'
+import { useValidation } from '@/composables/useValidation'
+import { useAppStore } from '@/stores/app'
+import { PageStateConst } from '@/const/state.constants'
+import { useAuth } from '@/composables/useAuth'
 
 const route = useRoute()
 const router = useRouter()
@@ -207,12 +327,23 @@ const router = useRouter()
 const isDisabled = ref(false)
 const showDeleteModal = ref(false)
 const showCustomerModel = ref(false)
+const showEmployeeModal = ref(false)
 const paymentMethodModal = ref(false)
+const deliveryFormState = reactive({
+  show: false,
+  hideBody: true
+})
 const rowEventName = 'sales-order-row-event'
 
+// stores
+const appStore = useAppStore()
 const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
+const employeeStore = useEmployeeStore()
 const paymentMethodStore = usePaymentMethodStore()
+
+// composables
+const { getAuthUser } = useAuth()
 
 const productTransferModal = {
   product_id: '',
@@ -220,32 +351,47 @@ const productTransferModal = {
   quantity: 0,
   price: 0,
   total: 0,
-  discount: 0
+  discount: 0,
+  serial_number: ''
 }
 
 const defaultModel = {
   sales_order: {
-    customer_id: '',
-    type: '',
     memo: '',
-    purchase_date: '',
-    delivery_date: '',
-    bill_due: '',
-    status: 'open',
-    payment_method_id: ''
+    type: '',
+    user_id: '',
+    customer_id: '',
+    has_delivery: false,
+    payment_method_id: '',
+    sub_total: 0.0,
+    total: 0.0,
+    total_discount: 0.0,
+    status: SalesOrderStatus.OPEN,
+    purchase_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
   },
-  shipment_address: {
+  sales_order_products: [{ ...productTransferModal }]
+}
+
+const deliveryDefaultModel = {
+  courier: '',
+  address_id: '',
+  address: {
     address1: '',
     address2: '',
     city: '',
     province: '',
     postal: ''
   },
-  sales_order_products: [{ ...productTransferModal }]
+  use_customer_address: false,
+  delivery_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
 }
 
 const model = ref(ObjectHelpers.copyObj(defaultModel))
-const modelErrors = ref({})
+// composables
+const { errors, validateData, hasErrors } = useValidation(
+  SalesOrderCreateSchema,
+  model.value
+)
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -254,6 +400,7 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
 /** ================================================
  * COMPUTED
  ** ================================================*/
+const isEdit = computed(() => (route.query.id ? true : false))
 const customerOptions = computed(() => {
   return customerStore.customers.map((customer) => {
     return {
@@ -270,58 +417,25 @@ const paymentMethodOptions = computed(() =>
   }))
 )
 
+const employeeOptions = computed(() =>
+  employeeStore.employees.map((employee) => {
+    return {
+      text: `${employee.first_name} ${employee.last_name}`,
+      value: employee.id
+    }
+  })
+)
+
 /** ================================================
  * METHODS
  ** ================================================*/
+
 const onSubmit = async (saveAndNew) => {
   // validation
-  modelErrors.value = {}
-  Event.emit(rowEventName, modelErrors.value.sales_order_products)
+  validateData()
 
-  const { error } = SalesOrderCreateSchema.validate(model.value, {
-    abortEarly: false
-  })
-
-  if (error) {
-    error.details.forEach((err) => {
-      if (err.path.includes('sales_order_products')) {
-        if (
-          modelErrors.value[err.path[0]] &&
-          Object.keys(modelErrors.value[err.path[0]]).length
-        ) {
-          modelErrors.value[err.path[0]] = {
-            ...modelErrors.value[err.path[0]],
-            [err.context.key]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        } else {
-          modelErrors.value[err.path[0]] = {
-            [err.context.key]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        }
-      } else if (err.path.includes('shipment_address')) {
-        if (
-          modelErrors.value[err.path[0]] &&
-          Object.keys(modelErrors.value[err.path[0]])
-        ) {
-          modelErrors.value[err.path[0]] = {
-            ...modelErrors.value[err.path[0]],
-            [err.path[1]]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        } else {
-          modelErrors.value[err.path[0]] = {
-            [err.path[1]]: err.message.replace(/"[^"]*"/g, err.context.key)
-          }
-        }
-      } else {
-        modelErrors.value[err.context.key] = err.message.replace(
-          /"[^"]*"/g,
-          err.context.key
-        )
-      }
-    })
-
-    // trigger event to show errors in the products selection table
-    Event.emit(rowEventName, modelErrors.value.sales_order_products)
+  if (hasErrors.value) {
+    Event.emit(rowEventName, errors.value.sales_order_products)
     return
   }
 
@@ -357,6 +471,20 @@ const onAfterDelete = async () => {
   })
 }
 
+const setSalesOrderFormPageState = () => {
+  appStore.setPageState(PageStateConst.SALES_ORDER_FORM, {
+    route_scope: [SalesConst.SALES_ORDER_FORM, InventoryConst.PRODUCT_FORM],
+    state: model.value
+  })
+}
+
+const populateAddress = (address) => {
+  model.value.delivery.address = ObjectHelpers.assignSameFields(
+    model.value.delivery.address,
+    address
+  )
+}
+
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
@@ -364,10 +492,17 @@ const multiSelectTable = ref(null)
 useTableScroll(multiSelectTable)
 onMounted(async () => {
   await customerStore.getCustomers()
+  await employeeStore.getEmployees()
   await paymentMethodStore.getPaymentMethods()
 
+  // set default prepared by
+  const authUser = await getAuthUser()
+  if (authUser) {
+    model.value.sales_order.user_id = authUser.id
+  }
+
   if (route.query.id) {
-    await salesStore.getSalesOrder(route.query.id)
+    await salesStore.fetchSalesOrder(route.query.id)
 
     model.value.sales_order = ObjectHelpers.assignSameFields(
       model.value.sales_order,
@@ -380,20 +515,31 @@ onMounted(async () => {
           .toISOString()
           .split('T')[0]
       : ''
-    model.value.sales_order.bill_due = salesStore.salesOrder.bill_due
-      ? new Date(salesStore.salesOrder.bill_due).toISOString().split('T')[0]
-      : ''
-    model.value.sales_order.delivery_date = salesStore.salesOrder.delivery_date
-      ? new Date(salesStore.salesOrder.delivery_date)
-          .toISOString()
-          .split('T')[0]
-      : ''
 
-    // address
-    model.value.shipment_address = ObjectHelpers.assignSameFields(
-      model.value.shipment_address,
-      salesStore.salesOrder.shipment_address
-    )
+    // delivery
+    if (salesStore.salesOrder.delivery) {
+      deliveryFormState.show = true
+      deliveryFormState.hideBody = false
+      model.value.delivery = ObjectHelpers.assignSameFields(
+        deliveryDefaultModel,
+        salesStore.salesOrder.delivery
+      )
+
+      // address patches
+      model.value.delivery.address = {
+        address1: salesStore.salesOrder.delivery.address.address1,
+        address2: salesStore.salesOrder.delivery.address.address2,
+        city: salesStore.salesOrder.delivery.address.city,
+        province: salesStore.salesOrder.delivery.address.province,
+        postal: salesStore.salesOrder.delivery.address.postal
+      }
+
+      // date patches
+      model.value.delivery.delivery_date = DateHelpers.formatDate(
+        new Date(salesStore.salesOrder.delivery.delivery_date),
+        'YYYY-MM-DD'
+      )
+    }
 
     // products
     model.value.sales_order_products = salesStore.salesOrder.products.map(
@@ -407,6 +553,129 @@ onMounted(async () => {
     )
   }
 
+  // get all the save state
+  if (appStore.isPageExist(PageStateConst.SALES_ORDER_FORM)) {
+    if (
+      !ObjectHelpers.compareObjects(
+        model.value,
+        appStore.pages[PageStateConst.SALES_ORDER_FORM].state
+      )
+    ) {
+      model.value = ObjectHelpers.assignSameFields(
+        model.value,
+        appStore.pages[PageStateConst.SALES_ORDER_FORM].state
+      )
+    }
+  } else {
+    setSalesOrderFormPageState()
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
+
+/** ================================================
+ * WATCHERS
+ * ================================================*/
+watch(
+  () => model.value.sales_order.has_delivery,
+  (show) => {
+    if (show) {
+      model.value.delivery = ObjectHelpers.copyObj(deliveryDefaultModel)
+    } else {
+      model.value.delivery.use_customer_address = false
+    }
+  }
+)
+
+watch(
+  () => deliveryFormState.hideBody,
+  (hideBody) => {
+    if (hideBody) {
+      delete model.value.delivery
+    }
+  }
+)
+
+watch(
+  () => model.value.delivery?.use_customer_address,
+  (useCustomerAddress) => {
+    if (useCustomerAddress) {
+      const customer = customerStore.customers.find(
+        (c) => c.id == model.value.sales_order.customer_id
+      )
+      if (customer) {
+        model.value.delivery.address_id = customer.address_id
+        populateAddress(customer.address)
+      }
+    } else {
+      if (model.value.delivery) {
+        model.value.delivery.address_id = null
+        model.value.delivery.address = ObjectHelpers.copyObj(
+          deliveryDefaultModel.address
+        )
+      }
+    }
+  }
+)
+
+watch(
+  () => model.value.sales_order.customer_id,
+  (customerId) => {
+    if (
+      customerId &&
+      model.value.delivery?.use_customer_address &&
+      model.value.sales_order.has_delivery
+    ) {
+      const customer = customerStore.customers.find((c) => c.id == customerId)
+      if (customer) {
+        model.value.delivery.address_id = customer.address_id
+        populateAddress(customer.address)
+      }
+    }
+  }
+)
+
+watch(
+  () => model.value,
+  () => {
+    setSalesOrderFormPageState()
+  },
+  { deep: true }
+)
+
+// watch for the sales order products
+watch(
+  () => model.value.sales_order_products,
+  () => {
+    if (model.value.sales_order_products.length) {
+      const amount = model.value.sales_order_products
+        .filter((p) => p.total)
+        .map((p) => parseFloat(p.total))
+
+      const discount = model.value.sales_order_products
+        .filter((p) => p.discount)
+        .map((p) => parseFloat(p.discount))
+
+      const subTotal = amount.length ? amount.reduce((a, b) => a + b) : 0.0
+      const totalDiscount = discount.length
+        ? discount.reduce((a, b) => a + b)
+        : 0.0
+
+      model.value.sales_order.sub_total = subTotal
+      model.value.sales_order.total_discount = totalDiscount
+      model.value.sales_order.total = subTotal - totalDiscount
+    }
+  },
+  { deep: true }
+)
 </script>
+
+<style scoped>
+.delivery-info.show {
+  animation: fade-in 0.5s ease-in-out forwards;
+}
+
+.delivery-info.hide {
+  animation: fade-out 0.5s ease-in-out forwards;
+}
+</style>

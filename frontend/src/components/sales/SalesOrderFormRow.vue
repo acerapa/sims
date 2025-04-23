@@ -1,16 +1,17 @@
 <template>
   <div
     class="grid gap-3 min-w-[864px]"
-    :class="props.isDisabled ? 'grid-cols-8' : 'grid-cols-9'"
+    :class="props.isDisabled ? 'grid-cols-12' : 'grid-cols-12'"
   >
     <CustomInput
       type="select"
-      class="col-span-2"
+      class="col-span-5"
       name="product_id"
       v-model="model.product_id"
       placeholder="Select Product"
       :has-add-new="true"
-      @add-new=""
+      :can-search="true"
+      @add-new="onAddNew"
       :options="productOptions"
       :error-has-text="false"
       :error="modelErrors.product_id"
@@ -18,12 +19,12 @@
 
     <CustomInput
       type="text"
-      class="col-span-3"
-      name="description"
-      v-model="model.description"
-      placeholder="Item Description"
+      name="serial_no"
+      class="col-span-2"
+      v-model="model.serial_number"
+      placeholder="Serial No."
       :error-has-text="false"
-      :error="modelErrors.description"
+      :error="modelErrors.serial_number"
     />
 
     <CustomInput
@@ -34,6 +35,16 @@
       placeholder=""
       :error-has-text="false"
       :error="modelErrors.quantity"
+    />
+
+    <CustomInput
+      type="number"
+      name="discount"
+      class="col-span-1"
+      v-model="model.discount"
+      placeholder=""
+      :error-has-text="false"
+      :error="modelErrors.discount"
     />
 
     <CustomInput
@@ -73,6 +84,8 @@ import { useProductStore } from '@/stores/product'
 import CustomInput from '../shared/CustomInput.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import Event from '@/event'
+import { useRouter } from 'vue-router'
+import { InventoryConst, SalesConst } from '@/const/route.constants'
 
 const props = defineProps({
   ndx: {
@@ -93,6 +106,7 @@ const props = defineProps({
   }
 })
 
+const router = useRouter()
 const emit = defineEmits(['emit'])
 const productStore = useProductStore()
 const model = defineModel()
@@ -101,9 +115,17 @@ const modelErrors = ref({})
 /** ================================================
  * EVENTS
  ** ================================================*/
-Event.on(props.eventName, (data) => {
-  modelErrors.value = data ? data : {}
-})
+Event.on(
+  props.eventName,
+  (data) => {
+    if (data && data[props.ndx]) {
+      modelErrors.value = data[props.ndx]
+    } else {
+      modelErrors.value = {}
+    }
+  },
+  true
+)
 
 /** ================================================
  * COMPUTED
@@ -112,7 +134,7 @@ const productOptions = computed(() => {
   return productStore.products
     .map((product) => {
       return {
-        text: product.name,
+        text: product.product_details.sales_description,
         value: product.id
       }
     })
@@ -127,6 +149,18 @@ onMounted(async () => {
 })
 
 /** ================================================
+ * METHODS
+ ** ================================================*/
+const onAddNew = () => {
+  router.push({
+    name: InventoryConst.PRODUCT_FORM,
+    query: {
+      redirect: SalesConst.SALES_ORDER_FORM
+    }
+  })
+}
+
+/** ================================================
  * WATCHERS
  ** ================================================*/
 watch(
@@ -134,7 +168,6 @@ watch(
   (val) => {
     const prd = productStore.products.find((p) => p.id == val)
     if (prd) {
-      model.value.description = prd.product_details.sales_description
       model.value.price = prd.price
       model.value.quantity = 1
     }

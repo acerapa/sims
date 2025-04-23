@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 const showModal = defineModel()
@@ -39,7 +39,7 @@ const emit = defineEmits(['afterUpdate'])
 const purchaseOrderStore = usePurchaseOrderStore()
 
 const onSubmit = async () => {
-  await authenticatedApi(props.href, Method.POST, props.data)
+  await api(props.href, Method.POST, props.data)
   await purchaseOrderStore.fetchPurchaseOrders()
   showModal.value = false
 }

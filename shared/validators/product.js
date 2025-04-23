@@ -17,42 +17,65 @@ const ProductReorderSchema = Joi.object({
     "number.empty": "point is required",
     "any.required": "point is required",
   }),
-  products: Joi.array().items(Joi.number()).optional(),
 });
 
 const ProductSupplierSchema = Joi.object({
   supplier_id: Joi.number().required(),
-  cost: Joi.number().required(),
+  cost: Joi.number().min(1).required(),
 });
 
 const ProductDetailsSchema = Joi.object({
-  purchase_description: Joi.string().optional(),
-  sales_description: Joi.string().optional(),
+  purchase_description: Joi.string().required().messages({
+    "*": "Purchase Description is required",
+  }),
+  sales_description: Joi.string().required().messages({
+    "*": "Sales Description is required",
+  }),
   item_code: Joi.string().required(),
-  stock: Joi.number().required(),
-  cost: Joi.number().optional(),
+  cost: Joi.number().label("Cost").optional(),
+  stock: Joi.number().required().messages({
+    "number.base": "Stock must be a number",
+    "any.required": "Stock is required",
+  }),
   is_manually_set_cost: Joi.boolean().optional(),
   status: Joi.valid(...Object.values(ProductStatus)).required(),
   product_setting_id: Joi.number().allow(null, 0, "").optional(),
 });
 
 const ServiceDetailsSchema = Joi.object({
-  description: Joi.string().required(),
+  description: Joi.string().required().messages({
+    "string.base": "Description must be a string",
+    "*": "Description is required",
+  }),
 });
 
 const ProductSchema = Joi.object({
-  name: Joi.string().required(),
-  price: Joi.number().required(),
+  name: Joi.string().when(Joi.ref("type"), {
+    is: ItemType.NON_INVENTORY,
+    then: Joi.required().messages({
+      "*": "Name is required",
+    }),
+    otherwise: Joi.allow(null, "").optional(),
+  }),
+  price: Joi.number().required().messages({
+    "*": "Price is required",
+  }),
   type: Joi.valid(...Object.values(ItemType)).required(),
-  income_account: Joi.number().required(),
-  expense_account: Joi.number().required(),
+  income_account: Joi.number().required().messages({
+    "*": "Income account is required",
+  }),
+  expense_account: Joi.number().required().messages({
+    "*": "Expense account is required",
+  }),
 });
 
 const ProductItemSchema = Joi.object({
   product: ProductSchema,
   details: ProductDetailsSchema,
   suppliers: Joi.array().items(ProductSupplierSchema).min(1),
-  categories: Joi.array().items(Joi.number()).min(1),
+  categories: Joi.array().items(Joi.number()).min(1).messages({
+    "*": "Categories are required",
+  }),
 });
 
 const ServiceItemSchema = Joi.object({

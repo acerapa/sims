@@ -15,7 +15,7 @@
         v-model="model.name"
         label="Category Name"
         :error-has-text="true"
-        :error="modelError.name"
+        :error="errors.name"
         placeholder="Category Name"
       />
     </div>
@@ -37,6 +37,7 @@ import { CategorySchema } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
+import { useValidation } from '@/composables/useValidation'
 
 const showModal = defineModel()
 const showConfirmModal = ref(false)
@@ -65,39 +66,45 @@ const model = ref({
   name: '',
   general_cat: props.general_cat
 })
-const modelError = ref({})
+
+// composables
+const { errors, hasErrors, validateData } = useValidation(
+  CategorySchema,
+  model.value
+)
 
 onMounted(async () => {
+  await settingsStore.getProductCategories()
   if (props.selectedId) {
-    model.value = settingsStore.productCategories.find(
-      (pc) => pc.id == props.selectedId
-    )
-  }
-
-  if (props.general_cat) {
-    await settingsStore.getProductCategories()
-    const parentCat = settingsStore.getProductCategoryByIdSync(
-      props.general_cat
+    const category = await settingsStore.findCategoryInHierarchy(
+      props.selectedId
     )
 
-    if (parentCat) {
-      title.value = `New Sub Category for ${parentCat.name}`
+    if (category) {
+      model.value.name = category.name
+      model.value.general_cat = category.general_cat
+
+      if (category.general_cat) {
+        const parentCat = await settingsStore.findCategoryInHierarchy(
+          category.general_cat
+        )
+
+        if (parentCat) {
+          if (props.selectedId) {
+            title.value = `New Sub Category for ${parentCat.name}`
+          } else {
+            title.value = `Edit Sub Category for ${parentCat.name}`
+          }
+        }
+      }
     }
   }
 })
 
 const onSubmit = async () => {
   // validations
-  const { error } = CategorySchema.options({ allowUnknown: true }).validate(
-    model.value
-  )
-
-  if (error) {
-    error.details.forEach((err) => {
-      modelError.value[err.context.key] = err.message
-    })
-    return
-  }
+  validateData()
+  if (hasErrors.value) return
 
   let isSuccess = false
   if (props.selectedId) {
@@ -132,6 +139,9 @@ const onDelete = async () => {
 const onAfterDelete = async () => {
   showModal.value = false
   showConfirmModal.value = false
-  await settingsStore.fetchAllProductCategories()
+  await settingsStore.removeProductCategory({
+    id: props.selectedId,
+    general_cat: model.value.general_cat
+  })
 }
 </script>

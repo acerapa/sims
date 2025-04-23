@@ -1,4 +1,4 @@
-import { authenticatedApi, Method } from '@/api'
+import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -7,7 +7,7 @@ export const usePaymentMethodStore = defineStore('payment-method', () => {
   const paymentMethod = ref(null)
 
   const fetchPaymentMethods = async () => {
-    const res = await authenticatedApi('payment-method/')
+    const res = await api('payment-method/')
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -18,7 +18,7 @@ export const usePaymentMethodStore = defineStore('payment-method', () => {
   }
 
   const fetchPaymentMethodById = async (id) => {
-    const res = await authenticatedApi(`payment-method/${id}/`)
+    const res = await api(`payment-method/${id}/`)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -29,7 +29,7 @@ export const usePaymentMethodStore = defineStore('payment-method', () => {
   }
 
   const registerPaymentMethod = async (data) => {
-    const res = await authenticatedApi('payment-method/', Method.POST, data)
+    const res = await api('payment-method/', Method.POST, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {
@@ -44,7 +44,7 @@ export const usePaymentMethodStore = defineStore('payment-method', () => {
   }
 
   const updatePaymentMethod = async (id, data) => {
-    const res = await authenticatedApi(`payment-method/${id}`, Method.PUT, data)
+    const res = await api(`payment-method/${id}`, Method.PUT, data)
     const isSuccess = res.status < 400
 
     if (isSuccess) {

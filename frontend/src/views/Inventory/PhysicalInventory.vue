@@ -29,9 +29,9 @@
 <script setup>
 import PhysicalInventoryRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryRow.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
+import { useAuth } from '@/composables/useAuth'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
-import { useAuthStore } from '@/stores/auth'
 import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
 import { useProductStore } from '@/stores/product'
 import { PhysicalInventoryStatus } from 'shared/enums'
@@ -39,9 +39,11 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const authStore = useAuthStore()
+const { getAuthUser } = useAuth()
 const productStore = useProductStore()
 const physicalInventoryStore = usePhysicalInventoryStore()
+
+const authUser = ref(null)
 
 /** ================================================
  * EVENTS
@@ -68,8 +70,8 @@ const onStartPhysicalInventory = async () => {
     physical_inventory: {
       date_started: new Date(),
       status: PhysicalInventoryStatus.DRAFT,
-      inventory_incharge: authStore.getAuthUser().id,
-      branch_manager: authStore.getAuthUser().id, // temporary for now (supposedly need to set branch manager in the system)
+      inventory_incharge: authUser.value?.id,
+      branch_manager: authUser.value?.id, // temporary for now (supposedly need to set branch manager in the system)
       date_ended: null
     },
     items: []
@@ -109,6 +111,7 @@ const onView = (id) => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
+  authUser.value = await getAuthUser()
   await physicalInventoryStore.fetchAllPhysicalInventories()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })

@@ -1,12 +1,17 @@
 const { sequelize } = require("../models");
 const Address = require("../models/address");
+const Customer = require("../models/customer");
+const Delivery = require("../models/delivery");
 const SalesOrderProduct = require("../models/junction/sales-order-product");
 const PaymentMethod = require("../models/payment-method");
 const Product = require("../models/product");
 const SalesOrder = require("../models/sales-order");
+const User = require("../models/user");
+const { createDelivery } = require("../services/DeliveryService");
 const {
   findSalesOrder,
   updateSalesOrder,
+  findSalesOrderMinimal,
 } = require("../services/SalesOrderService");
 
 module.exports = {
@@ -16,16 +21,29 @@ module.exports = {
         order: [["createdAt", "DESC"]],
         include: [
           {
-            model: Address,
-            as: "shipment_address",
-          },
-          {
             model: Product,
             as: "products",
+            attributes: ["id"],
           },
           {
             model: PaymentMethod,
             as: "payment_method",
+            attributes: ["id", "name"],
+          },
+          {
+            model: User,
+            as: "sales_person",
+            attributes: ["id", "first_name", "last_name"],
+          },
+          {
+            model: Delivery,
+            as: "delivery",
+            attributes: ["id"],
+          },
+          {
+            model: Customer,
+            as: "customer",
+            attributes: ["id", "first_name", "last_name"],
           },
         ],
       });
@@ -51,16 +69,17 @@ module.exports = {
       const data = req.body.validated;
       let salesOrder = null;
 
-      let shipmentAddress = null;
-      if (data.shipment_address) {
-        shipmentAddress = await Address.create(data.shipment_address, {
-          transaction,
-        });
-      }
-
       if (data.sales_order) {
+        /**
+         * Sets the user ID for the sales order to the current authenticated user's ID
+         * if no user ID is explicitly provided in the sales order data
+         */
+        if (!data.sales_order.user_id) {
+          data.sales_order.user_id = req.user_id;
+        }
+
         salesOrder = await SalesOrder.create(
-          { ...data.sales_order, shipment_address_id: shipmentAddress.id },
+          { ...data.sales_order },
           { transaction }
         );
       }
@@ -76,9 +95,19 @@ module.exports = {
         );
       }
 
+      if (data.delivery) {
+        await createDelivery(
+          {
+            ...data.delivery,
+            sales_order_id: salesOrder.id,
+          },
+          transaction
+        );
+      }
+
       await transaction.commit();
 
-      const order = await findSalesOrder(salesOrder.id);
+      const order = await findSalesOrderMinimal(salesOrder.id);
       res.sendResponse({ order }, "Sales order created successfully", 200);
     } catch (error) {
       await transaction.rollback();
@@ -93,7 +122,7 @@ module.exports = {
       await updateSalesOrder(req.params.id, data, transaction);
       await transaction.commit();
 
-      const order = await findSalesOrder(req.params.id);
+      const order = await findSalesOrderMinimal(req.params.id);
       res.sendResponse({ order }, "Sales order updated successfully", 200);
     } catch (error) {
       await transaction.rollback();

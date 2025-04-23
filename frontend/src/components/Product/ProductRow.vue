@@ -8,7 +8,7 @@
       <p class="text-sm">{{ props.product.id }}</p>
     </div>
     <p class="col-span-3 text-sm truncate" :title="props.product.name">
-      {{ props.product.name }}
+      {{ props.product.product_details.purchase_description }}
     </p>
     <p class="col-span-1 text-sm">
       {{ props.product.product_details.item_code }}

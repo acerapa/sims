@@ -4,6 +4,9 @@ const Product = require("../models/product");
 const PurchaseOrder = require("../models/purchase-order");
 const Supplier = require("../models/supplier");
 const { sequelize } = require("../models");
+const ProductDetails = require("../models/product-details");
+const { Op } = require("sequelize");
+const { ItemType } = require("shared");
 
 /**
  * This function will return a purchase order promise containing the purchase order and its related products by purchase order id
@@ -30,6 +33,10 @@ const findOrder = async (id) => {
             model: Supplier,
             as: "suppliers",
             attributes: ["id"],
+          },
+          {
+            model: ProductDetails,
+            as: "product_details",
           },
         ],
       },
@@ -112,7 +119,70 @@ const updateOrder = async (id, data, transaction) => {
   }
 };
 
+/**
+ * Receives a purchase order by updating its status, product details, and preparing for stock update
+ * @param {number} id - The unique identifier of the purchase order
+ * @param {Object} data - The data containing order and product update information
+ * @param {Object} transaction - The database transaction for ensuring data consistency
+ */
+const orderReceive = async (id, data, transaction) => {
+  if (data.order) {
+    await PurchaseOrder.update(data.order, {
+      where: { id },
+      transaction,
+    });
+
+    if (data.products) {
+      await Promise.all(
+        data.products.map((p) =>
+          PurchaseOrderProducts.update(
+            {
+              quantity_received: p.quantity_received,
+              remarks: p.remarks,
+              status: p.status,
+            },
+            {
+              where: { id: p.id },
+              transaction,
+            }
+          )
+        )
+      );
+    }
+
+    // TODO: Update products stock
+    // reflect products stock basing form the quantity received
+    const products = await Product.findAll({
+      where: {
+        id: {
+          [Op.in]: data.products.map((p) => p.product_id),
+        },
+        type: ItemType.INVENTORY,
+      },
+      attributes: ["id"],
+      include: {
+        model: ProductDetails,
+        as: "product_details",
+        attributes: ["id", "stock"],
+      },
+    });
+
+    await Promise.all(
+      products.map((p) => {
+        const productData = data.products.find((dp) => dp.product_id == p.id);
+        return p.product_details.update(
+          {
+            stock: p.product_details.stock + productData.quantity_received,
+          },
+          { transaction }
+        );
+      })
+    );
+  }
+};
+
 module.exports = {
   findOrder,
   updateOrder,
+  orderReceive,
 };
