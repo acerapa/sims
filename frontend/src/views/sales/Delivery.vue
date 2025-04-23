@@ -1,9 +1,10 @@
 <template>
   <CustomTable
+    @view="onView"
     :data="filteredData"
+    :has-add-btn="false"
     :has-pagination="true"
     :row-prop-init="rowPropInit"
-    @view="onView"
     :table-row-component="DeliveryRow"
   >
     <template #table_header>
