@@ -34,10 +34,11 @@ const SalesOrderSchema = joi.object({
 });
 
 const SalesOrderProductSchema = joi.object({
-  product_id: joi.number().required(),
-  description: joi.string().allow("", null).optional(),
-  quantity: joi.number().min(1).required(),
   discount: joi.number().optional(),
+  product_id: joi.number().required(),
+  quantity: joi.number().min(1).required(),
+  description: joi.string().allow("", null).optional(),
+  serial_number: joi.string().allow("", null).optional(),
   price: joi.number().required(),
   total: joi.number().required(),
 });
