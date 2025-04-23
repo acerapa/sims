@@ -1,7 +1,10 @@
 <template>
   <CustomTable
-    :row-prop-init="rowPropInit"
+    @view="onView"
     :data="filteredData"
+    :has-add-btn="false"
+    :has-pagination="true"
+    :row-prop-init="rowPropInit"
     :table-row-component="DeliveryRow"
   >
     <template #table_header>
@@ -18,18 +21,29 @@
       </div>
     </template>
   </CustomTable>
+  <DeliveryModal
+    v-if="showModal"
+    :selected-id="selectedId"
+    v-model="showModal"
+  />
 </template>
 
 <script setup>
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { useDeliveryStore } from '@/stores/delivery'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
+import DeliveryModal from '@/components/sales/DeliveryModal.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import DeliveryRow from '@/components/sales/DeliveryRow.vue'
+import { storeToRefs } from 'pinia'
 
 const deliveryStore = useDeliveryStore()
+const { deliveries } = storeToRefs(deliveryStore)
+
+const selectedId = ref(0)
+const showModal = ref(false)
 
 /** ================================================
  * EVENTS
@@ -47,8 +61,16 @@ Event.on(rowPropInit, (data) => {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return deliveryStore.deliveries
+  return deliveries.value.filter((delivery) => delivery)
 })
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const onView = (id) => {
+  selectedId.value = id
+  showModal.value = true
+}
 
 /** ================================================
  * LIFECYCLE HOOKS

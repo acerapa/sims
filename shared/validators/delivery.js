@@ -21,6 +21,17 @@ const DeliverySchema = joi.object({
   sales_order_id: joi.number().optional(),
 });
 
+const DeliveryStatusSchema = joi.object({
+  status: joi
+    .string()
+    .valid(...Object.values(DeliveryStatus))
+    .required()
+    .messages({
+      "*": "Status is required",
+    }),
+});
+
 module.exports = {
   DeliverySchema,
+  DeliveryStatusSchema,
 };

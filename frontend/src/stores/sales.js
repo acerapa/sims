@@ -71,6 +71,14 @@ export const useSalesStore = defineStore('sales', () => {
     return isSuccess
   }
 
+  const getSalesOrder = async (id) => {
+    if (!salesOrder.value || salesOrder.value.id != id) {
+      await fetchSalesOrder(id)
+    }
+
+    return salesOrder.value
+  }
+
   const removeSalesOrder = async (id) => {
     if (salesOrders.value.length) {
       salesOrders.value = salesOrders.value.filter((item) => item.id != id)
@@ -82,6 +90,7 @@ export const useSalesStore = defineStore('sales', () => {
   return {
     salesOrder,
     salesOrders,
+    getSalesOrder,
     getSalesOrders,
     fetchSalesOrder,
     fetchSalesOrders,
