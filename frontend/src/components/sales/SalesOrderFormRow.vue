@@ -1,7 +1,7 @@
 <template>
   <div
     class="grid gap-3 min-w-[864px]"
-    :class="props.isDisabled ? 'grid-cols-8' : 'grid-cols-9'"
+    :class="props.isDisabled ? 'grid-cols-12' : 'grid-cols-12'"
   >
     <CustomInput
       type="select"
@@ -10,10 +10,21 @@
       v-model="model.product_id"
       placeholder="Select Product"
       :has-add-new="true"
+      :can-search="true"
       @add-new="onAddNew"
       :options="productOptions"
       :error-has-text="false"
       :error="modelErrors.product_id"
+    />
+
+    <CustomInput
+      type="text"
+      name="serial_no"
+      class="col-span-2"
+      v-model="model.serial_number"
+      placeholder="Serial No."
+      :error-has-text="false"
+      :error="modelErrors.serial_number"
     />
 
     <CustomInput
@@ -24,6 +35,16 @@
       placeholder=""
       :error-has-text="false"
       :error="modelErrors.quantity"
+    />
+
+    <CustomInput
+      type="number"
+      name="discount"
+      class="col-span-1"
+      v-model="model.discount"
+      placeholder=""
+      :error-has-text="false"
+      :error="modelErrors.discount"
     />
 
     <CustomInput

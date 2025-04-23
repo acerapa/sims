@@ -318,7 +318,8 @@ const productTransferModal = {
   quantity: 0,
   price: 0,
   total: 0,
-  discount: 0
+  discount: 0,
+  serial_number: ''
 }
 
 const defaultModel = {

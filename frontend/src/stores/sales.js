@@ -23,7 +23,7 @@ export const useSalesStore = defineStore('sales', () => {
   }
 
   const updateSalesOrder = async (id, data) => {
-    const res = await `api`(`sales-order/${id}`, Method.PUT, data)
+    const res = await api(`sales-order/${id}`, Method.PUT, data)
 
     const isSuccess = res.status < 400
 
