@@ -60,6 +60,21 @@ SalesOrder.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    sub_total: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0.0,
+    },
+    total: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0.0,
+    },
+    total_discount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0.0,
+    },
   },
   {
     sequelize,

@@ -31,6 +31,13 @@ const SalesOrderSchema = joi.object({
     .required()
     .messages({ "*": "Payment method is required" }),
   has_delivery: joi.boolean(),
+  sub_total: joi.number().required().messages({
+    "*": "Sub total is required",
+  }),
+  total: joi.number().required().messages({
+    "*": "Total is required",
+  }),
+  total_discount: joi.number().label("Total Discount").optional(),
 });
 
 const SalesOrderProductSchema = joi.object({
