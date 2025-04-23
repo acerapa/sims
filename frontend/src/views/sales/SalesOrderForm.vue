@@ -1,34 +1,63 @@
 <template>
   <div class="cont flex flex-col gap-5">
-    <div class="flex gap-3 max-lg:flex-col">
+    <div class="flex justify-between items-center py-3">
+      <h1 class="text-2xl font-bold">Sales Order</h1>
+      <CustomInput
+        type="date"
+        :has-label="true"
+        name="purchase_date"
+        label="Purchase Date:"
+        :error-has-text="true"
+        v-model="model.sales_order.purchase_date"
+        :error="errors.sales_order?.purchase_date"
+        class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
+      />
+    </div>
+    <hr />
+    <div class="flex justify-between items-center">
+      <p class="text-lg font-normal mb-1">Sales Order Information</p>
+      <div class="flex gap-3 items-center" v-if="isEdit">
+        <SelectStatusDropdown
+          v-model="model.sales_order.status"
+          :status-map="SalesOrderStatusMap"
+        />
+        <button class="btn-green">Generate Invoice</button>
+      </div>
+    </div>
+    <div class="flex flex-col gap-4 py-4">
+      <div class="flex gap-3">
+        <CustomInput
+          label="From"
+          type="select"
+          name="user_id"
+          class="flex-1"
+          :has-label="true"
+          :has-add-new="true"
+          :error-has-text="true"
+          placeholder="Prepared By"
+          :options="employeeOptions"
+          v-model="model.sales_order.user_id"
+          @add-new="showEmployeeModal = true"
+          :error="errors.sales_order?.user_id"
+        />
+        <CustomInput
+          type="select"
+          class="flex-1"
+          label="Customer"
+          :has-label="true"
+          :has-add-new="true"
+          name="customer_id"
+          :error-has-text="true"
+          :options="customerOptions"
+          placeholder="Select Customer"
+          @add-new="showCustomerModel = true"
+          v-model="model.sales_order.customer_id"
+          :error="errors.sales_order?.customer_id"
+          :disabled="route.query.id ? true : false"
+        />
+      </div>
       <div class="flex flex-col gap-3 flex-1">
-        <div class="flex justify-between items-center">
-          <p class="font-semibold mb-1">Sales Order Information</p>
-          <div class="flex gap-3 items-center" v-if="isEdit">
-            <SelectStatusDropdown
-              v-model="model.sales_order.status"
-              :status-map="SalesOrderStatusMap"
-            />
-            <button class="btn-green">Generate Invoice</button>
-          </div>
-        </div>
-
         <div class="flex gap-3">
-          <CustomInput
-            type="select"
-            class="flex-1"
-            :has-label="true"
-            :has-add-new="true"
-            name="customer_id"
-            :error-has-text="true"
-            label="Select Customer"
-            :options="customerOptions"
-            placeholder="Select Customer"
-            @add-new="showCustomerModel = true"
-            v-model="model.sales_order.customer_id"
-            :error="errors.sales_order?.customer_id"
-            :disabled="route.query.id ? true : false"
-          />
           <CustomInput
             type="select"
             class="flex-1"
@@ -50,19 +79,6 @@
             v-model="model.sales_order.type"
             :error="errors.sales_order?.type"
           />
-        </div>
-
-        <div class="flex gap-3">
-          <CustomInput
-            type="date"
-            class="flex-1"
-            :has-label="true"
-            name="purchase_date"
-            label="Purchase Date"
-            :error-has-text="true"
-            v-model="model.sales_order.purchase_date"
-            :error="errors.sales_order?.purchase_date"
-          />
           <CustomInput
             type="select"
             class="flex-1"
@@ -78,32 +94,6 @@
             :error="errors.sales_order?.payment_method_id"
           />
         </div>
-
-        <CustomInput
-          type="select"
-          name="user_id"
-          :has-label="true"
-          :has-add-new="true"
-          label="Prepared By"
-          :error-has-text="true"
-          placeholder="Prepared By"
-          :options="employeeOptions"
-          class="max-w-[calc(50%_-_6px)]"
-          v-model="model.sales_order.user_id"
-          @add-new="showEmployeeModal = true"
-          :error="errors.sales_order?.user_id"
-        />
-
-        <CustomInput
-          name="memo"
-          label="Memo"
-          type="textarea"
-          :has-label="true"
-          placeholder="Memo"
-          :error-has-text="true"
-          v-model="model.sales_order.memo"
-          :error="errors.sales_order?.memo"
-        />
       </div>
     </div>
   </div>
@@ -180,8 +170,8 @@
     </div>
   </div>
 
-  <div class="cont">
-    <p class="font-semibold">Select Products</p>
+  <div class="cont flex flex-col gap-5">
+    <p class="text-lg font-normal">Select Products</p>
     <div ref="multiSelectTable">
       <MultiSelectTable
         :header-component="SalesOrderFormHeader"
@@ -194,8 +184,49 @@
         }"
       ></MultiSelectTable>
     </div>
+  </div>
 
-    <!-- buttons -->
+  <div class="cont flex flex-col gap-5 mb-10">
+    <p class="text-lg font-normal">Notes & Summary</p>
+    <div class="flex gap-8 justify-between">
+      <CustomInput
+        :rows="6"
+        name="memo"
+        label="Memo"
+        class="flex-1"
+        type="textarea"
+        :has-label="true"
+        :error-has-text="true"
+        input-class="resize-none"
+        v-model="model.sales_order.memo"
+        :error="errors.sales_order?.memo"
+        placeholder="Add other notes here ..."
+      />
+      <div class="flex-1 flex items-end">
+        <div class="grid grid-cols-2 gap-5 ml-auto mr-0">
+          <!-- Sub total -->
+          <p class="flex-1 text-sm text-start">Sub total:</p>
+          <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
+            ₱ {{ model.sales_order.sub_total }}
+          </p>
+
+          <!-- Total Discount -->
+          <p class="flex-1 text-sm text-start">Total Discount:</p>
+          <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
+            ₱ {{ model.sales_order.total_discount }}
+          </p>
+
+          <hr class="col-span-2" />
+
+          <!-- Total -->
+          <p class="flex-1 text-sm text-start">Total:</p>
+          <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
+            ₱ {{ model.sales_order.total.toFixed(2) }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <hr />
     <div
       class="flex gap-3 mt-6"
       :class="route.query.id ? 'justify-between' : 'justify-end'"
@@ -330,6 +361,9 @@ const defaultModel = {
     customer_id: '',
     has_delivery: false,
     payment_method_id: '',
+    sub_total: 0.0,
+    total: 0.0,
+    total_discount: 0.0,
     status: SalesOrderStatus.OPEN,
     purchase_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
   },
@@ -603,6 +637,32 @@ watch(
   () => model.value,
   () => {
     setSalesOrderFormPageState()
+  },
+  { deep: true }
+)
+
+// watch for the sales order products
+watch(
+  () => model.value.sales_order_products,
+  () => {
+    if (model.value.sales_order_products.length) {
+      const amount = model.value.sales_order_products
+        .filter((p) => p.total)
+        .map((p) => parseFloat(p.total))
+
+      const discount = model.value.sales_order_products
+        .filter((p) => p.discount)
+        .map((p) => parseFloat(p.discount))
+
+      const subTotal = amount.length ? amount.reduce((a, b) => a + b) : 0.0
+      const totalDiscount = discount.length
+        ? discount.reduce((a, b) => a + b)
+        : 0.0
+
+      model.value.sales_order.sub_total = subTotal
+      model.value.sales_order.total_discount = totalDiscount
+      model.value.sales_order.total = subTotal - totalDiscount
+    }
   },
   { deep: true }
 )
