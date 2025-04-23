@@ -21,7 +21,11 @@
       </div>
     </template>
   </CustomTable>
-  <DeliveryModal v-if="showModal" v-model="showModal" />
+  <DeliveryModal
+    v-if="showModal"
+    :selected-id="selectedId"
+    v-model="showModal"
+  />
 </template>
 
 <script setup>
@@ -33,9 +37,12 @@ import { computed, onMounted, ref } from 'vue'
 import DeliveryModal from '@/components/sales/DeliveryModal.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import DeliveryRow from '@/components/sales/DeliveryRow.vue'
+import { storeToRefs } from 'pinia'
 
 const deliveryStore = useDeliveryStore()
+const { deliveries } = storeToRefs(deliveryStore)
 
+const selectedId = ref(0)
 const showModal = ref(false)
 
 /** ================================================
@@ -54,13 +61,14 @@ Event.on(rowPropInit, (data) => {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return deliveryStore.deliveries
+  return deliveries.value.filter((delivery) => delivery)
 })
 
 /** ================================================
  * METHODS
  ** ================================================*/
 const onView = (id) => {
+  selectedId.value = id
   showModal.value = true
 }
 
