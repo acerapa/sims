@@ -1,5 +1,5 @@
 <template>
-  <div class="flex">
+  <div class="flex fixed w-full overflow-auto">
     <SideNav />
     <div class="bg-gray-50 h-screen flex-1">
       <div class="flex-1">

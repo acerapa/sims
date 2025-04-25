@@ -1,26 +1,26 @@
 <template>
   <div
-    class="w-72 h-screen bg-regular-blue text-white z-30 relative"
+    class="w-72 h-screen bg-regular-blue text-white z-30 sticky top-0"
     :class="[
       isInitialLoad
         ? collpaseSideNav
-          ? 'w-[66px]'
+          ? 'w-[66px] min-w-[66px]'
           : 'w-72'
         : collpaseSideNav
           ? 'shrink-side-nav'
           : 'expand-side-nav'
     ]"
   >
-    <!-- toggle collapse button -->
-    <button
-      class="btn-outline collapse-btn"
-      :class="[collpaseSideNav ? 'rotate-180' : 'rotate-180-reverse']"
-      @click="onCollapse"
-    >
-      <img :src="leftArrow" class="w-3" alt="leftArrow.png" />
-    </button>
     <!-- User Profile -->
     <div class="bg-lighter-blue flex p-3 items-center h-15 relative">
+      <!-- toggle collapse button -->
+      <button
+        class="btn-outline collapse-btn"
+        :class="[collpaseSideNav ? 'rotate-180' : 'rotate-180-reverse']"
+        @click="onCollapse"
+      >
+        <img :src="leftArrow" class="w-3" alt="leftArrow.png" />
+      </button>
       <div class="flex justify-between items-center gap-3 flex-1">
         <img
           alt="profile"
