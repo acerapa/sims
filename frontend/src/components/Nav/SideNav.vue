@@ -1,17 +1,51 @@
 <template>
-  <div class="w-72 fixed h-screen bg-regular-blue text-white z-30">
+  <div
+    class="w-72 h-screen bg-regular-blue text-white z-30 relative"
+    :class="[
+      isInitialLoad
+        ? collpaseSideNav
+          ? 'w-[66px]'
+          : 'w-72'
+        : collpaseSideNav
+          ? 'shrink-side-nav'
+          : 'expand-side-nav'
+    ]"
+  >
+    <!-- toggle collapse button -->
+    <button
+      class="btn-outline collapse-btn"
+      :class="[collpaseSideNav ? 'rotate-180' : 'rotate-180-reverse']"
+      @click="onCollapse"
+    >
+      <img :src="leftArrow" class="w-3" alt="leftArrow.png" />
+    </button>
     <!-- User Profile -->
     <div class="bg-lighter-blue flex p-3 items-center h-15 relative">
-      <div class="flex-1 cursor-pointer" @click.stop="showDropdown = true">
-        <p>Administrator</p>
-        <p class="text-xs text-[#ADB3B9]">admin</p>
+      <div class="flex justify-between items-center gap-3 flex-1">
+        <img
+          alt="profile"
+          class="w-9 h-9 rounded-full cursor-pointer border-2 border-white"
+          src="@/assets/images/profile-sample.png"
+          @click.stop="showDropdown = true"
+        />
+        <div
+          class="flex-1 cursor-pointer"
+          :class="
+            isInitialLoad
+              ? collpaseSideNav
+                ? 'hidden'
+                : ''
+              : collpaseSideNav
+                ? 'fade-out'
+                : 'fade-in'
+          "
+          @click.stop="showDropdown = true"
+        >
+          <p>Administrator</p>
+          <p class="text-xs text-[#ADB3B9]">admin</p>
+        </div>
       </div>
-      <img
-        class="w-12 h-12 rounded-full cursor-pointer"
-        src="@/assets/images/profile-sample.png"
-        alt="profile"
-        @click.stop="showDropdown = true"
-      />
+
       <div class="dropdown flex flex-col" v-if="showDropdown">
         <button
           class="dropdown-item flex gap-2 items-center"
@@ -42,6 +76,8 @@
         :key="ndx"
         :nav="nav"
         @route-click="onRouteClick"
+        :is-collapse="collpaseSideNav"
+        :is-initial-load="isInitialLoad"
       />
     </div>
   </div>
@@ -56,17 +92,27 @@ import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { useAuth } from '@/composables/useAuth'
 
+import leftArrow from '@/assets/icons/arrow-left.svg'
+import { storeToRefs } from 'pinia'
+
 const route = useRoute()
 const router = useRouter()
 const targetRoutes = ref([])
 const appStore = useAppStore()
+const authUser = ref({})
 const showDropdown = ref(false)
+const isInitialLoad = ref(true)
+
+const { collpaseSideNav } = storeToRefs(appStore)
 
 // composables
-const { signOut } = useAuth()
+const { signOut, getAuthUser } = useAuth()
 
 // Custom global event
-onMounted(() => {
+onMounted(async () => {
+  authUser.value = await getAuthUser()
+  appStore.getCollpaseSideNav()
+
   Event.on(
     EventEnum.GLOBAL_CLICK,
     function () {
@@ -75,6 +121,11 @@ onMounted(() => {
     true
   )
 })
+
+const onCollapse = () => {
+  isInitialLoad.value = false
+  appStore.toggleSideNav()
+}
 
 const onLogout = async () => {
   await signOut()
@@ -150,5 +201,57 @@ getActiveRouteBasedIncludes(route)
 .navigations::-webkit-scrollbar-thumb {
   border-radius: 2px;
   background-color: #787878;
+}
+
+.collpase-nav {
+  @apply w-15 min-w-15 flex flex-col justify-center py-3;
+  background-color: rgb(21, 22, 91);
+}
+
+.collapse-btn {
+  @apply !border-2 !bg-blue-300 !border-white !p-2 !rounded-full absolute top-5 -right-4 z-10;
+}
+
+.fade-in:not(.initial-) {
+  animation: fade-in 0.5s ease-in-out forwards;
+}
+
+.fade-out {
+  animation: fade-out 0.5s ease-in-out forwards;
+}
+
+.rotate-180 {
+  animation: rotate-180 0.5s ease-in-out forwards;
+}
+
+.rotate-180-reverse {
+  animation: rotate-180-reverse 0.5s ease-in-out forwards;
+}
+
+.shrink-side-nav {
+  animation: shrink 0.5s ease-in-out forwards;
+}
+
+.expand-side-nav {
+  animation: expand 0.5s ease-in-out forwards;
+}
+
+@keyframes shrink {
+  0% {
+    width: 288px;
+  }
+
+  100% {
+    width: 66px;
+  }
+}
+
+@keyframes expand {
+  0% {
+    width: 66px;
+  }
+  100% {
+    width: 288px;
+  }
 }
 </style>

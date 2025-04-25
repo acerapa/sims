@@ -1,29 +1,47 @@
 <template>
   <div class="flex flex-col gap-3">
     <RouterLink
-      class="px-5 py-3 flex gap-3 items-center"
+      class="px-5 py-3 flex items-center"
       :to="{ name: props.nav.route }"
       active-class="bg-dark-blue font-bold"
-      :class="isIncludedRoute(nav) ? 'bg-dark-blue font-bold exact-active' : ''"
+      :class="[
+        isIncludedRoute(nav) ? 'bg-dark-blue font-bold exact-active' : '',
+        props.isCollapse ? 'hoverable' : 'gap-3'
+      ]"
       @click="emitRouteClick(props.nav.route, props.nav.children)"
     >
       <div
-        class="flex-1 flex items-center gap-3 text-sm tracking-wider text-nowrap"
+        class="flex items-center text-sm gap-3 flex-1 tracking-wider text-nowrap"
       >
         <img :src="props.nav.icon" alt="" />
-        {{ props.nav.text }}
+        <span
+          :class="
+            props.isInitialLoad
+              ? props.isCollapse
+                ? 'hidden'
+                : ''
+              : props.isCollapse
+                ? 'fade-out'
+                : 'fade-in'
+          "
+        >
+          {{ props.nav.text }}
+        </span>
       </div>
       <img
-        v-if="props.nav.children"
+        v-if="props.nav.children && !props.isCollapse"
         class="w-6 h-6"
-        :class="isOpenChildNav() ? '' : '-rotate-90'"
+        :class="[
+          isOpenChildNav() ? '' : '-rotate-90',
+          !props.isCollapse && props.nav.children ? 'fade-in' : 'fade-out'
+        ]"
         src="@/assets/icons/carret-down.svg"
         @click="showDropDown"
         alt="carret"
       />
     </RouterLink>
     <div
-      v-if="props.nav.children"
+      v-if="props.nav.children && !props.isCollapse"
       class="flex-col gap-3 pl-8"
       :class="isOpenChildNav() ? '!flex' : 'hidden'"
     >
@@ -59,6 +77,14 @@ const props = defineProps({
   nav: {
     type: Object,
     default: () => ({})
+  },
+  isCollapse: {
+    type: Boolean,
+    default: false
+  },
+  isInitialLoad: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -98,5 +124,16 @@ const isIncludedRoute = (rt) => {
 
 .dot {
   display: none;
+}
+
+.hoverable:hover {
+  @apply bg-dark-blue;
+}
+
+.fade-in {
+  animation: fade-in 0.5s ease-in-out forwards;
+}
+.fade-out {
+  animation: fade-out 0.5s ease-in-out forwards;
 }
 </style>

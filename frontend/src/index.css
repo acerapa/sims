@@ -160,13 +160,23 @@ select.input {
 /*=====================================================
  * KEYFRAMES, ANIMATIONS, TRANSISTIONS
  ======================================================*/
-@keyframes rotate {
+@keyframes rotate-180 {
   0% {
     transform: rotate(0deg);
   }
 
   100% {
     transform: rotate(180deg);
+  }
+}
+
+@keyframes rotate-180-reverse {
+  0% {
+    transform: rotate(180deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
   }
 }
 

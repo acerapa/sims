@@ -2,7 +2,7 @@
   <div class="flex">
     <SideNav />
     <div class="bg-gray-50 h-screen flex-1">
-      <div class="flex-1 ml-72">
+      <div class="flex-1">
         <Header />
         <div class="w-full px-5 mt-5 flex flex-col gap-4">
           <Breadcrumbs />
