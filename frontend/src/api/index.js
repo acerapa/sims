@@ -11,7 +11,10 @@ const apiConfig = {
 }
 
 // const BASE_PATH = apiConfig.serverUrls[import.meta.env.MODE]
-const BASE_PATH = `${window.location.origin}/api/` // this is temporary only
+const BASE_PATH =
+  import.meta.env.VITE_IS_DEPLOYED_IN_RENDER === 'true'
+    ? 'https://sims-1gh9.onrender.com/api/'
+    : `${window.location.origin}/api/` // this is temporary only
 
 export const Method = Object.freeze({
   GET: 'GET',
