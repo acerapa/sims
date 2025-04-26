@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-72 h-screen bg-regular-blue text-white z-30 sticky top-0"
+    class="w-72 h-screen bg-regular-blue text-white z-[60] sticky top-0"
     :class="[
       isInitialLoad
         ? collpaseSideNav
@@ -71,14 +71,54 @@
 
     <!-- Navigations -->
     <div class="navigations py-5 overflow-y-auto h-[calc(100vh-72px)]">
-      <NavRow
-        v-for="(nav, ndx) in navs"
-        :key="ndx"
-        :nav="nav"
-        @route-click="onRouteClick"
-        :is-collapse="collpaseSideNav"
-        :is-initial-load="isInitialLoad"
-      />
+      <div
+        v-if="collpaseSideNav && isShowHeaderWithSubNavs"
+        class="child-nav text-black"
+        :style="{
+          top: `${headerWithSubNavs.position.top}px`
+        }"
+        @mouseenter="isShowHeaderWithSubNavs = true"
+        @mouseleave="isShowHeaderWithSubNavs = false"
+      >
+        <p class="text-sm font-bold whitespace-nowrap">
+          {{ headerWithSubNavs.title }}
+        </p>
+        <div class="flex flex-col gap-2" v-if="headerWithSubNavs.navs">
+          <hr />
+          <NavRow
+            v-for="(nav, ndx) in headerWithSubNavs.navs"
+            :key="ndx"
+            :nav="nav"
+            :has-icon="false"
+            :is-initial-load="true"
+            @route-click="onRouteClick"
+            :custom-active-class="'!bg-slate-400'"
+            class="[&>a]:!px-2 [&>a]:py-1 hover:bg-slate-400"
+          />
+        </div>
+      </div>
+      <div
+        :class="[
+          isInitialLoad
+            ? collpaseSideNav
+              ? 'w-[66px] min-w-[66px] overflow-hidden'
+              : 'w-72'
+            : collpaseSideNav
+              ? 'shrink-side-nav overflow-hidden'
+              : 'expand-side-nav'
+        ]"
+      >
+        <NavRow
+          v-for="(nav, ndx) in navs"
+          :key="ndx"
+          :nav="nav"
+          @route-click="onRouteClick"
+          :is-collapse="collpaseSideNav"
+          :is-initial-load="isInitialLoad"
+          @mouseleave="isShowHeaderWithSubNavs = false"
+          @mouseenter="(e) => setHeaderWithSubNavs(e, nav.text, nav.children)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -87,7 +127,7 @@ import { useAppStore } from '@/stores/app'
 import { useRoute, useRouter } from 'vue-router'
 import NavRow from './NavRow.vue'
 import navs from '@/data/nav'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { useAuth } from '@/composables/useAuth'
@@ -102,26 +142,22 @@ const appStore = useAppStore()
 const authUser = ref({})
 const showDropdown = ref(false)
 const isInitialLoad = ref(true)
+const isShowHeaderWithSubNavs = ref(false)
+
+const headerWithSubNavs = reactive({
+  title: '',
+  navs: [],
+  position: {}
+})
 
 const { collpaseSideNav } = storeToRefs(appStore)
 
 // composables
 const { signOut, getAuthUser } = useAuth()
 
-// Custom global event
-onMounted(async () => {
-  authUser.value = await getAuthUser()
-  appStore.getCollpaseSideNav()
-
-  Event.on(
-    EventEnum.GLOBAL_CLICK,
-    function () {
-      showDropdown.value = false
-    },
-    true
-  )
-})
-
+/** ================================================
+ * METHODS
+ ** ================================================*/
 const onCollapse = () => {
   isInitialLoad.value = false
   appStore.toggleSideNav()
@@ -130,6 +166,14 @@ const onCollapse = () => {
 const onLogout = async () => {
   await signOut()
   router.go()
+}
+
+const setHeaderWithSubNavs = (e, title, sub_navs) => {
+  isShowHeaderWithSubNavs.value = true
+
+  headerWithSubNavs.title = title
+  headerWithSubNavs.navs = sub_navs
+  headerWithSubNavs.position = e.target.getBoundingClientRect()
 }
 
 const onRouteClick = (name = route.name, hasChild = false) => {
@@ -171,6 +215,25 @@ const getActiveRouteBasedIncludes = (route) => {
 
 navs.forEach((rt) => getIncludeActiveRoutes(rt))
 
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
+onMounted(async () => {
+  authUser.value = await getAuthUser()
+  appStore.getCollpaseSideNav()
+
+  Event.on(
+    EventEnum.GLOBAL_CLICK,
+    function () {
+      showDropdown.value = false
+    },
+    true
+  )
+})
+
+/** ================================================
+ * WATCHERS
+ * ================================================*/
 watch(route, (val) => {
   getActiveRouteBasedIncludes(val)
 })
@@ -210,6 +273,10 @@ getActiveRouteBasedIncludes(route)
 
 .collapse-btn {
   @apply !border-2 !bg-blue-300 !border-white !p-2 !rounded-full absolute top-5 -right-4 z-10;
+}
+
+.child-nav {
+  @apply bg-white absolute left-[66px] shadow-sm rounded border p-3 flex flex-col gap-3 z-[60];
 }
 
 .fade-in:not(.initial-) {

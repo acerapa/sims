@@ -11,49 +11,52 @@
       :selected-id="selectedReorderingId"
     />
     <div class="flex flex-col gap-6">
-      <CustomTable
-        :has-pagination="true"
-        class="w-[calc(100vw_-_328px)]"
-        title="Product Reordering Point"
-        :data="filteredReorderingPoints"
-        @add-new-record="onNewReorderingPoint"
-        :row-prop-init="productReorderingRowEvent"
-        :table-row-component="ProductReorderingPointRow"
-        @view="onViewReOrdering"
-      >
-        <template #table_header>
-          <div class="grid grid-cols-5 gap-3 min-w-[430px]">
-            <div class="col-span-2 flex gap-3 items-center">
-              <input type="checkbox" class="input" />
-              <p class="table-header">#</p>
+      <div ref="tableRefPoint">
+        <CustomTable
+          :has-pagination="true"
+          title="Product Reordering Point"
+          :data="filteredReorderingPoints"
+          @add-new-record="onNewReorderingPoint"
+          :row-prop-init="productReorderingRowEvent"
+          :table-row-component="ProductReorderingPointRow"
+          @view="onViewReOrdering"
+        >
+          <template #table_header>
+            <div class="grid grid-cols-5 gap-3 min-w-[430px]">
+              <div class="col-span-2 flex gap-3 items-center">
+                <input type="checkbox" class="input" />
+                <p class="table-header">#</p>
+              </div>
+              <p class="table-header col-span-3">Points</p>
             </div>
-            <p class="table-header col-span-3">Points</p>
-          </div>
-        </template>
-      </CustomTable>
-      <CustomTable
-        :has-add-btn="true"
-        :has-pagination="true"
-        :has-check-box="false"
-        title="Product Categories"
-        class="w-[calc(100vw_-_328px)]"
-        :data="filteredProductCategories"
-        @add-new-record="onNewProductCategory"
-        :row-prop-init="productCategoryRowEvent"
-        :table-row-component="ProductCategoryRow"
-      >
-        <template #table_header>
-          <div class="grid gap-3 grid-cols-7 min-w-[550px] px-3">
-            <div class="col-span-1 flex gap-3 items-center">
-              <!-- <input type="checkbox" class="input" /> -->
-              <p class="table-header">#</p>
+          </template>
+        </CustomTable>
+      </div>
+
+      <div ref="tableRefCat">
+        <CustomTable
+          :has-add-btn="true"
+          :has-pagination="true"
+          :has-check-box="false"
+          title="Product Categories"
+          :data="filteredProductCategories"
+          @add-new-record="onNewProductCategory"
+          :row-prop-init="productCategoryRowEvent"
+          :table-row-component="ProductCategoryRow"
+        >
+          <template #table_header>
+            <div class="grid gap-3 grid-cols-7 min-w-[550px] px-3">
+              <div class="col-span-1 flex gap-3 items-center">
+                <!-- <input type="checkbox" class="input" /> -->
+                <p class="table-header">#</p>
+              </div>
+              <p class="col-span-3 table-header">Name</p>
+              <p class="col-span-1 table-header">Sub Cats</p>
+              <p class="col-span-2 table-header">Date Added</p>
             </div>
-            <p class="col-span-3 table-header">Name</p>
-            <p class="col-span-1 table-header">Sub Cats</p>
-            <p class="col-span-2 table-header">Date Added</p>
-          </div>
-        </template>
-      </CustomTable>
+          </template>
+        </CustomTable>
+      </div>
     </div>
   </div>
 </template>
@@ -67,6 +70,7 @@ import CustomTable from '@/components/shared/CustomTable.vue'
 import ProductReorderingPointRow from '@/components/Settings/ProductReorderingPointRow.vue'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const settingsStore = useSettingsStore()
 
@@ -75,6 +79,13 @@ const showReorderingPointModal = ref(false)
 
 const selectedCategoryId = ref(0)
 const showCategoryModal = ref(false)
+
+const tableRefPoint = ref(null)
+const tableRefCat = ref(null)
+
+// composables
+useTableScroll(tableRefPoint, false)
+useTableScroll(tableRefCat, false)
 
 /** ================================================
  * EVENTS

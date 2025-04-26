@@ -1,30 +1,31 @@
 <template>
-  <CustomTable
-    @view="onView"
-    :has-add-btn="true"
-    :data="filteredData"
-    :has-pagination="true"
-    :row-prop-init="rowPropInit"
-    class="w-[calc(100vw_-_328px)]"
-    v-model:search-text="searchText"
-    @add-new-record="onAddNewRecord"
-    :table-row-component="IbrrListRow"
-  >
-    <template #table_header>
-      <div class="grid grid-cols-9 gap-3 min-w-[1020px]">
-        <div class="col-span-1 flex gap-3 items-center">
-          <input type="checkbox" class="input" />
-          <p class="table-header">#</p>
+  <div ref="tableRef">
+    <CustomTable
+      @view="onView"
+      :has-add-btn="true"
+      :data="filteredData"
+      :has-pagination="true"
+      :row-prop-init="rowPropInit"
+      v-model:search-text="searchText"
+      @add-new-record="onAddNewRecord"
+      :table-row-component="IbrrListRow"
+    >
+      <template #table_header>
+        <div class="grid grid-cols-9 gap-3 min-w-[1020px]">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-1 table-header">STR #</p>
+          <p class="col-span-2 table-header">From</p>
+          <p class="col-span-1 table-header">Manager</p>
+          <p class="col-span-1 table-header">Process By</p>
+          <p class="col-span-2 table-header">When</p>
+          <p class="col-span-1 table-header">Status</p>
         </div>
-        <p class="col-span-1 table-header">STR #</p>
-        <p class="col-span-2 table-header">From</p>
-        <p class="col-span-1 table-header">Manager</p>
-        <p class="col-span-1 table-header">Process By</p>
-        <p class="col-span-2 table-header">When</p>
-        <p class="col-span-1 table-header">Status</p>
-      </div>
-    </template>
-  </CustomTable>
+      </template>
+    </CustomTable>
+  </div>
 </template>
 
 <script setup>
@@ -36,10 +37,16 @@ import { useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import IbrrListRow from '@/components/stock-transfer/ibrr-list-row.vue'
 import { TransferConst } from '@/const/route.constants'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const router = useRouter()
 const searchText = ref('')
+const tableRef = ref(null)
 const transferStore = useTransferStore()
+
+// composables
+useTableScroll(tableRef, false)
+
 /** ================================================
  * EVENTS
  ** ================================================*/

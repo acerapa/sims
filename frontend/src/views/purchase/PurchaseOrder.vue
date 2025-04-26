@@ -12,7 +12,7 @@
     :data="toUpdate"
     @after-update="purchaseOrderStore.fetchPurchaseOrders()"
   />
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-6" ref="tableRef">
     <RouterLink
       :to="{ name: PurchaseConst.PURCHASE_ORDER_FORM }"
       class="btn w-fit"
@@ -26,7 +26,6 @@
       :has-add-btn="false"
       :has-pagination="true"
       v-model:show-modal="showModal"
-      class="w-[calc(100vw_-_328px)]"
       v-model:search-text="searchText"
       :row-prop-init="purchaseOrderRowEvent"
       :table-row-component="PurchaseOrderRow"
@@ -125,6 +124,7 @@ import { useVendorStore } from '@/stores/supplier'
 import { DateHelpers } from 'shared'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const toDelete = ref()
 const toUpdate = ref()
@@ -141,9 +141,12 @@ const showModal = ref(false)
 const showRowMenu = ref(false)
 const showCancelModal = ref(false)
 const showDeleteConfirmation = ref(false)
+const tableRef = ref(null)
 
 const router = useRouter()
 const supplierStore = useVendorStore()
+
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS

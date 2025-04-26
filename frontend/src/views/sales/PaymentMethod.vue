@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="tableRef">
     <CustomTable
       class="!w-auto"
       :data="filteredData"
@@ -34,11 +34,16 @@ import PaymentMethodRow from '@/components/sales/payment-method/PaymentMethodRow
 import PaymentMethodModal from '@/components/sales/payment-method/PaymentMethodModal.vue'
 import { computed, onMounted, ref } from 'vue'
 import Event from '@/event'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const paymentMethodStore = usePaymentMethodStore()
 
 const showModal = ref(false)
 const selectedId = ref(null)
+const tableRef = ref(null)
+
+// composables
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS

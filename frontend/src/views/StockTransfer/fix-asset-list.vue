@@ -1,11 +1,10 @@
 <template>
-  <div>
+  <div ref="tableRef">
     <CustomTable
       :data="filteredData"
       title="Fix Asset List"
       :has-pagination="true"
       :row-prop-init="rowPropInit"
-      class="w-[calc(100vw_-_328px)]"
       @add-new-record="onAddNewRecord"
       v-model:search-text="searchText"
       :table-row-component="FixAssetRow"
@@ -37,10 +36,15 @@ import Event from '@/event'
 import { EventEnum } from '../../data/event/index'
 import { DateHelpers } from 'shared/helpers'
 import { TransferConst } from '@/const/route.constants'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const router = useRouter()
 const searchText = ref('')
+const tableRef = ref(null)
 const transferStore = useTransferStore()
+
+// composables
+useTableScroll(tableRef, false)
 
 Event.emit(EventEnum.IS_PAGE_LOADING)
 
