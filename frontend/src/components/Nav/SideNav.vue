@@ -70,7 +70,10 @@
     </div>
 
     <!-- Navigations -->
-    <div class="navigations py-5 overflow-y-auto h-[calc(100vh-72px)]">
+    <div
+      class="navigations py-5 overflow-y-auto h-[calc(100vh-72px)]"
+      :class="collpaseSideNav ? '' : 'overflow-x-clip'"
+    >
       <div
         v-if="collpaseSideNav && isShowHeaderWithSubNavs"
         class="child-nav text-black"
