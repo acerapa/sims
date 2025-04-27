@@ -65,18 +65,10 @@ const props = defineProps({
  * COMPUTED
  ** ================================================*/
 const customerName = computed(() => {
-  const customer = customers.value.find(
-    (c) => c.id == props.invoice.customer_id
-  )
-
-  return customer ? `${customer.first_name} ${customer.last_name}` : ''
+  return `${props.invoice.customer.first_name} ${props.invoice.customer.last_name}`
 })
 
 const employeeName = computed(() => {
-  const employee = employees.value.find(
-    (e) => e.id == props.invoice.employee_id
-  )
-
-  return employee ? `${employee.first_name} ${employee.last_name}` : ''
+  return `${props.invoice.sales_person.first_name} ${props.invoice.sales_person.last_name}`
 })
 </script>

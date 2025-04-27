@@ -5,6 +5,7 @@
       title="Invoice List"
       :table-row-component="InvoiceRow"
       :data="filteredData"
+      v-model:search-text="searchText"
       :row-prop-init="rowEventName"
       :has-pagination="true"
       @view="onView"
@@ -49,6 +50,7 @@ const { getEmployees } = useEmployeeStore()
 
 const router = useRouter()
 
+const searchText = ref('')
 const tableRef = ref(null)
 
 // composables
@@ -67,7 +69,18 @@ Event.on(rowEventName, (data) => {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return invoices.value
+  return invoices.value.filter((invoice) => {
+    const searchCondition = `
+      ${invoice.id} ${invoice.customer_id} ${invoice.employee_id}
+      ${invoice.issue_date} ${invoice.due_date} ${invoice.status} ${invoice.total}
+      ${invoice.customer.first_name} ${invoice.customer.last_name}
+      ${invoice.sales_person.first_name} ${invoice.sales_person.last_name}
+    `.toLowerCase()
+
+    return searchText.value
+      ? searchCondition.includes(searchText.value.toLowerCase())
+      : invoice
+  })
 })
 
 /** ================================================

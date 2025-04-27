@@ -1,7 +1,9 @@
 const { sequelize } = require("../models");
+const Customer = require("../models/customer");
 const Invoice = require("../models/invoice");
 const InvoiceProducts = require("../models/junction/invoice-products");
 const Product = require("../models/product");
+const User = require("../models/user");
 const { updateInvoice } = require("../services/InvoiceService");
 
 module.exports = {
@@ -9,6 +11,18 @@ module.exports = {
     try {
       const invoices = await Invoice.findAll({
         order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: Customer,
+            as: "customer",
+            attributes: ["id", "first_name", "last_name"],
+          },
+          {
+            model: User,
+            as: "sales_person",
+            attributes: ["id", "first_name", "last_name"],
+          },
+        ],
       });
 
       res.sendResponse({ invoices }, "Successfully fetched!");
