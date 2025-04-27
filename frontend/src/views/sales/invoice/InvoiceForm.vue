@@ -1,10 +1,29 @@
 <template>
   <div class="cont flex flex-col gap-3">
-    <div class="flex justify-between items-center py-3">
-      <h1 class="text-2xl font-bold">Invoice</h1>
+    <div class="flex justify-between items-start py-3">
+      <div class="flex gap-5 items-start">
+        <div>
+          <h1 class="text-2xl font-bold">
+            Invoice
+            <span class="font-normal ml-3" v-if="invoice"
+              >#{{ invoice.id }}</span
+            >
+          </h1>
+          <p v-if="invoice && invoice.sales_order_id">
+            Sales Order #{{ invoice.sales_order_id }}
+          </p>
+        </div>
+        <BadgeComponent
+          v-if="invoice"
+          class="mt-1.5"
+          :text="InvoiceStatusMap[invoice.status].text"
+          :custom-class="InvoiceStatusMap[invoice.status].class"
+        />
+      </div>
       <CustomInput
         type="date"
         :has-label="true"
+        :disabled="isView"
         name="invoice_date"
         label="Issue Date: "
         v-model="model.invoice.issue_date"
@@ -27,6 +46,7 @@
             placeholder="Select Employee"
             v-model="model.invoice.employee_id"
             :error="errors.invoice?.employee_id"
+            :disabled="isView"
             class="[&>div>div]:ml-2 w-fit [&>div>.error]:ml-2"
             @focus="() => onFocusResetError('invoice.employee_id')"
           />
@@ -60,6 +80,7 @@
             :has-label="true"
             :can-search="true"
             name="customer_id"
+            :disabled="isView"
             :has-add-new="true"
             :error-has-text="true"
             :options="customerOptions"
@@ -96,9 +117,11 @@
       <MultiSelectTable
         :format="invoiceProductModel"
         v-model="model.products"
+        :has-add-new-item="!isFromSalesOrder"
         :header-component="InvoiceFormHeader"
         :row-component="InvoiceFormRow"
         :row-event-name="rowEventName"
+        :is-disabled="isView"
         :row-props="{
           selected: model.products
         }"
@@ -115,6 +138,7 @@
         type="textarea"
         :rows="6"
         :has-label="true"
+        :disabled="isView"
         input-class="resize-none"
         v-model="model.invoice.memo"
         placeholder="Add other notes here ..."
@@ -129,17 +153,9 @@
 
           <!-- Discount -->
           <p class="flex-1 text-sm text-start">Discount:</p>
-          <div class="flex items-center gap-2">
-            <p>₱</p>
-            <CustomInput
-              type="number"
-              class="w-full"
-              name="discount"
-              placeholder="0.00"
-              input-class="text-end w-full"
-              v-model="model.invoice.discount"
-            />
-          </div>
+          <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
+            ₱ {{ model.invoice.discount.toFixed(2) }}
+          </p>
 
           <hr class="col-span-2" />
 
@@ -153,8 +169,10 @@
     </div>
     <hr class="mt-3" />
     <div class="flex gap-3 justify-end">
-      <button class="btn-danger-outline">Cancel</button>
-      <button class="btn" @click="onSubmit">Submit</button>
+      <button class="btn-danger-outline" @click="onBackOrCancel">
+        {{ isView ? 'Back' : 'Cancel' }}
+      </button>
+      <button v-if="!isView" class="btn" @click="onSubmit">Submit</button>
     </div>
   </div>
   <CustomerModal v-if="showCustomerModal" v-model="showCustomerModal" />
@@ -173,7 +191,13 @@ import { storeToRefs } from 'pinia'
 import { useCustomerStore } from '@/stores/customer'
 import { useEmployeeStore } from '@/stores/employee'
 import { useSettingsStore } from '@/stores/settings'
-import { DateHelpers, InvoiceWithProductsSchema, UserTypeMap } from 'shared'
+import {
+  DateHelpers,
+  InvoiceStatusMap,
+  InvoiceWithProductsSchema,
+  ObjectHelpers,
+  UserTypeMap
+} from 'shared'
 import { useTableScroll } from '@/use/useTableScroll'
 import { useValidation } from '@/composables/useValidation'
 import Event from '@/event'
@@ -181,15 +205,20 @@ import { useInvoiceStore } from '@/stores/invoice'
 import { EventEnum } from '@/data/event'
 import { SalesConst } from '@/const/route.constants'
 import { ToastTypes } from '@/data/types'
-import { useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
+import BadgeComponent from '@/components/shared/BadgeComponent.vue'
+import { useSalesStore } from '@/stores/sales'
 
+const route = useRoute()
 const router = useRouter()
 const customerStore = useCustomerStore()
 const { customers } = storeToRefs(customerStore)
 const employeeStore = useEmployeeStore()
 const { employees } = storeToRefs(employeeStore)
 const { getCurrentBranch } = useSettingsStore()
-const { createInvoice } = useInvoiceStore()
+const salesStore = useSalesStore()
+const invoiceStore = useInvoiceStore()
+const { invoice } = storeToRefs(invoiceStore)
 
 const showCustomerModal = ref(false)
 
@@ -200,6 +229,8 @@ const rowEventName = ref('invoice-form-row-event')
 const invoiceProductModel = {
   product_id: '',
   quantity: 0,
+  discount: 0.0,
+  serial_number: '',
   price: 0,
   total: 0
 }
@@ -209,6 +240,7 @@ const model = ref({
     employee_id: '',
     customer_id: '',
     memo: '',
+    sales_order_id: '',
     issue_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
     due_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
     discount: 0.0,
@@ -259,6 +291,14 @@ const employeeInfo = computed(() => {
   return employees.value.find((e) => e.id == model.value.invoice.employee_id)
 })
 
+const isView = computed(() => {
+  return !!route.query.id
+})
+
+const isFromSalesOrder = computed(() => {
+  return !!route.query.sales_order_id
+})
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -279,7 +319,14 @@ const onSubmit = async () => {
 
   // create invoice
   let isSuccess = false
-  isSuccess = await createInvoice(model.value)
+
+  let data = { ...model.value }
+  if (isFromSalesOrder.value) {
+    delete data.invoice.customer_id
+    delete data.invoice.employee_id
+    delete data.products
+  }
+  isSuccess = await invoiceStore.createInvoice(model.value)
 
   if (isSuccess) {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -317,6 +364,61 @@ const onFocusResetError = (path) => {
   }
 }
 
+const onBackOrCancel = () => {
+  router.back()
+}
+
+const populateFormWithInvoiceData = async () => {
+  const isSuccess = await invoiceStore.fetchInvoiceById(route.query.id)
+
+  if (isSuccess) {
+    if (invoice.value.sales_order_id) {
+      populateFormWithSalesOrderData(invoice.value.sales_order)
+    } else {
+      model.value.invoice = ObjectHelpers.assignSameFields(
+        { ...model.value.invoice },
+        invoice.value
+      )
+
+      model.value.invoice.total = parseFloat(invoice.value.total)
+      model.value.invoice.discount = parseFloat(invoice.value.discount)
+      model.value.invoice.sub_total = parseFloat(invoice.value.sub_total)
+
+      model.value.invoice.issue_date = DateHelpers.formatDate(
+        invoice.value.issue_date,
+        'YYYY-MM-DD'
+      )
+
+      model.value.products = invoice.value.products.map((p) => {
+        return ObjectHelpers.assignSameFields(
+          { ...invoiceProductModel },
+          p.InvoiceProducts
+        )
+      })
+    }
+  }
+}
+
+const populateFormWithSalesOrderData = async (salesOrder = null) => {
+  if (!salesOrder) {
+    salesOrder = await salesStore.getSalesOrder(route.query.sales_order_id)
+  }
+
+  if (salesOrder) {
+    model.value.invoice.customer_id = salesOrder.customer_id
+    model.value.invoice.employee_id = salesOrder.user_id
+    model.value.invoice.sales_order_id = salesOrder.id
+  }
+
+  // Map products
+  model.value.products = salesOrder.products.map((p) => {
+    return ObjectHelpers.assignSameFields(
+      { ...invoiceProductModel },
+      p.SalesOrderProduct
+    )
+  })
+}
+
 /** ================================================
  * LIFECYCLE HOOKS
  ** ================================================*/
@@ -326,7 +428,20 @@ onMounted(async () => {
 
   currentBranch.value = await getCurrentBranch()
 
+  if (route.query.id) {
+    populateFormWithInvoiceData()
+  } else if (route.query.sales_order_id) {
+    populateFormWithSalesOrderData()
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
+
+onBeforeRouteLeave(() => {
+  // clear the invoice store
+  if (route.query.id) {
+    invoiceStore.invoice = null
+  }
 })
 
 /** ================================================
@@ -338,6 +453,11 @@ watch(
     model.value.invoice.sub_total = model.value.products
       .filter((p) => p.product_id && p.total)
       .map((p) => (p.total ? parseFloat(p.total) : 0.0))
+      .reduce((acc, curr) => acc + curr, 0)
+
+    model.value.invoice.discount = model.value.products
+      .filter((p) => p.product_id && p.discount)
+      .map((p) => (p.discount ? parseFloat(p.discount) : 0.0))
       .reduce((acc, curr) => acc + curr, 0)
   },
   { deep: true }

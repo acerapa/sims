@@ -40,6 +40,28 @@ Product.belongsToMany(Invoice, {
   as: "invoices",
 });
 
+// invoice to customer
+Invoice.belongsTo(Customer, {
+  foreignKey: "customer_id",
+  as: "customer",
+});
+
+Customer.hasMany(Invoice, {
+  foreignKey: "customer_id",
+  as: "invoices",
+});
+
+// invoice to user/sales person
+Invoice.belongsTo(User, {
+  foreignKey: "employee_id",
+  as: "sales_person",
+});
+
+User.hasMany(Invoice, {
+  foreignKey: "employee_id",
+  as: "invoices",
+});
+
 // Sales Order, Product, Address, Invoice and Sales Order Product Relations
 SalesOrder.belongsToMany(Product, {
   through: SalesOrderProduct,

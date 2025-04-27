@@ -5,6 +5,7 @@
       title="Invoice List"
       :table-row-component="InvoiceRow"
       :data="filteredData"
+      v-model:search-text="searchText"
       :row-prop-init="rowEventName"
       :has-pagination="true"
       @view="onView"
@@ -49,6 +50,7 @@ const { getEmployees } = useEmployeeStore()
 
 const router = useRouter()
 
+const searchText = ref('')
 const tableRef = ref(null)
 
 // composables
@@ -67,7 +69,26 @@ Event.on(rowEventName, (data) => {
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return invoices.value
+  return invoices.value.filter((invoice) => {
+    let { customer, sales_person } = invoice
+    if (!customer) {
+      customer = invoice.sales_order.customer
+    }
+    if (!sales_person) {
+      sales_person = invoice.sales_order.sales_person
+    }
+
+    const searchCondition = `
+      ${invoice.id} ${invoice.customer_id} ${invoice.employee_id}
+      ${invoice.issue_date} ${invoice.due_date} ${invoice.status} ${invoice.total}
+      ${customer.first_name} ${customer.last_name}
+      ${sales_person.first_name} ${sales_person.last_name}
+    `.toLowerCase()
+
+    return searchText.value
+      ? searchCondition.includes(searchText.value.toLowerCase())
+      : invoice
+  })
 })
 
 /** ================================================
@@ -90,7 +111,7 @@ const onView = (id) => {
  * LIFECYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await invoiceStore.fetchInvoices()
+  await invoiceStore.getInvoices()
   await getCustomers()
   await getEmployees()
 

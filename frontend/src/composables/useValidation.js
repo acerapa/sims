@@ -1,6 +1,8 @@
 import { computed, ref } from 'vue'
 
-export function useValidation(schema, data) {
+export function useValidation(schema, data, options = {}) {
+  const { abortEarly = false, stripUnkknown = false } = options
+
   const errors = ref({})
 
   const hasErrors = computed(() => {
@@ -9,7 +11,7 @@ export function useValidation(schema, data) {
 
   const validateData = () => {
     errors.value = {}
-    const { error } = schema.validate(data, { abortEarly: false })
+    const { error } = schema.validate(data, { abortEarly, stripUnkknown })
     if (error) {
       error.details.forEach((e) => {
         setDepthValue(0, e.path, e.message, errors.value)

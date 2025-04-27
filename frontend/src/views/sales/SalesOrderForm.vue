@@ -1,13 +1,19 @@
 <template>
   <div class="cont flex flex-col gap-5">
     <div class="flex justify-between items-center py-3">
-      <h1 class="text-2xl font-bold">Sales Order</h1>
+      <h1 class="text-2xl font-bold">
+        Sales Order
+        <span class="font-normal ml-3" v-if="isEdit"
+          >#{{ route.query.id }}</span
+        >
+      </h1>
       <CustomInput
         type="date"
         :has-label="true"
         name="purchase_date"
         label="Purchase Date:"
         :error-has-text="true"
+        :disabled="isEdit"
         v-model="model.sales_order.purchase_date"
         :error="errors.sales_order?.purchase_date"
         class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
@@ -20,8 +26,15 @@
         <SelectStatusDropdown
           v-model="model.sales_order.status"
           :status-map="SalesOrderStatusMap"
+          :class="isInvoicedOrCancelled ? 'pointer-events-none' : ''"
         />
-        <button class="btn-green">Generate Invoice</button>
+        <button
+          class="btn-green"
+          @click="onGenerateInvoice"
+          v-if="!isInvoicedOrCancelled"
+        >
+          Generate Invoice
+        </button>
       </div>
     </div>
     <div class="flex flex-col gap-4 py-4">
@@ -37,6 +50,7 @@
           :error-has-text="true"
           placeholder="Prepared By"
           :options="employeeOptions"
+          :disabled="isInvoicedOrCancelled"
           v-model="model.sales_order.user_id"
           @add-new="showEmployeeModal = true"
           :error="errors.sales_order?.user_id"
@@ -49,13 +63,13 @@
           :has-add-new="true"
           name="customer_id"
           :can-search="true"
+          :disabled="isEdit"
           :error-has-text="true"
           :options="customerOptions"
           placeholder="Select Customer"
           @add-new="showCustomerModel = true"
           v-model="model.sales_order.customer_id"
           :error="errors.sales_order?.customer_id"
-          :disabled="route.query.id ? true : false"
         />
       </div>
       <div class="flex flex-col gap-3 flex-1">
@@ -79,6 +93,7 @@
             :error-has-text="true"
             placeholder="Order Type"
             v-model="model.sales_order.type"
+            :disabled="isInvoicedOrCancelled"
             :error="errors.sales_order?.type"
           />
           <CustomInput
@@ -90,6 +105,7 @@
             :error-has-text="true"
             name="payment_method_id"
             :options="paymentMethodOptions"
+            :disabled="isInvoicedOrCancelled"
             placeholder="Select Payment Method"
             @add-new="paymentMethodModal = true"
             v-model="model.sales_order.payment_method_id"
@@ -134,6 +150,7 @@
           name="delivery_date"
           label="Delivery Date"
           :error-has-text="true"
+          :disabled="isInvoicedOrCancelled"
           v-model="model.delivery.delivery_date"
           :error="errors.delivery?.delivery_date"
         />
@@ -146,6 +163,7 @@
           placeholder="Courier"
           :error-has-text="true"
           v-model="model.delivery.courier"
+          :disabled="isInvoicedOrCancelled"
           :error="errors.delivery?.courier"
         />
       </div>
@@ -166,7 +184,9 @@
           :has-label="true"
           v-model="model.delivery.address"
           :address-errors="errors.delivery?.address"
-          :disabled="model.delivery.use_customer_address"
+          :disabled="
+            model.delivery.use_customer_address || isInvoicedOrCancelled
+          "
         />
       </div>
     </div>
@@ -184,6 +204,7 @@
         :row-props="{
           selected: model.sales_order_products
         }"
+        :is-disabled="isInvoicedOrCancelled"
       ></MultiSelectTable>
     </div>
   </div>
@@ -202,6 +223,7 @@
         input-class="resize-none"
         v-model="model.sales_order.memo"
         :error="errors.sales_order?.memo"
+        :disabled="isInvoicedOrCancelled"
         placeholder="Add other notes here ..."
       />
       <div class="flex-1 flex items-end">
@@ -235,14 +257,14 @@
     >
       <button
         class="btn-danger-outline"
-        v-if="route.query.id"
         @click="showDeleteModal = true"
+        v-if="route.query.id && !isInvoicedOrCancelled"
       >
         Delete
       </button>
       <div class="flex gap-3">
         <RouterLink :to="{ name: SalesConst.SALES }" class="btn-gray-outline">
-          {{ isDisabled ? 'Back' : 'Cancel' }}
+          {{ isInvoicedOrCancelled ? 'Back' : 'Cancel' }}
         </RouterLink>
         <button
           type="button"
@@ -265,7 +287,7 @@
         <button
           type="button"
           class="btn"
-          v-if="route.query.id && !isDisabled"
+          v-if="route.query.id && !isInvoicedOrCancelled"
           @click="onSubmit(false)"
         >
           Update
@@ -324,7 +346,6 @@ import { useAuth } from '@/composables/useAuth'
 const route = useRoute()
 const router = useRouter()
 
-const isDisabled = ref(false)
 const showDeleteModal = ref(false)
 const showCustomerModel = ref(false)
 const showEmployeeModal = ref(false)
@@ -426,6 +447,13 @@ const employeeOptions = computed(() =>
   })
 )
 
+const isInvoicedOrCancelled = computed(() => {
+  return (
+    model.value.sales_order.status === SalesOrderStatus.INVOICED ||
+    model.value.sales_order.status === SalesOrderStatus.CANCELLED
+  )
+})
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -462,6 +490,15 @@ const onSubmit = async (saveAndNew) => {
       type: ToastTypes.ERROR
     })
   }
+}
+
+const onGenerateInvoice = async () => {
+  router.push({
+    name: SalesConst.INVOICE_FORM,
+    query: {
+      sales_order_id: route.query.id
+    }
+  })
 }
 
 const onAfterDelete = async () => {
