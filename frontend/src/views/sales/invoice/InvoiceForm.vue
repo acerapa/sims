@@ -1,13 +1,21 @@
 <template>
   <div class="cont flex flex-col gap-3">
-    <div class="flex justify-between items-center py-3">
-      <div class="flex gap-5 items-center">
-        <h1 class="text-2xl font-bold">
-          Invoice
-          <span class="font-normal ml-3" v-if="invoice">#{{ invoice.id }}</span>
-        </h1>
+    <div class="flex justify-between items-start py-3">
+      <div class="flex gap-5 items-start">
+        <div>
+          <h1 class="text-2xl font-bold">
+            Invoice
+            <span class="font-normal ml-3" v-if="invoice"
+              >#{{ invoice.id }}</span
+            >
+          </h1>
+          <p v-if="invoice && invoice.sales_order_id">
+            Sales Order #{{ invoice.sales_order_id }}
+          </p>
+        </div>
         <BadgeComponent
           v-if="invoice"
+          class="mt-1.5"
           :text="InvoiceStatusMap[invoice.status].text"
           :custom-class="InvoiceStatusMap[invoice.status].class"
         />
@@ -109,6 +117,7 @@
       <MultiSelectTable
         :format="invoiceProductModel"
         v-model="model.products"
+        :has-add-new-item="!isFromSalesOrder"
         :header-component="InvoiceFormHeader"
         :row-component="InvoiceFormRow"
         :row-event-name="rowEventName"
@@ -198,6 +207,7 @@ import { SalesConst } from '@/const/route.constants'
 import { ToastTypes } from '@/data/types'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import BadgeComponent from '@/components/shared/BadgeComponent.vue'
+import { useSalesStore } from '@/stores/sales'
 
 const route = useRoute()
 const router = useRouter()
@@ -206,6 +216,7 @@ const { customers } = storeToRefs(customerStore)
 const employeeStore = useEmployeeStore()
 const { employees } = storeToRefs(employeeStore)
 const { getCurrentBranch } = useSettingsStore()
+const salesStore = useSalesStore()
 const invoiceStore = useInvoiceStore()
 const { invoice } = storeToRefs(invoiceStore)
 
@@ -229,6 +240,7 @@ const model = ref({
     employee_id: '',
     customer_id: '',
     memo: '',
+    sales_order_id: '',
     issue_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
     due_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
     discount: 0.0,
@@ -271,16 +283,20 @@ const employeeOptions = computed(() => {
   })
 })
 
-const isView = computed(() => {
-  return !!route.query.id
-})
-
 const customerInfo = computed(() => {
   return customers.value.find((c) => c.id == model.value.invoice.customer_id)
 })
 
 const employeeInfo = computed(() => {
   return employees.value.find((e) => e.id == model.value.invoice.employee_id)
+})
+
+const isView = computed(() => {
+  return !!route.query.id
+})
+
+const isFromSalesOrder = computed(() => {
+  return !!route.query.sales_order_id
 })
 
 /** ================================================
@@ -304,6 +320,12 @@ const onSubmit = async () => {
   // create invoice
   let isSuccess = false
 
+  let data = { ...model.value }
+  if (isFromSalesOrder.value) {
+    delete data.invoice.customer_id
+    delete data.invoice.employee_id
+    delete data.products
+  }
   isSuccess = await invoiceStore.createInvoice(model.value)
 
   if (isSuccess) {
@@ -346,19 +368,13 @@ const onBackOrCancel = () => {
   router.back()
 }
 
-/** ================================================
- * LIFECYCLE HOOKS
- ** ================================================*/
-onMounted(async () => {
-  await customerStore.getCustomers()
-  await employeeStore.getEmployees()
+const populateFormWithInvoiceData = async () => {
+  const isSuccess = await invoiceStore.fetchInvoiceById(route.query.id)
 
-  currentBranch.value = await getCurrentBranch()
-
-  if (route.query.id) {
-    const isSuccess = await invoiceStore.fetchInvoiceById(route.query.id)
-
-    if (isSuccess) {
+  if (isSuccess) {
+    if (invoice.value.sales_order_id) {
+      populateFormWithSalesOrderData(invoice.value.sales_order)
+    } else {
       model.value.invoice = ObjectHelpers.assignSameFields(
         { ...model.value.invoice },
         invoice.value
@@ -380,6 +396,42 @@ onMounted(async () => {
         )
       })
     }
+  }
+}
+
+const populateFormWithSalesOrderData = async (salesOrder = null) => {
+  if (!salesOrder) {
+    salesOrder = await salesStore.getSalesOrder(route.query.sales_order_id)
+  }
+
+  if (salesOrder) {
+    model.value.invoice.customer_id = salesOrder.customer_id
+    model.value.invoice.employee_id = salesOrder.user_id
+    model.value.invoice.sales_order_id = salesOrder.id
+  }
+
+  // Map products
+  model.value.products = salesOrder.products.map((p) => {
+    return ObjectHelpers.assignSameFields(
+      { ...invoiceProductModel },
+      p.SalesOrderProduct
+    )
+  })
+}
+
+/** ================================================
+ * LIFECYCLE HOOKS
+ ** ================================================*/
+onMounted(async () => {
+  await customerStore.getCustomers()
+  await employeeStore.getEmployees()
+
+  currentBranch.value = await getCurrentBranch()
+
+  if (route.query.id) {
+    populateFormWithInvoiceData()
+  } else if (route.query.sales_order_id) {
+    populateFormWithSalesOrderData()
   }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)

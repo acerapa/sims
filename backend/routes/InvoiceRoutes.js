@@ -13,8 +13,8 @@ const { validateBody } = require("../middleware/request-validator");
 router.get("/", all);
 router.get("/:id", byId);
 
-router.put("/:id", validateBody(InvoiceWithProductsSchema), update);
+router.put("/:id", validateBody(InvoiceWithProductsSchema, true, true), update);
 
-router.post("/", validateBody(InvoiceWithProductsSchema), register);
+router.post("/", validateBody(InvoiceWithProductsSchema, true, true), register);
 
 module.exports = router;

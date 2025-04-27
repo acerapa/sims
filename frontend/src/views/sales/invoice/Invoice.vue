@@ -70,11 +70,19 @@ Event.on(rowEventName, (data) => {
  ** ================================================*/
 const filteredData = computed(() => {
   return invoices.value.filter((invoice) => {
+    let { customer, sales_person } = invoice
+    if (!customer) {
+      customer = invoice.sales_order.customer
+    }
+    if (!sales_person) {
+      sales_person = invoice.sales_order.sales_person
+    }
+
     const searchCondition = `
       ${invoice.id} ${invoice.customer_id} ${invoice.employee_id}
       ${invoice.issue_date} ${invoice.due_date} ${invoice.status} ${invoice.total}
-      ${invoice.customer.first_name} ${invoice.customer.last_name}
-      ${invoice.sales_person.first_name} ${invoice.sales_person.last_name}
+      ${customer.first_name} ${customer.last_name}
+      ${sales_person.first_name} ${sales_person.last_name}
     `.toLowerCase()
 
     return searchText.value

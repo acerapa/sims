@@ -38,19 +38,11 @@
 </template>
 
 <script setup>
-import { useCustomerStore } from '@/stores/customer'
-import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 
 import { InvoiceStatusMap } from 'shared'
 
 import BadgeComponent from '@/components/shared/BadgeComponent.vue'
-import { useEmployeeStore } from '@/stores/employee'
-
-const customerStore = useCustomerStore()
-const { customers } = storeToRefs(customerStore)
-const employeeStore = useEmployeeStore()
-const { employees } = storeToRefs(employeeStore)
 
 const emit = defineEmits(['view'])
 
@@ -65,10 +57,16 @@ const props = defineProps({
  * COMPUTED
  ** ================================================*/
 const customerName = computed(() => {
-  return `${props.invoice.customer.first_name} ${props.invoice.customer.last_name}`
+  let { customer } = props.invoice
+  if (!customer) customer = props.invoice.sales_order.customer
+
+  return `${customer.first_name} ${customer.last_name}`
 })
 
 const employeeName = computed(() => {
-  return `${props.invoice.sales_person.first_name} ${props.invoice.sales_person.last_name}`
+  let { sales_person } = props.invoice
+  if (!sales_person) sales_person = props.invoice.sales_order.sales_person
+
+  return `${sales_person.first_name} ${sales_person.last_name}`
 })
 </script>
