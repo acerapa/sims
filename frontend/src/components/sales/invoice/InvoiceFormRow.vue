@@ -1,7 +1,7 @@
 <template>
   <div
-    class="grid gap-3 min-w-[690px]"
-    :class="props.isDisabled ? 'grid-cols-8' : 'grid-cols-9'"
+    class="grid gap-3 min-w-[1295px]"
+    :class="props.isDisabled ? 'grid-cols-12' : 'grid-cols-13'"
   >
     <CustomInput
       type="select"
@@ -14,7 +14,19 @@
       @add-new="onAddNew"
       :options="productOptions"
       :error-has-text="false"
+      :disabled="props.isDisabled"
       :error="modelErrors.product_id"
+    />
+
+    <CustomInput
+      type="text"
+      name="serial_number"
+      class="col-span-3"
+      v-model="model.serial_number"
+      placeholder="Serial Number"
+      :error-has-text="false"
+      :disabled="props.isDisabled"
+      :error="modelErrors.serial_number"
     />
 
     <CustomInput
@@ -24,6 +36,7 @@
       v-model="model.quantity"
       placeholder=""
       :error-has-text="false"
+      :disabled="props.isDisabled"
       :error="modelErrors.quantity"
     />
 
@@ -35,7 +48,20 @@
       v-model="model.price"
       :error-has-text="false"
       :error="modelErrors.price"
+      :disabled="props.isDisabled"
     />
+
+    <CustomInput
+      type="number"
+      name="discount"
+      class="col-span-1"
+      placeholder="Discount"
+      v-model="model.discount"
+      :error-has-text="false"
+      :disabled="props.isDisabled"
+      :error="modelErrors.discount"
+    />
+
     <CustomInput
       type="number"
       name="total"
@@ -44,6 +70,7 @@
       v-model="model.total"
       :error-has-text="false"
       :error="modelErrors.total"
+      :disabled="props.isDisabled"
     />
     <p
       class="col-span-1 text-sm pl-3 mt-[10px]"

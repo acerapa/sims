@@ -47,6 +47,8 @@ const InvoiceProductSchema = joi.object({
   quantity: joi.number().min(1).required().messages({
     "*": "Quantity is required",
   }),
+  discount: joi.number().optional(),
+  serial_number: joi.string().allow("", null).optional(),
   price: joi.number().min(0.01).required().messages({
     "*": "Price is required",
   }),

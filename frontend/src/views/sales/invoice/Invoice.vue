@@ -90,7 +90,7 @@ const onView = (id) => {
  * LIFECYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await invoiceStore.fetchInvoices()
+  await invoiceStore.getInvoices()
   await getCustomers()
   await getEmployees()
 

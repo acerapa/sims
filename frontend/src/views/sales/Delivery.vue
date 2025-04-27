@@ -84,7 +84,7 @@ const onView = (id) => {
  * LIFECYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
-  await deliveryStore.fetchDeliveries()
+  await deliveryStore.getDeliveries()
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })

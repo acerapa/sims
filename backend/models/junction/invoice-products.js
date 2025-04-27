@@ -41,6 +41,14 @@ InvoiceProducts.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    serial_number: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    discount: {
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0.0,
+    },
   },
   {
     sequelize,
