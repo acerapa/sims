@@ -1,0 +1,68 @@
+const { Model, DataTypes } = require("sequelize");
+const Invoice = require("./invoice");
+const PaymentMenthod = require("./payment-method");
+const { sequelize } = require(".");
+const User = require("./user");
+const Customer = require("./customer");
+
+class ReceivePayment extends Model {}
+
+ReceivePayment.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    amount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    remaining_balance: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    payment_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    payment_method_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: PaymentMenthod,
+        key: "id",
+      },
+    },
+    invoice_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Invoice,
+        key: "id",
+      },
+    },
+    customer_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Customer,
+        key: "id",
+      },
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
+  },
+  {
+    sequelize,
+    timestamps: true,
+  }
+);
+
+module.exports = ReceivePayment;
