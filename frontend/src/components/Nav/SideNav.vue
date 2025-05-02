@@ -95,8 +95,8 @@
             :has-icon="false"
             :is-initial-load="true"
             @route-click="onRouteClick"
-            :custom-active-class="'!bg-slate-400'"
-            class="[&>a]:!px-2 [&>a]:py-1 hover:bg-slate-400"
+            :custom-active-class="'!bg-slate-50'"
+            class="[&>a]:!px-2 [&>a]:py-1 hover:bg-slate-50"
           />
         </div>
       </div>
@@ -279,7 +279,8 @@ getActiveRouteBasedIncludes(route)
 }
 
 .child-nav {
-  @apply bg-white absolute left-[66px] shadow-sm rounded border p-3 flex flex-col gap-3 z-[60];
+  background-color: #e2e7ec;
+  @apply absolute left-[66px] shadow-sm rounded border p-3 flex flex-col gap-3 z-[60];
 }
 
 .fade-in:not(.initial-) {
