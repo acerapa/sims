@@ -3,11 +3,10 @@ const Invoice = require("./invoice");
 const PaymentMenthod = require("./payment-method");
 const { sequelize } = require(".");
 const User = require("./user");
-const Customer = require("./customer");
 
-class ReceivePayment extends Model {}
+class ReceivedPayment extends Model {}
 
-ReceivePayment.init(
+ReceivedPayment.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -42,14 +41,6 @@ ReceivePayment.init(
         key: "id",
       },
     },
-    customer_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Customer,
-        key: "id",
-      },
-    },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -65,4 +56,4 @@ ReceivePayment.init(
   }
 );
 
-module.exports = ReceivePayment;
+module.exports = ReceivedPayment;

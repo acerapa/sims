@@ -1,4 +1,4 @@
-const ReceivePayment = require("../models/receive-payment");
+const ReceivePayment = require("../models/received-payment");
 
 module.exports = {
   all: async (req, res) => {
@@ -11,6 +11,20 @@ module.exports = {
       );
     } catch (error) {
       res.sendError({ error }, "Failed to fetch receive payments");
+    }
+  },
+
+  register: async (req, res) => {
+    try {
+      const data = req.body.validated;
+      const newReceivePayment = await ReceivePayment.create(data);
+
+      res.sendResponse(
+        { receive_payment: newReceivePayment },
+        "Successfully registered receive payment"
+      );
+    } catch (error) {
+      res.sendError({ error }, "Failed to register receive payment");
     }
   },
 };
