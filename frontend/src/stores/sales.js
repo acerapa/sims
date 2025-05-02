@@ -87,6 +87,15 @@ export const useSalesStore = defineStore('sales', () => {
     }
   }
 
+  const setSaleOrderStatus = async (id, status) => {
+    if (salesOrders.value.length) {
+      const index = salesOrders.value.findIndex((item) => item.id == id)
+      salesOrders.value[index].status = status
+    } else {
+      await fetchSalesOrders()
+    }
+  }
+
   return {
     salesOrder,
     salesOrders,
@@ -96,6 +105,7 @@ export const useSalesStore = defineStore('sales', () => {
     fetchSalesOrders,
     createSalesOrder,
     removeSalesOrder,
-    updateSalesOrder
+    updateSalesOrder,
+    setSaleOrderStatus
   }
 })
