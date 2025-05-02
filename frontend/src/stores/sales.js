@@ -1,8 +1,10 @@
 import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useDeliveryStore } from './delivery'
 
 export const useSalesStore = defineStore('sales', () => {
+  const deliveryStore = useDeliveryStore()
   const salesOrders = ref([])
   const salesOrder = ref()
 
@@ -16,6 +18,11 @@ export const useSalesStore = defineStore('sales', () => {
         salesOrders.value.unshift(res.data.order)
       } else {
         await fetchSalesOrders()
+      }
+
+      // add new created delivery to delivery store
+      if (res.data.order.delivery) {
+        deliveryStore.addDelivery(res.data.order.delivery)
       }
     }
 
@@ -37,6 +44,10 @@ export const useSalesStore = defineStore('sales', () => {
 
       if (salesOrder.value && salesOrder.value.id == id) {
         salesOrder.value = res.data.order
+      }
+
+      if (res.data.order.delivery) {
+        deliveryStore.addDelivery(res.data.order.delivery)
       }
     }
 
