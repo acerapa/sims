@@ -80,7 +80,7 @@ export default [
         path: '/received-payments',
         name: SalesConst.RECEIVED_PAYMENTS,
         component: () =>
-          import('@/views/sales/receive-payment/ReceivePayments.vue'),
+          import('@/views/sales/received-payment/ReceivedPayments.vue'),
         meta: {
           requiresAuth: true
         }
