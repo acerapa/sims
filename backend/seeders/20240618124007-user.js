@@ -10,21 +10,11 @@ const {
   removeSeederExecution,
 } = require("./misc/SeederHelpers");
 const { Op } = require("sequelize");
-const { removeConstraints } = require("../models");
+const { removeConstraints, setForeignKeyChecks } = require("../models");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    /**
-     * Add seed commands here.
-     *
-     * Example:
-     * await queryInterface.bulkInsert('People', [{
-     *   name: 'John Doe',
-     *   isBetaMember: false
-     * }], {});
-     */
-
     const isExecuted = await checkIfSeederExecuted(basename(__filename));
     if (!isExecuted) {
       const fields = [
@@ -103,6 +93,9 @@ module.exports = {
     // remove constaints
     await removeConstraints(User.getTableName(), queryInterface);
 
+    // Force to remove all the data
+    await setForeignKeyChecks(0);
+
     const seeder = await getSeederExecution(basename(__filename));
     if (seeder) {
       await User.destroy({
@@ -115,5 +108,7 @@ module.exports = {
 
       await removeSeederExecution(basename(__filename));
     }
+
+    await setForeignKeyChecks(1);
   },
 };

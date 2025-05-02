@@ -10,7 +10,7 @@ const {
 const { ConsoleColors } = require("shared/enums");
 const customerDummy = require("./dummy/customers");
 const { Op } = require("sequelize");
-const { removeConstraints } = require("../models");
+const { removeConstraints, setForeignKeyChecks } = require("../models");
 const Address = require("../models/address");
 
 /** @type {import('sequelize-cli').Migration} */
@@ -44,6 +44,9 @@ module.exports = {
     // remove constaints
     await removeConstraints(Customer.getTableName(), queryInterface);
 
+    // force to remove all the data
+    await setForeignKeyChecks(0);
+
     const seeder = await getSeederExecution(basename(__filename));
     if (seeder) {
       await Customer.destroy({
@@ -56,5 +59,7 @@ module.exports = {
 
       await removeSeederExecution(basename(__filename));
     }
+
+    await setForeignKeyChecks(1);
   },
 };

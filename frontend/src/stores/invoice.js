@@ -1,8 +1,11 @@
 import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useSalesStore } from './sales'
+import { SalesOrderStatus } from 'shared'
 
 export const useInvoiceStore = defineStore('invoice', () => {
+  const salesOrderStore = useSalesStore()
   const invoice = ref()
   const invoices = ref([])
 
@@ -40,6 +43,14 @@ export const useInvoiceStore = defineStore('invoice', () => {
         invoices.value.unshift(res.data.invoice)
       } else {
         await fetchInvoices()
+      }
+
+      if (model.invoice.sales_order_id) {
+        // update sales order in store status this is to avoid refetching the sales order
+        await salesOrderStore.setSaleOrderStatus(
+          model.invoice.sales_order_id,
+          SalesOrderStatus.INVOICED
+        )
       }
     }
 
