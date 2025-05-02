@@ -88,6 +88,11 @@ export default [
         icon: outlineDot
       },
       {
+        text: 'Received Payments',
+        route: SalesConst.RECEIVED_PAYMENTS,
+        icon: outlineDot
+      },
+      {
         text: 'Customers',
         route: SalesConst.CUSTOMERS,
         icon: outlineDot
