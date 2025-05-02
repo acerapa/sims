@@ -56,8 +56,22 @@ export const useDeliveryStore = defineStore('delivery', () => {
     return isSuccess
   }
 
+  const addDelivery = async (deliveryData) => {
+    if (!deliveries.value.length) {
+      await fetchDeliveries()
+    } else {
+      const index = deliveries.value.findIndex(
+        (item) => item.id == deliveryData.id
+      )
+      if (index > -1) {
+        deliveries.value[index] = deliveryData
+      } else {
+        deliveries.value.unshift(deliveryData)
+      }
+    }
+  }
+
   // getters
-  // TODO: Issue is that when creating a new sales order with delivery, it will not automatically fetched the deliveries
   const getDeliveries = async () => {
     if (!deliveries.value.length) {
       await fetchDeliveries()
@@ -70,6 +84,7 @@ export const useDeliveryStore = defineStore('delivery', () => {
     delivery,
     deliveries,
 
+    addDelivery,
     getDeliveries,
     getDeliveryById,
     fetchDeliveries,

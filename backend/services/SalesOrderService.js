@@ -70,7 +70,6 @@ const findSalesOrderMinimal = async (id) => {
       {
         model: Delivery,
         as: "delivery",
-        attributes: ["id"],
       },
       {
         model: Customer,
