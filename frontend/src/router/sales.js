@@ -75,6 +75,15 @@ export default [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/received-payments',
+        name: SalesConst.RECEIVED_PAYMENTS,
+        component: () =>
+          import('@/views/sales/received-payment/ReceivedPayments.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   }

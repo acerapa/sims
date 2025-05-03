@@ -30,7 +30,8 @@ export const SalesConst = Object.freeze({
   PAYMENT_METHODS: 'payment-methods',
   INVOICES: 'invoices',
   INVOICE_FORM: 'invoice-form',
-  DELIVERIES: 'deliveries'
+  DELIVERIES: 'deliveries',
+  RECEIVED_PAYMENTS: 'received-payments'
 })
 
 export const TransferConst = Object.freeze({

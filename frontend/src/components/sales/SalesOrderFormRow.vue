@@ -1,7 +1,7 @@
 <template>
   <div
     class="grid gap-3 min-w-[864px]"
-    :class="props.isDisabled ? 'grid-cols-12' : 'grid-cols-12'"
+    :class="props.isDisabled ? 'grid-cols-11' : 'grid-cols-12'"
   >
     <CustomInput
       type="select"
@@ -14,6 +14,7 @@
       @add-new="onAddNew"
       :options="productOptions"
       :error-has-text="false"
+      :disabled="props.isDisabled"
       :error="modelErrors.product_id"
     />
 
@@ -24,6 +25,7 @@
       v-model="model.serial_number"
       placeholder="Serial No."
       :error-has-text="false"
+      :disabled="props.isDisabled"
       :error="modelErrors.serial_number"
     />
 
@@ -34,6 +36,7 @@
       v-model="model.quantity"
       placeholder=""
       :error-has-text="false"
+      :disabled="props.isDisabled"
       :error="modelErrors.quantity"
     />
 
@@ -44,6 +47,7 @@
       v-model="model.discount"
       placeholder=""
       :error-has-text="false"
+      :disabled="props.isDisabled"
       :error="modelErrors.discount"
     />
 
@@ -55,6 +59,7 @@
       v-model="model.price"
       :error-has-text="false"
       :error="modelErrors.price"
+      :disabled="props.isDisabled"
     />
     <CustomInput
       type="number"
@@ -64,6 +69,7 @@
       v-model="model.total"
       :error-has-text="false"
       :error="modelErrors.total"
+      :disabled="props.isDisabled"
     />
     <p
       class="col-span-1 text-sm pl-3 mt-[10px]"

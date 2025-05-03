@@ -10,6 +10,7 @@ const DeliveryValidators = require("./delivery");
 const SalesOrderValidators = require("./sales-order");
 const NotificationValidators = require("./notification");
 const PurchaseOrderValidators = require("./purchase-order");
+const ReceivePaymentsValidators = require("./received-payments");
 
 const Joi = require("joi");
 
@@ -27,4 +28,5 @@ module.exports = {
   ...SalesOrderValidators,
   ...NotificationValidators,
   ...PurchaseOrderValidators,
+  ...ReceivePaymentsValidators,
 };
