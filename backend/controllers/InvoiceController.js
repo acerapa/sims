@@ -3,7 +3,6 @@ const { sequelize } = require("../models");
 const Customer = require("../models/customer");
 const Invoice = require("../models/invoice");
 const InvoiceProducts = require("../models/junction/invoice-products");
-const Product = require("../models/product");
 const SalesOrder = require("../models/sales-order");
 const User = require("../models/user");
 const {

@@ -3,7 +3,9 @@ const ReceivePayment = require("../models/received-payment");
 module.exports = {
   all: async (req, res) => {
     try {
-      const receivePayments = await ReceivePayment.findAll();
+      const receivePayments = await ReceivePayment.findAll({
+        order: [["id", "DESC"]],
+      });
 
       res.sendResponse(
         { receive_payments: receivePayments },

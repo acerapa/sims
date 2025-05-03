@@ -62,7 +62,7 @@ protectedRoutes.use("/invoices", invoiceRoutes);
 const deliveryRoutes = require("./DeliveryRoutes");
 protectedRoutes.use("/deliveries", deliveryRoutes);
 
-const receivePaymentRoutes = require("./ReceivePaymentRoutes");
+const receivePaymentRoutes = require("./ReceivedPaymentRoutes");
 protectedRoutes.use("/received-payments", receivePaymentRoutes);
 // end use routes
 

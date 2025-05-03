@@ -137,7 +137,7 @@
     <hr />
 
     <div class="flex gap-3 justify-end">
-      <button class="btn-danger-outline">Cancel</button>
+      <button class="btn-danger-outline" @click="onBackOrCancel">Cancel</button>
       <button class="btn" @click="onSubmit">Submit</button>
     </div>
   </div>
@@ -147,6 +147,7 @@
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useValidation } from '@/composables/useValidation'
+import { SalesConst } from '@/const/route.constants'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
 import Event from '@/event'
@@ -157,7 +158,9 @@ import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useReceivedPaymentsStore } from '@/stores/received-payments'
 import { DateHelpers, ReceivePaymentsSchema } from 'shared'
 import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const invoiceStore = useInvoiceStore()
 const customerStore = useCustomerStore()
 const employeeStore = useEmployeeStore()
@@ -165,7 +168,7 @@ const paymentMethodStore = usePaymentMethodStore()
 const receivedPaymentStore = useReceivedPaymentsStore()
 
 const selectedInvoice = ref(null)
-const customerId = ref(0)
+const customerId = ref(null)
 const model = ref({
   amount: 0,
   remaining_balance: 0,
@@ -202,16 +205,23 @@ const customerOptions = computed(() => {
 })
 
 const invoiceOptions = computed(() => {
-  return invoiceStore.invoices.map((invoice) => {
-    const customer = !invoice.sales_order_id
-      ? invoice.customer
-      : invoice.sales_order.customer
+  return invoiceStore.invoices
+    .filter((invoice) => {
+      const customer = !invoice.sales_order_id
+        ? invoice.customer
+        : invoice.sales_order.customer
+      return customerId.value ? customer.id === customerId.value : true
+    })
+    .map((invoice) => {
+      const customer = !invoice.sales_order_id
+        ? invoice.customer
+        : invoice.sales_order.customer
 
-    return {
-      text: `${customer.first_name} ${customer.last_name} - #${invoice.id}`,
-      value: invoice.id
-    }
-  })
+      return {
+        text: `${customer.first_name} ${customer.last_name} - #${invoice.id}`,
+        value: invoice.id
+      }
+    })
 })
 
 const paymentMethodsOptions = computed(() => {
@@ -255,12 +265,18 @@ const onSubmit = async () => {
       type: ToastTypes.SUCCESS,
       message: 'Received Payment successfully!'
     })
+
+    router.push({ name: SalesConst.RECEIVED_PAYMENTS })
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
       type: ToastTypes.ERROR,
       message: 'Failed to create received payment.'
     })
   }
+}
+
+const onBackOrCancel = () => {
+  router.push({ name: SalesConst.RECEIVED_PAYMENTS })
 }
 
 /** ================================================
