@@ -1,6 +1,7 @@
 <template>
   <CustomTable
     :data="filteredData"
+    :row-prop-init="rowPropInit"
     :btn-custom-text="'Receive Payment'"
     :table-row-component="ReceivedPaymentRow"
     @add-new-record="onAddNewRecord"
