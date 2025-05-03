@@ -84,6 +84,15 @@ export default [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/received-payment-form',
+        name: SalesConst.RECEIVED_PAYMENT_FORM,
+        component: () =>
+          import('@/views/sales/received-payment/ReceivedPaymentForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   }

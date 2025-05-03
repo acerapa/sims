@@ -77,6 +77,14 @@ export const useInvoiceStore = defineStore('invoice', () => {
     return invoices.value
   }
 
+  const getInvoiceById = async (id) => {
+    if (!invoice.value || invoice.value.id != id) {
+      await fetchInvoiceById(id)
+    }
+
+    return invoice.value
+  }
+
   return {
     invoice,
     invoices,
@@ -85,6 +93,7 @@ export const useInvoiceStore = defineStore('invoice', () => {
     updateInvoice,
     createInvoice,
     fetchInvoices,
+    getInvoiceById,
     fetchInvoiceById
   }
 })

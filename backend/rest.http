@@ -371,10 +371,10 @@ GET {{host}}/api/test/notification
 
 
 ### Receive Payment Testing
-GET {{host}}/api/receive-payments
+GET {{host}}/api/received-payments
 
 ###
-POST {{host}}/api/receive-payments
+POST {{host}}/api/received-payments
 Accept: application/json
 Content-Type: application/json
 

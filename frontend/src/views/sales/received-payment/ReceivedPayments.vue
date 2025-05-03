@@ -1,5 +1,10 @@
 <template>
-  <CustomTable :data="filteredData" :table-row-component="ReceivedPaymentRow">
+  <CustomTable
+    :data="filteredData"
+    :btn-custom-text="'Receive Payment'"
+    :table-row-component="ReceivedPaymentRow"
+    @add-new-record="onAddNewRecord"
+  >
     <template #table_header>
       <div class="grid grid-cols-9 gap-3">
         <div class="col-span-1 flex gap-3 items-center">
@@ -24,7 +29,11 @@ import ReceivedPaymentRow from '@/components/sales/received-payment/ReceivedPaym
 import { computed, onMounted } from 'vue'
 import { useReceivedPaymentsStore } from '@/stores/received-payments'
 import Event from '@/event'
+import { useRouter } from 'vue-router'
+import { SalesConst } from '@/const/route.constants'
+import { EventEnum } from '@/data/event'
 
+const router = useRouter()
 const receivedPaymentsStore = useReceivedPaymentsStore()
 
 /** ================================================
@@ -37,6 +46,8 @@ Event.on(rowPropInit, (data) => {
   }
 })
 
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
+
 /** ================================================
  * COMPUTED
  ** ================================================*/
@@ -47,9 +58,20 @@ const filteredData = computed(() => {
 })
 
 /** ================================================
+ * METHODS
+ ** ================================================*/
+const onAddNewRecord = () => {
+  router.push({
+    name: SalesConst.RECEIVED_PAYMENT_FORM
+  })
+}
+
+/** ================================================
  * LIFECYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
   await receivedPaymentsStore.getReceivedPayments()
+
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>

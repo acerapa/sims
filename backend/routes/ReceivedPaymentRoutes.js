@@ -1,4 +1,4 @@
-const { all, register } = require("../controllers/ReceivePaymentsConstroller");
+const { all, register } = require("../controllers/ReceivedPaymentsController");
 const { validateBody } = require("../middleware/request-validator");
 const { ReceivePaymentsSchema } = require("shared");
 
