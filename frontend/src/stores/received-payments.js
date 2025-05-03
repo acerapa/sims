@@ -6,7 +6,7 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
   const receivedPayments = ref([])
 
   const registerReceivedPayment = async (data) => {
-    const res = await api('/received-payments', Method.POST, data)
+    const res = await api('received-payments', Method.POST, data)
 
     const isSuccess = res.status < 400
 
@@ -19,7 +19,7 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
   }
 
   const fetchReceivedPayments = async () => {
-    const res = await api('/received-payments')
+    const res = await api('received-payments')
 
     const isSuccess = res.status < 400
 
