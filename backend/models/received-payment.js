@@ -25,6 +25,10 @@ ReceivedPayment.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    memo: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     payment_method_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

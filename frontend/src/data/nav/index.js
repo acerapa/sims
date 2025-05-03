@@ -90,7 +90,8 @@ export default [
       {
         text: 'Received Payments',
         route: SalesConst.RECEIVED_PAYMENTS,
-        icon: outlineDot
+        icon: outlineDot,
+        includes_active: [SalesConst.RECEIVED_PAYMENT_FORM]
       },
       {
         text: 'Customers',

@@ -14,6 +14,7 @@ const ReceivePaymentsSchema = Joi.object({
     "date.base": "Payment date must be a valid date",
     "any.required": "Payment date is required",
   }),
+  memo: Joi.string().allow(null, "").optional(),
   payment_method_id: Joi.number().required().messages({
     "number.base": "Payment method ID must be a number",
     "any.required": "Payment method ID is required",

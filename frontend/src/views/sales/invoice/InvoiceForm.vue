@@ -172,6 +172,9 @@
       <button class="btn-danger-outline" @click="onBackOrCancel">
         {{ isView ? 'Back' : 'Cancel' }}
       </button>
+      <button v-if="isView" class="btn" @click="onCustomerPayment">
+        Customer payment
+      </button>
       <button v-if="!isView" class="btn" @click="onSubmit">Submit</button>
     </div>
   </div>
@@ -416,6 +419,15 @@ const populateFormWithSalesOrderData = async (salesOrder = null) => {
       { ...invoiceProductModel },
       p.SalesOrderProduct
     )
+  })
+}
+
+const onCustomerPayment = () => {
+  router.push({
+    name: SalesConst.RECEIVED_PAYMENT_FORM,
+    query: {
+      invoice_id: route.query.id
+    }
   })
 }
 
