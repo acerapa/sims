@@ -24,6 +24,29 @@ const Invoice = require("./invoice");
 const PaymentMethod = require("./payment-method");
 const Delivery = require("./delivery");
 const InvoiceProducts = require("./junction/invoice-products");
+const ReceivedPayment = require("./received-payment");
+
+// receive payments to invoice
+Invoice.hasMany(ReceivedPayment, {
+  foreignKey: "invoice_id",
+  as: "received_payments",
+});
+
+ReceivedPayment.belongsTo(Invoice, {
+  foreignKey: "invoice_id",
+  as: "invoice",
+});
+
+// receive payments to user
+ReceivedPayment.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "cashier",
+});
+
+User.hasMany(ReceivedPayment, {
+  foreignKey: "user_id",
+  as: "received_payments",
+});
 
 // invoice to products
 Invoice.belongsToMany(Product, {
