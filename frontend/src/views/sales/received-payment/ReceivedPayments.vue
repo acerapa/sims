@@ -5,6 +5,7 @@
     :btn-custom-text="'Receive Payment'"
     :table-row-component="ReceivedPaymentRow"
     @add-new-record="onAddNewRecord"
+    @view="onView"
   >
     <template #table_header>
       <div class="grid grid-cols-9 gap-3">
@@ -64,6 +65,13 @@ const filteredData = computed(() => {
 const onAddNewRecord = () => {
   router.push({
     name: SalesConst.RECEIVED_PAYMENT_FORM
+  })
+}
+
+const onView = (id) => {
+  router.push({
+    name: SalesConst.RECEIVED_PAYMENT_FORM,
+    query: { id }
   })
 }
 

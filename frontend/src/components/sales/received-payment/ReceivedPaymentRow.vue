@@ -1,5 +1,8 @@
 <template>
-  <div class="grid grid-cols-9 gap-3 gen-table-row">
+  <div
+    class="grid grid-cols-9 gap-3 gen-table-row"
+    @click="emit('view', props.receivedPayment.id)"
+  >
     <div class="col-span-1 flex gap-3 items-center">
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.receivedPayment.id }}</p>
@@ -32,6 +35,8 @@ const props = defineProps({
     required: false
   }
 })
+
+const emit = defineEmits(['view'])
 
 /** ================================================
  * COMPUTED

@@ -51,6 +51,21 @@ module.exports = {
     }
   },
 
+  byId: async (req, res) => {
+    try {
+      const received_payment = await ReceivePayment.findByPk(req.params.id);
+
+      if (!received_payment) throw new Error("Received payment not found");
+
+      res.sendResponse(
+        { received_payment },
+        "Successfully fetched receive payment by ID"
+      );
+    } catch (error) {
+      res.sendError({ error }, "Failed to fetch receive payment by ID");
+    }
+  },
+
   register: async (req, res) => {
     try {
       const data = req.body.validated;

@@ -5,6 +5,7 @@
       <CustomInput
         type="date"
         :has-label="true"
+        :disabled="isView"
         name="payment_date"
         label="Payment Date: "
         :error-has-text="true"
@@ -23,6 +24,7 @@
         :has-label="true"
         name="customer_id"
         :can-search="true"
+        :disabled="isView"
         v-model="customerId"
         label="Select Customer"
         :options="customerOptions"
@@ -34,6 +36,7 @@
         name="invoice_id"
         :has-label="true"
         :can-search="true"
+        :disabled="isView"
         label="Select Invoice"
         :error-has-text="true"
         :options="invoiceOptions"
@@ -49,6 +52,7 @@
         class="flex-1"
         :has-label="true"
         :can-search="true"
+        :disabled="isView"
         :error-has-text="true"
         name="payment_method_id"
         label="Select Payment Method"
@@ -59,12 +63,14 @@
       />
 
       <CustomInput
+        step="0.01"
         type="number"
+        name="amount"
         class="flex-1"
         label="Amount"
-        name="amount"
         :has-label="true"
         :can-search="true"
+        :disabled="isView"
         :error="errors.amount"
         :error-has-text="true"
         v-model="model.amount"
@@ -81,6 +87,7 @@
         name="user_id"
         :has-label="true"
         :can-search="true"
+        :disabled="isView"
         label="Select Cashier"
         :error-has-text="true"
         :error="errors.user_id"
@@ -100,6 +107,7 @@
         type="textarea"
         :rows="6"
         :has-label="true"
+        :disabled="isView"
         v-model="model.memo"
         :error="errors.memo"
         :error-has-text="true"
@@ -120,7 +128,7 @@
           <!-- Payment Amount -->
           <p class="flex-1 text-sm text-start">Payment Amount:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.amount.toFixed(2) }}
+            ₱ {{ model.amount }}
           </p>
 
           <hr class="col-span-2" />
@@ -137,8 +145,13 @@
     <hr />
 
     <div class="flex gap-3 justify-end">
-      <button class="btn-danger-outline" @click="onBackOrCancel">Cancel</button>
-      <button class="btn" @click="onSubmit">Submit</button>
+      <button
+        :class="isView ? 'btn-gray-outline' : 'btn-danger-outline'"
+        @click="onBackOrCancel"
+      >
+        {{ isView ? 'Back' : 'Cancel' }}
+      </button>
+      <button class="btn" @click="onSubmit" v-if="!isView">Submit</button>
     </div>
   </div>
 </template>
@@ -158,8 +171,9 @@ import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useReceivedPaymentsStore } from '@/stores/received-payments'
 import { DateHelpers, ReceivePaymentsSchema } from 'shared'
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+const route = useRoute()
 const router = useRouter()
 const invoiceStore = useInvoiceStore()
 const customerStore = useCustomerStore()
@@ -242,6 +256,8 @@ const employeeOptions = computed(() => {
   })
 })
 
+const isView = computed(() => (route.query.id ? true : false))
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -293,6 +309,27 @@ onMounted(async () => {
     model.value.user_id = authUser.id
   }
 
+  if (isView.value) {
+    const receivedPayment = await receivedPaymentStore.getReceivedPaymentsById(
+      route.query.id
+    )
+
+    if (receivedPayment) {
+      model.value.invoice_id = receivedPayment.invoice_id
+      model.value.amount = parseFloat(receivedPayment.amount).toFixed(2)
+      model.value.remaining_balance = parseFloat(
+        receivedPayment.remaining_balance
+      )
+      model.value.payment_method_id = receivedPayment.payment_method_id
+      model.value.user_id = receivedPayment.user_id
+      model.value.memo = receivedPayment.memo
+      model.value.payment_date = DateHelpers.formatDate(
+        receivedPayment.payment_date,
+        'YYYY-MM-DD'
+      )
+    }
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 
@@ -317,6 +354,7 @@ watch(
 watch(
   () => model.value.amount,
   () => {
+    if (!selectedInvoice.value) return
     model.value.remaining_balance =
       selectedInvoice.value.total - model.value.amount
   }
