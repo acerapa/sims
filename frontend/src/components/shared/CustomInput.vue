@@ -8,7 +8,7 @@
         props.type != 'multi-string'
       "
     >
-      <small v-if="props.hasLabel" :class="props.labelCss">{{
+      <small v-if="props.hasLabel" :class="`${props.labelCss} text-gray-600`">{{
         props.label
       }}</small>
       <input
@@ -32,7 +32,7 @@
       <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'textarea'">
-      <small v-if="props.hasLabel" :class="props.labelCss">{{
+      <small v-if="props.hasLabel" :class="`${props.labelCss} text-gray-600`">{{
         props.label
       }}</small>
       <textarea
@@ -57,7 +57,7 @@
       <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'select'">
-      <small v-if="props.hasLabel" :class="props.labelCss">{{
+      <small v-if="props.hasLabel" :class="`${props.labelCss} text-gray-600`">{{
         props.label
       }}</small>
       <CustomSelectInput
@@ -89,7 +89,7 @@
       class="flex flex-col gap-1 relative"
       v-if="props.type == 'multi-string'"
     >
-      <small v-if="props.hasLabel" :class="props.labelCss">{{
+      <small v-if="props.hasLabel" :class="`${props.labelCss} text-gray-600`">{{
         props.label
       }}</small>
       <MultiStringInput

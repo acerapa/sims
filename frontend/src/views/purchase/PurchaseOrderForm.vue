@@ -12,40 +12,33 @@
     </RouterLink>
   </AlertComponent>
   <div class="flex flex-col gap-4">
-    <div class="bg-white rounded-2xl p-4 shadow flex flex-col gap-3">
+    <div class="bg-white rounded-2xl p-4 shadow flex flex-col gap-3 mb-10">
       <div class="flex justify-between items-center mb-4">
         <p
-          class="text-base font-semibold text-success"
-          v-if="status == PurchaseOrderStatus.COMPLETED"
+          :class="[
+            'text-base font-semibold',
+            isCompleted ? 'text-green-500' : ''
+          ]"
         >
-          Received Purchase Order
-        </p>
-        <p v-else class="text-base font-semibold">
-          {{ isEdit ? 'Edit' : 'New' }} Purchase Order
+          {{
+            isCompleted
+              ? 'Received Purchase Order'
+              : `${isEdit ? 'Edit' : 'New'} Purchase Order`
+          }}
         </p>
 
         <div class="flex gap-3 items-center">
           <SelectStatusDropdown
             :status-map="purchaseOrderStatus"
             v-model="model.order.status"
-            :class="
-              purchaseOrderStore.purchaseOrder &&
-              purchaseOrderStore.purchaseOrder.status ===
-                PurchaseOrderStatus.OPEN
-                ? ''
-                : 'pointer-events-none'
-            "
+            :class="isOpen ? '' : 'pointer-events-none'"
           />
           <button
             class="btn-green"
-            v-if="
-              purchaseOrderStore.purchaseOrder &&
-              purchaseOrderStore.purchaseOrder.status ===
-                PurchaseOrderStatus.CONFIRMED
-            "
+            v-if="isConfirmed || isCompleted"
             @click="onReceiveOrder"
           >
-            Recevie Order
+            {{ isCompleted ? 'View Items Received' : 'Receive Order' }}
           </button>
           <button type="button" class="btn float-right" @click="startPrint">
             &#128438; Print
@@ -178,11 +171,7 @@
       <div class="flex justify-between items-center mt-6">
         <div class="flex gap-2 items-center">
           <p class="text-base font-semibold">
-            {{
-              model.order.status == PurchaseOrderStatus.COMPLETED
-                ? 'Selected'
-                : 'Select'
-            }}
+            {{ isCompleted ? 'Selected' : 'Select' }}
             Products
           </p>
           <small
@@ -200,12 +189,7 @@
           :row-component="PurchaseOrderFormRow"
           :format="productFormat"
           v-model="model.products"
-          :is-disabled="
-            model.order.supplier_id &&
-            model.order.status != PurchaseOrderStatus.COMPLETED
-              ? false
-              : true
-          "
+          :is-disabled="model.order.supplier_id && !isCompleted ? false : true"
           :row-props="{
             sup_id: model.order.supplier_id.toString(),
             selected: model.products
@@ -213,14 +197,17 @@
           :row-event-name="rowEventName"
         >
           <template #aggregate>
-            <p class="text-end w-full">
-              Total: &#8369;
-              {{
-                model.order.amount.toLocaleString('en', {
-                  minimumFractionDigits: 2
-                })
-              }}
-            </p>
+            <div class="w-full flex-1 py-2">
+              <hr />
+              <p class="text-end w-full mt-3">
+                Total: &#8369;
+                {{
+                  model.order.amount.toLocaleString('en', {
+                    minimumFractionDigits: 2
+                  })
+                }}
+              </p>
+            </div>
           </template>
         </MultiSelectTable>
       </div>
@@ -230,8 +217,13 @@
         class="flex gap-3 mt-6"
         :class="route.query.id ? 'justify-between' : 'justify-end'"
       >
-        <button class="btn-danger-outline" v-if="route.query.id">Delete</button>
-        <div class="flex gap-3">
+        <button class="btn-danger-outline" v-if="route.query.id && !isDisabled">
+          Delete
+        </button>
+        <div
+          class="flex gap-3"
+          :class="isCompleted ? 'w-full justify-end' : ''"
+        >
           <RouterLink
             :to="{ name: PurchaseConst.PURCHASE_ORDER }"
             class="btn-gray-outline"
@@ -289,7 +281,7 @@ import {
 } from 'shared/enums'
 import { PurchaseOrderCreationSchema } from 'shared'
 import { ObjectHelpers } from 'shared/helpers'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useSettingsStore } from '@/stores/settings'
@@ -307,7 +299,6 @@ const isEdit = ref(false)
 const selectedStatus = ref()
 const showVendorModal = ref(false)
 const modelErrors = ref({ products: [] })
-const status = ref(PurchaseOrderStatus.OPEN)
 
 const appStore = useAppStore()
 const { startPrint } = usePrint()
@@ -388,14 +379,33 @@ const supplierOptions = computed(() => {
   })
 })
 
-const orderStatus = ref()
-const isDisabled = computed(() => {
-  return orderStatus.value
-    ? orderStatus.value == PurchaseOrderStatus.CANCELLED ||
-        orderStatus.value == PurchaseOrderStatus.COMPLETED ||
-        orderStatus.value == PurchaseOrderStatus.CONFIRMED
-    : false
-})
+const isDisabled = computed(
+  () => isCompleted.value || isCancelled.value || isConfirmed.value
+)
+
+const isCompleted = computed(
+  () =>
+    purchaseOrderStore.purchaseOrder &&
+    purchaseOrderStore.purchaseOrder.status == PurchaseOrderStatus.COMPLETED
+)
+
+const isCancelled = computed(
+  () =>
+    purchaseOrderStore.purchaseOrder &&
+    purchaseOrderStore.purchaseOrder.status == PurchaseOrderStatus.CANCELLED
+)
+
+const isConfirmed = computed(
+  () =>
+    purchaseOrderStore.purchaseOrder &&
+    purchaseOrderStore.purchaseOrder.status == PurchaseOrderStatus.CONFIRMED
+)
+
+const isOpen = computed(
+  () =>
+    purchaseOrderStore.purchaseOrder &&
+    purchaseOrderStore.purchaseOrder.status == PurchaseOrderStatus.OPEN
+)
 
 /** ================================================
  * METHODS
@@ -505,9 +515,7 @@ onMounted(async () => {
   if (route.query.id) {
     isEdit.value = true
     await purchaseOrderStore.getPurchaseOrder(route.query.id)
-    status.value = purchaseOrderStore.purchaseOrder.status
     const order = purchaseOrderStore.purchaseOrder
-    orderStatus.value = order.status
     selectedStatus.value = PurchaseStatusMap[order.status]
     model.value.address = ObjectHelpers.assignSameFields(
       model.value.address,
@@ -557,6 +565,10 @@ onMounted(async () => {
   }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
+
+onBeforeUnmount(() => {
+  purchaseOrderStore.purchaseOrder = null
 })
 
 /** ================================================
