@@ -17,6 +17,7 @@
           class="w-fit"
           :error-has-text="true"
           name="delivery_number"
+          :disabled="isCompleted"
           placeholder="Delivery Number"
           v-model="model.order.delivery_number"
           :error="errors.order?.delivery_number"
@@ -32,6 +33,7 @@
         :row-component="ReceivingOrderRow"
         :header-component="ReceivingOrderHeader"
         :format="{}"
+        :is-disabled="isCompleted"
       >
         <template #>
           <div class="grid grid-cols-9 gap-3 min-w-[1106px]">
@@ -51,10 +53,20 @@
       <button
         class="btn-outline !border-danger !text-danger w-fit mx-auto"
         @click="onCancel"
+        v-if="!isCompleted"
       >
         Cancel
       </button>
-      <button class="btn w-fit mx-auto" @click="onSubmit">Receive Order</button>
+      <button class="btn w-fit mx-auto" v-if="!isCompleted" @click="onSubmit">
+        Receive Order
+      </button>
+      <button
+        class="btn w-fit mx-auto"
+        v-if="isCompleted"
+        @click="router.back()"
+      >
+        Back
+      </button>
     </div>
   </div>
 </template>
@@ -66,7 +78,7 @@ import { PurchaseConst } from '@/const/route.constants'
 import { usePurchaseOrderStore } from '@/stores/purchase-order'
 import { PurchaseOrderStatus, ReceivePurchaseOrderSchema } from 'shared'
 import { DateHelpers } from 'shared/helpers'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ToastTypes } from '@/data/types'
 import { useTableScroll } from '@/use/useTableScroll'
@@ -120,6 +132,15 @@ const { errors, hasErrors, validateData } = useValidation(
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 /** ================================================
+ * COMPUTED
+ ** ================================================*/
+const isCompleted = computed(
+  () =>
+    purchaseOrder.value &&
+    purchaseOrder.value.status == PurchaseOrderStatus.COMPLETED
+)
+
+/** ================================================
  * METHODS
  ** ================================================*/
 
@@ -171,22 +192,8 @@ onMounted(async () => {
   if (route.params.id) {
     await purchaseOrderStore.fetchPurchaseOrderById(route.params.id)
 
-    // check order status
-    if (
-      purchaseOrderStore.purchaseOrder.status === PurchaseOrderStatus.COMPLETED
-    ) {
-      Event.emit(EventEnum.TOAST_MESSAGE, {
-        message: 'Purchase order already received!',
-        type: ToastTypes.INFO,
-        duration: 2000
-      })
-
-      setTimeout(() => {
-        router.back()
-      }, 1000)
-
-      return
-    }
+    model.value.order.delivery_number = purchaseOrder.value.delivery_number
+    model.value.order.status = purchaseOrder.value.status
 
     model.value.products = [
       ...purchaseOrderStore.purchaseOrder.products.map((product) => {

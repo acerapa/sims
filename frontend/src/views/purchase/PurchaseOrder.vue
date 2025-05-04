@@ -13,22 +13,15 @@
     @after-update="purchaseOrderStore.fetchPurchaseOrders()"
   />
   <div class="flex flex-col gap-6" ref="tableRef">
-    <RouterLink
-      :to="{ name: PurchaseConst.PURCHASE_ORDER_FORM }"
-      class="btn w-fit"
-      @click="showModal = true"
-    >
-      New Purchase Order
-    </RouterLink>
     <CustomTable
       :has-filter="true"
       :data="filteredData"
-      :has-add-btn="false"
       :has-pagination="true"
-      v-model:show-modal="showModal"
       v-model:search-text="searchText"
+      btn-custom-text="New purchase order"
       :row-prop-init="purchaseOrderRowEvent"
       :table-row-component="PurchaseOrderRow"
+      @add-new-record="onNewPurchaseOrder"
       @view="onView"
     >
       <template #table_header>
@@ -137,7 +130,6 @@ const filters = ref({
 })
 const selectedId = ref(0)
 const searchText = ref('')
-const showModal = ref(false)
 const showRowMenu = ref(false)
 const showCancelModal = ref(false)
 const showDeleteConfirmation = ref(false)
@@ -202,6 +194,12 @@ const filteredData = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
+const onNewPurchaseOrder = () => {
+  router.push({
+    name: PurchaseConst.PURCHASE_ORDER_FORM
+  })
+}
+
 const onView = (id) => {
   router.push({
     name: PurchaseConst.PURCHASE_ORDER_FORM,
