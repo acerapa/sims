@@ -30,6 +30,11 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
     return isSuccess
   }
 
+  const fetchReceivedPaymentsById = async (id) => {
+    const res = await api(`received-payments/${id}`)
+    return res.data.received_payment
+  }
+
   // getters
   const getReceivedPayments = async () => {
     if (!receivedPayments.value.length) {
@@ -39,11 +44,23 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
     return receivedPayments.value
   }
 
+  const getReceivedPaymentsById = async (id) => {
+    let payment = receivedPayments.value.find((payment) => payment.id == id)
+
+    if (!payment) {
+      payment = await fetchReceivedPaymentsById(id)
+    }
+
+    return payment
+  }
+
   return {
     receivedPayments,
 
     getReceivedPayments,
     fetchReceivedPayments,
-    registerReceivedPayment
+    registerReceivedPayment,
+    getReceivedPaymentsById,
+    fetchReceivedPaymentsById
   }
 })

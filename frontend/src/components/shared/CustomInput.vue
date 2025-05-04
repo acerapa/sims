@@ -20,6 +20,7 @@
           props.inputClass,
           props.error ? 'border-red-500' : ''
         ]"
+        :step="props.step ? props.step : undefined"
         :placeholder="props.placeholder"
         :disabled="props.disabled"
         v-model="value"
@@ -184,6 +185,10 @@ const props = defineProps({
   cols: {
     type: Number,
     default: 20
+  },
+  step: {
+    type: String,
+    required: false
   }
 })
 
