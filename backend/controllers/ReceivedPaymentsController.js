@@ -3,6 +3,9 @@ const Invoice = require("../models/invoice");
 const ReceivePayment = require("../models/received-payment");
 const SalesOrder = require("../models/sales-order");
 const User = require("../models/user");
+const {
+  findreceivedPaymentDetailed,
+} = require("../services/ReceivedPaymentService");
 
 module.exports = {
   all: async (req, res) => {
@@ -71,8 +74,12 @@ module.exports = {
       const data = req.body.validated;
       const newReceivePayment = await ReceivePayment.create(data);
 
+      const received_payment = await findreceivedPaymentDetailed(
+        newReceivePayment.id
+      );
+
       res.sendResponse(
-        { receive_payment: newReceivePayment },
+        { received_payment: received_payment },
         "Successfully registered receive payment"
       );
     } catch (error) {
