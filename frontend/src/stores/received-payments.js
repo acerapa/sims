@@ -4,6 +4,7 @@ import { ref } from 'vue'
 
 export const useReceivedPaymentsStore = defineStore('received-payments', () => {
   const receivedPayments = ref([])
+  const receivedInvoicePayments = ref([])
 
   const registerReceivedPayment = async (data) => {
     const res = await api('received-payments', Method.POST, data)
@@ -30,8 +31,23 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
     return isSuccess
   }
 
-  const fetchReceivedPaymentsById = async (id) => {
+  const fetchReceivedPaymentById = async (id) => {
     const res = await api(`received-payments/${id}`)
+    return res.data.received_payment
+  }
+
+  const fetchReceivedPaymentsByInvoiceId = async (invoiceId) => {
+    const res = await api(`received-payments/invoice/${invoiceId}`)
+
+    if (res.status < 400) {
+      receivedInvoicePayments.value = res.data.received_payments
+    }
+
+    return res.data.received_payments
+  }
+
+  const fetchLatestReceivedPaymentsByInvoiceId = async (invoiceId) => {
+    const res = await api(`received-payments/invoice/${invoiceId}/latest`)
     return res.data.received_payment
   }
 
@@ -48,7 +64,7 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
     let payment = receivedPayments.value.find((payment) => payment.id == id)
 
     if (!payment) {
-      payment = await fetchReceivedPaymentsById(id)
+      payment = await fetchReceivedPaymentById(id)
     }
 
     return payment
@@ -56,11 +72,14 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
 
   return {
     receivedPayments,
+    receivedInvoicePayments,
 
     getReceivedPayments,
     fetchReceivedPayments,
     registerReceivedPayment,
     getReceivedPaymentsById,
-    fetchReceivedPaymentsById
+    fetchReceivedPaymentById,
+    fetchReceivedPaymentsByInvoiceId,
+    fetchLatestReceivedPaymentsByInvoiceId
   }
 })

@@ -1,6 +1,6 @@
 const Customer = require("../models/customer");
 const Invoice = require("../models/invoice");
-const ReceivePayment = require("../models/received-payment");
+const ReceivedPayment = require("../models/received-payment");
 const SalesOrder = require("../models/sales-order");
 const User = require("../models/user");
 const {
@@ -10,7 +10,7 @@ const {
 module.exports = {
   all: async (req, res) => {
     try {
-      const receivePayments = await ReceivePayment.findAll({
+      const receivePayments = await ReceivedPayment.findAll({
         order: [["id", "DESC"]],
         include: [
           {
@@ -56,7 +56,7 @@ module.exports = {
 
   byId: async (req, res) => {
     try {
-      const received_payment = await ReceivePayment.findByPk(req.params.id);
+      const received_payment = await ReceivedPayment.findByPk(req.params.id);
 
       if (!received_payment) throw new Error("Received payment not found");
 
@@ -69,10 +69,44 @@ module.exports = {
     }
   },
 
+  latestPaymentByInvoiceId: async (req, res) => {
+    try {
+      const received_payment = await ReceivedPayment.findOne({
+        order: [["id", "DESC"]],
+        where: { invoice_id: req.params.invoice_id },
+      });
+
+      res.sendResponse(
+        { received_payment },
+        "Successfully fetched latest receive payment by invoice ID"
+      );
+    } catch (error) {
+      res.sendError({ error }, "Failed to retrieved customer payment");
+    }
+  },
+
+  paymentsByInvoiceId: async (req, res) => {
+    try {
+      const received_payments = await ReceivedPayment.findAll({
+        where: { invoice_id: req.params.invoice_id },
+      });
+
+      res.sendResponse(
+        { received_payments },
+        "Successfully fetched receive payments by invoice ID"
+      );
+    } catch (error) {
+      res.sendError(
+        { error },
+        "Failed to fetch receive payments by invoice ID"
+      );
+    }
+  },
+
   register: async (req, res) => {
     try {
       const data = req.body.validated;
-      const newReceivePayment = await ReceivePayment.create(data);
+      const newReceivePayment = await ReceivedPayment.create(data);
 
       const received_payment = await findreceivedPaymentDetailed(
         newReceivePayment.id

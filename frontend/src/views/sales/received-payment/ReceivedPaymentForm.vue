@@ -1,4 +1,45 @@
 <template>
+  <!-- Recent customer payments -->
+  <div class="cont flex flex-col gap-3" v-if="model.invoice_id && !isView">
+    <p class="text-lg font-normal">Recent Customer Payments</p>
+    <hr />
+    <div>
+      <div v-if="receivedInvoicePayments.length" class="flex flex-col">
+        <div class="grid grid-cols-6 mb-4">
+          <p class="text-sm font-semibold col-span-2">Date Paid</p>
+          <p class="text-sm font-semibold col-span-3">Amount</p>
+          <p class="text-sm font-semibold col-span-1">Action</p>
+        </div>
+
+        <div
+          class="grid grid-cols-6 items-center gen-table-row"
+          v-for="rp in receivedInvoicePayments"
+        >
+          <p class="text-sm col-span-2">
+            {{
+              new Date(rp.payment_date).toLocaleString('default', {
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric'
+              })
+            }}
+          </p>
+          <p class="text-sm col-span-3">₱ {{ rp.amount }}</p>
+
+          <RouterLink
+            :to="{
+              name: SalesConst.RECEIVED_PAYMENT_FORM,
+              query: { id: rp.id }
+            }"
+            class="btn-outline col-span-1 w-fit"
+            >view</RouterLink
+          >
+        </div>
+      </div>
+      <p v-else class="text-sm text-gray-600 text-center">No Data</p>
+    </div>
+  </div>
+
   <div class="cont flex flex-col gap-3">
     <div class="flex justify-between items-center py-3">
       <h1 class="text-2xl font-bold">Received Payment</h1>
@@ -169,8 +210,9 @@ import { useEmployeeStore } from '@/stores/employee'
 import { useInvoiceStore } from '@/stores/invoice'
 import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useReceivedPaymentsStore } from '@/stores/received-payments'
-import { DateHelpers, ReceivePaymentsSchema } from 'shared'
-import { computed, onMounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { DateHelpers, ObjectHelpers, ReceivePaymentsSchema } from 'shared'
+import { computed, onMounted, onUpdated, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -181,6 +223,8 @@ const employeeStore = useEmployeeStore()
 const paymentMethodStore = usePaymentMethodStore()
 const receivedPaymentStore = useReceivedPaymentsStore()
 
+const { receivedInvoicePayments } = storeToRefs(receivedPaymentStore)
+const latestReceivedPayment = ref(null)
 const selectedInvoice = ref(null)
 const customerId = ref(null)
 const model = ref({
@@ -258,6 +302,8 @@ const employeeOptions = computed(() => {
 
 const isView = computed(() => (route.query.id ? true : false))
 
+const hasInvoiceId = computed(() => (route.query.invoice_id ? true : false))
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -295,6 +341,25 @@ const onBackOrCancel = () => {
   router.push({ name: SalesConst.RECEIVED_PAYMENTS })
 }
 
+const getAndPopulatePaymentData = async (id) => {
+  const receivedPayment = await receivedPaymentStore.getReceivedPaymentsById(id)
+
+  if (receivedPayment) {
+    model.value.invoice_id = receivedPayment.invoice_id
+    model.value.amount = parseFloat(receivedPayment.amount).toFixed(2)
+    model.value.remaining_balance = parseFloat(
+      receivedPayment.remaining_balance
+    )
+    model.value.payment_method_id = receivedPayment.payment_method_id
+    model.value.user_id = receivedPayment.user_id
+    model.value.memo = receivedPayment.memo
+    model.value.payment_date = DateHelpers.formatDate(
+      receivedPayment.payment_date,
+      'YYYY-MM-DD'
+    )
+  }
+}
+
 /** ================================================
  * LIFECYCLE HOOKS
  ** ================================================*/
@@ -309,25 +374,21 @@ onMounted(async () => {
     model.value.user_id = authUser.id
   }
 
-  if (isView.value) {
-    const receivedPayment = await receivedPaymentStore.getReceivedPaymentsById(
-      route.query.id
+  if (hasInvoiceId.value) {
+    model.value.invoice_id = route.query.invoice_id
+
+    await receivedPaymentStore.fetchReceivedPaymentsByInvoiceId(
+      route.query.invoice_id
     )
 
-    if (receivedPayment) {
-      model.value.invoice_id = receivedPayment.invoice_id
-      model.value.amount = parseFloat(receivedPayment.amount).toFixed(2)
-      model.value.remaining_balance = parseFloat(
-        receivedPayment.remaining_balance
+    latestReceivedPayment.value =
+      await receivedPaymentStore.fetchLatestReceivedPaymentsByInvoiceId(
+        route.query.invoice_id
       )
-      model.value.payment_method_id = receivedPayment.payment_method_id
-      model.value.user_id = receivedPayment.user_id
-      model.value.memo = receivedPayment.memo
-      model.value.payment_date = DateHelpers.formatDate(
-        receivedPayment.payment_date,
-        'YYYY-MM-DD'
-      )
-    }
+  }
+
+  if (isView.value) {
+    await getAndPopulatePaymentData(route.query.id)
   }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
@@ -357,6 +418,26 @@ watch(
     if (!selectedInvoice.value) return
     model.value.remaining_balance =
       selectedInvoice.value.total - model.value.amount
+  }
+)
+
+watch(
+  () => route.query.id,
+  async (val) => {
+    if (val) {
+      getAndPopulatePaymentData(val)
+    } else {
+      // reset objects
+      model.value = {
+        amount: 0,
+        remaining_balance: 0,
+        payment_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
+        memo: '',
+        payment_method_id: '',
+        invoice_id: '',
+        user_id: ''
+      }
+    }
   }
 )
 </script>
