@@ -104,18 +104,4 @@ module.exports = {
       res.sendError({ error }, "Something went wrong!");
     }
   },
-
-  update: async (req, res) => {
-    const transaction = await sequelize.transaction();
-    try {
-      const data = req.body.validated;
-      await updateInvoice(req.params.id, data, transaction);
-
-      await transaction.commit();
-      res.sendResponse({ done: true }, "Successfully updated!");
-    } catch (error) {
-      await transaction.rollback();
-      res.sendError({ error }, "Something went wrong!");
-    }
-  },
 };

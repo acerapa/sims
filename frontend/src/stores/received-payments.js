@@ -1,10 +1,12 @@
 import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useInvoiceStore } from './invoice'
 
 export const useReceivedPaymentsStore = defineStore('received-payments', () => {
   const receivedPayments = ref([])
   const receivedInvoicePayments = ref([])
+  const invoiceStore = useInvoiceStore()
 
   const registerReceivedPayment = async (data) => {
     const res = await api('received-payments', Method.POST, data)
@@ -12,6 +14,12 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
     const isSuccess = res.status < 400
 
     if (isSuccess) {
+      // update invoice status
+      // assuming that the invoice status is in `data`
+      await invoiceStore.updateInvoice(data.invoice_id, {
+        status: data.invoice_status
+      })
+
       const { received_payment } = res.data
       receivedPayments.value.unshift(received_payment)
     }

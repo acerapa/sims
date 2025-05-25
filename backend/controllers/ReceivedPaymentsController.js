@@ -1,3 +1,5 @@
+const { InvoiceStatus } = require("shared/enums");
+const { sequelize } = require("../models");
 const Customer = require("../models/customer");
 const Invoice = require("../models/invoice");
 const ReceivedPayment = require("../models/received-payment");
@@ -5,6 +7,8 @@ const SalesOrder = require("../models/sales-order");
 const User = require("../models/user");
 const {
   findreceivedPaymentDetailed,
+  getInvoiceNewInvoiceStatus,
+  getInvoiceLatestReceivedpayment,
 } = require("../services/ReceivedPaymentService");
 
 module.exports = {
@@ -71,10 +75,9 @@ module.exports = {
 
   latestPaymentByInvoiceId: async (req, res) => {
     try {
-      const received_payment = await ReceivedPayment.findOne({
-        order: [["id", "DESC"]],
-        where: { invoice_id: req.params.invoice_id },
-      });
+      const received_payment = await getInvoiceLatestReceivedpayment(
+        req.params.invoice_id
+      );
 
       res.sendResponse(
         { received_payment },
@@ -104,10 +107,37 @@ module.exports = {
   },
 
   register: async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      const newReceivePayment = await ReceivedPayment.create(data);
+      const invoiceToPay = await Invoice.findByPk(data.invoice_id);
+      if (!invoiceToPay) throw new Error("Invoice not found");
 
+      if (
+        [
+          InvoiceStatus.FAILED,
+          InvoiceStatus.REFUNDED,
+          InvoiceStatus.PAID,
+        ].includes(invoiceToPay.status)
+      ) {
+        throw new Error("Invoice is already paid, refunded, or failed");
+      }
+
+      const invoice_status = await getInvoiceNewInvoiceStatus(
+        invoiceToPay,
+        data
+      );
+
+      const newReceivePayment = await ReceivedPayment.create(
+        { invoice_status: invoice_status, ...data },
+        { transaction }
+      );
+
+      if (invoiceToPay.status != invoice_status) {
+        await invoiceToPay.update({ status: invoice_status }, { transaction });
+      }
+
+      await transaction.commit();
       const received_payment = await findreceivedPaymentDetailed(
         newReceivePayment.id
       );
@@ -117,6 +147,7 @@ module.exports = {
         "Successfully registered receive payment"
       );
     } catch (error) {
+      await transaction.rollback();
       res.sendError({ error }, "Failed to register receive payment");
     }
   },
