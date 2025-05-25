@@ -9,9 +9,16 @@
               >#{{ invoice.id }}</span
             >
           </h1>
-          <p v-if="invoice && invoice.sales_order_id">
+          <RouterLink
+            class="hover:text-blue-500"
+            :to="{
+              name: SalesConst.SALES_ORDER_FORM,
+              query: { id: invoice.sales_order_id }
+            }"
+            v-if="invoice && invoice.sales_order_id"
+          >
             Sales Order #{{ invoice.sales_order_id }}
-          </p>
+          </RouterLink>
         </div>
         <BadgeComponent
           v-if="invoice"
@@ -258,7 +265,7 @@ import { useInvoiceStore } from '@/stores/invoice'
 import { EventEnum } from '@/data/event'
 import { SalesConst } from '@/const/route.constants'
 import { ToastTypes } from '@/data/types'
-import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, RouterLink, useRoute, useRouter } from 'vue-router'
 import { useSalesStore } from '@/stores/sales'
 import { useReceivedPaymentsStore } from '@/stores/received-payments'
 

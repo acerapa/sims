@@ -231,13 +231,13 @@
           <!-- Sub total -->
           <p class="flex-1 text-sm text-start">Sub total:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.sales_order.sub_total }}
+            ₱ {{ parseFloat(model.sales_order.sub_total).toFixed(2) }}
           </p>
 
           <!-- Total Discount -->
           <p class="flex-1 text-sm text-start">Total Discount:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.sales_order.total_discount }}
+            ₱ {{ parseFloat(model.sales_order.total_discount).toFixed(2) }}
           </p>
 
           <hr class="col-span-2" />
@@ -245,7 +245,7 @@
           <!-- Total -->
           <p class="flex-1 text-sm text-start">Total:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.sales_order.total.toFixed(2) }}
+            ₱ {{ parseFloat(model.sales_order.total).toFixed(2) }}
           </p>
         </div>
       </div>
@@ -253,7 +253,7 @@
     <hr />
     <div
       class="flex gap-3 mt-6"
-      :class="route.query.id ? 'justify-between' : 'justify-end'"
+      :class="route.query.id && !isInvoiced ? 'justify-between' : 'justify-end'"
     >
       <button
         class="btn-danger-outline"
@@ -266,6 +266,17 @@
         <RouterLink :to="{ name: SalesConst.SALES }" class="btn-gray-outline">
           {{ isInvoicedOrCancelled ? 'Back' : 'Cancel' }}
         </RouterLink>
+        <RouterLink
+          :to="{
+            name: SalesConst.INVOICE_FORM,
+            query: {
+              id: salesOrder.invoice.id
+            }
+          }"
+          v-if="isInvoiced"
+          class="btn-green"
+          >Check Invoice</RouterLink
+        >
         <button
           type="button"
           class="btn-outline"
@@ -309,7 +320,7 @@
 <script setup>
 import Event from '@/event'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import {
   DateHelpers,
@@ -342,6 +353,7 @@ import { useValidation } from '@/composables/useValidation'
 import { useAppStore } from '@/stores/app'
 import { PageStateConst } from '@/const/state.constants'
 import { useAuth } from '@/composables/useAuth'
+import { storeToRefs } from 'pinia'
 
 const route = useRoute()
 const router = useRouter()
@@ -362,6 +374,8 @@ const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
 const employeeStore = useEmployeeStore()
 const paymentMethodStore = usePaymentMethodStore()
+
+const { salesOrder } = storeToRefs(salesStore)
 
 // composables
 const { getAuthUser } = useAuth()
@@ -447,9 +461,13 @@ const employeeOptions = computed(() =>
   })
 )
 
+const isInvoiced = computed(() => {
+  return model.value.sales_order.status === SalesOrderStatus.INVOICED
+})
+
 const isInvoicedOrCancelled = computed(() => {
   return (
-    model.value.sales_order.status === SalesOrderStatus.INVOICED ||
+    isInvoiced.value ||
     model.value.sales_order.status === SalesOrderStatus.CANCELLED
   )
 })
@@ -543,51 +561,47 @@ onMounted(async () => {
 
     model.value.sales_order = ObjectHelpers.assignSameFields(
       model.value.sales_order,
-      salesStore.salesOrder
+      salesOrder.value
     )
 
     // few dates patches
-    model.value.sales_order.purchase_date = salesStore.salesOrder.purchase_date
-      ? new Date(salesStore.salesOrder.purchase_date)
-          .toISOString()
-          .split('T')[0]
+    model.value.sales_order.purchase_date = salesOrder.value.purchase_date
+      ? new Date(salesOrder.value.purchase_date).toISOString().split('T')[0]
       : ''
 
     // delivery
-    if (salesStore.salesOrder.delivery) {
+    if (salesOrder.value.delivery) {
       deliveryFormState.show = true
       deliveryFormState.hideBody = false
       model.value.delivery = ObjectHelpers.assignSameFields(
         deliveryDefaultModel,
-        salesStore.salesOrder.delivery
+        salesOrder.value.delivery
       )
 
       // address patches
       model.value.delivery.address = {
-        address1: salesStore.salesOrder.delivery.address.address1,
-        address2: salesStore.salesOrder.delivery.address.address2,
-        city: salesStore.salesOrder.delivery.address.city,
-        province: salesStore.salesOrder.delivery.address.province,
-        postal: salesStore.salesOrder.delivery.address.postal
+        address1: salesOrder.value.delivery.address.address1,
+        address2: salesOrder.value.delivery.address.address2,
+        city: salesOrder.value.delivery.address.city,
+        province: salesOrder.value.delivery.address.province,
+        postal: salesOrder.value.delivery.address.postal
       }
 
       // date patches
       model.value.delivery.delivery_date = DateHelpers.formatDate(
-        new Date(salesStore.salesOrder.delivery.delivery_date),
+        new Date(salesOrder.value.delivery.delivery_date),
         'YYYY-MM-DD'
       )
     }
 
     // products
-    model.value.sales_order_products = salesStore.salesOrder.products.map(
-      (p) => {
-        let salesProductsModel = ObjectHelpers.copyObj(productTransferModal)
-        return ObjectHelpers.assignSameFields(
-          salesProductsModel,
-          p.SalesOrderProduct
-        )
-      }
-    )
+    model.value.sales_order_products = salesOrder.value.products.map((p) => {
+      let salesProductsModel = ObjectHelpers.copyObj(productTransferModal)
+      return ObjectHelpers.assignSameFields(
+        salesProductsModel,
+        p.SalesOrderProduct
+      )
+    })
   }
 
   // get all the save state

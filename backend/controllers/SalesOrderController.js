@@ -1,5 +1,4 @@
 const { sequelize } = require("../models");
-const Address = require("../models/address");
 const Customer = require("../models/customer");
 const Delivery = require("../models/delivery");
 const SalesOrderProduct = require("../models/junction/sales-order-product");
