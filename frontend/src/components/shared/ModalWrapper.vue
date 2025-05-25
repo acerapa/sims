@@ -1,7 +1,7 @@
 <template>
   <div class="overlay"></div>
   <div
-    class="fixed w-full max-h-[calc(100vh-80px)] max-w-[614px] rounded-xl top-10 left-1/2 -translate-x-1/2 p-4 z-40 bg-white"
+    class="fixed w-full max-h-[calc(100vh-80px)] max-w-[614px] rounded-xl top-10 left-1/2 -translate-x-1/2 p-4 z-[70] bg-white"
     :class="props.modalClass"
   >
     <div class="flex justify-between items-center">
@@ -89,6 +89,6 @@ const onSave = () => {
 
 <style scoped>
 .overlay {
-  @apply bg-black opacity-45 fixed top-0 left-0 w-screen h-screen z-40;
+  @apply bg-black opacity-45 fixed top-0 left-0 w-screen h-screen z-[70];
 }
 </style>

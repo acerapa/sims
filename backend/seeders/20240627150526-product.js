@@ -12,6 +12,7 @@ const base_path = path.dirname(__dirname);
 const Product = require("../models/product");
 const { Op } = require("sequelize");
 const ProductDetails = require("../models/product-details");
+const { removeConstraints, setForeignKeyChecks } = require("../models");
 const { getProducts } = require(base_path + "/seeders/dummy/products");
 
 /** @type {import('sequelize-cli').Migration} */
@@ -55,12 +56,10 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
+    await removeConstraints(Product.getTableName(), queryInterface);
+
+    // force to remove all the data
+    await setForeignKeyChecks(0);
 
     const seeder = await getSeederExecution(path.basename(__filename));
     if (seeder) {
@@ -74,5 +73,7 @@ module.exports = {
 
       await removeSeederExecution(path.basename(__filename));
     }
+
+    await setForeignKeyChecks(1);
   },
 };

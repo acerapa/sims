@@ -1,13 +1,19 @@
 <template>
   <div class="cont flex flex-col gap-5">
     <div class="flex justify-between items-center py-3">
-      <h1 class="text-2xl font-bold">Sales Order</h1>
+      <h1 class="text-2xl font-bold">
+        Sales Order
+        <span class="font-normal ml-3" v-if="isEdit"
+          >#{{ route.query.id }}</span
+        >
+      </h1>
       <CustomInput
         type="date"
         :has-label="true"
         name="purchase_date"
         label="Purchase Date:"
         :error-has-text="true"
+        :disabled="isEdit"
         v-model="model.sales_order.purchase_date"
         :error="errors.sales_order?.purchase_date"
         class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
@@ -20,8 +26,15 @@
         <SelectStatusDropdown
           v-model="model.sales_order.status"
           :status-map="SalesOrderStatusMap"
+          :class="isInvoicedOrCancelled ? 'pointer-events-none' : ''"
         />
-        <button class="btn-green">Generate Invoice</button>
+        <button
+          class="btn-green"
+          @click="onGenerateInvoice"
+          v-if="!isInvoicedOrCancelled"
+        >
+          Generate Invoice
+        </button>
       </div>
     </div>
     <div class="flex flex-col gap-4 py-4">
@@ -37,6 +50,7 @@
           :error-has-text="true"
           placeholder="Prepared By"
           :options="employeeOptions"
+          :disabled="isInvoicedOrCancelled"
           v-model="model.sales_order.user_id"
           @add-new="showEmployeeModal = true"
           :error="errors.sales_order?.user_id"
@@ -49,13 +63,14 @@
           :has-add-new="true"
           name="customer_id"
           :can-search="true"
+          :disabled="isEdit"
           :error-has-text="true"
           :options="customerOptions"
           placeholder="Select Customer"
           @add-new="showCustomerModel = true"
+          :key="model.sales_order.customer_id"
           v-model="model.sales_order.customer_id"
           :error="errors.sales_order?.customer_id"
-          :disabled="route.query.id ? true : false"
         />
       </div>
       <div class="flex flex-col gap-3 flex-1">
@@ -79,6 +94,7 @@
             :error-has-text="true"
             placeholder="Order Type"
             v-model="model.sales_order.type"
+            :disabled="isInvoicedOrCancelled"
             :error="errors.sales_order?.type"
           />
           <CustomInput
@@ -90,6 +106,7 @@
             :error-has-text="true"
             name="payment_method_id"
             :options="paymentMethodOptions"
+            :disabled="isInvoicedOrCancelled"
             placeholder="Select Payment Method"
             @add-new="paymentMethodModal = true"
             v-model="model.sales_order.payment_method_id"
@@ -134,6 +151,7 @@
           name="delivery_date"
           label="Delivery Date"
           :error-has-text="true"
+          :disabled="isInvoicedOrCancelled"
           v-model="model.delivery.delivery_date"
           :error="errors.delivery?.delivery_date"
         />
@@ -146,6 +164,7 @@
           placeholder="Courier"
           :error-has-text="true"
           v-model="model.delivery.courier"
+          :disabled="isInvoicedOrCancelled"
           :error="errors.delivery?.courier"
         />
       </div>
@@ -166,7 +185,9 @@
           :has-label="true"
           v-model="model.delivery.address"
           :address-errors="errors.delivery?.address"
-          :disabled="model.delivery.use_customer_address"
+          :disabled="
+            model.delivery.use_customer_address || isInvoicedOrCancelled
+          "
         />
       </div>
     </div>
@@ -184,6 +205,7 @@
         :row-props="{
           selected: model.sales_order_products
         }"
+        :is-disabled="isInvoicedOrCancelled"
       ></MultiSelectTable>
     </div>
   </div>
@@ -202,6 +224,7 @@
         input-class="resize-none"
         v-model="model.sales_order.memo"
         :error="errors.sales_order?.memo"
+        :disabled="isInvoicedOrCancelled"
         placeholder="Add other notes here ..."
       />
       <div class="flex-1 flex items-end">
@@ -209,13 +232,13 @@
           <!-- Sub total -->
           <p class="flex-1 text-sm text-start">Sub total:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.sales_order.sub_total }}
+            ₱ {{ parseFloat(model.sales_order.sub_total).toFixed(2) }}
           </p>
 
           <!-- Total Discount -->
           <p class="flex-1 text-sm text-start">Total Discount:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.sales_order.total_discount }}
+            ₱ {{ parseFloat(model.sales_order.total_discount).toFixed(2) }}
           </p>
 
           <hr class="col-span-2" />
@@ -223,7 +246,7 @@
           <!-- Total -->
           <p class="flex-1 text-sm text-start">Total:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.sales_order.total.toFixed(2) }}
+            ₱ {{ parseFloat(model.sales_order.total).toFixed(2) }}
           </p>
         </div>
       </div>
@@ -231,24 +254,35 @@
     <hr />
     <div
       class="flex gap-3 mt-6"
-      :class="route.query.id ? 'justify-between' : 'justify-end'"
+      :class="route.query.id && !isInvoiced ? 'justify-between' : 'justify-end'"
     >
       <button
         class="btn-danger-outline"
-        v-if="route.query.id"
         @click="showDeleteModal = true"
+        v-if="route.query.id && !isInvoicedOrCancelled"
       >
         Delete
       </button>
       <div class="flex gap-3">
         <RouterLink :to="{ name: SalesConst.SALES }" class="btn-gray-outline">
-          {{ isDisabled ? 'Back' : 'Cancel' }}
+          {{ isInvoicedOrCancelled ? 'Back' : 'Cancel' }}
         </RouterLink>
+        <RouterLink
+          :to="{
+            name: SalesConst.INVOICE_FORM,
+            query: {
+              id: salesOrder.invoice.id
+            }
+          }"
+          v-if="isInvoiced"
+          class="btn-green"
+          >Check Invoice</RouterLink
+        >
         <button
           type="button"
           class="btn-outline"
-          @click=""
           v-if="!route.query.id"
+          @click="onSubmit(true)"
         >
           Save and New
         </button>
@@ -265,7 +299,7 @@
         <button
           type="button"
           class="btn"
-          v-if="route.query.id && !isDisabled"
+          v-if="route.query.id && !isInvoicedOrCancelled"
           @click="onSubmit(false)"
         >
           Update
@@ -287,7 +321,7 @@
 <script setup>
 import Event from '@/event'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import {
   DateHelpers,
@@ -320,11 +354,12 @@ import { useValidation } from '@/composables/useValidation'
 import { useAppStore } from '@/stores/app'
 import { PageStateConst } from '@/const/state.constants'
 import { useAuth } from '@/composables/useAuth'
+import { storeToRefs } from 'pinia'
 
 const route = useRoute()
 const router = useRouter()
 
-const isDisabled = ref(false)
+const authUser = ref(null)
 const showDeleteModal = ref(false)
 const showCustomerModel = ref(false)
 const showEmployeeModal = ref(false)
@@ -341,6 +376,8 @@ const salesStore = useSalesStore()
 const customerStore = useCustomerStore()
 const employeeStore = useEmployeeStore()
 const paymentMethodStore = usePaymentMethodStore()
+
+const { salesOrder } = storeToRefs(salesStore)
 
 // composables
 const { getAuthUser } = useAuth()
@@ -426,6 +463,17 @@ const employeeOptions = computed(() =>
   })
 )
 
+const isInvoiced = computed(() => {
+  return model.value.sales_order.status === SalesOrderStatus.INVOICED
+})
+
+const isInvoicedOrCancelled = computed(() => {
+  return (
+    isInvoiced.value ||
+    model.value.sales_order.status === SalesOrderStatus.CANCELLED
+  )
+})
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -453,15 +501,29 @@ const onSubmit = async (saveAndNew) => {
       type: ToastTypes.SUCCESS
     })
 
-    router.push({
-      name: SalesConst.SALES_ORDER
-    })
+    if (saveAndNew) {
+      model.value = ObjectHelpers.copyObj(defaultModel)
+      model.value.sales_order.user_id = authUser.value.id
+    } else {
+      router.push({
+        name: SalesConst.SALES_ORDER
+      })
+    }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
       message: `Failed to ${route.query.id ? 'update' : 'create'} Sales Order!`,
       type: ToastTypes.ERROR
     })
   }
+}
+
+const onGenerateInvoice = async () => {
+  router.push({
+    name: SalesConst.INVOICE_FORM,
+    query: {
+      sales_order_id: route.query.id
+    }
+  })
 }
 
 const onAfterDelete = async () => {
@@ -496,9 +558,9 @@ onMounted(async () => {
   await paymentMethodStore.getPaymentMethods()
 
   // set default prepared by
-  const authUser = await getAuthUser()
-  if (authUser) {
-    model.value.sales_order.user_id = authUser.id
+  authUser.value = await getAuthUser()
+  if (authUser.value) {
+    model.value.sales_order.user_id = authUser.value.id
   }
 
   if (route.query.id) {
@@ -506,51 +568,47 @@ onMounted(async () => {
 
     model.value.sales_order = ObjectHelpers.assignSameFields(
       model.value.sales_order,
-      salesStore.salesOrder
+      salesOrder.value
     )
 
     // few dates patches
-    model.value.sales_order.purchase_date = salesStore.salesOrder.purchase_date
-      ? new Date(salesStore.salesOrder.purchase_date)
-          .toISOString()
-          .split('T')[0]
+    model.value.sales_order.purchase_date = salesOrder.value.purchase_date
+      ? new Date(salesOrder.value.purchase_date).toISOString().split('T')[0]
       : ''
 
     // delivery
-    if (salesStore.salesOrder.delivery) {
+    if (salesOrder.value.delivery) {
       deliveryFormState.show = true
       deliveryFormState.hideBody = false
       model.value.delivery = ObjectHelpers.assignSameFields(
         deliveryDefaultModel,
-        salesStore.salesOrder.delivery
+        salesOrder.value.delivery
       )
 
       // address patches
       model.value.delivery.address = {
-        address1: salesStore.salesOrder.delivery.address.address1,
-        address2: salesStore.salesOrder.delivery.address.address2,
-        city: salesStore.salesOrder.delivery.address.city,
-        province: salesStore.salesOrder.delivery.address.province,
-        postal: salesStore.salesOrder.delivery.address.postal
+        address1: salesOrder.value.delivery.address.address1,
+        address2: salesOrder.value.delivery.address.address2,
+        city: salesOrder.value.delivery.address.city,
+        province: salesOrder.value.delivery.address.province,
+        postal: salesOrder.value.delivery.address.postal
       }
 
       // date patches
       model.value.delivery.delivery_date = DateHelpers.formatDate(
-        new Date(salesStore.salesOrder.delivery.delivery_date),
+        new Date(salesOrder.value.delivery.delivery_date),
         'YYYY-MM-DD'
       )
     }
 
     // products
-    model.value.sales_order_products = salesStore.salesOrder.products.map(
-      (p) => {
-        let salesProductsModel = ObjectHelpers.copyObj(productTransferModal)
-        return ObjectHelpers.assignSameFields(
-          salesProductsModel,
-          p.SalesOrderProduct
-        )
-      }
-    )
+    model.value.sales_order_products = salesOrder.value.products.map((p) => {
+      let salesProductsModel = ObjectHelpers.copyObj(productTransferModal)
+      return ObjectHelpers.assignSameFields(
+        salesProductsModel,
+        p.SalesOrderProduct
+      )
+    })
   }
 
   // get all the save state

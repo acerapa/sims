@@ -1,11 +1,10 @@
 <template>
-  <div>
+  <div ref="tableRef">
     <CustomTable
       @view="onView"
       :data="filteredData"
       :has-pagination="true"
       :row-prop-init="rowPropInit"
-      class="w-[calc(100vw_-_328px)]"
       v-model:search-text="searchText"
       @add-new-record="onAddNewRecord"
       :table-row-component="StrListRow"
@@ -37,10 +36,15 @@ import { useRouter } from 'vue-router'
 import { useTransferStore } from '@/stores/transfer'
 import { DateHelpers } from 'shared/helpers'
 import { TransferConst } from '@/const/route.constants'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const searchText = ref()
 const router = useRouter()
+const tableRef = ref(null)
 const transferStore = useTransferStore()
+
+// composables
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS

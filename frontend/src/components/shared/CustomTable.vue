@@ -1,5 +1,5 @@
 <template>
-  <div class="relative overflow-x-hidden">
+  <div class="relative overflow-x-hidden main-table">
     <div class="table-wrapper w-full relative flex flex-col gap-4">
       <!-- Table tools -->
       <div class="sticky top-0">
@@ -63,8 +63,14 @@
             <slot name="tools"></slot>
           </div>
           <div class="flex gap-3" v-if="props.hasAddBtn">
-            <button class="bg-primary p-2 rounded" @click="onAddNew">
+            <button
+              class="bg-primary p-2 rounded flex items-center gap-3"
+              @click="onAddNew"
+            >
               <img src="@/assets/icons/plus.svg" alt="Plus" />
+              <span class="text-white text-sm" v-if="props.btnCustomText">{{
+                props.btnCustomText
+              }}</span>
             </button>
             <!-- Custom buttons -->
             <slot name="buttons"></slot>
@@ -222,6 +228,10 @@ const props = defineProps({
     default: {
       showItems: [5, 10, 20, 50, 100]
     }
+  },
+  btnCustomText: {
+    type: String,
+    required: false
   }
 })
 

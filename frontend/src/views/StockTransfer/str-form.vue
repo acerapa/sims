@@ -446,7 +446,6 @@ onMounted(async () => {
       model.value.products = transfer.products.map((p) => {
         return {
           product_id: p.StockTransferProducts.product_id,
-          description: p.StockTransferProducts.description,
           quantity: p.StockTransferProducts.quantity,
           cost: p.StockTransferProducts.cost,
           amount: p.StockTransferProducts.amount

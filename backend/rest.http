@@ -368,3 +368,21 @@ Content-Type: application/json
 
 ### Notification testing
 GET {{host}}/api/test/notification
+
+
+### Receive Payment Testing
+GET {{host}}/api/received-payments
+
+###
+POST {{host}}/api/received-payments
+Accept: application/json
+Content-Type: application/json
+
+{
+	"amount": 1000,
+	"remaining_balance": 1000,
+	"payment_date": "2024-06-09",
+	"payment_method_id": 1,
+	"invoice_id": 1,
+	"user_id": 1
+}

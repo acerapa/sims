@@ -12,24 +12,16 @@
     :data="toUpdate"
     @after-update="purchaseOrderStore.fetchPurchaseOrders()"
   />
-  <div class="flex flex-col gap-6">
-    <RouterLink
-      :to="{ name: PurchaseConst.PURCHASE_ORDER_FORM }"
-      class="btn w-fit"
-      @click="showModal = true"
-    >
-      New Purchase Order
-    </RouterLink>
+  <div class="flex flex-col gap-6" ref="tableRef">
     <CustomTable
       :has-filter="true"
       :data="filteredData"
-      :has-add-btn="false"
       :has-pagination="true"
-      v-model:show-modal="showModal"
-      class="w-[calc(100vw_-_328px)]"
       v-model:search-text="searchText"
+      btn-custom-text="New purchase order"
       :row-prop-init="purchaseOrderRowEvent"
       :table-row-component="PurchaseOrderRow"
+      @add-new-record="onNewPurchaseOrder"
       @view="onView"
     >
       <template #table_header>
@@ -125,6 +117,7 @@ import { useVendorStore } from '@/stores/supplier'
 import { DateHelpers } from 'shared'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const toDelete = ref()
 const toUpdate = ref()
@@ -137,13 +130,15 @@ const filters = ref({
 })
 const selectedId = ref(0)
 const searchText = ref('')
-const showModal = ref(false)
 const showRowMenu = ref(false)
 const showCancelModal = ref(false)
 const showDeleteConfirmation = ref(false)
+const tableRef = ref(null)
 
 const router = useRouter()
 const supplierStore = useVendorStore()
+
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS
@@ -199,6 +194,12 @@ const filteredData = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
+const onNewPurchaseOrder = () => {
+  router.push({
+    name: PurchaseConst.PURCHASE_ORDER_FORM
+  })
+}
+
 const onView = (id) => {
   router.push({
     name: PurchaseConst.PURCHASE_ORDER_FORM,

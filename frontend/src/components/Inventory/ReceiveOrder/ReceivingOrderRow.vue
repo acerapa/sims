@@ -11,6 +11,7 @@
       class="col-span-1"
       type="number"
       name="quantity-received"
+      :disabled="props.isDisabled"
       v-model="product.quantity_received"
     />
     <CustomInput
@@ -19,6 +20,7 @@
       type="textarea"
       name="remarks"
       placeholder="Remarks"
+      :disabled="props.isDisabled"
       v-model="product.remarks"
     />
     <CustomInput
@@ -27,6 +29,7 @@
       :error-has-text="true"
       :error="errors.status"
       v-model="product.status"
+      :disabled="props.isDisabled"
       class="w-full [&>select]:w-full"
       :options="productOrderStatusOptions"
       placeholder="Select Ordered Product Status"

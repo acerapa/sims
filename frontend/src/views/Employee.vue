@@ -4,33 +4,34 @@
     :selected-id="selectedId"
     v-if="showModal"
   />
-  <CustomTable
-    title="Employee table"
-    :has-add-btn="true"
-    :data="filteredData"
-    :has-pagination="true"
-    @add-new-record="onNewRecord"
-    class="w-[calc(100vw_-_328px)]"
-    v-model:search-text="searchText"
-    :row-prop-init="employeeRowEvent"
-    :table-row-component="EmployeeRow"
-    @view="onView"
-  >
-    <template #table_header>
-      <div class="grid grid-cols-12 gap-3 items-center min-w-[792px]">
-        <div class="col-span-1 flex gap-3 items-center">
-          <input type="checkbox" class="input" />
-          <p class="table-header">#</p>
+  <div ref="tableRef">
+    <CustomTable
+      title="Employee table"
+      :has-add-btn="true"
+      :data="filteredData"
+      :has-pagination="true"
+      @add-new-record="onNewRecord"
+      v-model:search-text="searchText"
+      :row-prop-init="employeeRowEvent"
+      :table-row-component="EmployeeRow"
+      @view="onView"
+    >
+      <template #table_header>
+        <div class="grid grid-cols-12 gap-3 items-center min-w-[792px]">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-2 table-header">Name</p>
+          <p class="col-span-2 table-header">Branch</p>
+          <p class="col-span-2 table-header">Position</p>
+          <p class="col-span-2 table-header">Date Started</p>
+          <p class="col-span-2 table-header">Date Ended</p>
+          <p class="col-span-1 table-header">Status</p>
         </div>
-        <p class="col-span-2 table-header">Name</p>
-        <p class="col-span-2 table-header">Branch</p>
-        <p class="col-span-2 table-header">Position</p>
-        <p class="col-span-2 table-header">Date Started</p>
-        <p class="col-span-2 table-header">Date Ended</p>
-        <p class="col-span-1 table-header">Status</p>
-      </div>
-    </template>
-  </CustomTable>
+      </template>
+    </CustomTable>
+  </div>
 </template>
 <script setup>
 import EmployeeModal from '@/components/Employee/EmployeeModal.vue'
@@ -39,14 +40,18 @@ import CustomTable from '@/components/shared/CustomTable.vue'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { useEmployeeStore } from '@/stores/employee'
+import { useTableScroll } from '@/use/useTableScroll'
 import { DateHelpers } from 'shared'
 import { computed, onMounted, ref } from 'vue'
 
-const target = ref(null)
 const showModal = ref(false)
 const selectedId = ref(-1)
 const employeeStore = useEmployeeStore()
 const searchText = ref()
+const tableRef = ref(null)
+
+// composables
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS

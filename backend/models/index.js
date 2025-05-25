@@ -119,8 +119,13 @@ const removeConstraints = async (table, queryInterface) => {
   );
 };
 
+const setForeignKeyChecks = async (value) => {
+  await sequelize.query(`SET FOREIGN_KEY_CHECKS = ${value}`);
+};
+
 db.removeConstraints = removeConstraints;
 db.getColumnConstrains = getColumnConstrains;
+db.setForeignKeyChecks = setForeignKeyChecks;
 db.isColumnExistInTable = isColumnExistInTable;
 db.areColumnsExistInTable = areColumnsExistInTable;
 

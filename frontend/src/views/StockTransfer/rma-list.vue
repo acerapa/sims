@@ -1,12 +1,11 @@
 <template>
-  <div>
+  <div ref="tableRef">
     <CustomTable
       title="RMA list"
       :data="filterData"
       :has-pagination="true"
       :row-prop-init="rowInitProp"
       @add-new-record="onNewRecord"
-      class="w-[calc(100vw_-_328px)]"
       v-model:search-text="searchText"
       :table-row-component="RmaListRow"
       @view="onView"
@@ -36,10 +35,15 @@ import { useTransferStore } from '@/stores/transfer'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { TransferConst } from '@/const/route.constants'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const searchText = ref('')
 const router = useRouter()
+const tableRef = ref(null)
 const transferStore = useTransferStore()
+
+// composables
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS

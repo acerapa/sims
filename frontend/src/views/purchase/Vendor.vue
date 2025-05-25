@@ -5,33 +5,34 @@
       v-model="showModal"
       :selected-id="selectedId"
     />
-    <CustomTable
-      :has-add-btn="true"
-      :data="filteredData"
-      :has-pagination="true"
-      class="w-[calc(100vw_-_328px)]"
-      :row-prop-init="vendorRowEvent"
-      v-model:search-text="searchText"
-      :table-row-component="VendorRow"
-      @view="onView"
-      @add-new-record="
-        () => {
-          showModal = true
-          selectedId = 0
-        }
-      "
-    >
-      <template #table_header>
-        <div class="grid grid-cols-6 gap-3 items-center min-w-[564px]">
-          <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
-            <p class="table-header">#</p>
+    <div ref="tableRef">
+      <CustomTable
+        :has-add-btn="true"
+        :data="filteredData"
+        :has-pagination="true"
+        :row-prop-init="vendorRowEvent"
+        v-model:search-text="searchText"
+        :table-row-component="VendorRow"
+        @view="onView"
+        @add-new-record="
+          () => {
+            showModal = true
+            selectedId = 0
+          }
+        "
+      >
+        <template #table_header>
+          <div class="grid grid-cols-6 gap-3 items-center min-w-[564px]">
+            <div class="col-span-1 flex gap-3 items-center">
+              <input type="checkbox" class="input" />
+              <p class="table-header">#</p>
+            </div>
+            <p class="col-span-3 table-header">Company Name</p>
+            <p class="col-span-2 table-header">Rep. Name</p>
           </div>
-          <p class="col-span-3 table-header">Company Name</p>
-          <p class="col-span-2 table-header">Rep. Name</p>
-        </div>
-      </template>
-    </CustomTable>
+        </template>
+      </CustomTable>
+    </div>
   </div>
 </template>
 
@@ -43,11 +44,15 @@ import { useVendorStore } from '@/stores/supplier'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const searchText = ref()
 const selectedId = ref(-1)
+const tableRef = ref(null)
 const showModal = ref(false)
 const vendorStore = useVendorStore()
+
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS

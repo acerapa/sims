@@ -10,9 +10,7 @@ export const useAppStore = defineStore('app', () => {
     settingsStore.branches.find((branch) => branch.is_current)
   )
 
-  // Localstorage keys
-  const pageState = 'page-state'
-  const modalState = 'modal-state'
+  const collpaseSideNav = ref(false)
 
   const pages = ref({})
   const modals = ref({})
@@ -59,17 +57,21 @@ export const useAppStore = defineStore('app', () => {
     })
   }
 
+  const toggleSideNav = () => {
+    collpaseSideNav.value = !collpaseSideNav.value
+    localStorage.setItem('collpaseSideNav', collpaseSideNav.value)
+  }
+
+  const getCollpaseSideNav = () => {
+    const isCollapsed = localStorage.getItem('collpaseSideNav')
+    if (isCollapsed) {
+      collpaseSideNav.value = isCollapsed === 'true'
+    } else {
+      collpaseSideNav.value = false
+    }
+  }
+
   // private methods
-  const getPageStateFromLS = () => {
-    const strPages = localStorage.getItem(pageState)
-    if (strPages) pages.value = JSON.parse(strPages)
-  }
-
-  const getModalStateFromLS = () => {
-    const strModals = localStorage.getItem(modalState)
-    if (strModals) modals.value = JSON.parse(strModals)
-  }
-
   const removePage = (page) => {
     delete pages.value[page]
   }
@@ -83,6 +85,7 @@ export const useAppStore = defineStore('app', () => {
     modals,
     currentNav,
     currentBranch,
+    collpaseSideNav,
 
     isPageExist,
     isModalExist,
@@ -90,6 +93,8 @@ export const useAppStore = defineStore('app', () => {
     getPageState,
     setModalState,
     getModalState,
+    toggleSideNav,
+    getCollpaseSideNav,
     evaluatePageScopes,
     evaluateModalScopes
   }

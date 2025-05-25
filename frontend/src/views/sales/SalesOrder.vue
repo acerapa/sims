@@ -1,31 +1,32 @@
 <template>
-  <CustomTable
-    :data="filteredData"
-    :has-pagination="true"
-    title="Sales Order List"
-    :row-prop-init="rowPropInit"
-    class="w-[calc(100vw_-_328px)]"
-    @add-new-record="onAddNewRecord"
-    v-model:search-text="searchText"
-    :table-row-component="SalesOrderRow"
-    @view="onView"
-  >
-    <template #table_header>
-      <div class="grid grid-cols-10 gap-3 min-w-[935px]">
-        <div class="col-span-1 flex gap-3 items-center">
-          <input type="checkbox" class="input" />
-          <p class="table-header">#</p>
+  <div ref="tableRef">
+    <CustomTable
+      :data="filteredData"
+      :has-pagination="true"
+      title="Sales Order List"
+      :row-prop-init="rowPropInit"
+      @add-new-record="onAddNewRecord"
+      v-model:search-text="searchText"
+      :table-row-component="SalesOrderRow"
+      @view="onView"
+    >
+      <template #table_header>
+        <div class="grid grid-cols-10 gap-3 min-w-[935px]">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="table-header">#</p>
+          </div>
+          <p class="col-span-1 table-header">Type</p>
+          <p class="col-span-2 table-header">Customer</p>
+          <p class="col-span-2 table-header">Sales Person</p>
+          <p class="col-span-1 table-header">Purch Date</p>
+          <p class="col-span-1 table-header">Pay Mode</p>
+          <p class="col-span-1 table-header">Total</p>
+          <p class="col-span-1 table-header">Status</p>
         </div>
-        <p class="col-span-1 table-header">Type</p>
-        <p class="col-span-2 table-header">Customer</p>
-        <p class="col-span-2 table-header">Sales Person</p>
-        <p class="col-span-1 table-header">Purch Date</p>
-        <p class="col-span-1 table-header">Pay Mode</p>
-        <p class="col-span-1 table-header">Total</p>
-        <p class="col-span-1 table-header">Status</p>
-      </div>
-    </template>
-  </CustomTable>
+      </template>
+    </CustomTable>
+  </div>
 </template>
 
 <script setup>
@@ -37,11 +38,16 @@ import { useSalesStore } from '@/stores/sales'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { SalesConst } from '@/const/route.constants'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const router = useRouter()
 const salesStore = useSalesStore()
 
+const tableRef = ref(null)
 const searchText = ref('')
+
+// composables
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS

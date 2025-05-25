@@ -5,6 +5,7 @@ import employees from '@/assets/icons/employees.svg'
 import settings from '@/assets/icons/settings.svg'
 import outlineDot from '@/assets/icons/outline-dot.svg'
 import transfer from '@/assets/icons/transfer.png'
+import purchase from '@/assets/icons/purchase-icon.png'
 import sales from '@/assets/icons/sales.png'
 import {
   InventoryConst,
@@ -46,7 +47,7 @@ export default [
   {
     text: 'Purchase Management',
     route: 'purchase',
-    icon: inventory,
+    icon: purchase,
     children: [
       {
         text: 'Purchase Order',
@@ -85,6 +86,12 @@ export default [
         text: 'Deliveries',
         route: SalesConst.DELIVERIES,
         icon: outlineDot
+      },
+      {
+        text: 'Received Payments',
+        route: SalesConst.RECEIVED_PAYMENTS,
+        icon: outlineDot,
+        includes_active: [SalesConst.RECEIVED_PAYMENT_FORM]
       },
       {
         text: 'Customers',

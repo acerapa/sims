@@ -12,6 +12,7 @@ const {
   findDeliveryBySalesOrderId,
   createDelivery,
 } = require("./DeliveryService");
+const Invoice = require("../models/invoice");
 
 /**
  * Retrieves a sales order by its ID with selected related model attributes
@@ -29,6 +30,11 @@ const findSalesOrder = async (id) => {
       {
         model: User,
         as: "sales_person",
+      },
+      {
+        model: Invoice,
+        as: "invoice",
+        attributes: ["id"],
       },
       {
         model: Delivery,
@@ -70,7 +76,6 @@ const findSalesOrderMinimal = async (id) => {
       {
         model: Delivery,
         as: "delivery",
-        attributes: ["id"],
       },
       {
         model: Customer,

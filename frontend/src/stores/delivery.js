@@ -56,9 +56,36 @@ export const useDeliveryStore = defineStore('delivery', () => {
     return isSuccess
   }
 
+  const addDelivery = async (deliveryData) => {
+    if (!deliveries.value.length) {
+      await fetchDeliveries()
+    } else {
+      const index = deliveries.value.findIndex(
+        (item) => item.id == deliveryData.id
+      )
+      if (index > -1) {
+        deliveries.value[index] = deliveryData
+      } else {
+        deliveries.value.unshift(deliveryData)
+      }
+    }
+  }
+
+  // getters
+  const getDeliveries = async () => {
+    if (!deliveries.value.length) {
+      await fetchDeliveries()
+    }
+
+    return deliveries.value
+  }
+
   return {
     delivery,
     deliveries,
+
+    addDelivery,
+    getDeliveries,
     getDeliveryById,
     fetchDeliveries,
     updateDeliveryStatus

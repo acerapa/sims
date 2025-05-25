@@ -4,33 +4,34 @@
     v-model="showModal"
     :selected-id="selectedId"
   />
-  <CustomTable
-    :class="`w-[calc(100vw_-_${328}px)]`"
-    :data="filteredData"
-    title="Customer List"
-    :has-pagination="true"
-    :row-prop-init="rowPropInit"
-    :table-row-component="CustomerRow"
-    @add-new-record="
-      () => {
-        showModal = true
-        selectedId = 0
-      }
-    "
-    @view="onView"
-  >
-    <template #table_header>
-      <div class="grid grid-cols-8 gap-3 min-w-[888px]">
-        <div class="col-span-1 flex gap-3 items-center">
-          <input type="checkbox" class="input" />
-          <p class="font-bold">#</p>
+  <div ref="tableRef">
+    <CustomTable
+      :data="filteredData"
+      title="Customer List"
+      :has-pagination="true"
+      :row-prop-init="rowPropInit"
+      :table-row-component="CustomerRow"
+      @add-new-record="
+        () => {
+          showModal = true
+          selectedId = 0
+        }
+      "
+      @view="onView"
+    >
+      <template #table_header>
+        <div class="grid grid-cols-8 gap-3 min-w-[888px]">
+          <div class="col-span-1 flex gap-3 items-center">
+            <input type="checkbox" class="input" />
+            <p class="font-bold">#</p>
+          </div>
+          <p class="col-span-2 table-header">Name</p>
+          <p class="col-span-4 table-header">Address</p>
+          <p class="col-span-1 table-header">Phone</p>
         </div>
-        <p class="col-span-2 table-header">Name</p>
-        <p class="col-span-4 table-header">Address</p>
-        <p class="col-span-1 table-header">Phone</p>
-      </div>
-    </template>
-  </CustomTable>
+      </template>
+    </CustomTable>
+  </div>
   <code
     >This is the list/records of the customers so far that buys the
     products</code
@@ -45,15 +46,20 @@ import CustomTable from '@/components/shared/CustomTable.vue'
 import CustomerRow from '@/components/Customer/CustomerRow.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
 import { useCustomerStore } from '@/stores/customer'
+import { useTableScroll } from '@/use/useTableScroll'
 
 const showModal = ref(false)
 const selectedId = ref(0)
+const tableRef = ref(null)
 
 const customerStore = useCustomerStore()
 
 const filteredData = computed(() => {
   return customerStore.customers.filter((customer) => true)
 })
+
+// composables
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS
