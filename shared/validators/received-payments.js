@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { InvoiceStatus } = require("../enums");
 
 const ReceivePaymentsSchema = Joi.object({
   amount: Joi.number().required().min(1).messages({
@@ -23,6 +24,9 @@ const ReceivePaymentsSchema = Joi.object({
     "number.base": "Invoice id must be a number",
     "any.required": "Invoice id is required",
   }),
+  invoice_status: Joi.string()
+    .valid(...Object.values(InvoiceStatus))
+    .required(),
   user_id: Joi.number().required().messages({
     "number.base": "User id must be a number",
     "any.required": "User id is required",

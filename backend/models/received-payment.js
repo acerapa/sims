@@ -3,6 +3,7 @@ const Invoice = require("./invoice");
 const PaymentMenthod = require("./payment-method");
 const { sequelize } = require(".");
 const User = require("./user");
+const { InvoiceStatus } = require("shared/enums");
 
 class ReceivedPayment extends Model {}
 
@@ -23,6 +24,11 @@ ReceivedPayment.init(
     },
     payment_date: {
       type: DataTypes.DATE,
+      allowNull: false,
+    },
+    invoice_status: {
+      type: DataTypes.ENUM,
+      values: Object.values(InvoiceStatus),
       allowNull: false,
     },
     memo: {

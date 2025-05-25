@@ -1,45 +1,4 @@
 <template>
-  <!-- Recent customer payments -->
-  <div class="cont flex flex-col gap-3" v-if="model.invoice_id && !isView">
-    <p class="text-lg font-normal">Recent Customer Payments</p>
-    <hr />
-    <div>
-      <div v-if="receivedInvoicePayments.length" class="flex flex-col">
-        <div class="grid grid-cols-6 mb-4">
-          <p class="text-sm font-semibold col-span-2">Date Paid</p>
-          <p class="text-sm font-semibold col-span-3">Amount</p>
-          <p class="text-sm font-semibold col-span-1">Action</p>
-        </div>
-
-        <div
-          class="grid grid-cols-6 items-center gen-table-row"
-          v-for="rp in receivedInvoicePayments"
-        >
-          <p class="text-sm col-span-2">
-            {{
-              new Date(rp.payment_date).toLocaleString('default', {
-                month: 'short',
-                day: '2-digit',
-                year: 'numeric'
-              })
-            }}
-          </p>
-          <p class="text-sm col-span-3">₱ {{ rp.amount }}</p>
-
-          <RouterLink
-            :to="{
-              name: SalesConst.RECEIVED_PAYMENT_FORM,
-              query: { id: rp.id }
-            }"
-            class="btn-outline col-span-1 w-fit"
-            >view</RouterLink
-          >
-        </div>
-      </div>
-      <p v-else class="text-sm text-gray-600 text-center">No Data</p>
-    </div>
-  </div>
-
   <div class="cont flex flex-col gap-3">
     <div class="flex justify-between items-center py-3">
       <h1 class="text-2xl font-bold">Received Payment</h1>
@@ -223,7 +182,6 @@ const employeeStore = useEmployeeStore()
 const paymentMethodStore = usePaymentMethodStore()
 const receivedPaymentStore = useReceivedPaymentsStore()
 
-const { receivedInvoicePayments } = storeToRefs(receivedPaymentStore)
 const latestReceivedPayment = ref(null)
 const selectedInvoice = ref(null)
 const customerId = ref(null)
@@ -338,7 +296,7 @@ const onSubmit = async () => {
 }
 
 const onBackOrCancel = () => {
-  router.push({ name: SalesConst.RECEIVED_PAYMENTS })
+  router.back()
 }
 
 const getAndPopulatePaymentData = async (id) => {
@@ -376,15 +334,6 @@ onMounted(async () => {
 
   if (hasInvoiceId.value) {
     model.value.invoice_id = route.query.invoice_id
-
-    await receivedPaymentStore.fetchReceivedPaymentsByInvoiceId(
-      route.query.invoice_id
-    )
-
-    latestReceivedPayment.value =
-      await receivedPaymentStore.fetchLatestReceivedPaymentsByInvoiceId(
-        route.query.invoice_id
-      )
   }
 
   if (isView.value) {
@@ -418,26 +367,6 @@ watch(
     if (!selectedInvoice.value) return
     model.value.remaining_balance =
       selectedInvoice.value.total - model.value.amount
-  }
-)
-
-watch(
-  () => route.query.id,
-  async (val) => {
-    if (val) {
-      getAndPopulatePaymentData(val)
-    } else {
-      // reset objects
-      model.value = {
-        amount: 0,
-        remaining_balance: 0,
-        payment_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
-        memo: '',
-        payment_method_id: '',
-        invoice_id: '',
-        user_id: ''
-      }
-    }
   }
 )
 </script>
