@@ -180,6 +180,47 @@
           </div>
         </div>
         <p v-else class="text-sm text-gray-600 text-center">No Data</p>
+
+        <div
+          v-if="receivedInvoicePayments.length"
+          class="mt-4 flex flex-col gap-3"
+        >
+          <hr />
+          <div class="flex justify-end">
+            <div class="grid grid-cols-2 gap-5 ml-auto mr-0">
+              <!-- Total Amount Payable -->
+              <p class="flex-1 text-sm text-start">Total Amount Payable:</p>
+              <p
+                class="flex-1 text-sm text-end font-semibold whitespace-nowrap"
+              >
+                ₱ {{ model.invoice.total.toFixed(2) }}
+              </p>
+
+              <!-- Total Amount Received -->
+              <p class="flex-1 text-sm text-start">Total Amount Received:</p>
+              <p
+                class="flex-1 text-sm text-end font-semibold whitespace-nowrap"
+              >
+                ₱ {{ totalAmountReceived.toFixed(2) }}
+              </p>
+
+              <hr class="col-span-2" />
+
+              <!-- Remaining Payable -->
+              <p class="flex-1 text-sm text-start">Remaining Payable:</p>
+              <p
+                class="flex-1 text-sm text-end font-semibold whitespace-nowrap"
+              >
+                ₱
+                {{
+                  parseFloat(model.invoice.total - totalAmountReceived).toFixed(
+                    2
+                  )
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -351,6 +392,13 @@ const customerInfo = computed(() => {
 
 const employeeInfo = computed(() => {
   return employees.value.find((e) => e.id == model.value.invoice.employee_id)
+})
+
+const totalAmountReceived = computed(() => {
+  return receivedInvoicePayments.value.reduce(
+    (acc, payment) => acc + parseFloat(payment.amount),
+    0
+  )
 })
 
 const isView = computed(() => {
