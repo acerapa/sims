@@ -10,6 +10,10 @@ const ReceivePaymentsSchema = Joi.object({
     "number.base": "Remaining balance must be a number",
     "any.required": "Remaining balance is required",
   }),
+  amounts_payable: Joi.number().required().messages({
+    "number.base": "Amounts payable must be a number",
+    "any.required": "Amounts payable is required",
+  }),
   payment_date: Joi.date().required().messages({
     "date.base": "Payment date must be a valid date",
     "any.required": "Payment date is required",

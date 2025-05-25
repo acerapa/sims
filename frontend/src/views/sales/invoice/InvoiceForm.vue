@@ -128,6 +128,54 @@
       />
     </div>
   </div>
+  <!-- Recent customer payments -->
+  <div class="cont flex flex-col gap-3" v-if="isView">
+    <p class="text-lg font-normal">Recent Customer Payments</p>
+    <hr />
+    <div>
+      <div class="flex flex-col">
+        <div class="grid grid-cols-8 mb-4">
+          <p class="text-sm font-semibold col-span-2">Date Paid</p>
+          <p class="text-sm font-semibold col-span-3">Amount</p>
+          <p class="text-sm font-semibold col-span-2">Invoice status</p>
+          <p class="text-sm font-semibold col-span-1">Action</p>
+        </div>
+
+        <div v-if="receivedInvoicePayments.length">
+          <div
+            class="grid grid-cols-8 items-center gen-table-row"
+            v-for="rp in receivedInvoicePayments"
+          >
+            <p class="text-sm col-span-2">
+              {{
+                new Date(rp.payment_date).toLocaleString('default', {
+                  month: 'short',
+                  day: '2-digit',
+                  year: 'numeric'
+                })
+              }}
+            </p>
+            <p class="text-sm col-span-3">₱ {{ rp.amount }}</p>
+            <div class="col-span-2">
+              <BadgeComponent
+                :text="InvoiceStatusMap[rp.invoice_status].text"
+                :custom-class="InvoiceStatusMap[rp.invoice_status].class"
+              />
+            </div>
+            <RouterLink
+              :to="{
+                name: SalesConst.RECEIVED_PAYMENT_FORM,
+                query: { id: rp.id }
+              }"
+              class="btn-outline col-span-1 w-fit"
+              >view</RouterLink
+            >
+          </div>
+        </div>
+        <p v-else class="text-sm text-gray-600 text-center">No Data</p>
+      </div>
+    </div>
+  </div>
   <div class="cont flex flex-col gap-5 mb-10">
     <p class="text-lg font-normal">Notes & Summary</p>
     <div class="flex gap-8 justify-between">
@@ -172,7 +220,7 @@
       <button class="btn-danger-outline" @click="onBackOrCancel">
         {{ isView ? 'Back' : 'Cancel' }}
       </button>
-      <button v-if="isView" class="btn" @click="onCustomerPayment">
+      <button v-if="isView && !isPaid" class="btn" @click="onCustomerPayment">
         Customer payment
       </button>
       <button v-if="!isView" class="btn" @click="onSubmit">Submit</button>
@@ -186,6 +234,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomerModal from '@/components/Customer/CustomerModal.vue'
+import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import InvoiceFormRow from '@/components/sales/invoice/InvoiceFormRow.vue'
 import InvoiceFormHeader from '@/components/sales/invoice/InvoiceFormHeader.vue'
@@ -196,6 +245,7 @@ import { useEmployeeStore } from '@/stores/employee'
 import { useSettingsStore } from '@/stores/settings'
 import {
   DateHelpers,
+  InvoiceStatus,
   InvoiceStatusMap,
   InvoiceWithProductsSchema,
   ObjectHelpers,
@@ -209,8 +259,8 @@ import { EventEnum } from '@/data/event'
 import { SalesConst } from '@/const/route.constants'
 import { ToastTypes } from '@/data/types'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
-import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 import { useSalesStore } from '@/stores/sales'
+import { useReceivedPaymentsStore } from '@/stores/received-payments'
 
 const route = useRoute()
 const router = useRouter()
@@ -221,7 +271,9 @@ const { employees } = storeToRefs(employeeStore)
 const { getCurrentBranch } = useSettingsStore()
 const salesStore = useSalesStore()
 const invoiceStore = useInvoiceStore()
+const receivedPaymentStore = useReceivedPaymentsStore()
 const { invoice } = storeToRefs(invoiceStore)
+const { receivedInvoicePayments } = storeToRefs(receivedPaymentStore)
 
 const showCustomerModal = ref(false)
 
@@ -297,6 +349,10 @@ const employeeInfo = computed(() => {
 const isView = computed(() => {
   return !!route.query.id
 })
+
+const isPaid = computed(
+  () => invoice.value && invoice.value.status === InvoiceStatus.PAID
+)
 
 const isFromSalesOrder = computed(() => {
   return !!route.query.sales_order_id
@@ -441,6 +497,7 @@ onMounted(async () => {
   currentBranch.value = await getCurrentBranch()
 
   if (route.query.id) {
+    await receivedPaymentStore.fetchReceivedPaymentsByInvoiceId(route.query.id)
     populateFormWithInvoiceData()
   } else if (route.query.sales_order_id) {
     populateFormWithSalesOrderData()

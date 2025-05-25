@@ -38,9 +38,11 @@ import { useRouter } from 'vue-router'
 import { SalesConst } from '@/const/route.constants'
 import { EventEnum } from '@/data/event'
 import { useTableScroll } from '@/use/useTableScroll'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const receivedPaymentsStore = useReceivedPaymentsStore()
+const { receivedPayments } = storeToRefs(receivedPaymentsStore)
 
 const tableRef = ref(null)
 
@@ -63,9 +65,7 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return receivedPaymentsStore.receivedPayments.filter(
-    (receivePayment) => receivePayment
-  )
+  return receivedPayments.value.filter((receivePayment) => receivePayment)
 })
 
 /** ================================================

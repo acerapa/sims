@@ -88,13 +88,13 @@
         :has-label="true"
         :can-search="true"
         :disabled="isView"
-        label="Select Cashier"
         :error-has-text="true"
         :error="errors.user_id"
         v-model="model.user_id"
         :options="employeeOptions"
-        placeholder="Select Cashier"
+        :placeholder="'Select Cashier'"
         label-css="text-sm font-bold text-gray-500"
+        :label="isView ? 'Cashier' : 'Select Cashier'"
         class="[&>div]:gap-3 [&>div]:items-start [&>div]:flex-row w-fit [&>div>small]:mt-[10px]"
       />
     </div>
@@ -120,15 +120,13 @@
           <p class="flex-1 text-sm text-start">Amount Payable:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
             ₱
-            {{
-              parseFloat(selectedInvoice ? selectedInvoice.total : 0).toFixed(2)
-            }}
+            {{ parseFloat(model.amounts_payable).toFixed(2) }}
           </p>
 
           <!-- Payment Amount -->
           <p class="flex-1 text-sm text-start">Payment Amount:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.amount }}
+            ₱ {{ parseFloat(model.amount || 0).toFixed(2) }}
           </p>
 
           <hr class="col-span-2" />
@@ -181,9 +179,11 @@ const employeeStore = useEmployeeStore()
 const paymentMethodStore = usePaymentMethodStore()
 const receivedPaymentStore = useReceivedPaymentsStore()
 
-const selectedInvoice = ref(null)
 const customerId = ref(null)
+const selectedInvoice = ref(null)
+const latestReceivedPayment = ref(null)
 const model = ref({
+  amounts_payable: 0,
   amount: 0,
   remaining_balance: 0,
   payment_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
@@ -258,6 +258,8 @@ const employeeOptions = computed(() => {
 
 const isView = computed(() => (route.query.id ? true : false))
 
+const hasInvoiceId = computed(() => (route.query.invoice_id ? true : false))
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -292,7 +294,27 @@ const onSubmit = async () => {
 }
 
 const onBackOrCancel = () => {
-  router.push({ name: SalesConst.RECEIVED_PAYMENTS })
+  router.back()
+}
+
+const getAndPopulatePaymentData = async (id) => {
+  const receivedPayment = await receivedPaymentStore.getReceivedPaymentsById(id)
+
+  if (receivedPayment) {
+    model.value.invoice_id = receivedPayment.invoice_id
+    model.value.amount = parseFloat(receivedPayment.amount).toFixed(2)
+    model.value.amounts_payable = parseFloat(receivedPayment.amounts_payable)
+    model.value.remaining_balance = parseFloat(
+      receivedPayment.remaining_balance
+    )
+    model.value.payment_method_id = receivedPayment.payment_method_id
+    model.value.user_id = receivedPayment.user_id
+    model.value.memo = receivedPayment.memo
+    model.value.payment_date = DateHelpers.formatDate(
+      receivedPayment.payment_date,
+      'YYYY-MM-DD'
+    )
+  }
 }
 
 /** ================================================
@@ -305,29 +327,17 @@ onMounted(async () => {
   await paymentMethodStore.getPaymentMethods()
 
   const authUser = await getAuthUser()
+
   if (authUser) {
     model.value.user_id = authUser.id
   }
 
-  if (isView.value) {
-    const receivedPayment = await receivedPaymentStore.getReceivedPaymentsById(
-      route.query.id
-    )
+  if (hasInvoiceId.value) {
+    model.value.invoice_id = route.query.invoice_id
+  }
 
-    if (receivedPayment) {
-      model.value.invoice_id = receivedPayment.invoice_id
-      model.value.amount = parseFloat(receivedPayment.amount).toFixed(2)
-      model.value.remaining_balance = parseFloat(
-        receivedPayment.remaining_balance
-      )
-      model.value.payment_method_id = receivedPayment.payment_method_id
-      model.value.user_id = receivedPayment.user_id
-      model.value.memo = receivedPayment.memo
-      model.value.payment_date = DateHelpers.formatDate(
-        receivedPayment.payment_date,
-        'YYYY-MM-DD'
-      )
-    }
+  if (isView.value) {
+    await getAndPopulatePaymentData(route.query.id)
   }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
@@ -343,20 +353,34 @@ watch(
       model.value.invoice_id
     )
 
+    latestReceivedPayment.value =
+      await receivedPaymentStore.fetchLatestReceivedPaymentsByInvoiceId(
+        model.value.invoice_id
+      )
+
     if (selectedInvoice.value) {
+      if (!isView.value) {
+        model.value.amounts_payable = latestReceivedPayment.value
+          ? latestReceivedPayment.value.remaining_balance
+          : selectedInvoice.value.total
+      }
       customerId.value = selectedInvoice.value.sales_order_id
         ? selectedInvoice.value.sales_order.customer_id
         : selectedInvoice.value.customer_id
     }
+
+    // Attempt to set remaining balance
+    model.value.remaining_balance =
+      model.value.amounts_payable - model.value.amount
   }
 )
 
 watch(
   () => model.value.amount,
   () => {
-    if (!selectedInvoice.value) return
+    if (!model.value.amounts_payable) return
     model.value.remaining_balance =
-      selectedInvoice.value.total - model.value.amount
+      model.value.amounts_payable - model.value.amount
   }
 )
 </script>
