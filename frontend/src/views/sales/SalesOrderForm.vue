@@ -68,6 +68,7 @@
           :options="customerOptions"
           placeholder="Select Customer"
           @add-new="showCustomerModel = true"
+          :key="model.sales_order.customer_id"
           v-model="model.sales_order.customer_id"
           :error="errors.sales_order?.customer_id"
         />
@@ -280,8 +281,8 @@
         <button
           type="button"
           class="btn-outline"
-          @click=""
           v-if="!route.query.id"
+          @click="onSubmit(true)"
         >
           Save and New
         </button>
@@ -358,6 +359,7 @@ import { storeToRefs } from 'pinia'
 const route = useRoute()
 const router = useRouter()
 
+const authUser = ref(null)
 const showDeleteModal = ref(false)
 const showCustomerModel = ref(false)
 const showEmployeeModal = ref(false)
@@ -499,9 +501,14 @@ const onSubmit = async (saveAndNew) => {
       type: ToastTypes.SUCCESS
     })
 
-    router.push({
-      name: SalesConst.SALES_ORDER
-    })
+    if (saveAndNew) {
+      model.value = ObjectHelpers.copyObj(defaultModel)
+      model.value.sales_order.user_id = authUser.value.id
+    } else {
+      router.push({
+        name: SalesConst.SALES_ORDER
+      })
+    }
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
       message: `Failed to ${route.query.id ? 'update' : 'create'} Sales Order!`,
@@ -551,9 +558,9 @@ onMounted(async () => {
   await paymentMethodStore.getPaymentMethods()
 
   // set default prepared by
-  const authUser = await getAuthUser()
-  if (authUser) {
-    model.value.sales_order.user_id = authUser.id
+  authUser.value = await getAuthUser()
+  if (authUser.value) {
+    model.value.sales_order.user_id = authUser.value.id
   }
 
   if (route.query.id) {
