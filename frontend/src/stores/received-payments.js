@@ -14,14 +14,13 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
     const isSuccess = res.status < 400
 
     if (isSuccess) {
-      // update invoice status
-      // assuming that the invoice status is in `data`
-      await invoiceStore.updateInvoice(data.invoice_id, {
-        status: data.invoice_status
-      })
-
       const { received_payment } = res.data
-      receivedPayments.value.unshift(received_payment)
+
+      await fetchReceivedPayments()
+      await invoiceStore.updateInvoiceStatus(
+        received_payment.invoice_id,
+        received_payment.invoice_status
+      )
     }
 
     return isSuccess

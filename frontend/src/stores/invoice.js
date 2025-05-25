@@ -57,15 +57,13 @@ export const useInvoiceStore = defineStore('invoice', () => {
     return isSuccess
   }
 
-  const updateInvoice = async (id, model) => {
-    const res = await api(`invoices/${id}`, Method.PUT, model)
-    const isSuccess = res.status < 400
-
-    if (isSuccess) {
-      await fetchInvoiceById(id)
+  const updateInvoiceStatus = async (id, status) => {
+    const ndx = invoices.value.findIndex((i) => i.id == id)
+    if (ndx > -1) {
+      invoices.value[ndx].status = status
+    } else {
+      await fetchInvoices()
     }
-
-    return isSuccess
   }
 
   // getters
@@ -90,10 +88,10 @@ export const useInvoiceStore = defineStore('invoice', () => {
     invoices,
 
     getInvoices,
-    updateInvoice,
     createInvoice,
     fetchInvoices,
     getInvoiceById,
-    fetchInvoiceById
+    fetchInvoiceById,
+    updateInvoiceStatus
   }
 })

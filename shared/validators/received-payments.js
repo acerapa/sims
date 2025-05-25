@@ -1,5 +1,4 @@
 const Joi = require("joi");
-const { InvoiceStatus } = require("../enums");
 
 const ReceivePaymentsSchema = Joi.object({
   amount: Joi.number().required().min(1).messages({
@@ -10,6 +9,10 @@ const ReceivePaymentsSchema = Joi.object({
   remaining_balance: Joi.number().required().messages({
     "number.base": "Remaining balance must be a number",
     "any.required": "Remaining balance is required",
+  }),
+  amounts_payable: Joi.number().required().messages({
+    "number.base": "Amounts payable must be a number",
+    "any.required": "Amounts payable is required",
   }),
   payment_date: Joi.date().required().messages({
     "date.base": "Payment date must be a valid date",

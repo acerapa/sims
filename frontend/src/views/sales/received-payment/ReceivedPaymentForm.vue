@@ -88,13 +88,13 @@
         :has-label="true"
         :can-search="true"
         :disabled="isView"
-        label="Select Cashier"
         :error-has-text="true"
         :error="errors.user_id"
         v-model="model.user_id"
         :options="employeeOptions"
-        placeholder="Select Cashier"
+        :placeholder="'Select Cashier'"
         label-css="text-sm font-bold text-gray-500"
+        :label="isView ? 'Cashier' : 'Select Cashier'"
         class="[&>div]:gap-3 [&>div]:items-start [&>div]:flex-row w-fit [&>div>small]:mt-[10px]"
       />
     </div>
@@ -120,15 +120,13 @@
           <p class="flex-1 text-sm text-start">Amount Payable:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
             ₱
-            {{
-              parseFloat(selectedInvoice ? selectedInvoice.total : 0).toFixed(2)
-            }}
+            {{ parseFloat(model.amounts_payable).toFixed(2) }}
           </p>
 
           <!-- Payment Amount -->
           <p class="flex-1 text-sm text-start">Payment Amount:</p>
           <p class="flex-1 text-sm text-end font-semibold whitespace-nowrap">
-            ₱ {{ model.amount }}
+            ₱ {{ parseFloat(model.amount || 0).toFixed(2) }}
           </p>
 
           <hr class="col-span-2" />
@@ -169,9 +167,8 @@ import { useEmployeeStore } from '@/stores/employee'
 import { useInvoiceStore } from '@/stores/invoice'
 import { usePaymentMethodStore } from '@/stores/payment-method'
 import { useReceivedPaymentsStore } from '@/stores/received-payments'
-import { storeToRefs } from 'pinia'
-import { DateHelpers, ObjectHelpers, ReceivePaymentsSchema } from 'shared'
-import { computed, onMounted, onUpdated, ref, watch } from 'vue'
+import { DateHelpers, ReceivePaymentsSchema } from 'shared'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -182,10 +179,11 @@ const employeeStore = useEmployeeStore()
 const paymentMethodStore = usePaymentMethodStore()
 const receivedPaymentStore = useReceivedPaymentsStore()
 
-const latestReceivedPayment = ref(null)
-const selectedInvoice = ref(null)
 const customerId = ref(null)
+const selectedInvoice = ref(null)
+const latestReceivedPayment = ref(null)
 const model = ref({
+  amounts_payable: 0,
   amount: 0,
   remaining_balance: 0,
   payment_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
@@ -305,6 +303,7 @@ const getAndPopulatePaymentData = async (id) => {
   if (receivedPayment) {
     model.value.invoice_id = receivedPayment.invoice_id
     model.value.amount = parseFloat(receivedPayment.amount).toFixed(2)
+    model.value.amounts_payable = parseFloat(receivedPayment.amounts_payable)
     model.value.remaining_balance = parseFloat(
       receivedPayment.remaining_balance
     )
@@ -328,6 +327,7 @@ onMounted(async () => {
   await paymentMethodStore.getPaymentMethods()
 
   const authUser = await getAuthUser()
+
   if (authUser) {
     model.value.user_id = authUser.id
   }
@@ -353,20 +353,34 @@ watch(
       model.value.invoice_id
     )
 
+    latestReceivedPayment.value =
+      await receivedPaymentStore.fetchLatestReceivedPaymentsByInvoiceId(
+        model.value.invoice_id
+      )
+
     if (selectedInvoice.value) {
+      if (!isView.value) {
+        model.value.amounts_payable = latestReceivedPayment.value
+          ? latestReceivedPayment.value.remaining_balance
+          : selectedInvoice.value.total
+      }
       customerId.value = selectedInvoice.value.sales_order_id
         ? selectedInvoice.value.sales_order.customer_id
         : selectedInvoice.value.customer_id
     }
+
+    // Attempt to set remaining balance
+    model.value.remaining_balance =
+      model.value.amounts_payable - model.value.amount
   }
 )
 
 watch(
   () => model.value.amount,
   () => {
-    if (!selectedInvoice.value) return
+    if (!model.value.amounts_payable) return
     model.value.remaining_balance =
-      selectedInvoice.value.total - model.value.amount
+      model.value.amounts_payable - model.value.amount
   }
 )
 </script>

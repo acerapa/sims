@@ -22,6 +22,10 @@ ReceivedPayment.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    amounts_payable: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
     payment_date: {
       type: DataTypes.DATE,
       allowNull: false,
