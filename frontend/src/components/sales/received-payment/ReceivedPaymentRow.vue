@@ -7,7 +7,17 @@
       <input type="checkbox" class="input" />
       <p class="text-sm">{{ props.receivedPayment.id }}</p>
     </div>
-    <p class="col-span-1 text-sm">#{{ props.receivedPayment.invoice_id }}</p>
+    <RouterLink
+      @click.stop
+      :to="{
+        name: SalesConst.INVOICE_FORM,
+        query: {
+          id: props.receivedPayment.invoice_id
+        }
+      }"
+      class="col-span-1 text-sm hover:text-blue-500"
+      >#{{ props.receivedPayment.invoice_id }}</RouterLink
+    >
     <p class="col-span-2 text-sm">{{ customerName }}</p>
     <p class="col-span-2 text-sm">{{ employeeName }}</p>
     <p class="col-span-1 text-sm">
@@ -27,7 +37,9 @@
 </template>
 
 <script setup>
+import { SalesConst } from '@/const/route.constants'
 import { computed } from 'vue'
+import { RouterLink } from 'vue-router'
 
 const props = defineProps({
   receivedPayment: {
