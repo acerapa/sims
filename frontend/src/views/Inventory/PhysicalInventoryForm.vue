@@ -21,43 +21,50 @@
         <div class="flex gap-5">
           <CustomInput
             type="select"
-            :options="[]"
             class="flex-1"
             :has-label="true"
             name="manager_id"
             :can-search="true"
             label="Branch Manager"
             :error-has-text="true"
+            :options="managerOptions"
             v-model="model.manager_id"
             placeholder="Select Manager"
           />
           <CustomInput
             type="select"
-            :options="[]"
             class="flex-1"
             :has-label="true"
             :can-search="true"
             :error-has-text="true"
             v-model="model.manager_id"
-            name="inventory_incharge_id"
-            placeholder="Select Inventory In-Charge"
             label="Inventory In-Charge"
+            name="inventory_incharge_id"
+            :options="inventoryInchargeOptions"
+            placeholder="Select Inventory In-Charge"
           />
         </div>
       </div>
+    </div>
+    <div class="cont">
+      <CustomTable />
     </div>
   </div>
 </template>
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
-import { EventEnum } from '@/data/event'
+import CustomTable from '@/components/shared/CustomTable.vue'
+
 import Event from '@/event'
+import { EventEnum } from '@/data/event'
 import { useEmployeeStore } from '@/stores/employee'
-import { DateHelpers } from 'shared'
-import { onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { DateHelpers, UserType } from 'shared'
+import { computed, onMounted, ref } from 'vue'
 
 const employeeStore = useEmployeeStore()
+const { employees } = storeToRefs(employeeStore)
 
 const model = ref({
   date_started: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
@@ -73,11 +80,33 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
 /** ================================================
  * COMPUTED
  ** ================================================*/
+const managerOptions = computed(() => {
+  return employees.value
+    .filter((emp) => emp.position == UserType.MANAGER)
+    .map((emp) => {
+      return {
+        text: `${emp.first_name} ${emp.last_name}`,
+        value: emp.id
+      }
+    })
+})
+
+const inventoryInchargeOptions = computed(() => {
+  return employees.value
+    .filter((emp) => emp.position == UserType.INVENTORY)
+    .map((emp) => {
+      return {
+        text: `${emp.first_name} ${emp.last_name}`,
+        value: emp.id
+      }
+    })
+})
 
 /** ================================================
  * LIFECYCLE HOOKS
  ** ================================================*/
-onMounted(() => {
+onMounted(async () => {
+  await employeeStore.getEmployees()
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>
