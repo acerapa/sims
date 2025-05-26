@@ -1,14 +1,13 @@
 <template>
-  <div class="flex flex-col gap-6">
-    <button class="btn w-fit" @click="onStartPhysicalInventory">
-      Start Physical Inventory
-    </button>
+  <div class="flex flex-col gap-6" ref="tableRef">
     <CustomTable
-      :has-add-btn="false"
+      :has-add-btn="true"
       :data="filteredData"
       :has-pagination="true"
       :row-prop-init="eventRowInit"
       :table-row-component="PhysicalInventoryRow"
+      :btn-custom-text="'New Physical Inventory'"
+      @add-new-record="onStartPhysicalInventory"
       @view="onView"
     >
       <template #table_header>
@@ -30,20 +29,23 @@
 import PhysicalInventoryRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryRow.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import { useAuth } from '@/composables/useAuth'
+import { InventoryConst } from '@/const/route.constants'
 import { EventEnum } from '@/data/event'
 import Event from '@/event'
 import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
-import { useProductStore } from '@/stores/product'
-import { PhysicalInventoryStatus } from 'shared/enums'
+import { useTableScroll } from '@/use/useTableScroll'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const { getAuthUser } = useAuth()
-const productStore = useProductStore()
 const physicalInventoryStore = usePhysicalInventoryStore()
 
 const authUser = ref(null)
+const tableRef = ref(null)
+
+// composables
+useTableScroll(tableRef, false)
 
 /** ================================================
  * EVENTS
@@ -66,38 +68,9 @@ const filteredData = computed(() => {
  * METHODS
  ** ================================================*/
 const onStartPhysicalInventory = async () => {
-  const model = {
-    physical_inventory: {
-      date_started: new Date(),
-      status: PhysicalInventoryStatus.DRAFT,
-      inventory_incharge: authUser.value?.id,
-      branch_manager: authUser.value?.id, // temporary for now (supposedly need to set branch manager in the system)
-      date_ended: null
-    },
-    items: []
-  }
-  // fetch all products
-  await productStore.fetchAllProducts()
-
-  model.items = productStore.products.map((product) => {
-    return {
-      quantity: product.quantity_in_stock,
-      physical_quantity: 0,
-      product_id: product.id,
-      physical_inventory_id: 0
-    }
+  router.push({
+    name: InventoryConst.PHYSICAL_INVENTORY_FORM
   })
-
-  const res = await physicalInventoryStore.register(model)
-
-  if (res.status == 200) {
-    router.push({
-      name: 'physical-inventory-details',
-      params: {
-        id: res.data.physical_inventory.id
-      }
-    })
-  }
 }
 
 const onView = (id) => {

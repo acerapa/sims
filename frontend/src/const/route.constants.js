@@ -1,7 +1,7 @@
 export const InventoryConst = Object.freeze({
   INVENTORY: 'inventory',
   INVENTORY_STOCK_STATUS: 'inventory-stock-status',
-  PHYSICAL_INVENTORY_DETAILS: 'physical-inventory-details',
+  PHYSICAL_INVENTORY_FORM: 'physical-inventory-form',
   PRODUCTS: 'products',
   PRODUCT_FORM: 'product-form',
   SERVICES: 'services',

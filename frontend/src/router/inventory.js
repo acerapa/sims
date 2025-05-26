@@ -20,10 +20,9 @@ export default [
         }
       },
       {
-        path: '/physical-inventory-details/:id',
-        name: InventoryConst.PHYSICAL_INVENTORY_DETAILS,
-        component: () =>
-          import('@/views/Inventory/PhysicalInventoryDetails.vue'),
+        path: '/physical-inventory-form',
+        name: InventoryConst.PHYSICAL_INVENTORY_FORM,
+        component: () => import('@/views/Inventory/PhysicalInventoryForm.vue'),
         meta: {
           title: 'Physical Inventory',
           requiresAuth: true
