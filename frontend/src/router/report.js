@@ -6,16 +6,6 @@ export default [
     redirect: {
       name: 'physical-inventory'
     },
-    children: [
-      {
-        path: '/physical-inventory',
-        name: 'physical-inventory',
-        component: () => import('@/views/Inventory/PhysicalInventory.vue'),
-        meta: {
-          title: 'Physical Inventories',
-          requiresAuth: true
-        }
-      }
-    ]
+    children: []
   }
 ]

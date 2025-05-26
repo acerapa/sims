@@ -52,6 +52,15 @@ export default [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/physical-inventory',
+        name: InventoryConst.PHYSICAL_INVENTORY,
+        component: () => import('@/views/Inventory/PhysicalInventory.vue'),
+        meta: {
+          title: 'Physical Inventories',
+          requiresAuth: true
+        }
       }
     ]
   }

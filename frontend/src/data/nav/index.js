@@ -38,6 +38,11 @@ export default [
         icon: outlineDot
       },
       {
+        text: 'Physical Inventory',
+        route: InventoryConst.PHYSICAL_INVENTORY,
+        icon: outlineDot
+      },
+      {
         text: 'Inventory Stock Status',
         route: InventoryConst.INVENTORY_STOCK_STATUS,
         icon: outlineDot
@@ -145,13 +150,7 @@ export default [
     text: 'Reports',
     route: 'reports',
     icon: reports,
-    children: [
-      {
-        text: 'Physical Inventories',
-        route: 'physical-inventory',
-        icon: outlineDot
-      }
-    ]
+    children: []
   },
   {
     text: 'Employees',

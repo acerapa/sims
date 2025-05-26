@@ -4,7 +4,8 @@ export const InventoryConst = Object.freeze({
   PHYSICAL_INVENTORY_DETAILS: 'physical-inventory-details',
   PRODUCTS: 'products',
   PRODUCT_FORM: 'product-form',
-  SERVICES: 'services'
+  SERVICES: 'services',
+  PHYSICAL_INVENTORY: 'physical-inventory'
 })
 
 export const CommonConst = Object.freeze({
