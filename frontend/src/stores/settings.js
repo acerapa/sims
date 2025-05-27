@@ -101,6 +101,24 @@ export const useSettingsStore = defineStore('settings', () => {
     return category
   }
 
+  const getFullCategoryHeirarchy = async (id) => {
+    if (!productCategories.value.length) {
+      await fetchAllProductCategories()
+    }
+
+    // inner function to find category in hierarchy
+    const hierarchy = []
+    const findAndGatherCategories = (id) => {
+      const category = productCategories.value.find((pc) => pc.id == id)
+      if (category) {
+        hierarchy.unshift(category)
+        if (category.general_cat) {
+          findAndGatherCategories(category.general_cat)
+        }
+      }
+    }
+  }
+
   const getProductCategories = async () => {
     if (!productCategories.value.length) {
       await fetchAllProductCategories()
@@ -431,6 +449,7 @@ export const useSettingsStore = defineStore('settings', () => {
     registerProductCategory,
     findCategoryInHierarchy,
     registerReorderingPoint,
+    getFullCategoryHeirarchy,
     fetchAllProductCategories,
     fetchAllProductReorderingPoints
   }

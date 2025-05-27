@@ -46,8 +46,26 @@
         </div>
       </div>
     </div>
-    <div class="cont">
-      <CustomTable />
+    <div>
+      <!-- TODO: Change table to multi table input -->
+      <CustomTable
+        :has-tools="true"
+        title="Product List"
+        :row-prop-init="rowPropInit"
+        :has-add-btn="false"
+        :data="model.products"
+        :table-row-component="PhysicalInventoryFormRow"
+      >
+        <template #table_header>
+          <div class="grid grid-cols-7 gap-3">
+            <p class="col-span-1 table-header">Category</p>
+            <p class="col-span-2 table-header">Item Description</p>
+            <p class="col-span-2 table-header">Supplier</p>
+            <p class="col-span-1 table-header">Quantity</p>
+            <p class="col-span-1 table-header">Physical Count</p>
+          </div>
+        </template>
+      </CustomTable>
     </div>
   </div>
 </template>
@@ -55,19 +73,31 @@
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
+import PhysicalInventoryFormRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryFormRow.vue'
 
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { useEmployeeStore } from '@/stores/employee'
 import { storeToRefs } from 'pinia'
-import { DateHelpers, UserType } from 'shared'
+import { DateHelpers, PhysicalInventoryStatus, UserType } from 'shared'
 import { computed, onMounted, ref } from 'vue'
+import { useProductStore } from '@/stores/product'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
+
+const productStore = useProductStore()
 const employeeStore = useEmployeeStore()
+const { products } = storeToRefs(productStore)
 const { employees } = storeToRefs(employeeStore)
 
 const model = ref({
-  date_started: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
+  date_started: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
+  date_ended: null,
+  status: PhysicalInventoryStatus.DRAFT,
+  branch_manager: '',
+  inventory_incharge: '',
+  products: []
 })
 
 const errors = ref({}) // temporary errors object
@@ -76,6 +106,13 @@ const errors = ref({}) // temporary errors object
  * EVENTS
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
+
+const rowPropInit = 'rrow-prop-init-physical-inventory-form'
+Event.on(rowPropInit, (data) => {
+  return {
+    product: data
+  }
+})
 
 /** ================================================
  * COMPUTED
@@ -107,6 +144,24 @@ const inventoryInchargeOptions = computed(() => {
  ** ================================================*/
 onMounted(async () => {
   await employeeStore.getEmployees()
+  await productStore.getProducts()
+
+  if (route.query.id) {
+    // TODO: Fetch the physical inventory data by ID
+    // and populate the model with the fetched data.
+  } else {
+    model.value.products = products.value.map((p) => {
+      return {
+        product_id: p.id,
+        name: p.product_details.purchase_description,
+        category: p.categories.map((pc) => pc.name).join(':'),
+        suppliers: p.suppliers.map((s) => s.company_name).join(', '),
+        quantity: p.product_details.stock,
+        physical_quantity: 0
+      }
+    })
+  }
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>

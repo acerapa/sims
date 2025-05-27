@@ -49,6 +49,7 @@
               id="show-item"
               class="input"
               v-model="showItemSelected"
+              v-if="props.hasPagination"
             >
               <option
                 v-for="(val, ndx) in props.pgOptions.showItems"
