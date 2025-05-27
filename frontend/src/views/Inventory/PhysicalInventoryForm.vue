@@ -46,34 +46,37 @@
         </div>
       </div>
     </div>
-    <div>
-      <!-- TODO: Change table to multi table input -->
-      <CustomTable
-        :has-tools="true"
-        title="Product List"
+    <div
+      class="cont flex flex-col gap-4 mb-10 [&>.main-table>div:nth-child(2)]:max-h-[800px] [&>.main-table>div:nth-child(2)]:overflow-y-auto"
+    >
+      <p class="text-lg font-normal mb-1">Product List</p>
+      <hr />
+      <MultiSelectTable
+        v-model="model.products"
         :row-prop-init="rowPropInit"
-        :has-add-btn="false"
+        :has-add-new-item="false"
         :data="model.products"
-        :table-row-component="PhysicalInventoryFormRow"
+        :format="PIProducts"
+        :row-component="PhysicalInventoryFormRow"
+        :header-component="PhysicalInventoryFormHeader"
+        class="[&>.main-table]:border"
       >
-        <template #table_header>
-          <div class="grid grid-cols-7 gap-3">
-            <p class="col-span-1 table-header">Category</p>
-            <p class="col-span-2 table-header">Item Description</p>
-            <p class="col-span-2 table-header">Supplier</p>
-            <p class="col-span-1 table-header">Quantity</p>
-            <p class="col-span-1 table-header">Physical Count</p>
-          </div>
-        </template>
-      </CustomTable>
+      </MultiSelectTable>
+
+      <div class="flex justify-end gap-3">
+        <button class="btn-danger-outline">Cancel</button>
+        <button class="btn-outline">Save as Draft</button>
+        <button class="btn-green">Submit</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
-import CustomTable from '@/components/shared/CustomTable.vue'
+import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
 import PhysicalInventoryFormRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryFormRow.vue'
+import PhysicalInventoryFormHeader from '@/components/Inventory/PhysicalInventory/PhysicalInventoryFormHeader.vue'
 
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
@@ -90,6 +93,15 @@ const productStore = useProductStore()
 const employeeStore = useEmployeeStore()
 const { products } = storeToRefs(productStore)
 const { employees } = storeToRefs(employeeStore)
+
+const PIProducts = {
+  product_id: '',
+  name: '',
+  category: '',
+  suppliers: '',
+  quantity: 0,
+  physical_quantity: 0
+}
 
 const model = ref({
   date_started: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),

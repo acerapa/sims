@@ -1,19 +1,22 @@
 <template>
-  <div class="grid grid-cols-7 gap-3 gen-table-row">
+  <div class="grid grid-cols-7 gap-3 gen-table-row items-center">
     <p
-      class="col-span-1 text-sm text-nowrap overflow-hidden"
-      :title="props.product.category"
+      class="col-span-1 text-sm text-nowrap overflow-hidden text-ellipsis"
+      :title="model.category"
     >
-      {{ props.product.category }}
+      {{ model.category }}
     </p>
-    <p class="col-span-2 text-sm" :title="props.product.name">
-      {{ props.product.name }}
+    <p class="col-span-2 text-sm" :title="model.name">
+      {{ model.name }}
     </p>
-    <p class="col-span-2 text-sm" :title="props.product.suppliers">
-      {{ props.product.suppliers }}
+    <p
+      class="col-span-2 text-sm text-nowrap overflow-hidden text-ellipsis"
+      :title="model.suppliers"
+    >
+      {{ model.suppliers }}
     </p>
-    <p class="col-span-1 text-sm" :title="props.product.quantity">
-      {{ props.product.quantity }}
+    <p class="col-span-1 text-sm pl-5" :title="model.quantity">
+      {{ model.quantity }}
     </p>
     <CustomInput
       placeholder="Ex. 1"
@@ -22,7 +25,6 @@
       name="physical_count"
     />
   </div>
-  e
 </template>
 
 <script setup>
@@ -34,4 +36,6 @@ const props = defineProps({
     default: () => ({})
   }
 })
+
+const model = defineModel()
 </script>
