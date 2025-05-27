@@ -4,6 +4,7 @@ export function useValidation(schema, data, options = {}) {
   const { abortEarly = false, stripUnkknown = false } = options
 
   const errors = ref({})
+  const validatedData = ref({})
 
   const hasErrors = computed(() => {
     return Object.keys(errors.value).length > 0
@@ -11,11 +12,16 @@ export function useValidation(schema, data, options = {}) {
 
   const validateData = () => {
     errors.value = {}
-    const { error } = schema.validate(data, { abortEarly, stripUnkknown })
+    const { error, value } = schema.validate(data, {
+      abortEarly,
+      stripUnkknown
+    })
     if (error) {
       error.details.forEach((e) => {
         setDepthValue(0, e.path, e.message, errors.value)
       })
+    } else {
+      validatedData.value = value
     }
   }
 
@@ -52,6 +58,7 @@ export function useValidation(schema, data, options = {}) {
   return {
     errors,
     hasErrors,
+    validatedData,
     validateData
   }
 }

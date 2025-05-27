@@ -10,8 +10,8 @@
           label="Date Started:"
           :error-has-text="true"
           :disabled="true"
-          v-model="model.date_started"
-          :error="errors.date_started"
+          v-model="model.physical_inventory.date_started"
+          :error="errors.physical_inventory?.date_started"
           class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
         />
       </div>
@@ -23,13 +23,13 @@
             type="select"
             class="flex-1"
             :has-label="true"
-            name="manager_id"
             :can-search="true"
+            name="branch_manager"
             label="Branch Manager"
             :error-has-text="true"
             :options="managerOptions"
-            v-model="model.manager_id"
             placeholder="Select Manager"
+            v-model="model.physical_inventory.branch_manager"
           />
           <CustomInput
             type="select"
@@ -37,11 +37,11 @@
             :has-label="true"
             :can-search="true"
             :error-has-text="true"
-            v-model="model.manager_id"
             label="Inventory In-Charge"
             name="inventory_incharge_id"
             :options="inventoryInchargeOptions"
             placeholder="Select Inventory In-Charge"
+            v-model="model.physical_inventory.inventory_incharge"
           />
         </div>
       </div>
@@ -52,21 +52,19 @@
       <p class="text-lg font-normal mb-1">Product List</p>
       <hr />
       <MultiSelectTable
-        v-model="model.products"
+        v-model="model.items"
         :row-prop-init="rowPropInit"
         :has-add-new-item="false"
-        :data="model.products"
         :format="PIProducts"
         :row-component="PhysicalInventoryFormRow"
         :header-component="PhysicalInventoryFormHeader"
-        class="[&>.main-table]:border"
       >
       </MultiSelectTable>
 
       <div class="flex justify-end gap-3">
         <button class="btn-danger-outline">Cancel</button>
         <button class="btn-outline">Save as Draft</button>
-        <button class="btn-green">Submit</button>
+        <button class="btn-green" @click="onSubmit">Submit</button>
       </div>
     </div>
   </div>
@@ -82,10 +80,18 @@ import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { useEmployeeStore } from '@/stores/employee'
 import { storeToRefs } from 'pinia'
-import { DateHelpers, PhysicalInventoryStatus, UserType } from 'shared'
+import {
+  DateHelpers,
+  Joi,
+  PhysicalInventoryItemSchema,
+  PhysicalInventorySchema,
+  PhysicalInventoryStatus,
+  UserType
+} from 'shared'
 import { computed, onMounted, ref } from 'vue'
 import { useProductStore } from '@/stores/product'
 import { useRoute } from 'vue-router'
+import { useValidation } from '@/composables/useValidation'
 
 const route = useRoute()
 
@@ -104,15 +110,27 @@ const PIProducts = {
 }
 
 const model = ref({
-  date_started: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
-  date_ended: null,
-  status: PhysicalInventoryStatus.DRAFT,
-  branch_manager: '',
-  inventory_incharge: '',
-  products: []
+  physical_inventory: {
+    date_started: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
+    date_ended: null,
+    status: PhysicalInventoryStatus.DRAFT,
+    branch_manager: '',
+    inventory_incharge: ''
+  },
+  items: []
 })
 
-const errors = ref({}) // temporary errors object
+// composables
+const schema = Joi.object({
+  physical_inventory: PhysicalInventorySchema.required(),
+  items: Joi.array()
+    .items(PhysicalInventoryItemSchema.options({ stripUnknown: true }))
+    .min(1)
+})
+const { errors, hasErrors, validatedData, validateData } = useValidation(
+  schema,
+  model.value
+)
 
 /** ================================================
  * EVENTS
@@ -152,6 +170,19 @@ const inventoryInchargeOptions = computed(() => {
 })
 
 /** ================================================
+ * METHODS
+ ** ================================================*/
+const onSubmit = async () => {
+  validateData()
+  if (hasErrors.value) {
+    console.log(errors.value)
+    return
+  }
+
+  // TODO: Use the validated data to submit the physical inventory form.
+}
+
+/** ================================================
  * LIFECYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
@@ -162,7 +193,7 @@ onMounted(async () => {
     // TODO: Fetch the physical inventory data by ID
     // and populate the model with the fetched data.
   } else {
-    model.value.products = products.value.map((p) => {
+    model.value.items = products.value.map((p) => {
       return {
         product_id: p.id,
         name: p.product_details.purchase_description,

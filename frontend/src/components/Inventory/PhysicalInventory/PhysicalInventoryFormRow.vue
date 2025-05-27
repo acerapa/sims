@@ -23,6 +23,7 @@
       class="col-span-1"
       type="number"
       name="physical_count"
+      v-model="model.physical_quantity"
     />
   </div>
 </template>
