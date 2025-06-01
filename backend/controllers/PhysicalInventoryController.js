@@ -18,37 +18,29 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      let physicalInventory = null;
-      if (data.physical_inventory) {
-        physicalInventory = await PhysicalInventory.create(
-          data.physical_inventory,
-          {
-            transaction: transaction,
-          }
-        );
-      }
+      const createdPhysicalInventory = await PhysicalInventory.create(
+        data.physical_inventory,
+        { transaction }
+      );
 
-      if (physicalInventory && data.items) {
-        await Promise.all(
-          data.items.map((item) => {
-            item.physical_inventory_id = physicalInventory.id;
-            return PhysicalInventoryItem.create(item, {
-              transaction: transaction,
-            });
-          })
-        );
-      }
+      const items = data.items.map((item) => {
+        return {
+          ...item,
+          physical_inventory_id: createdPhysicalInventory.id,
+        };
+      });
+
+      await PhysicalInventoryItem.bulkCreate(items, { transaction });
 
       await transaction.commit();
 
       res.sendResponse(
-        { physical_inventory: physicalInventory },
-        "Successfully created!",
-        200
+        { physical_inventory: createdPhysicalInventory },
+        "Successfully registered!"
       );
-    } catch (e) {
+    } catch (error) {
       await transaction.rollback();
-      res.sendError(e, "Something wen't wrong", 400);
+      res.sendError(e, "Something went wrong! => " + e.message, 400);
     }
   },
 

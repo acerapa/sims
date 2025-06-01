@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-4">
-    <div class="cont flex flex-col gap-4">
+    <div class="cont flex flex-col gap-4 !pb-6">
       <div class="flex justify-between items-center !py-2 !pb-3">
         <h1 class="text-2xl font-bold">Physical Inventory Form</h1>
         <CustomInput
@@ -30,6 +30,7 @@
             :options="managerOptions"
             placeholder="Select Manager"
             v-model="model.physical_inventory.branch_manager"
+            :error="errors.physical_inventory?.branch_manager"
           />
           <CustomInput
             type="select"
@@ -42,6 +43,7 @@
             :options="inventoryInchargeOptions"
             placeholder="Select Inventory In-Charge"
             v-model="model.physical_inventory.inventory_incharge"
+            :error="errors.physical_inventory?.inventory_incharge"
           />
         </div>
       </div>
@@ -63,8 +65,10 @@
 
       <div class="flex justify-end gap-3">
         <button class="btn-danger-outline">Cancel</button>
-        <button class="btn-outline">Save as Draft</button>
-        <button class="btn-green" @click="onSubmit">Submit</button>
+        <button class="btn-outline" @click="() => onSubmit(true)">
+          Save as Draft
+        </button>
+        <button class="btn-green" @click="() => onSubmit()">Submit</button>
       </div>
     </div>
   </div>
@@ -90,13 +94,19 @@ import {
 } from 'shared'
 import { computed, onMounted, ref } from 'vue'
 import { useProductStore } from '@/stores/product'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useValidation } from '@/composables/useValidation'
+import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
+import { ToastTypes } from '@/data/types'
+import { InventoryConst } from '@/const/route.constants'
 
 const route = useRoute()
+const router = useRouter()
 
 const productStore = useProductStore()
 const employeeStore = useEmployeeStore()
+const physicalInventoryStore = usePhysicalInventoryStore()
+
 const { products } = storeToRefs(productStore)
 const { employees } = storeToRefs(employeeStore)
 
@@ -172,14 +182,41 @@ const inventoryInchargeOptions = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
-const onSubmit = async () => {
+const onSubmit = async (isSaveAsDraft = false) => {
+  // Few model values changes
+  model.value.physical_inventory.date_ended = DateHelpers.formatDate(
+    new Date(),
+    'YYYY-MM-DD'
+  )
+  model.value.physical_inventory.status = isSaveAsDraft
+    ? PhysicalInventoryStatus.DRAFT
+    : PhysicalInventoryStatus.DONE
+
   validateData()
   if (hasErrors.value) {
-    console.log(errors.value)
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Failed to save Physical Inventory. Please check your inputs'
+    })
     return
   }
 
-  // TODO: Use the validated data to submit the physical inventory form.
+  let isSuccess = false
+  isSuccess = await physicalInventoryStore.register(validatedData.value)
+
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.SUCCESS,
+      message: 'Physical Inventory successfully saved.'
+    })
+
+    router.push({ name: InventoryConst.PHYSICAL_INVENTORY })
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Something went wrong. Please try again.'
+    })
+  }
 }
 
 /** ================================================

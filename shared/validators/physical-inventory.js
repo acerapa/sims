@@ -6,8 +6,14 @@ const PhysicalInventorySchema = Joi.object({
   date_started: Joi.date().required(),
   date_ended: Joi.date().allow(null).optional(),
   status: Joi.string().valid(...Object.values(PhysicalInventoryStatus)),
-  inventory_incharge: Joi.number().required(),
-  branch_manager: Joi.number().required(),
+  inventory_incharge: Joi.number().required().messages({
+    "number.base": "Inventory Incharge must be a number",
+    "any.required": "Inventory Incharge is required",
+  }),
+  branch_manager: Joi.number().required().messages({
+    "number.base": "Branch Manager must be a number",
+    "any.required": "Branch Manager is required",
+  }),
 });
 
 // Physical Inventory Item
