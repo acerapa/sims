@@ -3,7 +3,10 @@
     <div class="cont flex flex-col gap-4 !pb-6">
       <div class="flex justify-between items-center !py-2 !pb-3">
         <div class="flex gap-3 w-fit items-center">
-          <h1 class="text-2xl font-bold">Physical Inventory Form</h1>
+          <h1 class="text-2xl font-bold">
+            Physical Inventory Form
+            {{ isViewOrEdit ? `#${physicalInventory?.id}` : '' }}
+          </h1>
           <BadgeComponent
             v-if="isViewOrEdit"
             :custom-class="
@@ -16,11 +19,11 @@
         </div>
         <CustomInput
           type="date"
+          :disabled="true"
           :has-label="true"
           name="date_started"
           label="Date Started:"
           :error-has-text="true"
-          :disabled="true"
           v-model="model.physical_inventory.date_started"
           :error="errors.physical_inventory?.date_started"
           class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
@@ -75,7 +78,9 @@
       />
 
       <div class="flex justify-end gap-3">
-        <button class="btn-danger-outline">Cancel</button>
+        <button class="btn-danger-outline" @click="onBackOrCancel">
+          Cancel
+        </button>
         <button
           class="btn-outline"
           v-if="!isViewOrEdit"
@@ -83,8 +88,14 @@
         >
           Save as Draft
         </button>
-        <button class="btn-green" @click="() => onSubmit()">
+        <button class="btn-green-outline" v-if="isViewOrEdit && isDraft">
+          Submit to done
+        </button>
+        <button class="btn" @click="() => onSubmit()">
           {{ isViewOrEdit ? 'Update' : 'Submit' }}
+        </button>
+        <button v-if="isViewOrEdit && isDone" class="btn">
+          Create Adjustments
         </button>
       </div>
     </div>
@@ -178,8 +189,16 @@ Event.on(rowPropInit, (data) => {
 /** ================================================
  * COMPUTED
  ** ================================================*/
+const isDraft = computed(() => {
+  return model.value.physical_inventory.status == PhysicalInventoryStatus.DRAFT
+})
+
+const isDone = computed(() => {
+  return model.value.physical_inventory.status == PhysicalInventoryStatus.DONE
+})
+
 const isViewOrEdit = computed(() => {
-  return route.query.id.toString() ? true : false
+  return route.query.id && route.query.id.toString() ? true : false
 })
 
 const managerOptions = computed(() => {
@@ -207,6 +226,11 @@ const inventoryInchargeOptions = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
+
+const onBackOrCancel = () => {
+  router.back()
+}
+
 const onSubmit = async (isSaveAsDraft = false) => {
   // Few model values changes
   model.value.physical_inventory.date_ended = DateHelpers.formatDate(
