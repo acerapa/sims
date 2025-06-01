@@ -60,6 +60,16 @@ export default [
           title: 'Physical Inventories',
           requiresAuth: true
         }
+      },
+      {
+        path: '/physical-inventory-adjustment-form',
+        name: InventoryConst.PHYSICAL_INVENTORY_ADJUSTMENT_FORM,
+        component: () =>
+          import('@/views/Inventory/PhysicalInventoryAdjustmentForm.vue'),
+        meta: {
+          title: 'Physical Inventory Adjustment Form',
+          requiresAuth: true
+        }
       }
     ]
   }

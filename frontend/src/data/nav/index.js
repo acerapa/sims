@@ -41,7 +41,10 @@ export default [
         text: 'Physical Inventory',
         route: InventoryConst.PHYSICAL_INVENTORY,
         icon: outlineDot,
-        includes_active: [InventoryConst.PHYSICAL_INVENTORY_FORM]
+        includes_active: [
+          InventoryConst.PHYSICAL_INVENTORY_FORM,
+          InventoryConst.PHYSICAL_INVENTORY_ADJUSTMENT_FORM
+        ]
       },
       {
         text: 'Inventory Stock Status',
