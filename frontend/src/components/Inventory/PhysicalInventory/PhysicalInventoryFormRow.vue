@@ -19,11 +19,13 @@
       {{ model.quantity }}
     </p>
     <CustomInput
-      placeholder="Ex. 1"
-      class="col-span-1"
       type="number"
+      class="col-span-1"
+      placeholder="Ex. 1"
       name="physical_count"
+      :disabled="props.disabled"
       v-model="model.physical_quantity"
+      :input-class="props.disabled ? '!bg-transparent' : ''"
     />
   </div>
 </template>
@@ -32,9 +34,9 @@
 import CustomInput from '@/components/shared/CustomInput.vue'
 
 const props = defineProps({
-  product: {
-    type: Object,
-    default: () => ({})
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 

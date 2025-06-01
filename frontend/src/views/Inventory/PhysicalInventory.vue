@@ -75,8 +75,8 @@ const onStartPhysicalInventory = async () => {
 
 const onView = (id) => {
   router.push({
-    name: 'physical-inventory-details',
-    params: { id }
+    name: InventoryConst.PHYSICAL_INVENTORY_FORM,
+    query: { id }
   })
 }
 

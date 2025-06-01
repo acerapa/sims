@@ -2,7 +2,18 @@
   <div class="flex flex-col gap-4">
     <div class="cont flex flex-col gap-4 !pb-6">
       <div class="flex justify-between items-center !py-2 !pb-3">
-        <h1 class="text-2xl font-bold">Physical Inventory Form</h1>
+        <div class="flex gap-3 w-fit items-center">
+          <h1 class="text-2xl font-bold">Physical Inventory Form</h1>
+          <BadgeComponent
+            v-if="isViewOrEdit"
+            :custom-class="
+              PhysicalInventoryStatusMap[model.physical_inventory.status].class
+            "
+            :text="
+              PhysicalInventoryStatusMap[model.physical_inventory.status].text
+            "
+          />
+        </div>
         <CustomInput
           type="date"
           :has-label="true"
@@ -58,17 +69,23 @@
         :row-prop-init="rowPropInit"
         :has-add-new-item="false"
         :format="PIProducts"
+        :is-disabled="isViewOrEdit"
         :row-component="PhysicalInventoryFormRow"
         :header-component="PhysicalInventoryFormHeader"
-      >
-      </MultiSelectTable>
+      />
 
       <div class="flex justify-end gap-3">
         <button class="btn-danger-outline">Cancel</button>
-        <button class="btn-outline" @click="() => onSubmit(true)">
+        <button
+          class="btn-outline"
+          v-if="!isViewOrEdit"
+          @click="() => onSubmit(true)"
+        >
           Save as Draft
         </button>
-        <button class="btn-green" @click="() => onSubmit()">Submit</button>
+        <button class="btn-green" @click="() => onSubmit()">
+          {{ isViewOrEdit ? 'Update' : 'Submit' }}
+        </button>
       </div>
     </div>
   </div>
@@ -87,9 +104,11 @@ import { storeToRefs } from 'pinia'
 import {
   DateHelpers,
   Joi,
+  ObjectHelpers,
   PhysicalInventoryItemSchema,
   PhysicalInventorySchema,
   PhysicalInventoryStatus,
+  PhysicalInventoryStatusMap,
   UserType
 } from 'shared'
 import { computed, onMounted, ref } from 'vue'
@@ -99,6 +118,7 @@ import { useValidation } from '@/composables/useValidation'
 import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
 import { ToastTypes } from '@/data/types'
 import { InventoryConst } from '@/const/route.constants'
+import BadgeComponent from '@/components/shared/BadgeComponent.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -109,6 +129,7 @@ const physicalInventoryStore = usePhysicalInventoryStore()
 
 const { products } = storeToRefs(productStore)
 const { employees } = storeToRefs(employeeStore)
+const { physicalInventory } = storeToRefs(physicalInventoryStore)
 
 const PIProducts = {
   product_id: '',
@@ -157,6 +178,10 @@ Event.on(rowPropInit, (data) => {
 /** ================================================
  * COMPUTED
  ** ================================================*/
+const isViewOrEdit = computed(() => {
+  return route.query.id.toString() ? true : false
+})
+
 const managerOptions = computed(() => {
   return employees.value
     .filter((emp) => emp.position == UserType.MANAGER)
@@ -202,7 +227,14 @@ const onSubmit = async (isSaveAsDraft = false) => {
   }
 
   let isSuccess = false
-  isSuccess = await physicalInventoryStore.register(validatedData.value)
+  if (!isViewOrEdit) {
+    isSuccess = await physicalInventoryStore.register(validatedData.value)
+  } else {
+    isSuccess = await physicalInventoryStore.update(
+      route.query.id,
+      validatedData.value
+    )
+  }
 
   if (isSuccess) {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -227,8 +259,30 @@ onMounted(async () => {
   await productStore.getProducts()
 
   if (route.query.id) {
-    // TODO: Fetch the physical inventory data by ID
-    // and populate the model with the fetched data.
+    await physicalInventoryStore.getPhysicalInventory(route.query.id)
+    model.value.physical_inventory = ObjectHelpers.assignSameFields(
+      model.value.physical_inventory,
+      physicalInventory.value
+    )
+
+    // patches
+    model.value.physical_inventory.date_started = DateHelpers.formatDate(
+      new Date(physicalInventory.value.date_started),
+      'YYYY-MM-DD'
+    )
+
+    // items
+    model.value.items = physicalInventory.value.items.map((item) => {
+      const product = products.value.find((p) => p.id == item.product_id)
+      return {
+        product_id: item.product_id,
+        name: product.product_details.purchase_description,
+        category: product.categories.map((pc) => pc.name).join(':'),
+        suppliers: product.suppliers.map((s) => s.company_name).join(', '),
+        quantity: item.quantity,
+        physical_quantity: item.physical_quantity
+      }
+    })
   } else {
     model.value.items = products.value.map((p) => {
       return {

@@ -48,7 +48,6 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-
       const physicalInventory = await PhysicalInventory.findOne({
         where: {
           id: req.params.id,
@@ -58,26 +57,24 @@ module.exports = {
       if (physicalInventory) {
         if (data.physical_inventory) {
           await physicalInventory.update(data.physical_inventory, {
-            transaction: transaction,
+            transaction,
           });
         }
 
         if (data.items) {
-          await Promise.all([
-            data.items.map((item) => {
-              const item_copy = { ...item };
-              delete item_copy;
-              return PhysicalInventoryItem.update(item_copy, {
+          await Promise.all(
+            data.items.map((item) =>
+              PhysicalInventoryItem.update(item, {
                 where: {
-                  id: item.id,
+                  product_id: item.product_id,
+                  physical_inventory_id: physicalInventory.id,
                 },
-                transaction: transaction,
-              });
-            }),
-          ]);
+              })
+            )
+          );
         }
       } else {
-        throw "Not found!";
+        throw new Error("Physical Inventory not found!");
       }
 
       await transaction.commit();
