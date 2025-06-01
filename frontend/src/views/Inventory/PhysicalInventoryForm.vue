@@ -94,7 +94,11 @@
         <button class="btn" @click="() => onSubmit()">
           {{ isViewOrEdit ? 'Update' : 'Submit' }}
         </button>
-        <button v-if="isViewOrEdit && isDone" class="btn">
+        <button
+          v-if="isViewOrEdit && isDone"
+          class="btn-outline"
+          @click="onCreateAdjustment"
+        >
           Create Adjustments
         </button>
       </div>
@@ -229,6 +233,10 @@ const inventoryInchargeOptions = computed(() => {
 
 const onBackOrCancel = () => {
   router.back()
+}
+
+const onCreateAdjustment = () => {
+  router.push({ name: InventoryConst.PHYSICAL_INVENTORY_ADJUSTMENT_FORM })
 }
 
 const onSubmit = async (isSaveAsDraft = false) => {

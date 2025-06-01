@@ -1,36 +1,45 @@
 <template>
   <div class="flex flex-col gap-4">
-    <div class="cont">
-      <div class="flex justify-between items-center !py-2 !pb-3">
-        <h1 class="text-2xl font-bold">Physical Inventory Adjustment Form</h1>
-        <CustomInput
-          type="date"
-          :has-label="true"
-          name="date_started"
-          label="Date Started:"
-          :error-has-text="true"
-          :disabled="true"
-          v-model="model.adjustment_information.date_started"
-          :error="errors.adjustment_information?.date_started"
-          class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
-        />
+    <div class="cont flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold">Adjustment Form</h1>
+        <RouterLink
+          :to="{
+            name: InventoryConst.PHYSICAL_INVENTORY_FORM,
+            query: {
+              id: 1
+            }
+          }"
+        >
+          For Physical Inventory #{{ 1 }}
+        </RouterLink>
       </div>
-      <hr />
-      <div class="flex gap-5">
-        <CustomInput type="select" />
-      </div>
+      <CustomInput
+        type="date"
+        :has-label="true"
+        name="date_started"
+        label="Date Started:"
+        :error-has-text="true"
+        :disabled="true"
+        v-model="model.adjustment_information.date_started"
+        :error="errors.adjustment_information?.date_started"
+        class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
+      />
     </div>
+    <div class="cont" ref="tableRef">Test</div>
   </div>
 </template>
 
 <script setup>
-import CustomInput from '@/components/shared/CustomInput.vue'
-import { EventEnum } from '@/data/event'
 import Event from '@/event'
-import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
 import { storeToRefs } from 'pinia'
 import { DateHelpers } from 'shared'
 import { onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
+import { EventEnum } from '@/data/event'
+import { InventoryConst } from '@/const/route.constants'
+import CustomInput from '@/components/shared/CustomInput.vue'
+import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
 
 const physicalInventoryStore = usePhysicalInventoryStore()
 const { physicalInventories } = storeToRefs(physicalInventoryStore)
