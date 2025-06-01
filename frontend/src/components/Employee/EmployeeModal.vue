@@ -165,7 +165,6 @@ const positionOptions = computed(() => {
  ** ================================================*/
 const onSubmit = async () => {
   // validator
-
   if (!props.selectedId) {
     model.value.password = `${model.value.username}-${new Date().getFullYear()}`
   }
@@ -226,8 +225,6 @@ onMounted(() => {
       // update date
       model.value.date_started = model.value.date_started.split('T')[0]
     }
-  } else {
-    model.value = ObjectHelpers.objectReset(model.value)
   }
 })
 </script>

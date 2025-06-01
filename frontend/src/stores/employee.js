@@ -22,23 +22,6 @@ export const useEmployeeStore = defineStore('employee', () => {
     }
   }
 
-  const getEmployees = async () => {
-    if (!employees.value.length) {
-      await fetchAllEmployees()
-    }
-
-    return employees.value
-  }
-
-  const employeeOptions = () => {
-    return employees.value.map((employee) => {
-      return {
-        text: `${employee.first_name} ${employee.last_name}`,
-        value: employee.id
-      }
-    })
-  }
-
   const registerEmployee = async (employee) => {
     const res = await api('users/register', Method.POST, employee)
     const isSuccess = res.status < 400
@@ -83,6 +66,24 @@ export const useEmployeeStore = defineStore('employee', () => {
     } else {
       await fetchAllEmployees()
     }
+  }
+
+  // getters
+  const employeeOptions = () => {
+    return employees.value.map((employee) => {
+      return {
+        text: `${employee.first_name} ${employee.last_name}`,
+        value: employee.id
+      }
+    })
+  }
+
+  const getEmployees = async () => {
+    if (!employees.value.length) {
+      await fetchAllEmployees()
+    }
+
+    return employees.value
   }
 
   return {

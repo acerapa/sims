@@ -11,6 +11,7 @@ const SalesOrderValidators = require("./sales-order");
 const NotificationValidators = require("./notification");
 const PurchaseOrderValidators = require("./purchase-order");
 const ReceivePaymentsValidators = require("./received-payments");
+const PhysicalInventoryValidators = require("./physical-inventory");
 
 const Joi = require("joi");
 
@@ -29,4 +30,5 @@ module.exports = {
   ...NotificationValidators,
   ...PurchaseOrderValidators,
   ...ReceivePaymentsValidators,
+  ...PhysicalInventoryValidators,
 };

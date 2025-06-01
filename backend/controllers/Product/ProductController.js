@@ -61,7 +61,7 @@ module.exports = {
           {
             model: Supplier,
             as: "suppliers",
-            attributes: ["id"],
+            attributes: ["id", "company_name"],
             through: { attributes: ["cost"] },
           },
           {

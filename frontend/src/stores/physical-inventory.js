@@ -34,11 +34,14 @@ export const usePhysicalInventoryStore = defineStore(
     const update = async (id, model) => {
       const res = await api(
         `physical-inventory/update/${id}`,
-        Method.POST,
+        Method.PUT,
         model
       )
 
-      return res
+      const isSuccess = res.status < 300
+      // TODO: Update the current physical inventory list
+      // This is to avoid re-fetching all the physical inventory list again
+      return isSuccess
     }
 
     const updateItem = async (id, model) => {
@@ -62,6 +65,14 @@ export const usePhysicalInventoryStore = defineStore(
       return physicalInventoryCopy
     }
 
+    const getPhysicalInventory = async (id) => {
+      if (!physicalInventory.value || physicalInventory.value.id != id) {
+        await fetchOne(id)
+      }
+
+      return physicalInventory.value
+    }
+
     return {
       physicalInventory,
       physicalInventories,
@@ -70,6 +81,7 @@ export const usePhysicalInventoryStore = defineStore(
       register,
       updateItem,
       getGroupedItems,
+      getPhysicalInventory,
       fetchAllPhysicalInventories
     }
   }

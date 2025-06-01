@@ -1,11 +1,7 @@
 const Joi = require("joi");
 const { AddressSchema } = require("./user");
 const { ValidatorHelpers } = require("../helpers/validators-helpers");
-const {
-  ProductOrderedStatus,
-  PhysicalInventoryStatus,
-  PurchaseOrderStatus,
-} = require("shared/enums");
+const { ProductOrderedStatus, PurchaseOrderStatus } = require("shared/enums");
 
 const PurchaseOrderSchema = Joi.object({
   ref_no: Joi.string().required().messages({
@@ -99,48 +95,10 @@ const ReceivePurchaseOrderSchema = Joi.object({
   products: Joi.array().items(ReceivePurchaseProductSchema).min(1).required(),
 });
 
-// Physical Inventory
-const PhysicalInventorySchema = Joi.object({
-  date_started: Joi.date().required(),
-  date_ended: Joi.date().allow(null).optional(),
-  status: Joi.string().valid(...Object.values(PhysicalInventoryStatus)),
-  inventory_incharge: Joi.number().required(),
-  branch_manager: Joi.number().required(),
-});
-
-// Physical Inventory Item
-const PhysicalInventoryItemSchema = Joi.object({
-  id: Joi.number().optional(),
-  quantity: Joi.number().required(),
-  product_id: Joi.number().required(),
-  physical_inventory_id: Joi.number().required(),
-  physical_quantity: Joi.number().min(0).required(),
-});
-
-const PhysicalInventoryCreateSchema = Joi.object({
-  physical_inventory: PhysicalInventorySchema.required(),
-  items: Joi.array().items(PhysicalInventoryItemSchema).min(1),
-});
-
-const PhysicalInventoryItemUpdateSchema =
-  ValidatorHelpers.makeSchemaFieldOptional(PhysicalInventoryItemSchema);
-
-const PhysicalInventoryUpdateSchema = Joi.object({
-  physical_inventory: ValidatorHelpers.makeSchemaFieldOptional(
-    PhysicalInventorySchema
-  ),
-  items: PhysicalInventoryItemUpdateSchema,
-});
-
 module.exports = {
   PurchaseOrderSchema,
   PurchaseProductSchema,
-  PhysicalInventorySchema,
   PurchaseOrderUpdateSchema,
   ReceivePurchaseOrderSchema,
   PurchaseOrderCreationSchema,
-  PhysicalInventoryItemSchema,
-  PhysicalInventoryUpdateSchema,
-  PhysicalInventoryCreateSchema,
-  PhysicalInventoryItemUpdateSchema,
 };

@@ -20,10 +20,9 @@ export default [
         }
       },
       {
-        path: '/physical-inventory-details/:id',
-        name: InventoryConst.PHYSICAL_INVENTORY_DETAILS,
-        component: () =>
-          import('@/views/Inventory/PhysicalInventoryDetails.vue'),
+        path: '/physical-inventory-form',
+        name: InventoryConst.PHYSICAL_INVENTORY_FORM,
+        component: () => import('@/views/Inventory/PhysicalInventoryForm.vue'),
         meta: {
           title: 'Physical Inventory',
           requiresAuth: true
@@ -50,6 +49,15 @@ export default [
         name: InventoryConst.SERVICES,
         component: () => import('@/views/Inventory/Services.vue'),
         meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/physical-inventory',
+        name: InventoryConst.PHYSICAL_INVENTORY,
+        component: () => import('@/views/Inventory/PhysicalInventory.vue'),
+        meta: {
+          title: 'Physical Inventories',
           requiresAuth: true
         }
       }
