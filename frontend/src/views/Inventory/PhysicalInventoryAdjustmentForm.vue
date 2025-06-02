@@ -36,6 +36,10 @@
         :row-component="PhysicalInventoryAdjustmentFormRow"
         :header-component="PhysicalInventoryAdjustmentFormHeader"
       />
+      <div class="flex justify-end gap-3">
+        <button class="btn-danger-outline">cancel</button>
+        <button class="btn">submit</button>
+      </div>
     </div>
   </div>
 </template>

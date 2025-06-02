@@ -64,6 +64,12 @@ protectedRoutes.use("/deliveries", deliveryRoutes);
 
 const receivePaymentRoutes = require("./ReceivedPaymentRoutes");
 protectedRoutes.use("/received-payments", receivePaymentRoutes);
+
+const physicalInventoryAdjustmentRoutes = require("./PhysicalInventoryAdjustmentRoutes");
+protectedRoutes.use(
+  "/physical-inventory-adjustments",
+  physicalInventoryAdjustmentRoutes
+);
 // end use routes
 
 // register protected routes
