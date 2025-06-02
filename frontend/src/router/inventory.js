@@ -62,7 +62,7 @@ export default [
         }
       },
       {
-        path: '/physical-inventory-adjustment-form',
+        path: '/physical-inventory-adjustment-form/:physical_inventory_id',
         name: InventoryConst.PHYSICAL_INVENTORY_ADJUSTMENT_FORM,
         component: () =>
           import('@/views/Inventory/PhysicalInventoryAdjustmentForm.vue'),

@@ -236,7 +236,12 @@ const onBackOrCancel = () => {
 }
 
 const onCreateAdjustment = () => {
-  router.push({ name: InventoryConst.PHYSICAL_INVENTORY_ADJUSTMENT_FORM })
+  router.push({
+    name: InventoryConst.PHYSICAL_INVENTORY_ADJUSTMENT_FORM,
+    params: {
+      physical_inventory_id: route.query.id
+    }
+  })
 }
 
 const onSubmit = async (isSaveAsDraft = false) => {
