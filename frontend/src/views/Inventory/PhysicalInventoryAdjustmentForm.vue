@@ -37,7 +37,9 @@
         :header-component="PhysicalInventoryAdjustmentFormHeader"
       />
       <div class="flex justify-end gap-3">
-        <button class="btn-danger-outline">cancel</button>
+        <button class="btn-danger-outline" @click="onCancelOrBack">
+          cancel
+        </button>
         <button class="btn">submit</button>
       </div>
     </div>
@@ -60,6 +62,7 @@ import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
 import { useTableScroll } from '@/use/useTableScroll'
 import { useProductStore } from '@/stores/product'
 import { storeToRefs } from 'pinia'
+import { useAuth } from '@/composables/useAuth'
 
 const route = useRoute()
 const router = useRouter()
@@ -70,20 +73,22 @@ const physicalInventoryStore = usePhysicalInventoryStore()
 const { product } = storeToRefs(productStore)
 
 const tableRef = ref(null)
+const authUser = ref(null)
 const physicalInventory = ref(null)
 
 const itemFormat = {
   name: '',
   item_id: '',
   category: '',
-  new_quantity: 0,
-  current_quantity: 0,
+  new_quantity: null,
+  current_quantity: null,
   difference_quantity: 0
 }
 
 const model = ref({
   adjustment_information: {
-    date_started: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
+    date_started: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
+    adjusted_by: ''
   },
   items: []
 })
@@ -92,6 +97,7 @@ const errors = ref({}) // Temporary
 
 // composables
 useTableScroll(tableRef, true)
+const { getAuthUser } = useAuth()
 
 /** ================================================
  * EVENTS
@@ -99,10 +105,22 @@ useTableScroll(tableRef, true)
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
 /** ================================================
+ * METHODS
+ ** ================================================*/
+const onCancelOrBack = () => {
+  router.back()
+}
+
+/** ================================================
  * LIFECYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
   await productStore.getProducts()
+  authUser.value = await getAuthUser()
+
+  if (authUser.value) {
+    model.value.adjustment_information.adjusted_by = authUser.value.id
+  }
 
   if (!route.params.physical_inventory_id) {
     Event.emit(EventEnum.TOAST_MESSAGE, {
@@ -118,9 +136,7 @@ onMounted(async () => {
     if (physicalInventory.value) {
       model.value.items = physicalInventory.value.items.map((item) => {
         productStore.getProduct(item.product_id)
-        console.log(product.value.product_details.purchase_description)
         return {
-          new_quantity: 0,
           item_id: item.id,
           difference_quantity: 0,
           current_quantity: item.physical_quantity,

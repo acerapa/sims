@@ -9,6 +9,8 @@
       placeholder="Ex. 0"
       class="col-span-1 text-sm"
       v-model="model.new_quantity"
+      @blur="() => (model.new_quantity = model.new_quantity || null)"
+      :disabled="props.isDisabled"
     />
     <CustomInput
       type="number"
@@ -16,13 +18,32 @@
       name="difference_quantity"
       class="col-span-1 text-sm"
       v-model="model.difference_quantity"
+      :disabled="true"
     />
   </div>
 </template>
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
+import { watch } from 'vue'
+const props = defineProps({
+  isDisabled: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const model = defineModel({})
-console.log(model.value)
+
+watch(
+  () => model.value.new_quantity,
+  (newValue) => {
+    if (newValue === null || newValue === undefined || newValue === '') {
+      model.value.difference_quantity = 0
+    } else {
+      model.value.difference_quantity =
+        model.value.new_quantity - model.value.current_quantity
+    }
+  }
+)
 </script>
