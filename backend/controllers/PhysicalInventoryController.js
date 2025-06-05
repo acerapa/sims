@@ -1,7 +1,12 @@
+const { PhysicalInventoryStatus } = require("shared/enums");
 const { sequelize } = require("../models");
 const PhysicalInventory = require("../models/physical-inventory");
 const PhysicalInventoryItem = require("../models/physical-inventory-item");
 const Product = require("../models/product");
+const ProductDetails = require("../models/product-details");
+const {
+  reflectPhysicalProductCount,
+} = require("../services/PhysicalInventoryService");
 
 module.exports = {
   all: async (req, res) => {
@@ -31,6 +36,10 @@ module.exports = {
       });
 
       await PhysicalInventoryItem.bulkCreate(items, { transaction });
+
+      if (data.physical_inventory.status === PhysicalInventoryStatus.DONE) {
+        await reflectPhysicalProductCount(data.items, transaction);
+      }
 
       await transaction.commit();
 
@@ -72,6 +81,10 @@ module.exports = {
               })
             )
           );
+
+          if (data.physical_inventory.status === PhysicalInventoryStatus.DONE) {
+            await reflectPhysicalProductCount(data.items, transaction);
+          }
         }
       } else {
         throw new Error("Physical Inventory not found!");

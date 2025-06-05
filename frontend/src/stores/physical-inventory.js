@@ -1,10 +1,14 @@
 import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useProductStore } from './product'
+import { PhysicalInventoryStatus } from 'shared'
 
 export const usePhysicalInventoryStore = defineStore(
   'physical-inventory',
   () => {
+    const productStore = useProductStore()
+
     const physicalInventories = ref([])
     const physicalInventory = ref(null)
 
@@ -28,7 +32,15 @@ export const usePhysicalInventoryStore = defineStore(
     }
 
     const register = async (model) => {
-      return await api(`physical-inventory/register`, Method.POST, model)
+      const res = await api(`physical-inventory/register`, Method.POST, model)
+
+      const isSuccess = res.status < 400
+      if (isSuccess) {
+        if (model.physical_inventory.status == PhysicalInventoryStatus.DONE) {
+          await productStore.fetchAllProducts()
+        }
+      }
+      return isSuccess
     }
 
     const update = async (id, model) => {
@@ -38,9 +50,15 @@ export const usePhysicalInventoryStore = defineStore(
         model
       )
 
-      const isSuccess = res.status < 300
+      const isSuccess = res.status < 400
       // TODO: Update the current physical inventory list
       // This is to avoid re-fetching all the physical inventory list again
+
+      if (isSuccess) {
+        if (model.physical_inventory.status == PhysicalInventoryStatus.DONE) {
+          await productStore.fetchAllProducts()
+        }
+      }
       return isSuccess
     }
 
