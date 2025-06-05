@@ -18,12 +18,12 @@
       <CustomInput
         type="date"
         :has-label="true"
-        name="date_started"
+        name="date_recorded"
         label="Date Started:"
         :error-has-text="true"
         :disabled="true"
-        v-model="model.adjustment_information.date_started"
-        :error="errors.adjustment_information?.date_started"
+        v-model="model.adjustment_information.date_recorded"
+        :error="errors.adjustment_information?.date_recorded"
         class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
       />
     </div>
@@ -40,7 +40,7 @@
         <button class="btn-danger-outline" @click="onCancelOrBack">
           cancel
         </button>
-        <button class="btn">submit</button>
+        <button class="btn" @click="onSubmit">submit</button>
       </div>
     </div>
   </div>
@@ -53,7 +53,12 @@ import PhysicalInventoryAdjustmentFormHeader from '@/components/Inventory/Physic
 import PhysicalInventoryAdjustmentFormRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryAdjustmentFormRow.vue'
 
 import Event from '@/event'
-import { DateHelpers } from 'shared'
+import {
+  DateHelpers,
+  Joi,
+  PhysicalInventoryAdjustmentSchema,
+  ItemToAdjustmentsSchema
+} from 'shared'
 import { onMounted, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
@@ -61,13 +66,17 @@ import { InventoryConst } from '@/const/route.constants'
 import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
 import { useTableScroll } from '@/use/useTableScroll'
 import { useProductStore } from '@/stores/product'
+import { useAdjustmentsStore } from '@/stores/adjustments'
 import { storeToRefs } from 'pinia'
 import { useAuth } from '@/composables/useAuth'
+import { useValidation } from '@/composables/useValidation'
+import { ToastTypes } from '@/data/types'
 
 const route = useRoute()
 const router = useRouter()
 
 const productStore = useProductStore()
+const adjustmentStore = useAdjustmentsStore()
 const physicalInventoryStore = usePhysicalInventoryStore()
 
 const { product } = storeToRefs(productStore)
@@ -87,16 +96,26 @@ const itemFormat = {
 
 const model = ref({
   adjustment_information: {
-    date_started: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
-    adjusted_by: ''
+    user_id: '',
+    physical_inventory_id: route.params.physical_inventory_id || '',
+    date_recorded: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
   },
   items: []
 })
 
-const errors = ref({}) // Temporary
-
 // composables
+const schema = Joi.object({
+  adjustment_information: PhysicalInventoryAdjustmentSchema,
+  items: Joi.array()
+    .items(ItemToAdjustmentsSchema.options({ stripUnknown: true }))
+    .min(1)
+})
+
 useTableScroll(tableRef, true)
+const { errors, hasErrors, validateData, validatedData } = useValidation(
+  schema,
+  model.value
+)
 const { getAuthUser } = useAuth()
 
 /** ================================================
@@ -111,6 +130,23 @@ const onCancelOrBack = () => {
   router.back()
 }
 
+const onSubmit = async () => {
+  validateData()
+  if (hasErrors.value) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Please fill up the required fields.'
+    })
+    return
+  }
+
+  const isSuccess = await adjustmentStore.registerAdjustment(
+    validatedData.value
+  )
+
+  console.log(isSuccess)
+}
+
 /** ================================================
  * LIFECYCLE HOOKS
  ** ================================================*/
@@ -119,7 +155,7 @@ onMounted(async () => {
   authUser.value = await getAuthUser()
 
   if (authUser.value) {
-    model.value.adjustment_information.adjusted_by = authUser.value.id
+    model.value.adjustment_information.user_id = authUser.value.id
   }
 
   if (!route.params.physical_inventory_id) {

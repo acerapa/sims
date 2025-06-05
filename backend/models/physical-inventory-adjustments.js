@@ -11,6 +11,11 @@ PhysicalInventoryAdjustment.init(
       primaryKey: true,
       autoIncrement: true,
     },
+    date_recorded: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
     physical_inventory_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

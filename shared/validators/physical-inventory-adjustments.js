@@ -1,6 +1,10 @@
 const Joi = require("joi");
 
 const PhysicalInventoryAdjustmentSchema = Joi.object({
+  date_recorded: Joi.date().required().messages({
+    "date.base": "Date must be a date",
+    "any.required": "Date is required",
+  }),
   physical_inventory_id: Joi.number().required().messages({
     "number.base": "Physical Inventory ID must be a number",
     "any.required": "Physical Inventory ID is required",
