@@ -33,6 +33,10 @@ const ItemToAdjustmentsSchema = Joi.object({
   difference: Joi.number().default(0).messages({
     "number.base": "Difference must be a number",
   }),
+  product_id: Joi.number().required().messages({
+    "number.base": "Product Id must be a number",
+    "any.required": "Product Id is required",
+  })
 });
 
 const PhysicalInventoryAdjustmentSchemaWithItems = Joi.object({

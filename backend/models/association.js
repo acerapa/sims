@@ -25,6 +25,27 @@ const PaymentMethod = require("./payment-method");
 const Delivery = require("./delivery");
 const InvoiceProducts = require("./junction/invoice-products");
 const ReceivedPayment = require("./received-payment");
+const PhysicalInventoryAdjustments = require("./physical-inventory-adjustments");
+const ItemToAdjustments = require("./junction/item-to-adjustments");
+
+// adjustments to user
+PhysicalInventoryAdjustments.belongsTo(User, {
+  foreignKey: 'user_id',
+  as: 'adjusted_by',
+})
+
+// adjustments to itemtoadjust
+PhysicalInventoryAdjustments.hasMany(ItemToAdjustments, {
+  foreignKey: 'adjustment_id',
+  as: 'items'
+})
+
+PhysicalInventoryAdjustments.belongsToMany(PhysicalInventoryItem, {
+  through: ItemToAdjustments,
+  foreignKey: 'adjustment_id',
+  otherKey: 'item_id',
+  as: 'adjustment_items'
+})
 
 // receive payments to invoice
 Invoice.hasMany(ReceivedPayment, {

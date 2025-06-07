@@ -62,6 +62,25 @@
         </div>
       </div>
     </div>
+    <CustomTable
+      :data="adjustmentsMade"
+      title-style="!text-base mb-3"
+      title="Adjustments Made"
+      :has-tools="false"
+      :has-filter="false"
+      :has-add-btn="false"
+      :row-prop-init="rowPropInitAdjustment"
+      v-if="isViewOrEdit && isDone"
+      :table-row-component="PhysicalInventoryAdjustmentRow"
+    >
+      <template #table_header>
+        <div class="grid grid-cols-6 gap-3">
+          <p class="col-span-3 text-sm font-bold">Adjusted by</p>
+          <p class="col-span-2 text-sm font-bold">Date Adjusted</p>
+          <p class="col-span-1 text-sm font-bold"></p>
+        </div>
+      </template>
+    </CustomTable>
     <div
       class="cont flex flex-col gap-4 mb-10 [&>.main-table>div:nth-child(2)]:max-h-[800px] [&>.main-table>div:nth-child(2)]:overflow-y-auto"
     >
@@ -108,7 +127,9 @@
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
+import CustomTable from '@/components/shared/CustomTable.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
+ import PhysicalInventoryAdjustmentRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryAdjustmentRow.vue'
 import PhysicalInventoryFormRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryFormRow.vue'
 import PhysicalInventoryFormHeader from '@/components/Inventory/PhysicalInventory/PhysicalInventoryFormHeader.vue'
 
@@ -131,6 +152,7 @@ import { useProductStore } from '@/stores/product'
 import { useRoute, useRouter } from 'vue-router'
 import { useValidation } from '@/composables/useValidation'
 import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
+import { useAdjustmentsStore } from '@/stores/adjustments'
 import { ToastTypes } from '@/data/types'
 import { InventoryConst } from '@/const/route.constants'
 import BadgeComponent from '@/components/shared/BadgeComponent.vue'
@@ -141,10 +163,12 @@ const router = useRouter()
 const productStore = useProductStore()
 const employeeStore = useEmployeeStore()
 const physicalInventoryStore = usePhysicalInventoryStore()
+const adjustmentStore = useAdjustmentsStore()
 
 const { products } = storeToRefs(productStore)
 const { employees } = storeToRefs(employeeStore)
 const { physicalInventory } = storeToRefs(physicalInventoryStore)
+const { adjustments } = storeToRefs(adjustmentStore)
 
 const PIProducts = {
   product_id: '',
@@ -183,10 +207,19 @@ const { errors, hasErrors, validatedData, validateData } = useValidation(
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
-const rowPropInit = 'rrow-prop-init-physical-inventory-form'
+// product list
+const rowPropInit = 'row-prop-init-physical-inventory-form'
 Event.on(rowPropInit, (data) => {
   return {
     product: data
+  }
+})
+
+// adjustment list
+const rowPropInitAdjustment = 'row-prop-init-adjustments'
+Event.on(rowPropInitAdjustment, (data) => {
+  return {
+    adjustment: data
   }
 })
 
@@ -202,8 +235,15 @@ const isDone = computed(() => {
 })
 
 const isViewOrEdit = computed(() => {
-  return route.query.id && route.query.id.toString() ? true : false
+  return route.query.id ? true : false
 })
+
+const adjustmentsMade = computed(
+  () => adjustments
+          .value.filter(
+            a => a.physical_inventory_id == route.query.id
+          )
+)
 
 const managerOptions = computed(() => {
   return employees.value
@@ -294,6 +334,7 @@ const onSubmit = async (isSaveAsDraft = false) => {
 onMounted(async () => {
   await employeeStore.getEmployees()
   await productStore.getProducts()
+  await adjustmentStore.fetchAdjustments()
 
   if (route.query.id) {
     await physicalInventoryStore.getPhysicalInventory(route.query.id)

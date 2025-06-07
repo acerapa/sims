@@ -33,14 +33,15 @@
         :format="itemFormat"
         v-model="model.items"
         :has-add-new-item="false"
+        :is-disabled="isViewOrEdit"
         :row-component="PhysicalInventoryAdjustmentFormRow"
         :header-component="PhysicalInventoryAdjustmentFormHeader"
       />
       <div class="flex justify-end gap-3">
-        <button class="btn-danger-outline" @click="onCancelOrBack">
-          cancel
+        <button :class="isViewOrEdit ? 'btn-gray-outline' : 'btn-danger-outline'" @click="onCancelOrBack">
+          {{ isViewOrEdit ? 'Back' : 'Cancel' }}
         </button>
-        <button class="btn" @click="onSubmit">submit</button>
+        <button class="btn" @click="onSubmit" v-if="!isViewOrEdit">Submit</button>
       </div>
     </div>
   </div>
@@ -57,9 +58,10 @@ import {
   DateHelpers,
   Joi,
   PhysicalInventoryAdjustmentSchema,
-  ItemToAdjustmentsSchema
+  ItemToAdjustmentsSchema,
+  ObjectHelpers
 } from 'shared'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { EventEnum } from '@/data/event'
 import { InventoryConst } from '@/const/route.constants'
@@ -80,6 +82,7 @@ const adjustmentStore = useAdjustmentsStore()
 const physicalInventoryStore = usePhysicalInventoryStore()
 
 const { product } = storeToRefs(productStore)
+const { adjustment } = storeToRefs(adjustmentStore)
 
 const tableRef = ref(null)
 const authUser = ref(null)
@@ -91,7 +94,8 @@ const itemFormat = {
   category: '',
   new_quantity: null,
   current_quantity: null,
-  difference_quantity: 0
+  difference: 0,
+  product_id: ''
 }
 
 const model = ref({
@@ -122,6 +126,13 @@ const { getAuthUser } = useAuth()
  * EVENTS
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const isViewOrEdit = computed(() => {
+  return route.query.id ? true : false
+})
 
 /** ================================================
  * METHODS
@@ -188,16 +199,42 @@ onMounted(async () => {
     )
 
     if (physicalInventory.value) {
-      model.value.items = physicalInventory.value.items.map((item) => {
-        productStore.getProduct(item.product_id)
-        return {
-          item_id: item.id,
-          difference_quantity: 0,
-          current_quantity: item.physical_quantity,
-          name: product.value.product_details.purchase_description,
-          category: product.value.categories.map((pc) => pc.name).join(':')
-        }
-      })
+      if (isViewOrEdit.value) {
+        await adjustmentStore.fetchAdjustment(route.query.id)
+
+        model.value.adjustment_information = ObjectHelpers.assignSameFields(
+          model.value.adjustment_information,
+          adjustment.value
+        )
+
+        // patches
+        model.value.adjustment_information.date_recorded = DateHelpers.formatDate(new Date(adjustment.value.date_recorded), 'YYYY-MM-DD')
+
+        // items
+        model.value.items = adjustment.value.adjustment_items.map(item => {
+          return {
+            item_id: item.ItemToAdjustments.item_id,
+            difference: item.ItemToAdjustments.difference,
+            new_quantity: item.ItemToAdjustments.new_quantity,
+            current_quantity: item.ItemToAdjustments.current_quantity,
+            name: item.product.product_details.purchase_description,
+            category: item.product.categories.map((pc) => pc.name).join(':')
+          }
+        })
+
+      } else {
+        model.value.items = physicalInventory.value.items.map((item) => {
+          productStore.getProduct(item.product_id)
+          return {
+            difference: 0,
+            item_id: item.id,
+            product_id: product.value.id,
+            current_quantity: item.physical_quantity,
+            name: product.value.product_details.purchase_description,
+            category: product.value.categories.map((pc) => pc.name).join(':')
+          }
+        })
+      }
     }
   }
 

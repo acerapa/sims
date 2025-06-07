@@ -15,9 +15,9 @@
     <CustomInput
       type="number"
       placeholder="Ex. 0"
-      name="difference_quantity"
+      name="difference"
       class="col-span-1 text-sm"
-      v-model="model.difference_quantity"
+      v-model="model.difference"
       :disabled="true"
     />
   </div>
@@ -39,9 +39,9 @@ watch(
   () => model.value.new_quantity,
   (newValue) => {
     if (newValue === null || newValue === undefined || newValue === '') {
-      model.value.difference_quantity = 0
+      model.value.difference = 0
     } else {
-      model.value.difference_quantity =
+      model.value.difference =
         model.value.new_quantity - model.value.current_quantity
     }
   }

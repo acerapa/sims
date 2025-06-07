@@ -15,7 +15,7 @@
             </template>
           </FilterComponent>
         </div>
-        <p v-if="props.title" class="font-bold text-sm mb-3">
+        <p v-if="props.title" :class="props.titleStyle">
           {{ props.title }}
         </p>
         <div class="flex justify-between items-center" v-if="props.hasTools">
@@ -183,6 +183,10 @@ const emit = defineEmits([
 const props = defineProps({
   title: {
     type: String
+  },
+  titleStyle: {
+    type: String,
+    default: 'font-bold text-sm mb-3'
   },
   hasPagination: {
     type: Boolean,

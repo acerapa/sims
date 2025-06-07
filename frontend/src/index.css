@@ -99,7 +99,7 @@ select.input {
 }
 
 .btn-gray-outline {
-  @apply btn-outline !border-gray-600 !text-gray-600 hover:!text-white hover:!border-white;
+  @apply btn-outline !border-gray-600 !text-gray-600 hover:!bg-gray-600 hover:!text-white hover:!border-white;
 }
 
 .status {
