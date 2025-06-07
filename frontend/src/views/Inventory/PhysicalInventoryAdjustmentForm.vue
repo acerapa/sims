@@ -144,7 +144,25 @@ const onSubmit = async () => {
     validatedData.value
   )
 
-  console.log(isSuccess)
+  if (isSuccess) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.SUCCESS,
+      message: "Successfully submitted adjustments!"
+    })
+
+    router.push({
+      name: InventoryConst.PHYSICAL_INVENTORY_FORM,
+      query: {
+        id: route.params.physical_inventory_id
+      }
+    })
+
+  } else {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: "Failed to submit adjustments!"
+    })
+  }
 }
 
 /** ================================================

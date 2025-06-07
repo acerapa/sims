@@ -1,5 +1,6 @@
 import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 export const useAdjustmentsStore = defineStore('adjustments', () => {
   const adjustments = ref([])

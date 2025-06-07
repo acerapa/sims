@@ -1,5 +1,10 @@
+const { PhysicalInventoryAdjustmentSchemaWithItems } = require("shared");
+const { register } = require("../controllers/PhysicalInventoryAdjustmentController");
+const { validateBody } = require("../middleware/request-validator");
+
+
 const router = require("express").Router();
 
-// router.get('/physical-inventory-adjustments', (req, res) => {
+router.post('/', validateBody(PhysicalInventoryAdjustmentSchemaWithItems), register)
 
 module.exports = router;
