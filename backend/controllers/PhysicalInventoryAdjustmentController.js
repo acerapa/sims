@@ -59,7 +59,6 @@ module.exports = {
       await transaction.commit()
       res.sendResponse({adjustment}, "Physical inventory adjustment registered successfully");
     } catch (e) {
-      console.log(e)
       await transaction.rollback()
       res.sendError(e, "Error registering physical inventory adjustment");
     }
