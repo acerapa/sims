@@ -3,7 +3,10 @@
     <div class="cont flex flex-col gap-4 !pb-6">
       <div class="flex justify-between items-center !py-2 !pb-3">
         <div class="flex gap-3 w-fit items-center">
-          <h1 class="text-2xl font-bold">Physical Inventory Form</h1>
+          <h1 class="text-2xl font-bold">
+            Physical Inventory Form
+            {{ isViewOrEdit ? `#${physicalInventory?.id}` : '' }}
+          </h1>
           <BadgeComponent
             v-if="isViewOrEdit"
             :custom-class="
@@ -16,11 +19,11 @@
         </div>
         <CustomInput
           type="date"
+          :disabled="true"
           :has-label="true"
           name="date_started"
           label="Date Started:"
           :error-has-text="true"
-          :disabled="true"
           v-model="model.physical_inventory.date_started"
           :error="errors.physical_inventory?.date_started"
           class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
@@ -59,6 +62,25 @@
         </div>
       </div>
     </div>
+    <CustomTable
+      :data="adjustmentsMade"
+      title-style="!text-base mb-3"
+      title="Adjustments Made"
+      :has-tools="false"
+      :has-filter="false"
+      :has-add-btn="false"
+      :row-prop-init="rowPropInitAdjustment"
+      v-if="isViewOrEdit && isDone"
+      :table-row-component="PhysicalInventoryAdjustmentRow"
+    >
+      <template #table_header>
+        <div class="grid grid-cols-6 gap-3">
+          <p class="col-span-3 text-sm font-bold">Adjusted by</p>
+          <p class="col-span-2 text-sm font-bold">Date Adjusted</p>
+          <p class="col-span-1 text-sm font-bold"></p>
+        </div>
+      </template>
+    </CustomTable>
     <div
       class="cont flex flex-col gap-4 mb-10 [&>.main-table>div:nth-child(2)]:max-h-[800px] [&>.main-table>div:nth-child(2)]:overflow-y-auto"
     >
@@ -75,7 +97,9 @@
       />
 
       <div class="flex justify-end gap-3">
-        <button class="btn-danger-outline">Cancel</button>
+        <button class="btn-danger-outline" @click="onBackOrCancel">
+          Cancel
+        </button>
         <button
           class="btn-outline"
           v-if="!isViewOrEdit"
@@ -83,8 +107,18 @@
         >
           Save as Draft
         </button>
-        <button class="btn-green" @click="() => onSubmit()">
+        <button class="btn-green-outline" v-if="isViewOrEdit && isDraft">
+          Submit to done
+        </button>
+        <button class="btn" @click="() => onSubmit()">
           {{ isViewOrEdit ? 'Update' : 'Submit' }}
+        </button>
+        <button
+          v-if="isViewOrEdit && isDone"
+          class="btn-outline"
+          @click="onCreateAdjustment"
+        >
+          Create Adjustments
         </button>
       </div>
     </div>
@@ -93,7 +127,9 @@
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
+import CustomTable from '@/components/shared/CustomTable.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
+ import PhysicalInventoryAdjustmentRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryAdjustmentRow.vue'
 import PhysicalInventoryFormRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryFormRow.vue'
 import PhysicalInventoryFormHeader from '@/components/Inventory/PhysicalInventory/PhysicalInventoryFormHeader.vue'
 
@@ -116,6 +152,7 @@ import { useProductStore } from '@/stores/product'
 import { useRoute, useRouter } from 'vue-router'
 import { useValidation } from '@/composables/useValidation'
 import { usePhysicalInventoryStore } from '@/stores/physical-inventory'
+import { useAdjustmentsStore } from '@/stores/adjustments'
 import { ToastTypes } from '@/data/types'
 import { InventoryConst } from '@/const/route.constants'
 import BadgeComponent from '@/components/shared/BadgeComponent.vue'
@@ -126,10 +163,12 @@ const router = useRouter()
 const productStore = useProductStore()
 const employeeStore = useEmployeeStore()
 const physicalInventoryStore = usePhysicalInventoryStore()
+const adjustmentStore = useAdjustmentsStore()
 
 const { products } = storeToRefs(productStore)
 const { employees } = storeToRefs(employeeStore)
 const { physicalInventory } = storeToRefs(physicalInventoryStore)
+const { adjustments } = storeToRefs(adjustmentStore)
 
 const PIProducts = {
   product_id: '',
@@ -168,19 +207,43 @@ const { errors, hasErrors, validatedData, validateData } = useValidation(
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
-const rowPropInit = 'rrow-prop-init-physical-inventory-form'
+// product list
+const rowPropInit = 'row-prop-init-physical-inventory-form'
 Event.on(rowPropInit, (data) => {
   return {
     product: data
   }
 })
 
+// adjustment list
+const rowPropInitAdjustment = 'row-prop-init-adjustments'
+Event.on(rowPropInitAdjustment, (data) => {
+  return {
+    adjustment: data
+  }
+})
+
 /** ================================================
  * COMPUTED
  ** ================================================*/
-const isViewOrEdit = computed(() => {
-  return route.query.id.toString() ? true : false
+const isDraft = computed(() => {
+  return model.value.physical_inventory.status == PhysicalInventoryStatus.DRAFT
 })
+
+const isDone = computed(() => {
+  return model.value.physical_inventory.status == PhysicalInventoryStatus.DONE
+})
+
+const isViewOrEdit = computed(() => {
+  return route.query.id ? true : false
+})
+
+const adjustmentsMade = computed(
+  () => adjustments
+          .value.filter(
+            a => a.physical_inventory_id == route.query.id
+          )
+)
 
 const managerOptions = computed(() => {
   return employees.value
@@ -207,6 +270,20 @@ const inventoryInchargeOptions = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
+
+const onBackOrCancel = () => {
+  router.back()
+}
+
+const onCreateAdjustment = () => {
+  router.push({
+    name: InventoryConst.PHYSICAL_INVENTORY_ADJUSTMENT_FORM,
+    params: {
+      physical_inventory_id: route.query.id
+    }
+  })
+}
+
 const onSubmit = async (isSaveAsDraft = false) => {
   // Few model values changes
   model.value.physical_inventory.date_ended = DateHelpers.formatDate(
@@ -257,6 +334,7 @@ const onSubmit = async (isSaveAsDraft = false) => {
 onMounted(async () => {
   await employeeStore.getEmployees()
   await productStore.getProducts()
+  await adjustmentStore.fetchAdjustments()
 
   if (route.query.id) {
     await physicalInventoryStore.getPhysicalInventory(route.query.id)

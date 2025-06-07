@@ -20,6 +20,22 @@ const reflectPhysicalProductCount = (items, transaction) => {
   );
 };
 
+const reflectPhysicalProductCountFromAdjustments = async (items, transaction) => {
+  return await Promise.all(
+    items.map(item => {
+      return ProductDetails.update(
+        { stock: item.new_quantity },
+        {
+          where: {
+            product_id: item.product_id
+          }
+        }
+      )
+    })
+  )
+}
+
 module.exports = {
   reflectPhysicalProductCount,
+  reflectPhysicalProductCountFromAdjustments
 };
