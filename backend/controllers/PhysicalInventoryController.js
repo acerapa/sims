@@ -11,7 +11,9 @@ const {
 module.exports = {
   all: async (req, res) => {
     try {
-      const physical_inventories = await PhysicalInventory.findAll();
+      const physical_inventories = await PhysicalInventory.findAll({
+        order: [["createdAt", "DESC"]],
+      });
 
       res.sendResponse({ physical_inventories }, "Successfully Fetched!", 200);
     } catch (e) {

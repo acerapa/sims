@@ -60,6 +60,16 @@
             :error="errors.physical_inventory?.inventory_incharge"
           />
         </div>
+        <CustomInput
+          type="textarea"
+          placeholder="Memo"
+          name="memo"
+          :has-label="true"
+          label="Memo"
+          :error-has-text="true"
+          v-model="model.physical_inventory.memo"
+          :error="errors.physical_inventory?.memo"
+        />
       </div>
     </div>
     <CustomTable
@@ -185,7 +195,8 @@ const model = ref({
     date_ended: null,
     status: PhysicalInventoryStatus.DRAFT,
     branch_manager: '',
-    inventory_incharge: ''
+    inventory_incharge: '',
+    memo: ''
   },
   items: []
 })
@@ -304,7 +315,7 @@ const onSubmit = async (isSaveAsDraft = false) => {
   }
 
   let isSuccess = false
-  if (!isViewOrEdit) {
+  if (!isViewOrEdit.value) {
     isSuccess = await physicalInventoryStore.register(validatedData.value)
   } else {
     isSuccess = await physicalInventoryStore.update(

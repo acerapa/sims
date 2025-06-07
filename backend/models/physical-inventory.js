@@ -42,6 +42,10 @@ PhysicalInventory.init(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    memo: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   },
   {
     sequelize,

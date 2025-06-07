@@ -14,6 +14,9 @@ const PhysicalInventorySchema = Joi.object({
     "number.base": "Branch Manager must be a number",
     "any.required": "Branch Manager is required",
   }),
+  memo: Joi.string().allow(null, '').optional().messages({
+    "string.base": "Memo must be string"
+  })
 });
 
 // Physical Inventory Item

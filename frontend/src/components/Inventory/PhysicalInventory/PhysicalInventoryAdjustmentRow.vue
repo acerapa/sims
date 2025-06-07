@@ -6,7 +6,7 @@
     		new Date(props.adjustment.date_recorded).toLocaleString('default', {
     			day: '2-digit',
     			month: 'short',
-    			year: 'numeric'
+    			year: 'numeric',
     		})
     	}}
   	</p>
