@@ -18,7 +18,8 @@ module.exports = {
             as: 'adjusted_by',
             attributes: ['first_name', 'middle_name', 'last_name']
           }
-        ]
+        ],
+        order: [["createdAt", "DESC"]],
       })
 
       res.sendResponse({adjustments}, "Successfully fetched adjustments!")
