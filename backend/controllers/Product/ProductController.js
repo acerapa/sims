@@ -17,7 +17,7 @@ module.exports = {
   all: async (req, res) => {
     try {
       const items = await Product.findAll({
-        order: [["updatedAt", "DESC"]],
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: Supplier,
@@ -56,7 +56,7 @@ module.exports = {
   getProducts: async (req, res) => {
     try {
       const products = await Product.findAll({
-        order: [["updatedAt", "DESC"]],
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: Supplier,

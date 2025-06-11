@@ -186,7 +186,7 @@
         <div class="flex-1">
           <button
             type="button"
-            v-if="route.query.id"
+            v-if="isView"
             class="btn-danger-outline"
             @click="showConfirmationModal = true"
           >
@@ -194,7 +194,7 @@
           </button>
         </div>
         <button type="button" class="btn-gray-outline" @click="onCancel">
-          Cancel
+          {{ isView ? 'Back' : 'Cancel' }}
         </button>
         <button type="submit" class="btn">Save</button>
       </div>
@@ -317,6 +317,8 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
 /** ================================================
  * COMPUTED
  ** ================================================*/
+const isView = computed(() => (route.query.id ? true : false))
+
 const incomeAccounts = computed(() => {
   return settingStore.accounts
     .filter((acc) => acc.type == AccountTypes.INCOME)
@@ -388,7 +390,7 @@ const onSubmit = async () => {
   Event.emit(EventEnum.IS_PAGE_LOADING, true)
   let isSuccess = false
 
-  if (route.query.id) {
+  if (isView.value) {
     isSuccess = await productStore.updateProduct(route.query.id, data)
   } else {
     // backend validation for product item code
@@ -411,7 +413,7 @@ const onSubmit = async () => {
 
   if (isSuccess) {
     Event.emit(EventEnum.TOAST_MESSAGE, {
-      message: `Product ${route.query.id ? 'updated' : 'created'} successfully!`,
+      message: `Product ${isView.value ? 'updated' : 'created'} successfully!`,
       type: ToastTypes.SUCCESS,
       duration: 2000
     })
@@ -422,7 +424,7 @@ const onSubmit = async () => {
     })
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
-      message: `Failed to ${route.query.id ? 'update' : 'create'} product!`,
+      message: `Failed to ${isView.value ? 'update' : 'create'} product!`,
       type: ToastTypes.ERROR,
       duration: 2000
     })
@@ -434,10 +436,15 @@ const onAfterDelete = async () => {
   router.push({ name: InventoryConst.PRODUCTS })
 }
 
-const onCancel = () =>
-  router.push({
-    name: route.query.redirect ? route.query.redirect : InventoryConst.PRODUCTS
-  })
+const onCancel = () => {
+  if (route.query.redirect) {
+    router.push({
+      name: route.query.redirect
+    })
+  } else {
+    router.back()
+  }
+}
 
 const onInputPurchaseDescription = () => {
   if (isSameDescription.value) {
@@ -462,7 +469,7 @@ onMounted(async () => {
   await settingStore.getProductCategories()
 
   // check for query params
-  if (route.query.id) {
+  if (isView.value) {
     const product = await productStore.getProduct(route.query.id)
     if (product) {
       model.value.product = ObjectHelpers.assignSameFields(

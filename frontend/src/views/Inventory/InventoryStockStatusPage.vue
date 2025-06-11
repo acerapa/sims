@@ -1,52 +1,5 @@
 <template>
-  <div class="cont text-center">
-    <p>Coming soon 🎉!</p>
-    <small class="text-gray-500">We are currently working on it!</small>
-  </div>
-  <div>
-    <CustomTable
-      :is-nested="true"
-      :has-add-btn="false"
-      :has-pagination="false"
-      :table-header-component="StockStatusHeader"
-      class="[&>div.table-wrapper]:sticky [&>div.table-wrapper]:top-[80px] [&>div.table-wrapper]:z-50"
-    >
-      <template v-slot:tables>
-        <div v-for="(cat, ndx) in sampleData" :key="ndx" class="mt-5">
-          <CustomTable
-            :has-tools="false"
-            :has-add-btn="false"
-            :data="cat.products"
-            :title="cat.category"
-            :has-pagination="false"
-            :row-prop-init="initStockStatusRow"
-            :table-row-component="StockStatusRow"
-          ></CustomTable>
-        </div>
-      </template>
-    </CustomTable>
-
-    <!-- NOTES -->
-    <div class="flex flex-col">
-      <div class="flex gap-3">
-        <input type="checkbox" name="" id="" />
-        <code>Query all the products grouped by categories</code>
-      </div>
-      <div class="flex gap-3">
-        <input type="checkbox" name="" id="" />
-        <code>
-          Create a table with columns of [item-description, on hand, on sale,
-          avaliable, Ordered, On PO, Next Delivery]
-        </code>
-      </div>
-      <div class="flex gap-3">
-        <input type="checkbox" name="" id="" />
-        <code>
-          Needs to keep track of all products track, wether incoming or outgoing
-        </code>
-      </div>
-    </div>
-  </div>
+  <div class="cont">Test</div>
 </template>
 
 <script setup>
