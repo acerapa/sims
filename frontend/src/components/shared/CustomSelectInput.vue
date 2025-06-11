@@ -84,7 +84,7 @@
     </div>
 
     <!-- Can select multiple and can search too -->
-    <div class="relative group z-10" tabindex="0">
+    <div class="relative group z-10" tabindex="0" ref="selectMultipleCanSearch">
       <div
         class="min-h-[38px] relative z-10"
         :class="[
@@ -185,6 +185,8 @@ const singleDropdownGroup = ref()
 const selected = defineModel()
 const select = ref()
 
+const selectMultipleCanSearch = ref()
+
 onMounted(() => {
   if (props.canSearch && selected.value && !props.selectMultiple) {
     search.value = getName(selected.value)
@@ -213,6 +215,8 @@ const onSelectOpt = (value) => {
 
 const removeSelectedValue = (value) => {
   selected.value = selected.value.filter((sl) => sl != value)
+  // focus the parent element after removing a selected value
+  selectMultipleCanSearch.value.focus()
 }
 
 // only for the multi select options
