@@ -12,7 +12,7 @@ const InvoiceSchema = joi.object({
     .string()
     .valid(...Object.values(InvoiceStatus))
     .default(InvoiceStatus.UNPAID),
-  sales_order_id: joi.number().allow(null).optional(),
+  sales_order_id: joi.allow(null, '').optional(),
   memo: joi.string().allow("", null).optional(),
   discount: joi.number().allow("", null).optional(),
   sub_total: joi.number().required().messages({
