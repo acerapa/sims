@@ -1,10 +1,12 @@
 const { SalesOrderStatus } = require("shared/enums");
 const { sequelize } = require("../models");
+const { Op } = require("sequelize");
 const Customer = require("../models/customer");
 const Invoice = require("../models/invoice");
 const InvoiceProducts = require("../models/junction/invoice-products");
 const SalesOrder = require("../models/sales-order");
 const User = require("../models/user");
+const ProductDetails = require("../models/product-details");
 const {
   updateInvoice,
   findInvoiceById,
@@ -54,7 +56,8 @@ module.exports = {
   register: async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-      const { invoice, products } = req.body.validated;
+      const { invoice, products } = req.body;
+      console.log(invoice);
       let createdInvoice;
       if (invoice) {
         createdInvoice = await Invoice.create(invoice, { transaction });
@@ -67,16 +70,43 @@ module.exports = {
                   ...product,
                   invoice_id: createdInvoice.id,
                 },
-                { transaction }
+                { transaction },
               );
-            })
+            }),
+          );
+
+          // Deduct product stock from what invoice recorded
+          // getting all product id stocks
+          const productStocks = await ProductDetails.findAll({
+            where: {
+              product_id: {
+                [Op.in]: products.map((p) => p.product_id),
+              },
+            },
+            attributes: ["product_id", "stock"],
+          });
+
+          await Promise.all(
+            products.map((product) => {
+              const productStock = productStocks.find(
+                (ps) => ps.product_id == product.product_id,
+              );
+              return ProductDetails.update(
+                { stock: productStock.stock - product.quantity },
+                {
+                  where: {
+                    product_id: product.product_id,
+                  },
+                },
+              );
+            }),
           );
         }
 
         if (invoice.sales_order_id) {
           await SalesOrder.update(
             { status: SalesOrderStatus.INVOICED },
-            { where: { id: invoice.sales_order_id }, transaction }
+            { where: { id: invoice.sales_order_id }, transaction },
           );
         }
       }

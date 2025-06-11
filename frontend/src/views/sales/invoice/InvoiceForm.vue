@@ -343,7 +343,7 @@ const model = ref({
     employee_id: '',
     customer_id: '',
     memo: '',
-    sales_order_id: '',
+    sales_order_id: null,
     issue_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
     due_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
     discount: 0.0,
