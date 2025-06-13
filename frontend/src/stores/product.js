@@ -101,7 +101,7 @@ export const useProductStore = defineStore('product', () => {
   const fetchInventoryStock = async () => {
     const res = await api('products/stock-status')
 
-    return res.data.products
+    return res.data.grouped
   }
 
   const productOptions = computed(() => {

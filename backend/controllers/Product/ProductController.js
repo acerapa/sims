@@ -11,7 +11,10 @@ const ProductSupplier = require("../../models/product-supplier");
 const { Op } = require("sequelize");
 const { ProductType } = require("shared");
 const { sequelize } = require("../../models/index");
-const { findProduct } = require("../../services/ProductService");
+const {
+  findProduct,
+  groupCategories,
+} = require("../../services/ProductService");
 
 module.exports = {
   all: async (req, res) => {
@@ -450,20 +453,33 @@ module.exports = {
 
   inventoryStockStatus: async (req, res) => {
     try {
-      const products = await Product.findAll({
+      const products = await ProductCategory.findAll({
         include: [
           {
-            model: ProductCategory,
-            as: "categories",
+            model: Product,
+            as: "products",
+            include: [
+              {
+                model: ProductDetails,
+                as: "product_details",
+                attributes: ["id", "purchase_description", "stock"]
+              },
+              {
+                model: Supplier,
+                as: "suppliers",
+                attributes: ["id", "company_name"]
+              }
+            ]
           },
         ],
-        where: {
-          type: ProductType.INVENTORY,
-        },
       });
 
-      res.sendResponse({ products }, "Successfully fetched!");
+      res.sendResponse(
+        { grouped: groupCategories(products) },
+        "Successfully fetched!",
+      );
     } catch (e) {
+      console.log(e)
       res.sendError(e, "Something wen't wrong!");
     }
   },
