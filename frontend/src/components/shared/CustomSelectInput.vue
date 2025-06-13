@@ -115,6 +115,7 @@
             <span class="text-xs py-0.5">{{ getName(sl) }}</span>
             <button
               type="button"
+              v-if="showRemoveItemBtn(ndx)"
               class="text-danger hidden group-focus:block group-focus-within:block"
               @click="removeSelectedValue(sl)"
             >
@@ -143,6 +144,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { AccessPolicy } from '@/data/types/index'
 
 const emit = defineEmits(['addNew', 'change', 'focus'])
 
@@ -174,8 +176,13 @@ const props = defineProps({
   inputClass: {
     type: String,
     default: ''
+  },
+  removeStrat: {
+    type: String,
+    default: AccessPolicy.ANY
   }
 })
+
 
 const search = ref('')
 
@@ -211,6 +218,24 @@ const selectOption = (value) => {
 
 const onSelectOpt = (value) => {
   selected.value.push(value)
+}
+
+const showRemoveItemBtn = (ndx) => {
+  let res = false
+
+  switch (props.removeStrat) {
+    case AccessPolicy.LIFO:
+      res = ndx == selected.value.length - 1
+      break
+    case AccessPolicy.FIFO:
+      res = ndx == 0
+      break
+    case AccessPolicy.ANY:
+      res = true
+      break
+  }
+  
+  return res
 }
 
 const removeSelectedValue = (value) => {

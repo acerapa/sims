@@ -10,9 +10,17 @@
       <p class="col-span-1 table-header">OS</p>
       <p class="col-span-1 table-header">PO</p>
     </div>
-    <hr>
-    <div class="grid grid-cols-12 ga-3">
-      
+    <hr />
+    <div class="grid grid-cols-12 gap-3">
+      <p class="font-bold col-span-12" style="margin-left: 0rem">Computer</p>
+    </div>
+    <div class="grid grid-cols-12 gap-3">
+      <p class="font-bold col-span-12" style="margin-left: 1rem">Net Books</p>
+    </div>
+    <div class="grid grid-cols-12 gap-3">
+      <p class="font-bold col-span-5" style="margin-left: 2rem">
+        Dell Latitude 5320
+      </p>
     </div>
   </div>
 </template>
@@ -29,6 +37,7 @@ import { EventEnum } from '@/data/event/index'
 import { useProductStore } from '@/stores/product'
 
 const productStocks = ref([])
+const processedData = ref([])
 
 const productStore = useProductStore()
 
@@ -37,12 +46,15 @@ const productStore = useProductStore()
  ** ================================================*/
 Event.emit(EventEnum.IS_PAGE_LOADING, true)
 
-
 /** ================================================
  * LIFE CYCLE HOOKS
  ** ================================================*/
-onMounted( async () => {
+onMounted(async () => {
   productStocks.value = await productStore.fetchInventoryStock()
+
+  // process products categories
+  processedData.value = []
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>

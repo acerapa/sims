@@ -170,13 +170,8 @@ module.exports = {
         transaction,
       });
 
-      if (req.body.validated.categories) {
-        const categories = req.body.validated.categories;
-        await Promise.all(
-          categories.map((category) => {
-            return product.addCategory(category, { transaction });
-          }),
-        );
+      if (req.body.validated.category) {
+        product.addCategory(req.body.validated.category, { transaction });
       }
 
       if (req.body.validated.suppliers) {
@@ -459,15 +454,15 @@ module.exports = {
         include: [
           {
             model: ProductCategory,
-            as: 'categories'
-          }
+            as: "categories",
+          },
         ],
         where: {
-          type: ProductType.INVENTORY
-        }
-      })
+          type: ProductType.INVENTORY,
+        },
+      });
 
-      res.sendResponse({products}, "Successfully fetched!")
+      res.sendResponse({ products }, "Successfully fetched!");
     } catch (e) {
       res.sendError(e, "Something wen't wrong!");
     }

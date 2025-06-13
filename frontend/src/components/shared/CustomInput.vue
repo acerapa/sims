@@ -71,6 +71,7 @@
         :placeholder="props.placeholder"
         :id="props.id ? props.id : props.name"
         :select-multiple="props.selectMultiple"
+        :remove-strat="props.removeStrat"
         :class="
           props.error
             ? '[&>div>*]:border [&>div>*]:border-red-500 [&>select]:border [&>select]:border-red-500'
@@ -118,6 +119,9 @@
 <script setup>
 import MultiStringInput from './MultiStringInput.vue'
 import CustomSelectInput from './CustomSelectInput.vue'
+
+import { AccessPolicy } from '@/data/types'
+
 const props = defineProps({
   name: {
     type: String,
@@ -189,6 +193,12 @@ const props = defineProps({
   step: {
     type: String,
     required: false
+  },
+
+  // Custom select input exclusive props
+  removeStrat: {
+    type: String,
+    default: AccessPolicy.ANY
   }
 })
 

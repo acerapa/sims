@@ -117,6 +117,11 @@ export const useSettingsStore = defineStore('settings', () => {
         }
       }
     }
+
+    // Run the inner funtion
+    findAndGatherCategories(id)
+
+    return hierarchy
   }
 
   const getProductCategories = async () => {

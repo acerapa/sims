@@ -16,9 +16,10 @@
               :options="categoriesOptions"
               @add-new="showCategoryModal = true"
               v-model="model.categories"
+              :remove-strat="AccessPolicy.LIFO"
               label="Categories"
               :has-label="true"
-              :error="errors.categories"
+              :error="errors.category"
               :error-has-text="true"
             />
             <CustomInput
@@ -247,7 +248,7 @@ import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import { useProductStore } from '@/stores/product'
 import { useRoute } from 'vue-router'
 import router from '@/router'
-import { ToastTypes } from '@/data/types'
+import { ToastTypes, AccessPolicy } from '@/data/types'
 import { InventoryConst } from '@/const/route.constants'
 import { useValidation } from '@/composables/useValidation'
 import { useAppStore } from '@/stores/app'
@@ -293,14 +294,15 @@ const model = ref({
     product_setting_id: ''
   },
   suppliers: [{ ...productSupplier }],
-  categories: []
+  categories: [],
+  category: ''
 })
 
 const preselectedSupplier = ref([])
 
 // composables
 const { errors, validateData, hasErrors } = useValidation(
-  ProductItemSchema,
+  ProductItemSchema.options({ stripUnknown: true }),
   model.value
 )
 
@@ -379,11 +381,21 @@ const onSubmit = async () => {
     data.details.product_setting_id = null
   }
 
+  if (data.categories.length) {
+    const categoriesCopy = ObjectHelpers.copyArr(data.categories)
+    data.category = categoriesCopy.pop()
+    model.value.category = categoriesCopy.pop()
+  }
+
   // validate data
   validateData()
 
   if (hasErrors.value) {
     Event.emit(rowEventName, errors.value.suppliers)
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Please check some fields!'
+    })
     return
   }
 
@@ -489,7 +501,10 @@ onMounted(async () => {
         isSameDescription.value = true
       }
 
-      model.value.categories = product.categories.map((cat) => cat.id)
+      model.value.category = product.categories[0].id
+      const hierarchyCategories = await settingStore.getFullCategoryHeirarchy(model.value.category)
+      model.value.categories = hierarchyCategories.map((cat) => cat.id)
+
       model.value.suppliers = product.suppliers.map((supplier) => {
         return {
           supplier_id: supplier.id,
