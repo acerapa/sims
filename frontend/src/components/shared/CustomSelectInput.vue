@@ -84,7 +84,7 @@
     </div>
 
     <!-- Can select multiple and can search too -->
-    <div class="relative group z-10" tabindex="0" ref="selectMultipleCanSearch">
+    <div class="relative group z-10" tabindex="0" ref="selectMultipleCanSearch" @focus="emit('focus')">
       <div
         class="min-h-[38px] relative z-10"
         :class="[

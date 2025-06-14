@@ -6,6 +6,22 @@ export function useValidation(schema, data, options = {}) {
   const errors = ref({})
   const validatedData = ref({})
 
+  const resetErrorValue = (path, val = '') => {
+    const keys = path.split('.')
+    let current = errors.value
+
+    for (let ndx = 0; ndx < keys.length; ndx++) {
+      const key = keys[ndx]
+
+      if (!(key in current)) return
+      if (key in current && ndx == keys.length - 1) break
+
+      current = current[key]
+    }
+
+    current[keys.pop()] = val
+  }
+
   const hasErrors = computed(() => {
     return Object.keys(errors.value).length > 0
   })
@@ -59,6 +75,7 @@ export function useValidation(schema, data, options = {}) {
     errors,
     hasErrors,
     validatedData,
-    validateData
+    validateData,
+    resetErrorValue
   }
 }
