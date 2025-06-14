@@ -21,12 +21,7 @@
               :has-label="true"
               :error="errors.category"
               :error-has-text="true"
-              @focus="
-                () => {
-                  console.log('here')
-                  resetErrorValue('category')
-                }
-              "
+              @focus="resetErrorValue('category')"
             />
             <CustomInput
               type="select"
