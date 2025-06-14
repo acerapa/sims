@@ -1,9 +1,9 @@
 <template>
-  <div class="cont">
+  <div class="mb-5">
     <form @submit.prevent="onSubmit" class="flex flex-col gap-3">
       <div class="flex flex-col gap-3">
         <p class="text-base font-semibold">Basic Informations</p>
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-3 cont">
           <div class="flex gap-3">
             <CustomInput
               type="select"
@@ -21,6 +21,7 @@
               :has-label="true"
               :error="errors.category"
               :error-has-text="true"
+              @focus="resetErrorValue('category')"
             />
             <CustomInput
               type="select"
@@ -49,6 +50,7 @@
               placeholder="*Select Income Account"
               v-model="model.product.income_account"
               :error="errors.product?.income_account"
+              @focus="resetErrorValue('product.income_account')"
             />
             <CustomInput
               type="select"
@@ -63,141 +65,166 @@
               placeholder="*Select Expense Account"
               v-model="model.product.expense_account"
               :error="errors.product?.expense_account"
+              @focus="resetErrorValue('product.expense_account')"
             />
           </div>
         </div>
-        <div class="flex flex-col gap-3">
-          <p class="text-base font-semibold">Inventory and Sales information</p>
-          <div class="flex gap-3">
-            <div class="flex flex-col gap-5 flex-1">
-              <CustomInput
-                type="number"
-                name="cost"
-                :has-label="true"
-                label="Cost Price"
-                :error-has-text="true"
-                placeholder="Cost Price"
-                v-model="model.details.cost"
-                :error="errors.details?.cost"
-                :disabled="!model.details.is_manually_set_cost"
-                input-class="disabled:bg-gray-50 disabled:ring-1 disabled:ring-gray-200"
-              />
-              <CustomInput
-                type="checkbox"
-                name="manually_set_cost"
-                label="Manually set cost"
-                :has-label="true"
-                v-model="model.details.is_manually_set_cost"
-                class="[&>div]:flex-row-reverse [&>div]:justify-end"
-              />
-            </div>
-            <CustomInput
-              name="sale"
-              type="number"
-              class="flex-1"
-              :has-label="true"
-              label="Sale Price"
-              :error-has-text="true"
-              placeholder="Sale Price"
-              v-model="model.product.price"
-              :error="errors.product?.price"
-            />
-          </div>
-          <div class="flex gap-3">
-            <CustomInput
-              type="number"
-              class="flex-1"
-              :has-label="true"
-              :error-has-text="true"
-              name="quantity_in_stock"
-              label="Quantity in stock"
-              v-model="model.details.stock"
-              :error="errors.details?.stock"
-              placeholder="Quantity in stock"
-            />
-            <CustomInput
-              type="text"
-              class="flex-1"
-              name="item_code"
-              label="Item Code"
-              :has-label="true"
-              :error-has-text="true"
-              placeholder="Item Code"
-              v-model="model.details.item_code"
-              :error="errors.details?.item_code"
-            />
-          </div>
-          <CustomInput
-            type="checkbox"
-            :has-label="true"
-            v-model="isSameDescription"
-            name="is-the-same-description"
-            label="The same description?"
-            class="[&>div]:flex-row-reverse [&>div]:justify-end"
-          />
-          <div class="flex gap-3 items-end">
-            <CustomInput
-              :rows="5"
-              class="flex-1"
-              type="textarea"
-              :has-label="true"
-              :error-has-text="true"
-              name="purchase_description"
-              label="Purchase Description"
-              placeholder="*Purchase Description"
-              @input="onInputPurchaseDescription"
-              v-model="model.details.purchase_description"
-              :error="errors.details?.purchase_description"
-            />
 
-            <CustomInput
-              :rows="5"
-              class="flex-1"
-              type="textarea"
-              :has-label="true"
-              name="sale_description"
-              label="Sales Description"
-              placeholder="*Sales Description"
-              @input="onInputSalesDescription"
-              v-model="model.details.sales_description"
-              :error="errors.details?.sales_description"
-              :error-has-text="true"
-            />
-          </div>
-        </div>
-        <div class="flex flex-col gap-3 mt-4">
+        <div class="flex flex-col gap-3">
           <div class="flex justify-Eetween items-center">
             <p class="text-base font-semibold">Suppliers</p>
           </div>
-          <MultiSelectTable
-            :header-component="SupplierSelectHeader"
-            :row-component="SupplierSelectRow"
-            :row-event-name="rowEventName"
-            :format="productSupplier"
-            :row-props="{
-              preSelectedSups: preselectedSupplier,
-              selected: model.suppliers
-            }"
-            v-model="model.suppliers"
-          />
+          <div class="cont flex flex-col" @click="resetMultiTableError">
+            <MultiSelectTable
+              :header-component="SupplierSelectHeader"
+              :row-component="SupplierSelectRow"
+              :row-event-name="rowEventName"
+              :format="productSupplier"
+              :row-props="{
+                preSelectedSups: preselectedSupplier,
+                selected: model.suppliers
+              }"
+              v-model="model.suppliers"
+            />
+            <CustomInput
+              type="select"
+              :has-label="true"
+              class="mt-5 w-fit"
+              name="pref_sup_id"
+              :error-has-text="true"
+              label="Preferred Supplier"
+              :options="preferredSupplierOptions"
+              v-model="model.product.pref_sup_id"
+              :error="errors.product?.pref_sup_id"
+              placeholder="Select preferred supplier"
+              @focus="resetErrorValue('product.pref_sup_id')"
+            />
+          </div>
         </div>
-      </div>
 
-      <div class="flex gap-3 mt-4">
-        <div class="flex-1">
-          <button
-            type="button"
-            v-if="isView"
-            class="btn-danger-outline"
-            @click="showConfirmationModal = true"
-          >
-            Delete
-          </button>
+        <div class="flex flex-col gap-3">
+          <p class="text-base font-semibold">Inventory and Sales information</p>
+          <div class="flex flex-col gap-3 cont">
+            <div class="flex gap-3">
+              <div class="flex flex-col gap-5 flex-1">
+                <CustomInput
+                  type="number"
+                  name="cost"
+                  :has-label="true"
+                  label="Cost Price"
+                  :error-has-text="true"
+                  placeholder="Cost Price"
+                  v-model="model.details.cost"
+                  :error="errors.details?.cost"
+                  @focus="resetErrorValue('details.cost')"
+                  :disabled="!model.details.is_manually_set_cost"
+                  input-class="disabled:bg-gray-50 disabled:ring-1 disabled:ring-gray-200"
+                />
+                <CustomInput
+                  type="checkbox"
+                  name="manually_set_cost"
+                  label="Manually set cost"
+                  :has-label="true"
+                  v-model="model.details.is_manually_set_cost"
+                  class="[&>div]:flex-row-reverse [&>div]:justify-end"
+                />
+              </div>
+              <CustomInput
+                name="sale"
+                type="number"
+                class="flex-1"
+                :has-label="true"
+                label="Sale Price"
+                :error-has-text="true"
+                placeholder="Sale Price"
+                v-model="model.product.price"
+                :error="errors.product?.price"
+                @focus="resetErrorValue('product.price')"
+              />
+            </div>
+            <div class="flex gap-3">
+              <CustomInput
+                type="number"
+                class="flex-1"
+                :has-label="true"
+                :error-has-text="true"
+                name="quantity_in_stock"
+                label="Quantity in stock"
+                v-model="model.details.stock"
+                :error="errors.details?.stock"
+                placeholder="Quantity in stock"
+                @focus="resetErrorValue('details.stock')"
+              />
+              <CustomInput
+                type="text"
+                class="flex-1"
+                name="item_code"
+                label="Item Code"
+                :has-label="true"
+                :error-has-text="true"
+                placeholder="Item Code"
+                v-model="model.details.item_code"
+                :error="errors.details?.item_code"
+                @focus="resetErrorValue('details.item_code')"
+              />
+            </div>
+            <CustomInput
+              type="checkbox"
+              :has-label="true"
+              v-model="isSameDescription"
+              name="is-the-same-description"
+              label="The same description?"
+              class="[&>div]:flex-row-reverse [&>div]:justify-end"
+            />
+            <div class="flex gap-3 items-end">
+              <CustomInput
+                :rows="5"
+                class="flex-1"
+                type="textarea"
+                :has-label="true"
+                :error-has-text="true"
+                name="purchase_description"
+                label="Purchase Description"
+                placeholder="*Purchase Description"
+                @input="onInputPurchaseDescription"
+                v-model="model.details.purchase_description"
+                :error="errors.details?.purchase_description"
+                @focus="resetErrorValue('details.purchase_description')"
+              />
+
+              <CustomInput
+                :rows="5"
+                class="flex-1"
+                type="textarea"
+                :has-label="true"
+                name="sale_description"
+                label="Sales Description"
+                placeholder="*Sales Description"
+                @input="onInputSalesDescription"
+                v-model="model.details.sales_description"
+                :error="errors.details?.sales_description"
+                :error-has-text="true"
+                @focus="resetErrorValue('details.sales_description')"
+              />
+            </div>
+            <div class="flex gap-3 mt-4">
+              <div class="flex-1">
+                <button
+                  type="button"
+                  v-if="isView"
+                  class="btn-danger-outline"
+                  @click="showConfirmationModal = true"
+                >
+                  Delete
+                </button>
+              </div>
+              <button type="button" class="btn-gray-outline" @click="onCancel">
+                {{ isView ? 'Back' : 'Cancel' }}
+              </button>
+              <button type="submit" class="btn">Save</button>
+            </div>
+          </div>
         </div>
-        <button type="button" class="btn-gray-outline" @click="onCancel">
-          {{ isView ? 'Back' : 'Cancel' }}
-        </button>
-        <button type="submit" class="btn">Save</button>
       </div>
     </form>
   </div>
@@ -246,20 +273,26 @@ import SupplierSelectHeader from '@/components/product/SupplierSelectHeader.vue'
 import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 
 import { useProductStore } from '@/stores/product'
-import { useRoute } from 'vue-router'
-import router from '@/router'
+import { useVendorStore } from '@/stores/supplier'
+import { useRoute, useRouter } from 'vue-router'
 import { ToastTypes, AccessPolicy } from '@/data/types'
 import { InventoryConst } from '@/const/route.constants'
 import { useValidation } from '@/composables/useValidation'
 import { useAppStore } from '@/stores/app'
+import { storeToRefs } from 'pinia'
 import { PageStateConst } from '@/const/state.constants'
 import { useRetainPageStateOnReload } from '@/composables/useRetainPageStateOnReload'
 
 // injections and stores
 const route = useRoute()
+const router = useRouter()
 const appStore = useAppStore()
 const settingStore = useSettingsStore()
 const productStore = useProductStore()
+const supplierStore = useVendorStore()
+
+// store data
+const { suppliers } = storeToRefs(supplierStore)
 
 // flags
 const showAccountModal = ref(false)
@@ -281,7 +314,8 @@ const model = ref({
     price: '',
     type: ItemType.INVENTORY,
     income_account: '',
-    expense_account: ''
+    expense_account: '',
+    pref_sup_id: ''
   },
   details: {
     purchase_description: '',
@@ -301,7 +335,7 @@ const model = ref({
 const preselectedSupplier = ref([])
 
 // composables
-const { errors, validateData, hasErrors } = useValidation(
+const { errors, validateData, hasErrors, resetErrorValue } = useValidation(
   ProductItemSchema.options({ stripUnknown: true }),
   model.value
 )
@@ -372,6 +406,18 @@ const reorderingPointsOptions = computed(() => {
   })
 })
 
+const preferredSupplierOptions = computed(() => {
+  return model.value.suppliers
+    .filter((ss) => ss.supplier_id)
+    .map((ss) => {
+      const sup = suppliers.value.find((s) => s.id == ss.supplier_id)
+      return {
+        text: sup.company_name,
+        value: sup.id
+      }
+    })
+})
+
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -381,7 +427,7 @@ const onSubmit = async () => {
     data.details.product_setting_id = null
   }
 
-  if (data.categories.length) {
+  if (data.categories.length && !isView) {
     const categoriesCopy = ObjectHelpers.copyArr(data.categories)
     data.category = categoriesCopy.pop()
     model.value.category = categoriesCopy.pop()
@@ -472,11 +518,17 @@ const onInputSalesDescription = () => {
   }
 }
 
+const resetMultiTableError = () => {
+  resetErrorValue('suppliers')
+  Event.emit(rowEventName, errors.value.suppliers)
+}
+
 /** ================================================
  * LIFECYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
   await settingStore.getAccounts()
+  await supplierStore.getSuppliers()
   await settingStore.getReorderingPoints()
   await settingStore.getProductCategories()
 
@@ -502,7 +554,9 @@ onMounted(async () => {
       }
 
       model.value.category = product.categories[0].id
-      const hierarchyCategories = await settingStore.getFullCategoryHeirarchy(model.value.category)
+      const hierarchyCategories = await settingStore.getFullCategoryHeirarchy(
+        model.value.category
+      )
       model.value.categories = hierarchyCategories.map((cat) => cat.id)
 
       model.value.suppliers = product.suppliers.map((supplier) => {

@@ -212,13 +212,13 @@ Product.belongsToMany(PurchaseOrder, {
 // PurchaseOrderProducts to Product
 PurchaseOrderProducts.belongsTo(Product, {
   foreignKey: "product_id",
-  as: "product"
-})
+  as: "product",
+});
 
 Product.hasMany(PurchaseOrderProducts, {
   foreignKey: "product_id",
-  as: "po_products"
-})
+  as: "po_products",
+});
 
 // Stock Transfer, Product and Stock Transfer Product Relations
 StockTransfer.belongsToMany(Product, {
@@ -471,6 +471,12 @@ ProductDetails.belongsTo(Product, {
 ServiceDetails.belongsTo(Product, {
   foreignKey: "product_id",
   as: "product",
+});
+
+// Product to Preferred Supplier
+Product.belongsTo(Supplier, {
+  foreignKey: "pref_sup_id",
+  as: "preferred_supplier",
 });
 
 // Models that need to be exported for updated associations

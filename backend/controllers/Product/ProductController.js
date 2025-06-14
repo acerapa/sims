@@ -469,7 +469,7 @@ module.exports = {
               },
               {
                 model: Supplier,
-                as: "suppliers",
+                as: "preferred_supplier",
                 attributes: ["id", "company_name"],
               },
               {

@@ -67,6 +67,9 @@ const ProductSchema = Joi.object({
   expense_account: Joi.number().required().messages({
     "*": "Expense account is required",
   }),
+  pref_sup_id: Joi.number().required().messages({
+    "*": "Preferred Supplier is required!"
+  })
 });
 
 const ProductItemSchema = Joi.object({
