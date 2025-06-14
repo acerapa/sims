@@ -1,51 +1,13 @@
 <template>
-  <div class="cont text-center">
-    <p>Coming soon 🎉!</p>
-    <small class="text-gray-500">We are currently working on it!</small>
-  </div>
-  <div>
+  <div ref="tableRef">
     <CustomTable
-      :is-nested="true"
+      :has-tools="false"
       :has-add-btn="false"
-      :has-pagination="false"
+      :data="productStocks"
+      :row-prop-init="rowPropInit"
       :table-header-component="StockStatusHeader"
-      class="[&>div.table-wrapper]:sticky [&>div.table-wrapper]:top-[80px] [&>div.table-wrapper]:z-50"
-    >
-      <template v-slot:tables>
-        <div v-for="(cat, ndx) in sampleData" :key="ndx" class="mt-5">
-          <CustomTable
-            :has-tools="false"
-            :has-add-btn="false"
-            :data="cat.products"
-            :title="cat.category"
-            :has-pagination="false"
-            :row-prop-init="initStockStatusRow"
-            :table-row-component="StockStatusRow"
-          ></CustomTable>
-        </div>
-      </template>
-    </CustomTable>
-
-    <!-- NOTES -->
-    <div class="flex flex-col">
-      <div class="flex gap-3">
-        <input type="checkbox" name="" id="" />
-        <code>Query all the products grouped by categories</code>
-      </div>
-      <div class="flex gap-3">
-        <input type="checkbox" name="" id="" />
-        <code>
-          Create a table with columns of [item-description, on hand, on sale,
-          avaliable, Ordered, On PO, Next Delivery]
-        </code>
-      </div>
-      <div class="flex gap-3">
-        <input type="checkbox" name="" id="" />
-        <code>
-          Needs to keep track of all products track, wether incoming or outgoing
-        </code>
-      </div>
-    </div>
+      :table-row-component="StockStatusRow"
+    />
   </div>
 </template>
 
@@ -55,198 +17,42 @@ import StockStatusRow from '@/components/Inventory/StockStatus/StockStatusRow.vu
 import StockStatusHeader from '@/components/Inventory/StockStatus/StockStatusHeader.vue'
 import Event from '@/event'
 
+import { onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { EventEnum } from '@/data/event/index'
+import { useProductStore } from '@/stores/product'
+import { useSettingsStore } from '@/stores/settings'
+
+import { useTableScroll } from '@/use/useTableScroll'
+
+const tableRef = ref(null)
+const productStocks = ref([])
+
+const productStore = useProductStore()
+const settingStore = useSettingsStore()
+
+const { productCategories } = storeToRefs(settingStore)
+
+// composables
+useTableScroll(tableRef, false)
+
 /** ================================================
  * EVENTS
  ** ================================================*/
-const initStockStatusRow = 'init-stock-status-row'
-Event.on(initStockStatusRow, function (data) {
-  return { product: data }
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
+
+const rowPropInit = 'inventory-stock-status-page'
+Event.on(rowPropInit, (data) => {
+  return {
+    category: data
+  }
 })
 
-const sampleData = [
-  {
-    category: 'Laptops',
-    products: [
-      {
-        name: 'Dell latitude 5320',
-        on_hand: 20,
-        on_sale: 20,
-        available: 0,
-        ordered: true,
-        on_po: 0,
-        next_delivery: null
-      },
-      {
-        name: 'Total Laptop',
-        on_hand: 20,
-        on_sale: 20,
-        available: 0,
-        ordered: '',
-        on_po: 0,
-        next_delivery: null
-      }
-    ]
-  },
-  {
-    category: 'Smart Phone',
-    products: [
-      {
-        name: 'Samsung Galaxy A03',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: false,
-        on_po: 0,
-        next_delivery: null
-      },
-      {
-        name: 'Total Smart Phone',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: '',
-        on_po: 0,
-        next_delivery: null
-      }
-    ]
-  },
-  {
-    category: 'Smart Phone',
-    products: [
-      {
-        name: 'Samsung Galaxy A03',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: true,
-        on_po: 0,
-        next_delivery: null
-      },
-      {
-        name: 'Total Smart Phone',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: '',
-        on_po: 0,
-        next_delivery: null
-      }
-    ]
-  },
-  {
-    category: 'Smart Phone',
-    products: [
-      {
-        name: 'Samsung Galaxy A03',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: false,
-        on_po: 0,
-        next_delivery: null
-      },
-      {
-        name: 'Total Smart Phone',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: '',
-        on_po: 0,
-        next_delivery: null
-      }
-    ]
-  },
-  {
-    category: 'Smart Phone',
-    products: [
-      {
-        name: 'Samsung Galaxy A03',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: false,
-        on_po: 0,
-        next_delivery: null
-      },
-      {
-        name: 'Total Smart Phone',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: '',
-        on_po: 0,
-        next_delivery: null
-      }
-    ]
-  },
-  {
-    category: 'Smart Phone',
-    products: [
-      {
-        name: 'Samsung Galaxy A03',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: false,
-        on_po: 0,
-        next_delivery: null
-      },
-      {
-        name: 'Total Smart Phone',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: '',
-        on_po: 0,
-        next_delivery: null
-      }
-    ]
-  },
-  {
-    category: 'Smart Phone',
-    products: [
-      {
-        name: 'Samsung Galaxy A03',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: false,
-        on_po: 0,
-        next_delivery: null
-      },
-      {
-        name: 'Total Smart Phone',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: '',
-        on_po: 0,
-        next_delivery: null
-      }
-    ]
-  },
-  {
-    category: 'Smart Phone',
-    products: [
-      {
-        name: 'Samsung Galaxy A03',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: false,
-        on_po: 0,
-        next_delivery: null
-      },
-      {
-        name: 'Total Smart Phone',
-        on_hand: 4,
-        on_sale: 2,
-        available: 2,
-        ordered: '',
-        on_po: 0,
-        next_delivery: null
-      }
-    ]
-  }
-]
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
+onMounted(async () => {
+  productStocks.value = await productStore.fetchInventoryStock()
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
+})
 </script>

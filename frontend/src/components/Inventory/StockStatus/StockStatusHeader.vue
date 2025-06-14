@@ -1,20 +1,11 @@
 <template>
-  <div class="grid grid-cols-10 gap-3 pl-20">
-    <p class="col-span-4 table-header">Item Description</p>
-    <p class="col-span-1 table-header">On Hand</p>
-    <p class="col-span-1 table-header">On Sale</p>
-    <p class="col-span-1 table-header">Available</p>
-    <p class="col-span-1 table-header">Ordered</p>
-    <p class="col-span-1 table-header">On PO</p>
-    <p class="col-span-1 table-header">Next Deli</p>
+  <div class="grid grid-cols-12 gap-3 min-w-[1160px]">
+    <p class="col-span-5 table-header">Inventory</p>
+    <p class="col-span-2 table-header">Supplier</p>
+    <p class="col-span-1 text-right table-header">Quantity</p>
+    <p class="col-span-1 text-right table-header">Sales</p>
+    <p class="col-span-1 text-right table-header">Available</p>
+    <p class="col-span-1 text-right table-header">OS</p>
+    <p class="col-span-1 text-right table-header">PO</p>
   </div>
 </template>
-
-<script setup>
-const props = defineProps({
-  hasCheckBox: {
-    type: Boolean,
-    default: true
-  }
-})
-</script>

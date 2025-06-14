@@ -11,13 +11,19 @@ const ProductSupplier = require("../../models/product-supplier");
 const { Op } = require("sequelize");
 const { ProductType } = require("shared");
 const { sequelize } = require("../../models/index");
-const { findProduct } = require("../../services/ProductService");
+const {
+  findProduct,
+  groupCategories,
+} = require("../../services/ProductService");
+const InvoiceProducts = require("../../models/junction/invoice-products");
+const SalesOrderProduct = require("../../models/junction/sales-order-product");
+const PurchaseOrderProducts = require("../../models/junction/purchase-order-products");
 
 module.exports = {
   all: async (req, res) => {
     try {
       const items = await Product.findAll({
-        order: [["updatedAt", "DESC"]],
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: Supplier,
@@ -56,7 +62,7 @@ module.exports = {
   getProducts: async (req, res) => {
     try {
       const products = await Product.findAll({
-        order: [["updatedAt", "DESC"]],
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: Supplier,
@@ -170,13 +176,8 @@ module.exports = {
         transaction,
       });
 
-      if (req.body.validated.categories) {
-        const categories = req.body.validated.categories;
-        await Promise.all(
-          categories.map((category) => {
-            return product.addCategory(category, { transaction });
-          })
-        );
+      if (req.body.validated.category) {
+        product.addCategory(req.body.validated.category, { transaction });
       }
 
       if (req.body.validated.suppliers) {
@@ -189,7 +190,7 @@ module.exports = {
                 cost: supplier.cost,
               },
             });
-          })
+          }),
         );
       }
 
@@ -231,13 +232,13 @@ module.exports = {
 
         // get categories to remove and to add
         const categoriesToRemove = productToCategories.filter(
-          (ptc) => !data.categories.includes(ptc.category_id)
+          (ptc) => !data.categories.includes(ptc.category_id),
         );
         const categoriesToAdd = data.categories.filter(
           (category) =>
             !productToCategories
               .map((ptc) => ptc.category_id)
-              .includes(category)
+              .includes(category),
         );
 
         await Promise.all([
@@ -257,7 +258,7 @@ module.exports = {
               },
               {
                 transaction,
-              }
+              },
             );
           }),
         ]);
@@ -275,14 +276,14 @@ module.exports = {
           (ptc) =>
             !data.suppliers
               .map((sup) => sup.supplier_id)
-              .includes(ptc.supplier_id)
+              .includes(ptc.supplier_id),
         );
 
         const suppliersToAdd = data.suppliers.filter(
           (sup) =>
             !productToSuppliers
               .map((ptc) => ptc.supplier_id)
-              .includes(sup.supplier_id)
+              .includes(sup.supplier_id),
         );
 
         const suppliersToUpdate = data.suppliers.filter((sup) => {
@@ -291,7 +292,7 @@ module.exports = {
             .includes(sup.supplier_id);
 
           const ptc = productToSuppliers.find(
-            (ptc) => ptc.supplier_id === sup.supplier_id
+            (ptc) => ptc.supplier_id === sup.supplier_id,
           );
 
           return isExist && ptc.cost !== sup.cost;
@@ -313,7 +314,7 @@ module.exports = {
                 supplier_id: sup.supplier_id,
                 cost: sup.cost,
               },
-              { transaction }
+              { transaction },
             );
           }),
           ...suppliersToUpdate.map((sup) => {
@@ -327,7 +328,7 @@ module.exports = {
                   supplier_id: sup.supplier_id,
                 },
                 transaction,
-              }
+              },
             );
           }),
         ]);
@@ -377,22 +378,22 @@ module.exports = {
         });
 
         const toRemove = currentCategorys.filter(
-          (c) => !req.body.categories.includes(c.category_id)
+          (c) => !req.body.categories.includes(c.category_id),
         );
 
         const toAdd = req.body.categories.filter(
-          (c) => !currentCategorys.map((pc) => pc.category_id).includes(c)
+          (c) => !currentCategorys.map((pc) => pc.category_id).includes(c),
         );
 
         await Promise.all([
           ...toRemove.map((c) =>
-            ProductToCategories.destroy({ where: { id: c.id } })
+            ProductToCategories.destroy({ where: { id: c.id } }),
           ),
           ...toAdd.map((c) =>
             ProductToCategories.create({
               product_id: req.params.id,
               category_id: c,
-            })
+            }),
           ),
         ]);
       }
@@ -455,35 +456,43 @@ module.exports = {
 
   inventoryStockStatus: async (req, res) => {
     try {
-      const products = await Product.findAll({
-        where: {
-          status: "active",
-          type: "inventory",
-        },
-        attributes: ["id", "name", "quantity_in_stock"],
+      const products = await ProductCategory.findAll({
         include: [
           {
-            model: ProductCategory,
-            as: "category",
+            model: Product,
+            as: "products",
+            include: [
+              {
+                model: ProductDetails,
+                as: "product_details",
+                attributes: ["id", "purchase_description", "stock"],
+              },
+              {
+                model: Supplier,
+                as: "suppliers",
+                attributes: ["id", "company_name"],
+              },
+              {
+                model: InvoiceProducts,
+                as: "invoice_products",
+                attributes: ["id", "invoice_id", "quantity"],
+              },
+              {
+                model: SalesOrderProduct,
+                as: "so_products",
+              },
+              {
+                model: PurchaseOrderProducts,
+                as: "po_products"
+              }
+            ],
           },
         ],
       });
 
-      const groupedByCat = Object.entries(
-        Object.groupBy(products, ({ category }) => category.id)
-      ).map((item) => {
-        return {
-          category: item[1][0].category,
-          products: item[1],
-        };
-      });
-
-      // TODO: Need to query from PO and Sales
-
       res.sendResponse(
-        { grouped_by_gategory: groupedByCat },
-        "Successfully fetched",
-        200
+        { grouped: groupCategories(products) },
+        "Successfully fetched!",
       );
     } catch (e) {
       res.sendError(e, "Something wen't wrong!");

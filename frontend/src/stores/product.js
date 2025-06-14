@@ -98,6 +98,12 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  const fetchInventoryStock = async () => {
+    const res = await api('products/stock-status')
+
+    return res.data.grouped
+  }
+
   const productOptions = computed(() => {
     return products.value.map((product) => {
       return {
@@ -164,6 +170,7 @@ export const useProductStore = defineStore('product', () => {
     fetchAllProducts,
     fetchProductByIds,
     getProductItemCode,
+    fetchInventoryStock,
     checkProductItemCodeExist
   }
 })

@@ -16,9 +16,10 @@
               :options="categoriesOptions"
               @add-new="showCategoryModal = true"
               v-model="model.categories"
+              :remove-strat="AccessPolicy.LIFO"
               label="Categories"
               :has-label="true"
-              :error="errors.categories"
+              :error="errors.category"
               :error-has-text="true"
             />
             <CustomInput
@@ -186,7 +187,7 @@
         <div class="flex-1">
           <button
             type="button"
-            v-if="route.query.id"
+            v-if="isView"
             class="btn-danger-outline"
             @click="showConfirmationModal = true"
           >
@@ -194,7 +195,7 @@
           </button>
         </div>
         <button type="button" class="btn-gray-outline" @click="onCancel">
-          Cancel
+          {{ isView ? 'Back' : 'Cancel' }}
         </button>
         <button type="submit" class="btn">Save</button>
       </div>
@@ -247,7 +248,7 @@ import ProductPointModal from '@/components/Settings/ProductPointModal.vue'
 import { useProductStore } from '@/stores/product'
 import { useRoute } from 'vue-router'
 import router from '@/router'
-import { ToastTypes } from '@/data/types'
+import { ToastTypes, AccessPolicy } from '@/data/types'
 import { InventoryConst } from '@/const/route.constants'
 import { useValidation } from '@/composables/useValidation'
 import { useAppStore } from '@/stores/app'
@@ -293,14 +294,15 @@ const model = ref({
     product_setting_id: ''
   },
   suppliers: [{ ...productSupplier }],
-  categories: []
+  categories: [],
+  category: ''
 })
 
 const preselectedSupplier = ref([])
 
 // composables
 const { errors, validateData, hasErrors } = useValidation(
-  ProductItemSchema,
+  ProductItemSchema.options({ stripUnknown: true }),
   model.value
 )
 
@@ -317,6 +319,8 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
 /** ================================================
  * COMPUTED
  ** ================================================*/
+const isView = computed(() => (route.query.id ? true : false))
+
 const incomeAccounts = computed(() => {
   return settingStore.accounts
     .filter((acc) => acc.type == AccountTypes.INCOME)
@@ -377,18 +381,28 @@ const onSubmit = async () => {
     data.details.product_setting_id = null
   }
 
+  if (data.categories.length) {
+    const categoriesCopy = ObjectHelpers.copyArr(data.categories)
+    data.category = categoriesCopy.pop()
+    model.value.category = categoriesCopy.pop()
+  }
+
   // validate data
   validateData()
 
   if (hasErrors.value) {
     Event.emit(rowEventName, errors.value.suppliers)
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Please check some fields!'
+    })
     return
   }
 
   Event.emit(EventEnum.IS_PAGE_LOADING, true)
   let isSuccess = false
 
-  if (route.query.id) {
+  if (isView.value) {
     isSuccess = await productStore.updateProduct(route.query.id, data)
   } else {
     // backend validation for product item code
@@ -411,7 +425,7 @@ const onSubmit = async () => {
 
   if (isSuccess) {
     Event.emit(EventEnum.TOAST_MESSAGE, {
-      message: `Product ${route.query.id ? 'updated' : 'created'} successfully!`,
+      message: `Product ${isView.value ? 'updated' : 'created'} successfully!`,
       type: ToastTypes.SUCCESS,
       duration: 2000
     })
@@ -422,7 +436,7 @@ const onSubmit = async () => {
     })
   } else {
     Event.emit(EventEnum.TOAST_MESSAGE, {
-      message: `Failed to ${route.query.id ? 'update' : 'create'} product!`,
+      message: `Failed to ${isView.value ? 'update' : 'create'} product!`,
       type: ToastTypes.ERROR,
       duration: 2000
     })
@@ -434,10 +448,15 @@ const onAfterDelete = async () => {
   router.push({ name: InventoryConst.PRODUCTS })
 }
 
-const onCancel = () =>
-  router.push({
-    name: route.query.redirect ? route.query.redirect : InventoryConst.PRODUCTS
-  })
+const onCancel = () => {
+  if (route.query.redirect) {
+    router.push({
+      name: route.query.redirect
+    })
+  } else {
+    router.back()
+  }
+}
 
 const onInputPurchaseDescription = () => {
   if (isSameDescription.value) {
@@ -462,7 +481,7 @@ onMounted(async () => {
   await settingStore.getProductCategories()
 
   // check for query params
-  if (route.query.id) {
+  if (isView.value) {
     const product = await productStore.getProduct(route.query.id)
     if (product) {
       model.value.product = ObjectHelpers.assignSameFields(
@@ -482,7 +501,10 @@ onMounted(async () => {
         isSameDescription.value = true
       }
 
-      model.value.categories = product.categories.map((cat) => cat.id)
+      model.value.category = product.categories[0].id
+      const hierarchyCategories = await settingStore.getFullCategoryHeirarchy(model.value.category)
+      model.value.categories = hierarchyCategories.map((cat) => cat.id)
+
       model.value.suppliers = product.suppliers.map((supplier) => {
         return {
           supplier_id: supplier.id,

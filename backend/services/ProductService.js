@@ -8,12 +8,12 @@ const Supplier = require("../models/supplier");
 const Notification = require("../models/notification");
 const { getNotificationSocket } = require("../socket/namespaces/notification");
 
-const groupCategories = (cts) => {
+const linkedCategories = (cts) => {
   const categories = [...cts];
   categories.forEach((category, ndx) => {
     if (category.dataValues.general_cat) {
       parentCategoryIndex = categories.findIndex(
-        (cat) => cat.id == category.dataValues.general_cat
+        (cat) => cat.id == category.dataValues.general_cat,
       );
 
       if (parentCategoryIndex > -1) {
@@ -22,13 +22,52 @@ const groupCategories = (cts) => {
         }
 
         categories[parentCategoryIndex].dataValues.sub_categories.push(
-          category
+          category,
         );
       }
     }
   });
 
   return [...categories];
+};
+
+const groupCategories = (cts) => {
+  const ctsCopy = [...cts];
+  const categories = [];
+
+  // define inner function
+  const traceCategory = (cat) => {
+    if (cat.general_cat) {
+      const genCat = cts.find((c) => c.id == cat.general_cat);
+
+      if (!cat.dataValues.sub_categories && !cat.products.length) {
+        return;
+      }
+
+      if (genCat.dataValues.sub_categories) {
+        if (!genCat.dataValues.sub_categories.find((sc) => sc.id == cat.id)) {
+          genCat.dataValues.sub_categories.push(cat);
+        }
+      } else {
+        genCat.dataValues.sub_categories = [cat];
+      }
+
+      traceCategory(genCat);
+    } else {
+      if (!categories.find((c) => c.id == cat.id)) {
+        categories.push(cat);
+      }
+    }
+  };
+
+  ctsCopy.forEach((cat) => traceCategory(cat));
+
+  // return categories;
+  return categories.filter(
+    (c) =>
+      c.products.length ||
+      (c.dataValues.sub_categories && c.dataValues.sub_categories.length),
+  );
 };
 
 const findProduct = async (id) => {
@@ -86,5 +125,6 @@ const reorderingProductNotification = async (product, newStock) => {
 module.exports = {
   findProduct,
   groupCategories,
+  linkedCategories,
   reorderingProductNotification,
 };

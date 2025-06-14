@@ -1,5 +1,5 @@
 const ProductCategory = require("../models/product-category");
-const { groupCategories } = require("../services/ProductService");
+const { linkedCategories } = require("../services/ProductService");
 
 module.exports = {
   all: async (req, res) => {
@@ -9,7 +9,7 @@ module.exports = {
       });
 
       res.sendResponse(
-        { categories, grouped: groupCategories(categories) },
+        { categories, grouped: linkedCategories(categories) },
         "Successfully fetched!",
         200
       );

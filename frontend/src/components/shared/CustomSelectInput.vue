@@ -84,7 +84,7 @@
     </div>
 
     <!-- Can select multiple and can search too -->
-    <div class="relative group z-10" tabindex="0">
+    <div class="relative group z-10" tabindex="0" ref="selectMultipleCanSearch">
       <div
         class="min-h-[38px] relative z-10"
         :class="[
@@ -115,6 +115,7 @@
             <span class="text-xs py-0.5">{{ getName(sl) }}</span>
             <button
               type="button"
+              v-if="showRemoveItemBtn(ndx)"
               class="text-danger hidden group-focus:block group-focus-within:block"
               @click="removeSelectedValue(sl)"
             >
@@ -143,6 +144,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { AccessPolicy } from '@/data/types/index'
 
 const emit = defineEmits(['addNew', 'change', 'focus'])
 
@@ -174,8 +176,13 @@ const props = defineProps({
   inputClass: {
     type: String,
     default: ''
+  },
+  removeStrat: {
+    type: String,
+    default: AccessPolicy.ANY
   }
 })
+
 
 const search = ref('')
 
@@ -184,6 +191,8 @@ const singleDropdownGroup = ref()
 
 const selected = defineModel()
 const select = ref()
+
+const selectMultipleCanSearch = ref()
 
 onMounted(() => {
   if (props.canSearch && selected.value && !props.selectMultiple) {
@@ -211,8 +220,28 @@ const onSelectOpt = (value) => {
   selected.value.push(value)
 }
 
+const showRemoveItemBtn = (ndx) => {
+  let res = false
+
+  switch (props.removeStrat) {
+    case AccessPolicy.LIFO:
+      res = ndx == selected.value.length - 1
+      break
+    case AccessPolicy.FIFO:
+      res = ndx == 0
+      break
+    case AccessPolicy.ANY:
+      res = true
+      break
+  }
+  
+  return res
+}
+
 const removeSelectedValue = (value) => {
   selected.value = selected.value.filter((sl) => sl != value)
+  // focus the parent element after removing a selected value
+  selectMultipleCanSearch.value.focus()
 }
 
 // only for the multi select options
