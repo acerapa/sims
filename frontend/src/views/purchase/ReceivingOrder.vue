@@ -193,7 +193,6 @@ onMounted(async () => {
     await purchaseOrderStore.fetchPurchaseOrderById(route.params.id)
 
     model.value.order.delivery_number = purchaseOrder.value.delivery_number
-    model.value.order.status = purchaseOrder.value.status
 
     model.value.products = [
       ...purchaseOrderStore.purchaseOrder.products.map((product) => {

@@ -18,6 +18,9 @@ const {
 const InvoiceProducts = require("../../models/junction/invoice-products");
 const SalesOrderProduct = require("../../models/junction/sales-order-product");
 const PurchaseOrderProducts = require("../../models/junction/purchase-order-products");
+const SalesOrder = require("../../models/sales-order");
+const { SalesOrderStatus, PurchaseOrderStatus } = require("shared/enums");
+const PurchaseOrder = require("../../models/purchase-order");
 
 module.exports = {
   all: async (req, res) => {
@@ -480,11 +483,39 @@ module.exports = {
               {
                 model: SalesOrderProduct,
                 as: "so_products",
+                include: [
+                  {
+                    model: SalesOrder,
+                    as: "sales_order",
+                    where: {
+                      status: SalesOrderStatus.OPEN,
+                    },
+                    required: true,
+                    attributes: ["id"],
+                  },
+                ],
+                attributes: ["id", "sales_order_id", "quantity"],
               },
               {
                 model: PurchaseOrderProducts,
-                as: "po_products"
-              }
+                as: "po_products",
+                attributes: ["id", "purchase_order_id", "quantity"],
+                include: [
+                  {
+                    model: PurchaseOrder,
+                    as: "purchase_order",
+                    where: {
+                      status: {
+                        [Op.in]: [
+                          PurchaseOrderStatus.OPEN,
+                          PurchaseOrderStatus.CONFIRMED,
+                        ],
+                      },
+                    },
+                    attributes: ["id"],
+                  },
+                ],
+              },
             ],
           },
         ],
