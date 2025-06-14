@@ -143,6 +143,17 @@ SalesOrderProduct.belongsTo(Product, {
   as: "product",
 });
 
+// SalesOrderProduct to SalesOrder
+SalesOrder.hasMany(SalesOrderProduct, {
+  foreignKey: "sales_order_id",
+  as: "so_products",
+});
+
+SalesOrderProduct.belongsTo(SalesOrder, {
+  foreignKey: "sales_order_id",
+  as: "sales_order",
+});
+
 SalesOrder.belongsTo(PaymentMethod, {
   foreignKey: "payment_method_id",
   as: "payment_method",
@@ -217,6 +228,17 @@ PurchaseOrderProducts.belongsTo(Product, {
 
 Product.hasMany(PurchaseOrderProducts, {
   foreignKey: "product_id",
+  as: "po_products",
+});
+
+// PurchaseOrderProducts to PurchaseOrder
+PurchaseOrderProducts.belongsTo(PurchaseOrder, {
+  foreignKey: "purchase_order_id",
+  as: "purchase_order",
+});
+
+PurchaseOrder.hasMany(PurchaseOrderProducts, {
+  foreignKey: "purchase_order_id",
   as: "po_products",
 });
 

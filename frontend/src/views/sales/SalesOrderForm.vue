@@ -26,7 +26,7 @@
         <SelectStatusDropdown
           v-model="model.sales_order.status"
           :status-map="SalesOrderStatusMap"
-          :class="isInvoicedOrCancelled ? 'pointer-events-none' : ''"
+          :class="'pointer-events-none'"
         />
         <button
           class="btn-green"
@@ -34,6 +34,13 @@
           v-if="!isInvoicedOrCancelled"
         >
           Generate Invoice
+        </button>
+        <button
+          class="btn-danger-outline"
+          @click="onCancelOrder"
+          v-if="!isInvoicedOrCancelled"
+        >
+          Cancel Order
         </button>
       </div>
     </div>
@@ -477,6 +484,11 @@ const isInvoicedOrCancelled = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
+
+const onCancelOrder = async () => {
+  model.value.sales_order.status = SalesOrderStatus.CANCELLED
+  await onSubmit()
+}
 
 const onSubmit = async (saveAndNew) => {
   // validation
