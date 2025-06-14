@@ -21,7 +21,7 @@
       <p class="col-span-1 text-right mr-2">
         {{ p.product_details.stock }}
       </p>
-      <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
+      <p class="col-span-1 text-right mr-2">{{ getSales(p) }}</p>
       <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
       <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
       <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
@@ -69,4 +69,17 @@ const props = defineProps({
     default: 0
   }
 })
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const getSales = (p) => {
+  let quantitySold = 0
+
+  p.invoice_products.forEach((ip) => {
+    quantitySold += ip.quantity
+  })
+
+  return quantitySold
+}
 </script>

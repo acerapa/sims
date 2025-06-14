@@ -45,7 +45,9 @@ const groupCategories = (cts) => {
       }
 
       if (genCat.dataValues.sub_categories) {
-        genCat.dataValues.sub_categories.push(cat);
+        if (!genCat.dataValues.sub_categories.find((sc) => sc.id == cat.id)) {
+          genCat.dataValues.sub_categories.push(cat);
+        }
       } else {
         genCat.dataValues.sub_categories = [cat];
       }
@@ -60,7 +62,12 @@ const groupCategories = (cts) => {
 
   ctsCopy.forEach((cat) => traceCategory(cat));
 
-  return categories;
+  // return categories;
+  return categories.filter(
+    (c) =>
+      c.products.length ||
+      (c.dataValues.sub_categories && c.dataValues.sub_categories.length),
+  );
 };
 
 const findProduct = async (id) => {

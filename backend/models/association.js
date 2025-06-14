@@ -30,22 +30,22 @@ const ItemToAdjustments = require("./junction/item-to-adjustments");
 
 // adjustments to user
 PhysicalInventoryAdjustments.belongsTo(User, {
-  foreignKey: 'user_id',
-  as: 'adjusted_by',
-})
+  foreignKey: "user_id",
+  as: "adjusted_by",
+});
 
 // adjustments to itemtoadjust
 PhysicalInventoryAdjustments.hasMany(ItemToAdjustments, {
-  foreignKey: 'adjustment_id',
-  as: 'items'
-})
+  foreignKey: "adjustment_id",
+  as: "items",
+});
 
 PhysicalInventoryAdjustments.belongsToMany(PhysicalInventoryItem, {
   through: ItemToAdjustments,
-  foreignKey: 'adjustment_id',
-  otherKey: 'item_id',
-  as: 'adjustment_items'
-})
+  foreignKey: "adjustment_id",
+  otherKey: "item_id",
+  as: "adjustment_items",
+});
 
 // receive payments to invoice
 Invoice.hasMany(ReceivedPayment, {
@@ -84,6 +84,17 @@ Product.belongsToMany(Invoice, {
   as: "invoices",
 });
 
+// Invoice Products to products
+InvoiceProducts.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+Product.hasMany(InvoiceProducts, {
+  foreignKey: "product_id",
+  as: "invoice_products",
+});
+
 // invoice to customer
 Invoice.belongsTo(Customer, {
   foreignKey: "customer_id",
@@ -119,6 +130,17 @@ Product.belongsToMany(SalesOrder, {
   foreignKey: "product_id",
   otherKey: "sales_order_id",
   as: "sales_orders",
+});
+
+// SalesOrderProduct to Product
+Product.hasMany(SalesOrderProduct, {
+  foreignKey: "product_id",
+  as: "so_products",
+});
+
+SalesOrderProduct.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
 });
 
 SalesOrder.belongsTo(PaymentMethod, {

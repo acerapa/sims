@@ -1,18 +1,7 @@
 <template>
   <div ref="tableRef">
-    <!-- manually define the header here -->
-    <!-- <div class="cont flex flex-col gap-3 main-table">
-      <StockStatusHeader />
-      <hr />
-      <div class="flex flex-col gap-6">
-        <StockStatusRow
-          v-for="cat in productStocks"
-          :key="cat.id"
-          :category="cat"
-        />
-      </div>
-    </div> -->
     <CustomTable
+      :has-tools="false"
       :has-add-btn="false"
       :data="productStocks"
       :row-prop-init="rowPropInit"

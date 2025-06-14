@@ -15,6 +15,8 @@ const {
   findProduct,
   groupCategories,
 } = require("../../services/ProductService");
+const InvoiceProducts = require("../../models/junction/invoice-products");
+const SalesOrderProduct = require("../../models/junction/sales-order-product");
 
 module.exports = {
   all: async (req, res) => {
@@ -462,14 +464,23 @@ module.exports = {
               {
                 model: ProductDetails,
                 as: "product_details",
-                attributes: ["id", "purchase_description", "stock"]
+                attributes: ["id", "purchase_description", "stock"],
               },
               {
                 model: Supplier,
                 as: "suppliers",
-                attributes: ["id", "company_name"]
-              }
-            ]
+                attributes: ["id", "company_name"],
+              },
+              {
+                model: InvoiceProducts,
+                as: "invoice_products",
+                attributes: ["id", "invoice_id", "quantity"],
+              },
+              {
+                model: SalesOrderProduct,
+                as: "so_products",
+              },
+            ],
           },
         ],
       });
@@ -479,7 +490,6 @@ module.exports = {
         "Successfully fetched!",
       );
     } catch (e) {
-      console.log(e)
       res.sendError(e, "Something wen't wrong!");
     }
   },
