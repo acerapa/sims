@@ -209,6 +209,17 @@ Product.belongsToMany(PurchaseOrder, {
   as: "purchase_orders",
 });
 
+// PurchaseOrderProducts to Product
+PurchaseOrderProducts.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product"
+})
+
+Product.hasMany(PurchaseOrderProducts, {
+  foreignKey: "product_id",
+  as: "po_products"
+})
+
 // Stock Transfer, Product and Stock Transfer Product Relations
 StockTransfer.belongsToMany(Product, {
   through: StockTransferProducts,

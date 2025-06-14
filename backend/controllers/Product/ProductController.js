@@ -17,6 +17,7 @@ const {
 } = require("../../services/ProductService");
 const InvoiceProducts = require("../../models/junction/invoice-products");
 const SalesOrderProduct = require("../../models/junction/sales-order-product");
+const PurchaseOrderProducts = require("../../models/junction/purchase-order-products");
 
 module.exports = {
   all: async (req, res) => {
@@ -480,6 +481,10 @@ module.exports = {
                 model: SalesOrderProduct,
                 as: "so_products",
               },
+              {
+                model: PurchaseOrderProducts,
+                as: "po_products"
+              }
             ],
           },
         ],

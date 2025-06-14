@@ -57,7 +57,6 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const { invoice, products } = req.body;
-      console.log(invoice);
       let createdInvoice;
       if (invoice) {
         createdInvoice = await Invoice.create(invoice, { transaction });

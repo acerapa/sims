@@ -23,8 +23,8 @@
       </p>
       <p class="col-span-1 text-right mr-2">{{ getSales(p) }}</p>
       <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
-      <p class="col-span-1 text-right mr-2">{{ getOs(p) }}</p>
-      <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
+      <p class="col-span-1 text-right mr-2">{{ getOS(p) }}</p>
+      <p class="col-span-1 text-right mr-2">{{ getPO(p) }}</p>
     </div>
 
     <!-- Add another layer -->
@@ -38,6 +38,7 @@
         :key="subCategory.id"
         :category="subCategory"
         :padding-left="props.paddingLeft + 1"
+        :stock-status-event="statusEvent"
       />
     </div>
 
@@ -48,17 +49,31 @@
       >
         Total {{ props.category.name }}
       </p>
-      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">{{ 0 }}</p>
-      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">{{ 0 }}</p>
-      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">{{ 0 }}</p>
-      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">{{ 0 }}</p>
-      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">{{ 0 }}</p>
+      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">
+        {{ totalQuantity + quantities }}
+      </p>
+      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">
+        {{ totalSales + sales }}
+      </p>
+      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">
+        {{ totalAvailable + availables }}
+      </p>
+      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">
+        {{ totalOS + SOs }}
+      </p>
+      <p class="col-span-1 text-right mr-2 border-t-2 font-bold">
+        {{ totalPO + POs }}
+      </p>
     </div>
   </div>
 </template>
 
 <script setup>
 import StockStatusRow from '@/components/Inventory/StockStatus/StockStatusRow.vue'
+
+import { computed, watch, ref } from 'vue'
+import Event from '@/event'
+
 const props = defineProps({
   category: {
     type: Object,
@@ -67,8 +82,59 @@ const props = defineProps({
   paddingLeft: {
     type: Number,
     default: 0
+  },
+  stockStatusEvent: {
+    type: String,
+    default: ''
   }
 })
+
+const sales = ref(0)
+const quantities = ref(0)
+const availables = ref(0)
+const POs = ref(0)
+const SOs = ref(0)
+
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+const statusEvent = props.stockStatusEvent
+  ? props.stockStatusEvent
+  : `${props.category.id}-${props.category.name}`
+
+// set event only if props.stockStatusEvent has no value
+if (!props.stockStatusEvent) {
+  Event.on(statusEvent, (data) => {
+    quantities.value += data.totalQuantity
+    sales.value += data.totalSales
+    availables.value += data.totalAvailable
+    POs.value += data.totalPO
+    SOs.value += data.totalOS
+  })
+}
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const totalSales = computed(() =>
+  props.category.products.map((p) => getSales(p)).reduce((a, b) => a + b, 0)
+)
+
+const totalQuantity = computed(() =>
+  props.category.products
+    .map((p) => p.product_details.stock)
+    .reduce((a, b) => a + b, 0)
+)
+
+const totalAvailable = computed(() => 0) // this is temporary and to be discuss pa
+
+const totalOS = computed(() =>
+  props.category.products.map((p) => getOS(p)).reduce((a, b) => a + b, 0)
+)
+
+const totalPO = computed(() =>
+  props.category.products.map((p) => getPO(p)).reduce((a, b) => a + b, 0)
+)
 
 /** ================================================
  * METHODS
@@ -83,7 +149,7 @@ const getSales = (p) => {
   return quantitySold
 }
 
-const getOs = (p) => {
+const getOS = (p) => {
   let salesOrders = 0
 
   p.so_products.forEach((sp) => {
@@ -92,4 +158,42 @@ const getOs = (p) => {
 
   return salesOrders
 }
+
+const getPO = (p) => {
+  let purchaseOrders = 0
+
+  p.po_products.forEach((po) => {
+    purchaseOrders += po.quantity
+  })
+
+  return purchaseOrders
+}
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => [
+    totalSales.value,
+    totalOS.value,
+    totalPO.value,
+    totalQuantity.value,
+    totalAvailable.value
+  ],
+  () => {
+    if (props.stockStatusEvent) {
+      Event.emit(props.stockStatusEvent, {
+        totalSales: totalSales.value,
+        totalOS: totalOS.value,
+        totalPO: totalPO.value,
+        totalQuantity: totalQuantity.value,
+        totalAvailable: totalAvailable.value
+      })
+    }
+  },
+  {
+    deep: true,
+    immediate: true
+  }
+)
 </script>
