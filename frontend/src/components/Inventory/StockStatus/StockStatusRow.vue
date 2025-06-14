@@ -23,7 +23,7 @@
       </p>
       <p class="col-span-1 text-right mr-2">{{ getSales(p) }}</p>
       <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
-      <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
+      <p class="col-span-1 text-right mr-2">{{ getOs(p) }}</p>
       <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
     </div>
 
@@ -81,5 +81,15 @@ const getSales = (p) => {
   })
 
   return quantitySold
+}
+
+const getOs = (p) => {
+  let salesOrders = 0
+
+  p.so_products.forEach((sp) => {
+    salesOrders += sp.quantity
+  })
+
+  return salesOrders
 }
 </script>
