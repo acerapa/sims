@@ -180,7 +180,10 @@ export const useSettingsStore = defineStore('settings', () => {
       )
     }
 
-    return isSuccess
+    return {
+      isSuccess,
+      data: res.data.category
+    }
   }
 
   const updateProductCategory = async (id, model) => {

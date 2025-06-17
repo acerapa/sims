@@ -234,8 +234,9 @@
     :general_cat="
       model.categories.length
         ? model.categories[model.categories.length - 1]
-        : ''
+        : null
     "
+    @id="onCategoryCreated"
   />
   <AccountModal v-model="showAccountModal" v-if="showAccountModal" />
   <ProductPointModal
@@ -521,6 +522,12 @@ const onInputSalesDescription = () => {
 const resetMultiTableError = () => {
   resetErrorValue('suppliers')
   Event.emit(rowEventName, errors.value.suppliers)
+}
+
+const onCategoryCreated = async (id) => {
+  await settingStore.fetchAllProductCategories()
+  model.value.categories.push(id)
+  model.value.category = id
 }
 
 /** ================================================
