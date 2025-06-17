@@ -82,6 +82,7 @@
           :error-has-text="true"
           label="Position"
           :has-label="true"
+          :disabled="props.position ? true : false"
         />
         <CustomInput
           type="date"
@@ -110,9 +111,8 @@ import DeleteConfirmModal from '../DeleteConfirmModal.vue'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import ModalWrapper from '@/components/shared/ModalWrapper.vue'
 import { useEmployeeStore } from '@/stores/employee'
-import { ObjectHelpers, ValidatorHelpers } from 'shared'
+import { ObjectHelpers, ValidatorHelpers, UserSchema, UserType } from 'shared'
 import { computed, onMounted, ref } from 'vue'
-import { UserSchema } from 'shared'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
@@ -123,6 +123,10 @@ const showConfirmModal = ref(false)
 const props = defineProps({
   selectedId: {
     type: Number,
+    required: false
+  },
+  position: {
+    type: String,
     required: false
   }
 })
@@ -141,6 +145,7 @@ const model = ref({
 })
 
 const showModal = defineModel()
+const id = defineModel('id')
 
 // modify schema
 const schema = props.selectedId
@@ -154,9 +159,11 @@ const { errors, hasErrors, validateData } = useValidation(schema, model.value)
  ** ================================================*/
 const positionOptions = computed(() => {
   return [
-    { text: 'Admin', value: 'admin' },
-    { text: 'Inventory Manager', value: 'inventory' },
-    { text: 'Cashier', value: 'cashier' }
+    { text: 'Admin', value: UserType.ADMIN },
+    { text: 'Manager', value: UserType.MANAGER },
+    { text: 'Inventory Manager', value: UserType.INVENTORY },
+    { text: 'Cashier', value: UserType.CASHIER },
+    { text: 'Sales Man', value: UserType.SALES_MAN }
   ]
 })
 
@@ -179,7 +186,9 @@ const onSubmit = async () => {
       model.value
     )
   } else {
-    isSuccess = await employeeStore.registerEmployee(model.value)
+    let res = await employeeStore.registerEmployee(model.value)
+    isSuccess = res.isSuccess
+    id.value = res.data.id
   }
 
   if (isSuccess) {
@@ -215,6 +224,11 @@ const onAfterDelete = async () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(() => {
+  // Mapping values from props to model, This are presets
+  if (props.position) {
+    model.value.position = props.position
+  }
+
   if (props.selectedId) {
     const employee = employeeStore.employees.find(
       (emp) => emp.id == props.selectedId

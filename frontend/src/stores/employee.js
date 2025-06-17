@@ -32,7 +32,10 @@ export const useEmployeeStore = defineStore('employee', () => {
         await fetchAllEmployees()
       }
     }
-    return isSuccess
+    return {
+      isSuccess,
+      data: res.data.user
+    }
   }
 
   const updateEmployee = async (id, data) => {
