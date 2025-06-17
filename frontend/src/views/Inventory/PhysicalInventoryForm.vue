@@ -38,11 +38,13 @@
             class="flex-1"
             :has-label="true"
             :can-search="true"
+            :has-add-new="true"
             name="branch_manager"
             label="Branch Manager"
             :error-has-text="true"
             :options="managerOptions"
             placeholder="Select Manager"
+            @add-new="showEmployeeModalForManager = true"
             v-model="model.physical_inventory.branch_manager"
             :error="errors.physical_inventory?.branch_manager"
           />
@@ -51,11 +53,13 @@
             class="flex-1"
             :has-label="true"
             :can-search="true"
+            :has-add-new="true"
             :error-has-text="true"
             label="Inventory In-Charge"
             name="inventory_incharge_id"
             :options="inventoryInchargeOptions"
             placeholder="Select Inventory In-Charge"
+            @add-new="showEmployeeModalForInventory = true"
             v-model="model.physical_inventory.inventory_incharge"
             :error="errors.physical_inventory?.inventory_incharge"
           />
@@ -133,13 +137,26 @@
       </div>
     </div>
   </div>
+  <EmployeeModal
+    v-model="showEmployeeModalForManager"
+    v-if="showEmployeeModalForManager"
+    v-model:id="model.physical_inventory.branch_manager"
+    :position="UserType.MANAGER"
+  />
+  <EmployeeModal
+    v-model="showEmployeeModalForInventory"
+    v-if="showEmployeeModalForInventory"
+    v-model:id="model.physical_inventory.inventory_incharge"
+    :position="UserType.INVENTORY"
+  />
 </template>
 
 <script setup>
 import CustomInput from '@/components/shared/CustomInput.vue'
 import CustomTable from '@/components/shared/CustomTable.vue'
 import MultiSelectTable from '@/components/shared/MultiSelectTable.vue'
- import PhysicalInventoryAdjustmentRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryAdjustmentRow.vue'
+import EmployeeModal from '@/components/Employee/EmployeeModal.vue'
+import PhysicalInventoryAdjustmentRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryAdjustmentRow.vue'
 import PhysicalInventoryFormRow from '@/components/Inventory/PhysicalInventory/PhysicalInventoryFormRow.vue'
 import PhysicalInventoryFormHeader from '@/components/Inventory/PhysicalInventory/PhysicalInventoryFormHeader.vue'
 
@@ -179,6 +196,9 @@ const { products } = storeToRefs(productStore)
 const { employees } = storeToRefs(employeeStore)
 const { physicalInventory } = storeToRefs(physicalInventoryStore)
 const { adjustments } = storeToRefs(adjustmentStore)
+
+const showEmployeeModalForManager = ref(false)
+const showEmployeeModalForInventory = ref(false)
 
 const PIProducts = {
   product_id: '',
@@ -249,11 +269,8 @@ const isViewOrEdit = computed(() => {
   return route.query.id ? true : false
 })
 
-const adjustmentsMade = computed(
-  () => adjustments
-          .value.filter(
-            a => a.physical_inventory_id == route.query.id
-          )
+const adjustmentsMade = computed(() =>
+  adjustments.value.filter((a) => a.physical_inventory_id == route.query.id)
 )
 
 const managerOptions = computed(() => {
