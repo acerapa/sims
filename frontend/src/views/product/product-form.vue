@@ -427,7 +427,7 @@ const onSubmit = async () => {
     data.details.product_setting_id = null
   }
 
-  if (data.categories.length && !isView) {
+  if (data.categories.length && !data.category) {
     const categoriesCopy = ObjectHelpers.copyArr(data.categories)
     data.category = categoriesCopy.pop()
     model.value.category = categoriesCopy.pop()
