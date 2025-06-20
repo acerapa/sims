@@ -4,6 +4,7 @@
       :has-add-btn="true"
       :data="filteredData"
       :has-pagination="true"
+      :has-check-box="false"
       :row-prop-init="eventRowInit"
       :table-row-component="PhysicalInventoryRow"
       :btn-custom-text="'New Physical Inventory'"
@@ -13,7 +14,7 @@
       <template #table_header>
         <div class="grid grid-cols-4 gap-3 min-w-[935px]">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input type="checkbox" class="input" v-if="false" />
             <p class="table-header">#</p>
           </div>
           <p class="col-span-1 table-header">Date Started</p>

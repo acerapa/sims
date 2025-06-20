@@ -10,6 +10,7 @@
       :has-add-btn="true"
       :data="filteredData"
       :has-pagination="true"
+      :has-check-box="false"
       @add-new-record="onNewRecord"
       v-model:search-text="searchText"
       :row-prop-init="employeeRowEvent"
@@ -19,7 +20,7 @@
       <template #table_header>
         <div class="grid grid-cols-12 gap-3 items-center min-w-[792px]">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input type="checkbox" class="input" v-if="false" />
             <p class="table-header">#</p>
           </div>
           <p class="col-span-2 table-header">Name</p>

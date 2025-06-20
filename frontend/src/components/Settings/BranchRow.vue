@@ -4,7 +4,7 @@
     @click.stop="viewRow(props.branch.id)"
   >
     <div class="col-span-1 flex gap-3 items-center h-fit">
-      <input type="checkbox" class="input" />
+      <input type="checkbox" class="input" v-if="props.hasCheckBox" />
       <p class="text-sm">{{ props.branch.id }}</p>
     </div>
     <p class="col-span-2 text-sm">
@@ -31,6 +31,10 @@ const props = defineProps({
   branch: {
     type: Object,
     default: () => ({})
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 

@@ -4,7 +4,7 @@
     @click="$emit('view', props.fixAsset.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
-      <input type="checkbox" class="input" />
+      <input type="checkbox" class="input" v-if="props.hasCheckBox" />
       <p class="text-sm">{{ props.fixAsset.id }}</p>
     </div>
     <p class="col-span-1 text-sm">{{ props.fixAsset.po_no }}</p>
@@ -30,6 +30,10 @@ const props = defineProps({
   fixAsset: {
     type: Object,
     default: () => ({})
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 

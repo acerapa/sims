@@ -3,6 +3,7 @@
     <CustomTable
       :data="filteredData"
       :has-pagination="true"
+      :has-check-box="false"
       title="Sales Order List"
       :row-prop-init="rowPropInit"
       @add-new-record="onAddNewRecord"
@@ -13,7 +14,7 @@
       <template #table_header>
         <div class="grid grid-cols-10 gap-3 min-w-[935px]">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input type="checkbox" class="input" v-if="false" />
             <p class="table-header">#</p>
           </div>
           <p class="col-span-1 table-header">Type</p>

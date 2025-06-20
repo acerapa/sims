@@ -7,13 +7,14 @@
       :data="filteredData"
       v-model:search-text="searchText"
       :row-prop-init="rowEventName"
+      :has-check-box="false"
       :has-pagination="true"
       @view="onView"
     >
       <template #table_header>
         <div class="grid gap-3 grid-cols-9 min-w-[985px]">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input type="checkbox" class="input" v-if="false" />
             <p class="table-header">#</p>
           </div>
           <p class="col-span-2 table-header">Customer</p>

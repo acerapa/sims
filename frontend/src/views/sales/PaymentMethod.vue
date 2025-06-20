@@ -3,6 +3,7 @@
     <CustomTable
       class="!w-auto"
       :data="filteredData"
+      :has-check-box="false"
       title="Payment Method list"
       :row-prop-init="rowPropInit"
       :table-row-component="PaymentMethodRow"
@@ -12,7 +13,7 @@
       <template #table_header>
         <div class="grid gap-3 grid-cols-8">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input type="checkbox" class="input" v-if="false" />
             <p class="table-header">#</p>
           </div>
           <p class="col-span-7 table-header">Name</p>
