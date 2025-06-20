@@ -23,7 +23,7 @@ PurchaseOrder.init(
     },
     bill_due: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
     amount: {
       type: DataTypes.DECIMAL(10, 2),

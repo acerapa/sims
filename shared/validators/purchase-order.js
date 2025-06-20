@@ -8,7 +8,6 @@ const PurchaseOrderSchema = Joi.object({
     "*": "Ref no. is required",
   }),
   date: Joi.date().label("Date").required(),
-  bill_due: Joi.date().label("Bill due").required(),
   amount: Joi.number().label("Amount").required(),
   memo: Joi.string().allow("", null).optional(),
   supplier_id: Joi.alternatives(Joi.string(), Joi.number())
@@ -17,6 +16,11 @@ const PurchaseOrderSchema = Joi.object({
       "*": "Supplier is required",
     }),
   type: Joi.string().label("Type").valid("term", "cod").required(),
+  bill_due: Joi.when("type", {
+    is: "cod",
+    then: Joi.allow(null, '').optional().strip(),
+    otherwise: Joi.date().label("Bill due").required()
+  }),
   term_start: Joi.date()
     .label("Term Start")
     .when("type", {
