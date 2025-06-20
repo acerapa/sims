@@ -9,7 +9,7 @@
         <CustomInput
           type="checkbox"
           name="checkbox"
-          v-if="!props.isDisabled"
+          v-if="!props.isDisabled && props.hasCheckBox"
           class="flex-shrink-0 mt-[10px]"
         />
         <CustomInput
@@ -94,6 +94,10 @@ const props = defineProps({
   eventName: {
     type: String,
     required: false
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 

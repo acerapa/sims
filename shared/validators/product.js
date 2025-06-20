@@ -67,8 +67,10 @@ const ProductSchema = Joi.object({
   expense_account: Joi.number().required().messages({
     "*": "Expense account is required",
   }),
-  pref_sup_id: Joi.number().required().messages({
-    "*": "Preferred Supplier is required!"
+  pref_sup_id: Joi.when("type", {
+    is: ItemType.INVENTORY,
+    then: Joi.number().required().messages({ "*": "Preferred Supplier is required!" }),
+    otherwise: Joi.allow(null, '').optional().strip()
   })
 });
 

@@ -10,6 +10,7 @@
         :has-add-btn="true"
         :data="filteredData"
         :has-pagination="true"
+        :has-check-box="false"
         :row-prop-init="vendorRowEvent"
         v-model:search-text="searchText"
         :table-row-component="VendorRow"
@@ -24,7 +25,7 @@
         <template #table_header>
           <div class="grid grid-cols-6 gap-3 items-center min-w-[564px]">
             <div class="col-span-1 flex gap-3 items-center">
-              <input type="checkbox" class="input" />
+              <input type="checkbox" class="input" v-if="false" />
               <p class="table-header">#</p>
             </div>
             <p class="col-span-3 table-header">Company Name</p>

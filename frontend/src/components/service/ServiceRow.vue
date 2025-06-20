@@ -4,7 +4,7 @@
     @click="emit('view', props.service.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
-      <input type="checkbox" class="input" />
+      <input type="checkbox" v-if="props.hasCheckBox" class="input" />
       <p class="text-sm">{{ props.service.id }}</p>
     </div>
     <p class="col-span-2 text-sm truncate">
@@ -33,6 +33,10 @@ const props = defineProps({
   service: {
     type: Object,
     default: () => ({})
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 

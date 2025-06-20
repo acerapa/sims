@@ -89,6 +89,7 @@
         <p class="font-semibold">Select Product</p>
         <MultiSelectTable
           v-model="model.products"
+          :has-check-box="false"
           :header-component="IbrrSelectHeader"
           :row-component="ProductSelectRow"
           :format="productDefaultValue"

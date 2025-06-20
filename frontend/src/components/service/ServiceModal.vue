@@ -166,7 +166,13 @@ const onSubmit = async () => {
   // validate data
   validateData()
 
-  if (hasErrors.value) return
+  if (hasErrors.value) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Some fields are not properly inputed please check!'
+    })
+    return
+  }
 
   let isSuccess = false
   if (props.selectedId) {

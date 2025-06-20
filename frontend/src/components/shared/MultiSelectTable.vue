@@ -3,6 +3,7 @@
     <component
       :is="props.headerComponent"
       v-bind="{ isDisabled: props.isDisabled }"
+      :has-check-box="props.hasCheckBox"
       class="mb-4"
     />
     <div class="flex flex-col gap-4">
@@ -18,6 +19,7 @@
         v-model="dataInputs[ndx]"
         v-bind="propsBinder(ndx)"
         @remove="onRemove(ndx)"
+        :has-check-box="props.hasCheckBox"
       ></component>
       <div class="flex flex-col gap-4" v-if="!dataInputs.length">
         <p class="text-center text-sm">Table has no data!</p>
@@ -76,6 +78,10 @@ const props = defineProps({
   rowProps: {
     type: Object,
     required: false
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 

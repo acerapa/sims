@@ -89,6 +89,7 @@
           v-model="model.products"
           :header-component="ProductSelectHeader"
           :row-component="ProductSelectRow"
+          :has-check-box="false"
           :format="{ ...productDefaultValue }"
           :row-event-name="rowEventName"
           :is-disabled="isCompleted || isCancelled"

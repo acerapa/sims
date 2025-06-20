@@ -4,7 +4,7 @@
     @click="emit('view', props.account.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
-      <input type="checkbox" class="input" />
+      <input type="checkbox" class="input" v-if="props.hasCheckBox" />
       <p class="text-sm">{{ props.account.id }}</p>
     </div>
     <p class="col-span-3 text-sm">{{ props.account.name }}</p>
@@ -22,6 +22,10 @@ const props = defineProps({
   account: {
     type: Object,
     default: () => ({})
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 </script>

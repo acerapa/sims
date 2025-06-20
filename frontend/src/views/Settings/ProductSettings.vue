@@ -14,6 +14,7 @@
       <div ref="tableRefPoint">
         <CustomTable
           :has-pagination="true"
+          :has-check-box="false"
           title="Product Reordering Point"
           :data="filteredReorderingPoints"
           @add-new-record="onNewReorderingPoint"
@@ -24,7 +25,7 @@
           <template #table_header>
             <div class="grid grid-cols-5 gap-3 min-w-[430px]">
               <div class="col-span-2 flex gap-3 items-center">
-                <input type="checkbox" class="input" />
+                <input type="checkbox" class="input" v-if="false" />
                 <p class="table-header">#</p>
               </div>
               <p class="table-header col-span-3">Points</p>

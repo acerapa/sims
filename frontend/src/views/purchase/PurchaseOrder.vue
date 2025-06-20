@@ -17,6 +17,7 @@
       :has-filter="true"
       :data="filteredData"
       :has-pagination="true"
+      :has-check-box="false"
       v-model:search-text="searchText"
       btn-custom-text="New purchase order"
       :row-prop-init="purchaseOrderRowEvent"
@@ -27,7 +28,7 @@
       <template #table_header>
         <div class="grid grid-cols-11 gap-3 min-w-[935px]">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input type="checkbox" class="input" v-if="false" />
             <p class="table-header">#</p>
           </div>
           <p class="col-span-2 table-header">Ref. No.</p>

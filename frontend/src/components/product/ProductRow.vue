@@ -4,7 +4,7 @@
     @click="emit('view', props.product.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
-      <input type="checkbox" class="input" />
+      <input type="checkbox" class="input"  v-if="props.hasCheckBox"/>
       <p class="text-sm">{{ props.product.id }}</p>
     </div>
     <p class="col-span-3 text-sm truncate" :title="props.product.name">
@@ -65,6 +65,10 @@ const props = defineProps({
   product: {
     type: Object,
     default: () => ({})
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 
