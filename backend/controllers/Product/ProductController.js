@@ -8,7 +8,7 @@ const ProductToCategories = require("../../models/junction/product-to-categories
 const ProductDetails = require("../../models/product-details");
 const ProductSupplier = require("../../models/product-supplier");
 
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const { ProductType } = require("shared");
 const { sequelize } = require("../../models/index");
 const {
@@ -19,8 +19,14 @@ const InvoiceProducts = require("../../models/junction/invoice-products");
 const SalesOrderProduct = require("../../models/junction/sales-order-product");
 const PurchaseOrderProducts = require("../../models/junction/purchase-order-products");
 const SalesOrder = require("../../models/sales-order");
-const { SalesOrderStatus, PurchaseOrderStatus } = require("shared/enums");
+const {
+  SalesOrderStatus,
+  PurchaseOrderStatus,
+  InvoiceStatus,
+} = require("shared/enums");
 const PurchaseOrder = require("../../models/purchase-order");
+const ReceivedPayment = require("../../models/received-payment");
+const Invoice = require("../../models/invoice");
 
 module.exports = {
   all: async (req, res) => {
@@ -479,6 +485,20 @@ module.exports = {
                 model: InvoiceProducts,
                 as: "invoice_products",
                 attributes: ["id", "invoice_id", "quantity"],
+                include: [
+                  {
+                    model: Invoice,
+                    as: "invoice",
+                    required: true,
+                    include: [
+                      {
+                        model: ReceivedPayment,
+                        as: "received_payments",
+                        required: true,
+                      },
+                    ],
+                  },
+                ],
               },
               {
                 model: SalesOrderProduct,
@@ -487,10 +507,32 @@ module.exports = {
                   {
                     model: SalesOrder,
                     as: "sales_order",
-                    where: {
-                      status: SalesOrderStatus.OPEN,
-                    },
                     required: true,
+                    where: {
+                      [Op.and]: [
+                        {status: { [Op.ne]: SalesOrderStatus.CANCELLED }},
+                        {
+                          [Op.or]: [
+                            // No invoice
+                            Sequelize.literal(`NOT EXISTS (
+                              SELECT 1 FROM \`${Invoice.getTableName()}\` AS \`invoice\`
+                              WHERE \`invoice\`.\`sales_order_id\` = \`products->so_products->sales_order\`.\`id\`
+                            )`),
+
+                            // Has in invoice but should only have unpaid status
+                            Sequelize.literal(`EXISTS (
+                              SELECT 1 FROM \`${Invoice.getTableName()}\` as \`invoice\`
+                              WHERE \`invoice\`.\`sales_order_id\` = \`products->so_products->sales_order\`.\`id\`
+                              AND invoice.status = '${InvoiceStatus.UNPAID}'
+                            ) AND NOT EXISTS (
+                              SELECT 1 FROM \`${Invoice.getTableName()}\` as \`invoice\`
+                              WHERE \`invoice\`.\`sales_order_id\` = \`products->so_products->sales_order\`.\`id\`
+                              AND \`invoice\`.\`status\` != '${InvoiceStatus.UNPAID}'
+                            )`)
+                          ]
+                        }
+                      ],
+                    },
                     attributes: ["id"],
                   },
                 ],
@@ -526,6 +568,7 @@ module.exports = {
         "Successfully fetched!",
       );
     } catch (e) {
+      console.log(e);
       res.sendError(e, "Something wen't wrong!");
     }
   },

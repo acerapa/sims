@@ -22,7 +22,7 @@
         {{ p.product_details.stock }}
       </p>
       <p class="col-span-1 text-right mr-2">{{ getSales(p) }}</p>
-      <p class="col-span-1 text-right mr-2">{{ 0 }}</p>
+      <p class="col-span-1 text-right mr-2">{{ getAvailable(p) }}</p>
       <p class="col-span-1 text-right mr-2">{{ getOS(p) }}</p>
       <p class="col-span-1 text-right mr-2">{{ getPO(p) }}</p>
     </div>
@@ -126,8 +126,6 @@ const totalQuantity = computed(() =>
     .reduce((a, b) => a + b, 0)
 )
 
-const totalAvailable = computed(() => 0) // this is temporary and to be discuss pa
-
 const totalOS = computed(() =>
   props.category.products.map((p) => getOS(p)).reduce((a, b) => a + b, 0)
 )
@@ -136,6 +134,7 @@ const totalPO = computed(() =>
   props.category.products.map((p) => getPO(p)).reduce((a, b) => a + b, 0)
 )
 
+const totalAvailable = computed(() => totalQuantity.value - totalOS.value) // this is temporary and to be discuss pa
 /** ================================================
  * METHODS
  ** ================================================*/
@@ -167,6 +166,10 @@ const getPO = (p) => {
   })
 
   return purchaseOrders
+}
+
+const getAvailable = (p) => {
+  return p.product_details.stock - getOS(p)
 }
 
 /** ================================================

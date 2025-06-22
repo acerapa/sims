@@ -95,6 +95,17 @@ Product.hasMany(InvoiceProducts, {
   as: "invoice_products",
 });
 
+// Invoice Products to Invoices
+InvoiceProducts.belongsTo(Invoice, {
+  foreignKey: "invoice_id",
+  as: "invoice"
+})
+
+Invoice.hasMany(InvoiceProducts, {
+  foreignKey: "invoice_id",
+  as: "invoice_products"
+})
+
 // invoice to customer
 Invoice.belongsTo(Customer, {
   foreignKey: "customer_id",
