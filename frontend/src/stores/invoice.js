@@ -3,11 +3,9 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useSalesStore } from './sales'
 import { SalesOrderStatus } from 'shared'
-import { useProductStore } from './product'
 
 export const useInvoiceStore = defineStore('invoice', () => {
   const salesOrderStore = useSalesStore()
-  const productStore = useProductStore()
   const invoice = ref()
   const invoices = ref([])
 
@@ -40,10 +38,7 @@ export const useInvoiceStore = defineStore('invoice', () => {
 
     const isSuccess = res.status < 400
 
-    if (isSuccess) {
-      // update all products data
-      await productStore.fetchAllProducts()
-      
+    if (isSuccess) {      
       if (invoices.value.length) {
         invoices.value.unshift(res.data.invoice)
       } else {

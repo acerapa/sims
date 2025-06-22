@@ -73,35 +73,9 @@ module.exports = {
               );
             }),
           );
-
-          // Deduct product stock from what invoice recorded
-          // getting all product id stocks
-          const productStocks = await ProductDetails.findAll({
-            where: {
-              product_id: {
-                [Op.in]: products.map((p) => p.product_id),
-              },
-            },
-            attributes: ["product_id", "stock"],
-          });
-
-          await Promise.all(
-            products.map((product) => {
-              const productStock = productStocks.find(
-                (ps) => ps.product_id == product.product_id,
-              );
-              return ProductDetails.update(
-                { stock: productStock.stock - product.quantity },
-                {
-                  where: {
-                    product_id: product.product_id,
-                  },
-                },
-              );
-            }),
-          );
         }
 
+        // Update invoice status to invoiced
         if (invoice.sales_order_id) {
           await SalesOrder.update(
             { status: SalesOrderStatus.INVOICED },
