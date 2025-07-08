@@ -1,4 +1,11 @@
 <template>
-	<div>Purchase By Vendor header</div>
+	<div class="grid grid-cols-10 gap-3 min-w-[1158px]">
+		<p class="col-span-2 table-header">Supplier</p>
+		<p class="col-span-1 table-header">Delivery Date</p>
+		<p class="col-span-1 table-header">Delivery No.</p>
+		<p class="col-span-3 table-header">Item Description</p>
+		<p class="col-span-1 table-header">Quantity</p>
+		<p class="col-span-1 table-header">Cost</p>
+		<p class="col-span-1 table-header">Total</p>
+	</div>
 </template>
-<script setup></script>
