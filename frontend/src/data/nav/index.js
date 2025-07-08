@@ -154,7 +154,13 @@ export default [
     text: 'Reports',
     route: 'reports',
     icon: reports,
-    children: []
+    children: [
+      {
+        text: 'Purchase By Vendor Detailed Report',
+        route: PurchaseConst.PURCHASE_BY_VENDOR_DETAILED_REPORT,
+        icon: outlineDot
+      }
+    ]
   },
   {
     text: 'Employees',

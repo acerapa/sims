@@ -20,7 +20,8 @@ export const PurchaseConst = Object.freeze({
   PURCHASE_ORDER: 'purchase-order',
   PURCHASE_ORDER_FORM: 'purchase-order-form',
   PURCHASE_RECEIVING_ORDER: 'purchase-receiving-order',
-  VENDORS: 'vendors'
+  VENDORS: 'vendors',
+  PURCHASE_BY_VENDOR_DETAILED_REPORT: 'purchase-by-vendor-detailed-report'
 })
 
 export const SalesConst = Object.freeze({
