@@ -62,6 +62,10 @@ PurchaseOrder.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    received_date: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     address_id: {
       type: DataTypes.INTEGER,
       references: {

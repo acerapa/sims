@@ -1,12 +1,17 @@
 const Product = require("../models/product")
 const PurchaseOrder = require("../models/purchase-order")
 const Supplier = require("../models/supplier")
+const ProductDetails = require("../models/product-details")
 const { groupPurchaseByVendor } = require("../services/PurchaseReportService")
+const { PurchaseOrderStatus } = require("shared")
 
 module.exports = {
 	purchaseByVendor: async (req, res) => {
 		try {
 			const purchaseOrders = await PurchaseOrder.findAll({
+				where: {
+					status: PurchaseOrderStatus.COMPLETED
+				},
 				include: [
 					{
 						model: Supplier,
@@ -15,7 +20,13 @@ module.exports = {
 					{
 						model: Product,
 						as: 'products',
-						attributes: ['id']
+						attributes: ['id'],
+						include: [
+							{
+								model: ProductDetails,
+								as: 'product_details'
+							}
+						]
 					}
 				]
 			})

@@ -1,15 +1,24 @@
 const groupPurchaseByVendor = (purchaseOrders) => {
-	const groupedPOByVendor = {}
+	const groupedPOByVendor = []
 
 	purchaseOrders.forEach(po => {
 		const supplier = po.supplier
+		
+		// find index of supplier if already exist
+		const index = groupedPOByVendor.findIndex(po => po.supplier.id == supplier.id)
 
-		// Check if the 
-		if (!groupedPOByVendor[supplier.id.toString()]) {
-			groupedPOByVendor[supplier.id.toString()] = []
+		if (index < 0) {
+			groupedPOByVendor.push({
+				supplier: supplier,
+				pos: [po]
+			})
+		} else {
+			// check if po is already added
+			if (!groupedPOByVendor[index].pos.map(p => p.id).includes(po.id)) {
+				groupedPOByVendor[index].pos.push(po)
+			}
 		}
 
-		groupedPOByVendor[supplier.id.toString()].push(po)
 	})
 
 	return groupedPOByVendor

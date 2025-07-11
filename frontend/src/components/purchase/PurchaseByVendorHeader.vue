@@ -4,8 +4,8 @@
 		<p class="col-span-1 table-header">Delivery Date</p>
 		<p class="col-span-1 table-header">Delivery No.</p>
 		<p class="col-span-3 table-header">Item Description</p>
-		<p class="col-span-1 table-header">Quantity</p>
-		<p class="col-span-1 table-header">Cost</p>
-		<p class="col-span-1 table-header">Total</p>
+		<p class="col-span-1 table-header text-center">Quantity</p>
+		<p class="col-span-1 table-header text-end">Cost</p>
+		<p class="col-span-1 table-header text-end">Total</p>
 	</div>
 </template>

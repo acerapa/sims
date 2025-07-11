@@ -1,28 +1,41 @@
 <template>
   <div class="table-wrapper">
-    <div class="flex flex-col gap-2" v-if="purchaseOrder">
-      <p><b>PO #:</b> {{ purchaseOrder.id }}</p>
-      <p>
-        <b>Date Ordered #:</b>
-        {{ DateHelpers.formatDate(purchaseOrder.date) }}
-      </p>
-      <p>
-        <b>Supplier:</b>
-        {{ purchaseOrder.supplier.company_name }}
-      </p>
-      <div class="flex items-center gap-2">
-        <p><b>Delivery Number:</b></p>
-        <CustomInput
-          type="text"
-          class="w-fit"
-          :error-has-text="true"
-          name="delivery_number"
-          :disabled="isCompleted"
-          placeholder="Delivery Number"
-          v-model="model.order.delivery_number"
-          :error="errors.order?.delivery_number"
-        />
+    <div class="flex justify-between">
+      <div class="flex flex-col gap-2" v-if="purchaseOrder">
+        <p><b>PO #:</b> {{ purchaseOrder.id }}</p>
+        <p>
+          <b>Date Ordered #:</b>
+          {{ DateHelpers.formatDate(purchaseOrder.date) }}
+        </p>
+        <p>
+          <b>Supplier:</b>
+          {{ purchaseOrder.supplier.company_name }}
+        </p>
+        <div class="flex items-center gap-2">
+          <p><b>Delivery Number:</b></p>
+          <CustomInput
+            type="text"
+            class="w-fit"
+            :error-has-text="true"
+            name="delivery_number"
+            :disabled="isCompleted"
+            placeholder="Delivery Number"
+            v-model="model.order.delivery_number"
+            :error="errors.order?.delivery_number"
+          />
+        </div>
       </div>
+      <CustomInput
+        type="date"
+        :has-label="true"
+        label="Date Received"
+        :error-has-text="true"
+        :disabled="isCompleted"
+        :error="errors.order?.received_date"
+        v-model="model.order.received_date"
+        label-css="text-sm font-bold text-gray-500"
+        class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
+      />
     </div>
     <hr class="-mx-4" />
     <div class="" ref="tableWrapper">
@@ -104,7 +117,8 @@ useTableScroll(tableWrapper)
 const modelDefualtValue = {
   order: {
     status: PurchaseOrderStatus.COMPLETED,
-    delivery_number: ''
+    delivery_number: '',
+    received_date: '',
   },
   products: [
     {
@@ -189,10 +203,12 @@ const onSubmit = async () => {
  * LIFE CYCLE HOOKS
  ** ================================================*/
 onMounted(async () => {
+  model.value.order.received_date = DateHelpers.formatDate(new Date(), 'YYYY-MM-DD')
   if (route.params.id) {
     await purchaseOrderStore.fetchPurchaseOrderById(route.params.id)
 
     model.value.order.delivery_number = purchaseOrder.value.delivery_number
+    model.value.order.received_date = DateHelpers.formatDate(purchaseOrder.value.received_date, 'YYYY-MM-DD')
 
     model.value.products = [
       ...purchaseOrderStore.purchaseOrder.products.map((product) => {
