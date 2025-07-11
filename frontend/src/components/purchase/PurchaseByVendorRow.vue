@@ -51,6 +51,4 @@ const props = defineProps({
 const totalPOAmount = computed(() => {
 	return props.po.pos.map(po => parseFloat(po.amount)).reduce((a, b) => a + b, 0)
 })
-
-console.log(props.po)
 </script>

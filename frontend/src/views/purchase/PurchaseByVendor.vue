@@ -1,6 +1,7 @@
 <template>
 	<div ref="tableRef">
 		<CustomTable
+			:has-tools="false"
 			:data="filteredData"
 			:row-prop-init="rowPropInit"
 			:table-header-component="PurchaseByVendorHeader"
