@@ -68,6 +68,9 @@ const ReceiveOrderSchema = Joi.object({
   delivery_number: Joi.string().required().messages({
     "*": "Delivery number is required",
   }),
+  received_date: Joi.date().required().messages({
+    "*": "Received date is required"
+  })
 });
 
 const ReceivePurchaseProductSchema = Joi.object({

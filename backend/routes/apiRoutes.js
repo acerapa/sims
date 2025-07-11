@@ -70,6 +70,9 @@ protectedRoutes.use(
   "/physical-inventory-adjustments",
   physicalInventoryAdjustmentRoutes
 );
+
+const purchaseReportRoutes = require("./PurchaseReportRoutes");
+protectedRoutes.use("/reports", purchaseReportRoutes)
 // end use routes
 
 // register protected routes
