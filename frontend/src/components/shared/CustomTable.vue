@@ -59,9 +59,9 @@
                 {{ val }}
               </option>
             </select>
-          </div>
-          <div>
-            <slot name="tools"></slot>
+            <div>
+              <slot name="tools"></slot>
+            </div>
           </div>
           <div class="flex gap-3" v-if="props.hasAddBtn">
             <button
