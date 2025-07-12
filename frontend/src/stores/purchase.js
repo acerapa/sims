@@ -5,8 +5,8 @@ import { ref } from 'vue'
 export const usePurchaseStore = defineStore('purchase', () => {
 	const purchaseByVendor = ref([])
 
-	const fetchPurchaseByVendor = async () => {
-		const res = await api('reports/purchase-by-vendor')
+	const fetchPurchaseByVendor = async (from, to) => {
+		const res = await api(`reports/purchase-by-vendor?from=${from}&to=${to}`)
 
 		const isSuccess = res.status < 400
 
