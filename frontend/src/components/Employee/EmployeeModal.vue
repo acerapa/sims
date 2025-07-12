@@ -180,16 +180,17 @@ const onSubmit = async () => {
   if (hasErrors.value) return
 
   let isSuccess = false
+  let res = null
   if (props.selectedId) {
-    isSuccess = await employeeStore.updateEmployee(
-      props.selectedId,
-      model.value
-    )
+    res = await employeeStore.updateEmployee(props.selectedId, model.value)
+    isSuccess = updateRes.isSuccess
   } else {
-    let res = await employeeStore.registerEmployee(model.value)
+    res = await employeeStore.registerEmployee(model.value)
     isSuccess = res.isSuccess
-    id.value = res.data.id
+    id.value = res.data?.id
   }
+
+  extractError(res.response)
 
   if (isSuccess) {
     showModal.value = false
@@ -218,6 +219,18 @@ const onAfterDelete = async () => {
 
   showModal.value = false
   showConfirmModal.value = false
+}
+
+const extractError = (response) => {
+  const resKeys = Object.keys(response.data)
+  if (resKeys.includes('fields') && resKeys.includes('errors')) {
+    const fields = Object.keys(response.data['fields'])
+    fields.forEach((field) => {
+      errors.value[field] = response.data['errors'].find((err) =>
+        err.path.includes(field)
+      ).message
+    })
+  }
 }
 
 /** ================================================

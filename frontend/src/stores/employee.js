@@ -34,7 +34,8 @@ export const useEmployeeStore = defineStore('employee', () => {
     }
     return {
       isSuccess,
-      data: res.data.user
+      data: res.data.user,
+      response: res
     }
   }
 
@@ -57,7 +58,11 @@ export const useEmployeeStore = defineStore('employee', () => {
       }
     }
 
-    return isSuccess
+    return {
+      isSuccess,
+      data: employee,
+      response: res
+    }
   }
 
   const removeEmployee = async (id) => {
