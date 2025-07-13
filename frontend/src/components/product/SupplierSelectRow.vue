@@ -19,8 +19,10 @@
     />
     <CustomInput
       name="cost"
+      :icon="peso"
       type="number"
       class="col-span-1"
+      input-class="flex-1"
       v-model="model.cost"
       :error-has-text="false"
       :error="modelErrors.cost"
@@ -48,6 +50,9 @@ import Event from '@/event'
 
 import CustomInput from '../shared/CustomInput.vue'
 import VendorModal from '../Vendor/VendorModal.vue'
+
+// icons
+import peso from '@/assets/icons/peso.png'
 
 const showVendorModal = ref(false)
 const supplierStore = useVendorStore()

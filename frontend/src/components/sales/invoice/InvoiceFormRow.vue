@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid gap-3 min-w-[1295px]"
+    class="grid gap-3 min-w-[1295px] items-center"
     :class="props.isDisabled ? 'grid-cols-12' : 'grid-cols-13'"
   >
     <CustomInput
@@ -22,6 +22,7 @@
       type="text"
       name="serial_number"
       class="col-span-3"
+      input-class="w-full"
       v-model="model.serial_number"
       placeholder="Serial Number"
       :error-has-text="false"
@@ -29,49 +30,82 @@
       :error="modelErrors.serial_number"
     />
 
-    <CustomInput
-      type="number"
-      name="quantity"
-      class="col-span-1"
-      v-model="model.quantity"
-      placeholder=""
-      :error-has-text="false"
-      :disabled="props.isDisabled"
-      :error="modelErrors.quantity"
-    />
+    <div class="col-span-1">
+      <CustomInput
+        v-if="!props.isDisabled"
+        type="number"
+        name="quantity"
+        class="col-span-1"
+        v-model="model.quantity"
+        placeholder=""
+        input-class="w-full"
+        :error-has-text="false"
+        :disabled="props.isDisabled"
+        :error="modelErrors.quantity"
+      />
+      <p class="text-sm text-center" v-if="props.isDisabled">
+        {{ model.quantity }}
+      </p>
+    </div>
 
-    <CustomInput
-      type="number"
-      name="price"
-      class="col-span-1"
-      placeholder="Price"
-      v-model="model.price"
-      :error-has-text="false"
-      :error="modelErrors.price"
-      :disabled="props.isDisabled"
-    />
+    <div class="col-span-1">
+      <CustomInput
+        type="number"
+        name="price"
+        :icon="peso"
+        v-if="!props.isDisabled"
+        class="col-span-1"
+        placeholder="Price"
+        input-class="w-full"
+        v-model="model.price"
+        :error-has-text="false"
+        :error="modelErrors.price"
+        :disabled="props.isDisabled"
+      />
+      <p class="text-sm text-end" v-if="props.isDisabled">
+        ₱ {{ model.price }}
+      </p>
+    </div>
 
-    <CustomInput
-      type="number"
-      name="discount"
-      class="col-span-1"
-      placeholder="Discount"
-      v-model="model.discount"
-      :error-has-text="false"
-      :disabled="props.isDisabled"
-      :error="modelErrors.discount"
-    />
+    <div class="col-span-1">
+      <CustomInput
+        :icon="peso"
+        type="number"
+        name="discount"
+        class="col-span-1"
+        input-class="w-full"
+        placeholder="Discount"
+        v-if="!props.isDisabled"
+        v-model="model.discount"
+        :error-has-text="false"
+        :disabled="props.isDisabled"
+        :error="modelErrors.discount"
+      />
 
-    <CustomInput
-      type="number"
-      name="total"
-      class="col-span-1"
-      placeholder="Total"
-      v-model="model.total"
-      :error-has-text="false"
-      :error="modelErrors.total"
-      :disabled="props.isDisabled"
-    />
+      <p class="text-sm text-end" v-if="props.isDisabled">
+        ₱ {{ model.discount }}
+      </p>
+    </div>
+
+    <div class="col-span-1">
+      <CustomInput
+        name="total"
+        :icon="peso"
+        type="number"
+        class="col-span-1"
+        placeholder="Total"
+        input-class="w-full"
+        v-model="model.total"
+        :error-has-text="false"
+        v-if="!props.isDisabled"
+        :error="modelErrors.total"
+        :disabled="props.isDisabled"
+      />
+      <p class="text-sm text-end" v-if="props.isDisabled">
+        ₱ {{ model.total }}
+      </p>
+    </div>
+
     <p
       class="col-span-1 text-sm pl-3 mt-[10px]"
       :class="[props.isDisabled ? 'hidden' : '']"
@@ -93,6 +127,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import Event from '@/event'
 import { useRouter } from 'vue-router'
 import { InventoryConst, SalesConst } from '@/const/route.constants'
+import peso from '@/assets/icons/peso.png'
 
 const props = defineProps({
   ndx: {

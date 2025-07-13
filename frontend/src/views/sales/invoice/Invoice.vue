@@ -22,7 +22,7 @@
           <p class="col-span-1 table-header">Issue Date</p>
           <p class="col-span-1 table-header">Due Date</p>
           <p class="col-span-1 table-header">Status</p>
-          <p class="col-span-1 table-header">Total</p>
+          <p class="col-span-1 table-header text-end">Total</p>
         </div>
       </template>
     </CustomTable>

@@ -13,6 +13,7 @@
         type="number"
         class="mt-6"
         :has-label="true"
+        input-class="w-full"
         label="Reordering Point"
         placeholder="Re-ordering Points"
         v-model="model.point"

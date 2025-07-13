@@ -5,10 +5,10 @@
   >
     <p class="table-header col-span-5 pl-3">Item Description</p>
     <p class="table-header col-span-3 pl-3">Serial Number</p>
-    <p class="table-header col-span-1 pl-3">Qty</p>
-    <p class="table-header col-span-1 pl-3">Price</p>
-    <p class="table-header col-span-1 pl-3">Discount</p>
-    <p class="table-header col-span-1 pl-3">Total</p>
+    <p class="table-header col-span-1 pl-3 text-center">Qty</p>
+    <p class="table-header col-span-1 pl-3 text-end">Price</p>
+    <p class="table-header col-span-1 pl-3 text-end">Discount</p>
+    <p class="table-header col-span-1 pl-3 text-end">Total</p>
     <p class="table-header col-span-1 pl-3" v-if="!props.isDisabled">Action</p>
   </div>
 </template>

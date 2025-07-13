@@ -11,25 +11,42 @@
       <small v-if="props.hasLabel" :class="`${props.labelCss} text-gray-600`">{{
         props.label
       }}</small>
-      <input
-        :type="props.type"
-        :name="props.name"
-        :id="props.id ? props.id : props.name"
+      <div
         :class="[
-          'input',
-          props.inputClass,
-          props.error ? 'border-red-500' : ''
+          'group input-wrapper',
+          props.inputWrapperClass
         ]"
-        :step="props.step ? props.step : undefined"
-        :placeholder="props.placeholder"
-        :disabled="props.disabled"
-        v-model="value"
-        @input="emit('input')"
-        @focus="emit('focus')"
-        @blur="emit('blur')"
-        @change="emit('change')"
-        @reset="emit('reset')"
-      />
+      >
+        <div
+          v-if="props.icon"
+          :class="[
+            'group-focus-within:border-black flex border items-center justify-center p-1.5 rounded rounded-r-none min-w-8',
+            props.disabled ? 'border-none' : ''
+          ]"
+        >
+          <img :src="props.icon" class="min-w-5 w-5 h-5" />
+        </div>
+        <input
+          :type="props.type"
+          :name="props.name"
+          :id="props.id ? props.id : props.name"
+          :class="[
+            'input',
+            props.icon ? '!rounded-l-none !border-l-0' : '',
+            props.inputClass,
+            props.error ? 'border-red-500' : ''
+          ]"
+          :step="props.step ? props.step : undefined"
+          :placeholder="props.placeholder"
+          :disabled="props.disabled"
+          v-model="value"
+          @input="emit('input')"
+          @focus="emit('focus')"
+          @blur="emit('blur')"
+          @change="emit('change')"
+          @reset="emit('reset')"
+        />
+      </div>
       <small class="error" v-if="props.errorHasText">{{ props.error }}</small>
     </div>
     <div class="flex flex-col gap-1 relative" v-if="props.type == 'textarea'">
@@ -139,6 +156,10 @@ const props = defineProps({
     type: String,
     required: false
   },
+  inputWrapperClass: {
+    type: String,
+    required: false
+  },
   placeholder: {
     type: String,
     required: false
@@ -194,6 +215,10 @@ const props = defineProps({
     type: String,
     required: false
   },
+  icon: {
+    type: String,
+    required: false
+  },
 
   // Custom select input exclusive props
   removeStrat: {
@@ -223,5 +248,9 @@ const emit = defineEmits([
   bottom: -18px;
   color: #ef4444;
   position: absolute;
+}
+
+.input-wrapper {
+  @apply flex items-stretch;
 }
 </style>

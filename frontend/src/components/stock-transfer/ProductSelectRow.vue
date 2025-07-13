@@ -32,6 +32,7 @@
         type="number"
         name="quantity"
         class="col-span-1"
+        input-class="w-full"
         placeholder="quantity"
         v-model="model.quantity"
         :error-has-text="false"
@@ -41,8 +42,10 @@
       <CustomInput
         name="cost"
         type="number"
+        :icon="peso"
         class="col-span-1"
         placeholder="Cost"
+        input-class="w-full"
         v-model="model.cost"
         :error-has-text="false"
         :error="modelErrors.cost"
@@ -51,7 +54,9 @@
       <CustomInput
         type="number"
         name="amount"
+        :icon="peso"
         class="col-span-1"
+        input-class="w-full"
         placeholder="Amount"
         v-model="model.amount"
         :error-has-text="false"
@@ -80,6 +85,7 @@ import { useProductStore } from '@/stores/product'
 import Event from '@/event'
 import { useRouter } from 'vue-router'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
+import peso from '@/assets/icons/peso.png'
 
 const emit = defineEmits(['remove'])
 

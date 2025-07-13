@@ -1,7 +1,7 @@
 <template>
   <slot></slot>
   <div
-    class="grid gap-3 items-start min-w-[750px]"
+    class="grid gap-3 items-start min-w-[1264px]"
     :class="[props.isDisabled ? 'grid grid-cols-8' : 'grid-cols-9']"
   >
     <div class="col-span-5 flex gap-3">
@@ -30,6 +30,7 @@
       type="number"
       name="quantity"
       class="col-span-1"
+      input-class="w-full"
       placeholder="quantity"
       v-model="product.quantity"
       :disabled="props.isDisabled"
@@ -37,18 +38,22 @@
     />
     <CustomInput
       name="cost"
+      :icon="peso"
       type="number"
       class="col-span-1"
       placeholder="Cost"
+      input-class="w-full"
       v-model="product.cost"
       :disabled="props.isDisabled"
       :error="modelErrors.cost"
     />
     <CustomInput
+      :icon="peso"
       type="number"
       name="amount"
       class="col-span-1"
       placeholder="Amount"
+      input-class="w-full"
       v-model="product.amount"
       :disabled="props.isDisabled"
       :error="modelErrors.amount"
@@ -75,6 +80,7 @@ import { getCost } from '@/helper'
 import { useRouter } from 'vue-router'
 import { InventoryConst, PurchaseConst } from '@/const/route.constants'
 import Event from '@/event'
+import peso from '@/assets/icons/peso.png'
 
 const props = defineProps({
   ndx: {

@@ -15,6 +15,7 @@
         class="flex-1"
         :has-label="true"
         label="Name"
+        input-class="w-full"
         :error="errors.name"
         :error-has-text="true"
       />

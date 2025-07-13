@@ -4,12 +4,13 @@
     v-if="purchaseProductDetails"
   >
     <p class="col-span-2 text-sm">{{ purchaseProductDetails.name }}</p>
-    <p class="col-span-1 text-sm">{{ purchaseProductDetails.cost }}</p>
-    <p class="col-span-1 text-sm">{{ purchaseProductDetails.quantity }}</p>
-    <p class="col-span-1 text-sm">{{ purchaseProductDetails.amount }}</p>
+    <p class="col-span-1 text-sm text-end">₱ {{ purchaseProductDetails.cost }}</p>
+    <p class="col-span-1 text-sm text-center">{{ purchaseProductDetails.quantity }}</p>
+    <p class="col-span-1 text-sm text-end">₱ {{ purchaseProductDetails.amount }}</p>
     <CustomInput
       class="col-span-1"
       type="number"
+      input-class="text-center"
       name="quantity-received"
       :disabled="props.isDisabled"
       v-model="product.quantity_received"
