@@ -33,7 +33,7 @@
         :custom-class="InvoiceStatusMap[props.invoice.status].class"
       />
     </div>
-    <p class="col-span-1 text-sm">₱ {{ props.invoice.total }}</p>
+    <p class="col-span-1 text-sm text-end">₱ {{ props.invoice.total }}</p>
   </div>
 </template>
 

@@ -33,8 +33,8 @@
           </div>
           <p class="col-span-2 table-header">Ref. No.</p>
           <p class="col-span-2 table-header">Supplier</p>
-          <p class="col-span-1 table-header">Total</p>
-          <p class="col-span-2 table-header">Date</p>
+          <p class="col-span-1 table-header text-end">Total</p>
+          <p class="col-span-2 table-header ml-4">Date</p>
           <p class="col-span-2 table-header">Bill Due</p>
           <p class="col-span-1 table-header">Status</p>
         </div>

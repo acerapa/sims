@@ -14,7 +14,7 @@
       {{ props.product.product_details.item_code }}
     </p>
     <p class="col-span-1 text-sm text-end">
-      {{ props.product.price }}
+      ₱ {{ parseFloat(props.product.price).toFixed(2) }}
     </p>
     <p class="col-span-1 text-sm text-end pr-2">
       {{ props.product.product_details.stock }}

@@ -12,6 +12,7 @@
         class="flex-1"
         name="category"
         :has-label="true"
+        input-class="w-full"
         v-model="model.name"
         label="Category Name"
         :error-has-text="true"

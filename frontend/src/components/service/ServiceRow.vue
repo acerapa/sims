@@ -14,7 +14,7 @@
       {{ props.service.service_details.description }}
     </p>
     <p class="col-span-1 text-sm text-end pr-3">
-      {{ parseFloat(props.service.price).toFixed(2) }}
+      ₱ {{ parseFloat(props.service.price).toFixed(2) }}
     </p>
     <p class="col-span-2 text-sm text-center">
       {{

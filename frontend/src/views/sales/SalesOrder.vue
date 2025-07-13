@@ -22,8 +22,8 @@
           <p class="col-span-2 table-header">Sales Person</p>
           <p class="col-span-1 table-header">Purch Date</p>
           <p class="col-span-1 table-header">Pay Mode</p>
-          <p class="col-span-1 table-header">Total</p>
-          <p class="col-span-1 table-header">Status</p>
+          <p class="col-span-1 table-header text-end">Total</p>
+          <p class="col-span-1 table-header text-center">Status</p>
         </div>
       </template>
     </CustomTable>

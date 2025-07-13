@@ -25,8 +25,8 @@
       }}
     </p>
     <p class="col-span-1 text-sm">{{ props.order.payment_method.name }}</p>
-    <p class="col-span-1 text-sm">{{ parseFloat(total).toFixed(2) }}</p>
-    <div class="col-span-1">
+    <p class="col-span-1 text-sm text-end">₱ {{ parseFloat(total).toFixed(2) }}</p>
+    <div class="col-span-1 flex justify-center">
       <BadgeComponent
         :text="SalesOrderStatusMap[props.order.status].text"
         :custom-class="SalesOrderStatusMap[props.order.status].class"

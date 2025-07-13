@@ -110,6 +110,7 @@
                 <CustomInput
                   type="number"
                   name="cost"
+                  :icon="peso"
                   :has-label="true"
                   label="Cost Price"
                   :error-has-text="true"
@@ -118,7 +119,7 @@
                   :error="errors.details?.cost"
                   @focus="resetErrorValue('details.cost')"
                   :disabled="!model.details.is_manually_set_cost"
-                  input-class="disabled:bg-gray-50 disabled:ring-1 disabled:ring-gray-200"
+                  input-class="flex-1 bg-gray-50 disabled:!border-gray-200"
                 />
                 <CustomInput
                   type="checkbox"
@@ -131,10 +132,12 @@
               </div>
               <CustomInput
                 name="sale"
+                :icon="peso"
                 type="number"
                 class="flex-1"
                 :has-label="true"
                 label="Sale Price"
+                input-class="flex-1"
                 :error-has-text="true"
                 placeholder="Sale Price"
                 v-model="model.product.price"
@@ -147,6 +150,7 @@
                 type="number"
                 class="flex-1"
                 :has-label="true"
+                input-class="flex-1"
                 :error-has-text="true"
                 name="quantity_in_stock"
                 label="Quantity in stock"
@@ -161,6 +165,7 @@
                 name="item_code"
                 label="Item Code"
                 :has-label="true"
+                input-class="flex-1"
                 :error-has-text="true"
                 placeholder="Item Code"
                 v-model="model.details.item_code"
@@ -283,6 +288,9 @@ import { useAppStore } from '@/stores/app'
 import { storeToRefs } from 'pinia'
 import { PageStateConst } from '@/const/state.constants'
 import { useRetainPageStateOnReload } from '@/composables/useRetainPageStateOnReload'
+
+// icons
+import peso from '@/assets/icons/peso.png'
 
 // injections and stores
 const route = useRoute()
