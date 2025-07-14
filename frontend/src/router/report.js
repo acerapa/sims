@@ -1,4 +1,4 @@
-import { PurchaseConst } from '@/const/route.constants';
+import { PurchaseConst } from '@/const/route.constants'
 
 export default [
   {
@@ -15,6 +15,15 @@ export default [
         component: () => import('@/views/purchase/PurchaseByVendor.vue'),
         meta: {
           title: 'Purchase By Vendor',
+          requiresAuth: true
+        }
+      },
+      {
+        name: PurchaseConst.PURCHASE_BY_VENDOR_SUMMARY_REPORT,
+        path: 'purchase-by-vendor-summary',
+        component: () => import('@/views/purchase/PurchaseByVendorSummary.vue'),
+        meta: {
+          title: 'Purchase By Vendor Summary',
           requiresAuth: true
         }
       }
