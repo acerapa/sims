@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="mt-10">
-			<p>Here should be the content of the printables</p>
+			<p class="print:text-red-500">Here should be the content of the printables</p>
 		</div>
 	</div>
 </template>

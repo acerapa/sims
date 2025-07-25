@@ -1,11 +1,33 @@
 <template>
-	<div class="bg-gray-300 fixed top-0 left-0 w-screen h-screen flex flex-col items-center p-4">
-		<div class="min-w-[70rem] max-w-7xl flex flex-col gap-3">
-			<div class="flex justify-between items-center">
-				<p>File name</p>
+	<div class="bg-slate-100 flex justify-center h-screen p-10 print:p-0">
+		<div class="lg:max-w-7xl w-full flex flex-col gap-3">
+			<div class="flex justify-between items-center print:hidden">
+				<div class="flex items-center gap-3">
+					<button class="btn !p-2 !rounded-full" @click="onBack">
+						<img :src="leftArrow" class="w-4" alt="" />
+					</button>
+					<p>{{ filename }}</p>
+				</div>
 				<button class="btn">Print</button>
 			</div>
 			<RouterView />
 		</div>
 	</div>
 </template>
+
+<script setup>
+import leftArrow from '@/assets/icons/arrow-left.svg'
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
+const filename = route.meta.filename ? route.meta.filename : 'No filename indicated'
+
+
+/** ================================================
+* METHODS
+** ================================================*/
+const onBack = () => {
+	router.back()
+}
+</script>
