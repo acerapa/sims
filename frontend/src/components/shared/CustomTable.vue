@@ -63,12 +63,13 @@
               <slot name="tools"></slot>
             </div>
           </div>
-          <div class="flex gap-3" v-if="props.hasAddBtn">
+          <div class="flex gap-3">
             <button
               class="bg-primary p-2 rounded flex items-center gap-3"
               @click="onAddNew"
+              v-if="props.hasAddBtn"
             >
-              <img src="@/assets/icons/plus.svg" alt="Plus" />
+              <img src="@/assets/icons/plus.svg" alt="Plus" v-if="props.addBtnHasIcon" />
               <span class="text-white text-sm" v-if="props.btnCustomText">{{
                 props.btnCustomText
               }}</span>
@@ -237,6 +238,10 @@ const props = defineProps({
   btnCustomText: {
     type: String,
     required: false
+  },
+  addBtnHasIcon: {
+    type: Boolean,
+    default: true
   }
 })
 

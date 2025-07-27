@@ -107,7 +107,8 @@ export default [
           import('@/views/sales/printables/SalesOrderPrintable.vue'),
         meta: {
           title: 'Item Details',
-          requiresAuth: true
+          requiresAuth: true,
+          filename: 'Sales Order'
         }
       }
     ]

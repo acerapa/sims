@@ -58,3 +58,9 @@ export const SettingConst = Object.freeze({
   PRODUCT_SETTINGS: 'product-settings',
   ACCOUNT_SETTINGS: 'account-settings'
 })
+
+export const ReportConst = Object.freeze({
+  PRINT_REPORT: 'print-reports',
+  PRINT_PURCHASE_BY_VENDOR_DETAILED: 'print-purchase-by-vendor-detailed',
+  PRINT_PURCHASE_BY_VENDOR_SUMMARY: 'print-purchase-by-vendor-summary'
+})

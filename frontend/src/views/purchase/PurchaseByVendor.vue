@@ -3,6 +3,7 @@
 		<CustomTable
 			:has-tools="true"
 			:data="filteredData"
+			:has-add-btn="false"
 			:row-prop-init="rowPropInit"
 			v-model:searchText="searchText"
 			:table-header-component="PurchaseByVendorHeader"
@@ -28,6 +29,12 @@
 					/>
 				</div>
 			</template>
+			<template #buttons>
+				<button class="btn flex gap-3 items-center" @click="onPrint">
+					<img class="invert w-5" :src="Printer" />
+					<p>Print</p>
+				</button>
+			</template>
 		</CustomTable>
 	</div>
 </template>
@@ -43,9 +50,15 @@ import { usePurchaseStore } from '@/stores/purchase'
 import { EventEnum } from '@/data/event'
 import { useTableScroll } from '@/use/useTableScroll'
 import { DateHelpers } from 'shared'
+import { useRouter } from 'vue-router'
+import { ReportConst } from '@/const/route.constants'
 
 import Event from '@/event'
 
+// import icon
+import Printer from '@/assets/icons/printer.png'
+
+const router = useRouter()
 const purchaseStore = usePurchaseStore()
 
 const searchText = ref('')
@@ -94,6 +107,19 @@ const setFilterDate = () => {
 }
 setFilterDate()
 
+const onPrint = () => {
+	router.push({
+		name: ReportConst.PRINT_PURCHASE_BY_VENDOR_DETAILED,
+		query: {
+			search_text: searchText.value,
+			...dateFilter.value
+		}
+	})
+}
+
+/** ================================================
+ * LIFE CYCLE HOOKS
+ ** ================================================*/
 onMounted(async () => {
 	// call api
 	await purchaseStore.fetchPurchaseByVendor(
