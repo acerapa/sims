@@ -8,7 +8,7 @@
 					</button>
 					<p>{{ filename }}</p>
 				</div>
-				<button class="btn">Print</button>
+				<button class="btn" @click="onPrint">Print</button>
 			</div>
 			<RouterView />
 		</div>
@@ -21,13 +21,31 @@ import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
-const filename = route.meta.filename ? route.meta.filename : 'No filename indicated'
-
+const filename = route.meta.filename
+	? route.meta.filename
+	: 'No filename indicated'
 
 /** ================================================
-* METHODS
-** ================================================*/
+ * METHODS
+ ** ================================================*/
 const onBack = () => {
 	router.back()
 }
+
+const onPrint = () => {
+	window.print()
+}
 </script>
+
+<style scoped>
+@media print {
+	body {
+		font-family: 'Arial Narrow', 'Helvetica Neue', sans-serif;
+	}
+
+	@page {
+		size: a4;
+		margin: 24px 12px;
+	}
+}
+</style>

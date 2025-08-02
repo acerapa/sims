@@ -6,23 +6,11 @@ import path from 'path'
 export default defineConfig({
   base: '/',
   server: {
-    watch: {
-      usePolling: true,
-      interval: 100,
-      ignored: [
-        '**/node_modules/**', // Exclude node_modules
-        '**/.git/**', // Exclude .git
-        '**/dist/**', // Exclude dist
-        '**/build/**', // Exclude build
-        '**/.cache/**', // Exclude .cache
-        '**/.tmp/**' // Exclude .tmp
-      ]
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001/'
+      }
     }
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:3001/'
-    //   }
-    // }
   },
   plugins: [vue()],
   resolve: {
