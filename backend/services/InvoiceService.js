@@ -54,6 +54,6 @@ const findInvoiceById = async (id) => {
 };
 
 module.exports = {
-  findInvoiceById,
   updateInvoice,
+  findInvoiceById,
 };

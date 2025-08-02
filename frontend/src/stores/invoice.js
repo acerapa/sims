@@ -8,6 +8,7 @@ export const useInvoiceStore = defineStore('invoice', () => {
   const salesOrderStore = useSalesStore()
   const invoice = ref()
   const invoices = ref([])
+  const invoicesByCustomer = ref([])
 
   const fetchInvoices = async () => {
     const res = await api('invoices')
@@ -38,7 +39,7 @@ export const useInvoiceStore = defineStore('invoice', () => {
 
     const isSuccess = res.status < 400
 
-    if (isSuccess) {      
+    if (isSuccess) {
       if (invoices.value.length) {
         invoices.value.unshift(res.data.invoice)
       } else {
@@ -66,6 +67,14 @@ export const useInvoiceStore = defineStore('invoice', () => {
     }
   }
 
+  const fetchInvoiceByCustomer = async (from, to) => {
+    const res = await api(`invoices/by-customer?from=${from}&to=${to}`)
+
+    if (res.status < 400) {
+      invoicesByCustomer.value = res.data.customers
+    }
+  }
+
   // getters
   const getInvoices = async () => {
     if (!invoices.value.length) {
@@ -86,12 +95,14 @@ export const useInvoiceStore = defineStore('invoice', () => {
   return {
     invoice,
     invoices,
+    invoicesByCustomer,
 
     getInvoices,
     createInvoice,
     fetchInvoices,
     getInvoiceById,
     fetchInvoiceById,
-    updateInvoiceStatus
+    updateInvoiceStatus,
+    fetchInvoiceByCustomer
   }
 })

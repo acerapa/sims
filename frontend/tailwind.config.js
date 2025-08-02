@@ -15,6 +15,15 @@ export default {
       spacing: {
         15: '72px'
       },
+      gridColumn: {
+        'span-13': 'span 13 / span 13'
+      },
+      gridColumnStart: {
+        13: '13'
+      },
+      gridColumnEnd: {
+        13: '13'
+      },
       gridTemplateColumns: {
         13: 'repeat(13, minmax(0, 1fr))',
         14: 'repeat(14, minmax(0, 1fr))',
