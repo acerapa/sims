@@ -164,6 +164,11 @@ export default [
         text: 'Purchase By Vendor Summary Report',
         route: PurchaseConst.PURCHASE_BY_VENDOR_SUMMARY_REPORT,
         icon: outlineDot
+      },
+      {
+        text: 'Sales By Customer Detailed Report',
+        route: SalesConst.SALES_BY_CUSTOMER_DETAILED,
+        icon: outlineDot
       }
     ]
   },
