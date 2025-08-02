@@ -1,4 +1,4 @@
-import { PurchaseConst } from '@/const/route.constants'
+import { PurchaseConst, ReportConst } from '@/const/route.constants'
 
 export default [
   {
@@ -25,6 +25,23 @@ export default [
         meta: {
           title: 'Purchase By Vendor Summary',
           requiresAuth: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/print/reports',
+    name: ReportConst.PRINT_REPORT,
+    component: () => import('@/layout/PrintableLayout.vue'),
+    children: [
+      {
+        name: ReportConst.PRINT_PURCHASE_BY_VENDOR_DETAILED,
+        path: 'purchase-by-vendor-detailed',
+        component: () => import('@/views/purchase/PurchaseByVendorPrintable.vue'),
+        meta: {
+          title: 'Purchase By Vendor Report',
+          requiresAuth: true,
+          filename: 'Purchase By Vendor Detailed Report'
         }
       }
     ]

@@ -21,13 +21,8 @@
           :has-label="true"
           label="Username"
           name="username"
-          @focus="
-            () => {
-              errors.username = ''
-              errors.password = ''
-              responseError = ''
-            }
-          "
+          @focus="() => resetErrorValue('username')"
+          input-class="w-full"
           v-model="credentials.username"
           :error="errors.username"
           :error-has-text="true"
@@ -38,13 +33,8 @@
           :has-label="true"
           label="Password"
           name="password"
-          @focus="
-            () => {
-              errors.username = ''
-              errors.password = ''
-              responseError = ''
-            }
-          "
+          @focus="() => resetErrorValue('password')"
+          input-class="w-full"
           v-model="credentials.password"
           :error="errors.password"
           :error-has-text="true"
@@ -80,7 +70,7 @@ const credentials = ref({
 const responseError = ref('')
 
 // composables
-const { errors, hasErrors, validateData } = useValidation(
+const { errors, hasErrors, validateData, resetErrorValue } = useValidation(
   AuthSchema,
   credentials.value
 )

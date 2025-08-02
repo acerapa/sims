@@ -36,7 +36,8 @@ export const SalesConst = Object.freeze({
   INVOICE_FORM: 'invoice-form',
   DELIVERIES: 'deliveries',
   RECEIVED_PAYMENTS: 'received-payments',
-  RECEIVED_PAYMENT_FORM: 'received-payment-form'
+  RECEIVED_PAYMENT_FORM: 'received-payment-form',
+  SALES_ORDER_PRINT: 'sales-order-print'
 })
 
 export const TransferConst = Object.freeze({
@@ -56,4 +57,10 @@ export const SettingConst = Object.freeze({
   BRANCHES: 'branches',
   PRODUCT_SETTINGS: 'product-settings',
   ACCOUNT_SETTINGS: 'account-settings'
+})
+
+export const ReportConst = Object.freeze({
+  PRINT_REPORT: 'print-reports',
+  PRINT_PURCHASE_BY_VENDOR_DETAILED: 'print-purchase-by-vendor-detailed',
+  PRINT_PURCHASE_BY_VENDOR_SUMMARY: 'print-purchase-by-vendor-summary'
 })
