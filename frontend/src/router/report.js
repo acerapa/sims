@@ -1,4 +1,4 @@
-import { PurchaseConst, ReportConst } from '@/const/route.constants'
+import { PurchaseConst, ReportConst, SalesConst } from '@/const/route.constants'
 
 export default [
   {
@@ -26,6 +26,15 @@ export default [
           title: 'Purchase By Vendor Summary',
           requiresAuth: true
         }
+      },
+      {
+        name: SalesConst.SALES_BY_CUSTOMER_DETAILED,
+        path: 'sales-by-customer-detailed-report',
+        component: () => import('@/views/sales/SalesByCustomerDetailed.vue'),
+        meta: {
+          title: 'Sales By Customer Detailed Report',
+          requiresAuth: true
+        }
       }
     ]
   },
@@ -37,7 +46,8 @@ export default [
       {
         name: ReportConst.PRINT_PURCHASE_BY_VENDOR_DETAILED,
         path: 'purchase-by-vendor-detailed',
-        component: () => import('@/views/purchase/PurchaseByVendorPrintable.vue'),
+        component: () =>
+          import('@/views/purchase/PurchaseByVendorPrintable.vue'),
         meta: {
           title: 'Purchase By Vendor Report',
           requiresAuth: true,

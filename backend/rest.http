@@ -39,8 +39,8 @@ Accept: application/json
 Content-Type: application/json
 
 {
-	"username": "administrator",
-	"password": "password"
+	"username": "admin",
+	"password": "admin123"
 }
 
 #### - [Authenticating Users] success response
@@ -386,3 +386,9 @@ Content-Type: application/json
 	"invoice_id": 1,
 	"user_id": 1
 }
+
+
+###
+GET {{host}}/api/invoices/by-customer?from=2025-07-01&to=2025-08-03
+Accept: application/json
+Content-Type: application/json

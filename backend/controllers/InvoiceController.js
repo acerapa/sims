@@ -1,16 +1,17 @@
 const { SalesOrderStatus } = require("shared/enums");
 const { sequelize } = require("../models");
-const { Op } = require("sequelize");
+
 const Customer = require("../models/customer");
 const Invoice = require("../models/invoice");
 const InvoiceProducts = require("../models/junction/invoice-products");
 const SalesOrder = require("../models/sales-order");
 const User = require("../models/user");
+const ReceivedPayment = require("../models/received-payment");
+const Product = require("../models/product");
 const ProductDetails = require("../models/product-details");
-const {
-  updateInvoice,
-  findInvoiceById,
-} = require("../services/InvoiceService");
+
+const { findInvoiceById } = require("../services/InvoiceService");
+const { Op } = require("sequelize");
 
 module.exports = {
   all: async (req, res) => {
@@ -69,9 +70,9 @@ module.exports = {
                   ...product,
                   invoice_id: createdInvoice.id,
                 },
-                { transaction },
+                { transaction }
               );
-            }),
+            })
           );
         }
 
@@ -79,7 +80,7 @@ module.exports = {
         if (invoice.sales_order_id) {
           await SalesOrder.update(
             { status: SalesOrderStatus.INVOICED },
-            { where: { id: invoice.sales_order_id }, transaction },
+            { where: { id: invoice.sales_order_id }, transaction }
           );
         }
       }
@@ -103,6 +104,106 @@ module.exports = {
       }
 
       res.sendResponse({ invoice }, "Successfully fetched!");
+    } catch (error) {
+      res.sendError({ error }, "Something went wrong!");
+    }
+  },
+
+  invoiceByCustomer: async (req, res) => {
+    try {
+      const { from, to } = req.query;
+      let customers = await Customer.findAll({
+        include: [
+          {
+            model: Invoice,
+            as: "invoices",
+            required: false,
+            where: {
+              issue_date: {
+                [Op.gte]: new Date(from),
+                [Op.lte]: new Date(to),
+              },
+            },
+            include: [
+              {
+                model: ReceivedPayment,
+                as: "received_payments",
+                required: true,
+                attributes: ["id", "amount", "remaining_balance"],
+              },
+              {
+                model: Product,
+                as: "products",
+                attributes: ["id"],
+                include: [
+                  {
+                    model: ProductDetails,
+                    as: "product_details",
+                    attributes: ["sales_description"],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: SalesOrder,
+            as: "sales_orders",
+            attributes: ["id"],
+            include: [
+              {
+                model: Invoice,
+                as: "invoice",
+                required: true,
+                where: {
+                  issue_date: {
+                    [Op.gte]: new Date(from),
+                    [Op.lte]: new Date(to),
+                  },
+                },
+                include: [
+                  {
+                    model: ReceivedPayment,
+                    as: "received_payments",
+                    required: true,
+                  },
+                  {
+                    model: Product,
+                    as: "products",
+                    attributes: ["id"],
+                    include: [
+                      {
+                        model: ProductDetails,
+                        as: "product_details",
+                        attributes: ["sales_description"],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      // Extract data and combine information from sales order and invoice
+      if (customers.length) {
+        customers.map((customer) => {
+          const invoices = customer.invoices;
+          const salesOrders = customer.sales_orders;
+
+          salesOrders.forEach((salesOrder) => {
+            if (salesOrder.invoice) {
+              invoices.push(salesOrder.invoice);
+            }
+          });
+
+          customer.invoices = invoices;
+        });
+      }
+
+      // Remove customer that do not have invoice
+      customers = customers.filter((customer) => customer.invoices.length);
+
+      res.sendResponse({ customers }, "Successfully fetched!");
     } catch (error) {
       res.sendError({ error }, "Something went wrong!");
     }
