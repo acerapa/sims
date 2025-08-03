@@ -38,7 +38,8 @@ export const SalesConst = Object.freeze({
   RECEIVED_PAYMENTS: 'received-payments',
   RECEIVED_PAYMENT_FORM: 'received-payment-form',
   SALES_ORDER_PRINT: 'sales-order-print',
-  SALES_BY_CUSTOMER_DETAILED: 'sales-by-customer-detailed-report'
+  SALES_BY_CUSTOMER_DETAILED: 'sales-by-customer-detailed-report',
+  SALES_BY_CUSTOMER_SUMMARY: 'sales-by-customer-summary-report'
 })
 
 export const TransferConst = Object.freeze({

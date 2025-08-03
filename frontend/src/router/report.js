@@ -35,6 +35,15 @@ export default [
           title: 'Sales By Customer Detailed Report',
           requiresAuth: true
         }
+      },
+      {
+        name: SalesConst.SALES_BY_CUSTOMER_SUMMARY,
+        path: 'sales-by-customer-summary-report',
+        component: () => import('@/views/sales/SalesByCustomerSummary.vue'),
+        meta: {
+          title: 'Sales By Customer Summary Report',
+          requiresAuth: true
+        }
       }
     ]
   },
