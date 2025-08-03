@@ -16,7 +16,9 @@ export default {
         15: '72px'
       },
       gridColumn: {
-        'span-13': 'span 13 / span 13'
+        'span-13': 'span 13 / span 13',
+        'span-14': 'span 14 / span 14',
+        'span-15': 'span 15 / span 15'
       },
       gridColumnStart: {
         13: '13'

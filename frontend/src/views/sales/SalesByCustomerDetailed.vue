@@ -64,7 +64,10 @@ import { useTableScroll } from '@/use/useTableScroll'
 import { useInvoiceStore } from '@/stores/invoice'
 import { storeToRefs } from 'pinia'
 import { DateHelpers } from 'shared'
+import { ReportConst } from '@/const/route.constants'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const invoiceStore = useInvoiceStore()
 const { invoicesByCustomer } = storeToRefs(invoiceStore)
 
@@ -116,14 +119,13 @@ const setFilterDate = () => {
 }
 
 const onPrint = () => {
-  // TODO: Setup printable page for this page
-  // router.push({
-  // 	name: ReportConst.PRINT_PURCHASE_BY_VENDOR_DETAILED,
-  // 	query: {
-  // 		search_text: searchText.value,
-  // 		...dateFilter.value
-  // 	}
-  // })
+  router.push({
+    name: ReportConst.PRINT_SALES_BY_CUSTOMER_DETAILED,
+    query: {
+      search_text: searchText.value,
+      ...dateFilter.value
+    }
+  })
 }
 
 /** ================================================

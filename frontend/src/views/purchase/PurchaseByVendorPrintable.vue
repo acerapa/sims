@@ -72,6 +72,7 @@ import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePurchaseStore } from '@/stores/purchase'
 import { DateHelpers } from 'shared'
+import { formatDateRange } from '@/helper'
 
 const route = useRoute()
 const purchaseStore = usePurchaseStore()
@@ -101,51 +102,6 @@ const formattedDateRange = computed(() =>
  ** ================================================*/
 const getTotalAmount = (pos) => {
   return pos.map((po) => parseFloat(po.amount)).reduce((a, b) => a + b, 0)
-}
-
-const formatDateRange = (startDate, endDate) => {
-  const start = new Date(startDate)
-  const end = new Date(endDate)
-
-  const startParts = start
-    .toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    })
-    .split(' ')
-
-  const endParts = end
-    .toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    })
-    .split(' ')
-
-  const [startMonth, startDay, startYear] = [
-    startParts[0],
-    startParts[1].replace(',', ''),
-    startParts[2]
-  ]
-  const [endMonth, endDay, endYear] = [
-    endParts[0],
-    endParts[1].replace(',', ''),
-    endParts[2]
-  ]
-
-  // Same month and year
-  if (startMonth === endMonth && startYear === endYear) {
-    return `${startMonth} ${startDay} - ${endDay}, ${startYear}`
-  }
-
-  // Same year, different months
-  if (startYear === endYear) {
-    return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${startYear}`
-  }
-
-  // Different years
-  return `${startMonth} ${startDay}, ${startYear} - ${endMonth} ${endDay}, ${endYear}`
 }
 
 /** ================================================
