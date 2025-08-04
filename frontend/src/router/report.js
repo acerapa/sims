@@ -35,6 +35,15 @@ export default [
           title: 'Sales By Customer Detailed Report',
           requiresAuth: true
         }
+      },
+      {
+        name: SalesConst.OPEN_SALES_BY_CUSTOMER,
+        path: 'open-sales-by-customer-report',
+        component: () => import('@/views/sales/OpenSalesByCustomer.vue'),
+        meta: {
+          title: 'Open Sales By Customer Report',
+          requiresAuth: true
+        }
       }
     ]
   },
