@@ -35,6 +35,15 @@ export default [
           title: 'Sales By Customer Detailed Report',
           requiresAuth: true
         }
+      },
+      {
+        name: SalesConst.SALES_BY_ITEM_DETAILED,
+        path: 'sales-by-item-detailed-report',
+        component: () => import('@/views/sales/SalesByItemDetailed.vue'),
+        meta: {
+          title: 'Sales By Item Detailed Report',
+          requiresAuth: true
+        }
       }
     ]
   },

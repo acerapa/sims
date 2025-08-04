@@ -169,6 +169,11 @@ export default [
         text: 'Sales By Customer Detailed Report',
         route: SalesConst.SALES_BY_CUSTOMER_DETAILED,
         icon: outlineDot
+      },
+      {
+        text: 'Sales By Item Detailed Report',
+        route: SalesConst.SALES_BY_ITEM_DETAILED,
+        icon: outlineDot
       }
     ]
   },
