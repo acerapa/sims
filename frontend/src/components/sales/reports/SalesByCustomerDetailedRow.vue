@@ -1,10 +1,10 @@
 <template>
   <div
-    class="grid grid-cols-13 gap-3 gen-table-row group/customer last:group/customer"
+    class="grid grid-cols-12 gap-3 gen-table-row group/customer last:group/customer"
   >
     <p class="col-span-2 text-sm font-bold">{{ customerName }}</p>
     <div
-      class="col-span-13 grid grid-cols-13 gap-3 group-last:group/invoice"
+      class="col-span-12 grid grid-cols-12 gap-3 group-last:group/invoice"
       v-for="(invoice, invoiceNdx) in customer.invoices"
       :key="invoice.id"
     >
@@ -27,7 +27,7 @@
         }}
       </p>
       <div
-        class="col-span-13 grid grid-cols-13 gap-3 group-last:group/product"
+        class="col-span-12 grid grid-cols-12 gap-3 group-last:group/product"
         v-for="(product, productNdx) in invoice.products"
         :key="product.id"
       >
@@ -55,12 +55,11 @@
         <p class="col-span-1 text-sm text-end">Balace</p>
       </div>
     </div>
-    <div class="grid grid-cols-13 gap-3 col-span-13">
+    <div class="grid grid-cols-12 gap-3 col-span-12">
       <p class="col-span-11 text-sm font-bold">Total {{ customerName }}</p>
       <p class="col-span-1 text-sm font-bold text-end">
         {{ totalInvoiceAmount }}
       </p>
-      <p class="col-span-1" />
     </div>
   </div>
 </template>

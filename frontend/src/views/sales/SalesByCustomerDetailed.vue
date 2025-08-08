@@ -9,7 +9,7 @@
       :table-row-component="SalesByCustomerDetailedRow"
     >
       <template #table_header>
-        <div class="grid grid-cols-13 gap-3">
+        <div class="grid grid-cols-12 gap-3">
           <p class="col-span-2 table-header">Customer</p>
           <p class="col-span-1 table-header"># Invoice</p>
           <p class="col-span-2 table-header">Inv. Date</p>
@@ -17,7 +17,6 @@
           <p class="col-span-1 table-header text-center">Quantity</p>
           <p class="col-span-1 table-header text-end">Sale price</p>
           <p class="col-span-1 table-header text-end">Total</p>
-          <p class="col-span-1 table-header text-end">Balace</p>
         </div>
       </template>
       <template #tools>
