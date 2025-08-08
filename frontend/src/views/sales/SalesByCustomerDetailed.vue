@@ -1,6 +1,5 @@
 <template>
   <div ref="tableRef">
-    <code>Important: Balance column still need to clarify with client</code>
     <CustomTable
       :data="filteredData"
       :has-add-btn="false"
