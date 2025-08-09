@@ -8,6 +8,7 @@ export const useProductStore = defineStore('product', () => {
 
   const products = ref([])
   const product = ref(null)
+  const salesByItem = ref([])
 
   const supplierProducts = computed(() => {
     if (!supplierStore.selectedSupplier) return products.value
@@ -156,11 +157,20 @@ export const useProductStore = defineStore('product', () => {
     return res.data.is_exist
   }
 
+  const fetchSalesByItem = async () => {
+    const res = await api('products/sales-by-item')
+
+    if (res.status < 400) {
+      salesByItem.value = res.data.products
+    }
+  }
+
   return {
     product,
     products,
-    supplierProducts,
+    salesByItem,
     productOptions,
+    supplierProducts,
 
     getProduct,
     getProducts,
@@ -168,6 +178,7 @@ export const useProductStore = defineStore('product', () => {
     removeProduct,
     registerProduct,
     fetchAllProducts,
+    fetchSalesByItem,
     fetchProductByIds,
     getProductItemCode,
     fetchInventoryStock,

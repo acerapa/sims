@@ -19,4 +19,15 @@
 
 <script setup>
 import CustomTable from '@/components/shared/CustomTable.vue'
+import { useProductStore } from '@/stores/product'
+import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
+
+const productStore = useProductStore()
+const { salesByItem } = storeToRefs(productStore)
+
+onMounted(async () => {
+  await productStore.fetchSalesByItem()
+  console.log(salesByItem.value)
+})
 </script>

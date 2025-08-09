@@ -199,7 +199,7 @@ module.exports = {
                 cost: supplier.cost,
               },
             });
-          }),
+          })
         );
       }
 
@@ -241,13 +241,13 @@ module.exports = {
 
         // get categories to remove and to add
         const categoriesToRemove = productToCategories.filter(
-          (ptc) => !data.categories.includes(ptc.category_id),
+          (ptc) => !data.categories.includes(ptc.category_id)
         );
         const categoriesToAdd = data.categories.filter(
           (category) =>
             !productToCategories
               .map((ptc) => ptc.category_id)
-              .includes(category),
+              .includes(category)
         );
 
         await Promise.all([
@@ -267,7 +267,7 @@ module.exports = {
               },
               {
                 transaction,
-              },
+              }
             );
           }),
         ]);
@@ -285,14 +285,14 @@ module.exports = {
           (ptc) =>
             !data.suppliers
               .map((sup) => sup.supplier_id)
-              .includes(ptc.supplier_id),
+              .includes(ptc.supplier_id)
         );
 
         const suppliersToAdd = data.suppliers.filter(
           (sup) =>
             !productToSuppliers
               .map((ptc) => ptc.supplier_id)
-              .includes(sup.supplier_id),
+              .includes(sup.supplier_id)
         );
 
         const suppliersToUpdate = data.suppliers.filter((sup) => {
@@ -301,7 +301,7 @@ module.exports = {
             .includes(sup.supplier_id);
 
           const ptc = productToSuppliers.find(
-            (ptc) => ptc.supplier_id === sup.supplier_id,
+            (ptc) => ptc.supplier_id === sup.supplier_id
           );
 
           return isExist && ptc.cost !== sup.cost;
@@ -323,7 +323,7 @@ module.exports = {
                 supplier_id: sup.supplier_id,
                 cost: sup.cost,
               },
-              { transaction },
+              { transaction }
             );
           }),
           ...suppliersToUpdate.map((sup) => {
@@ -337,7 +337,7 @@ module.exports = {
                   supplier_id: sup.supplier_id,
                 },
                 transaction,
-              },
+              }
             );
           }),
         ]);
@@ -387,22 +387,22 @@ module.exports = {
         });
 
         const toRemove = currentCategorys.filter(
-          (c) => !req.body.categories.includes(c.category_id),
+          (c) => !req.body.categories.includes(c.category_id)
         );
 
         const toAdd = req.body.categories.filter(
-          (c) => !currentCategorys.map((pc) => pc.category_id).includes(c),
+          (c) => !currentCategorys.map((pc) => pc.category_id).includes(c)
         );
 
         await Promise.all([
           ...toRemove.map((c) =>
-            ProductToCategories.destroy({ where: { id: c.id } }),
+            ProductToCategories.destroy({ where: { id: c.id } })
           ),
           ...toAdd.map((c) =>
             ProductToCategories.create({
               product_id: req.params.id,
               category_id: c,
-            }),
+            })
           ),
         ]);
       }
@@ -510,7 +510,7 @@ module.exports = {
                     required: true,
                     where: {
                       [Op.and]: [
-                        {status: { [Op.ne]: SalesOrderStatus.CANCELLED }},
+                        { status: { [Op.ne]: SalesOrderStatus.CANCELLED } },
                         {
                           [Op.or]: [
                             // No invoice
@@ -528,9 +528,9 @@ module.exports = {
                               SELECT 1 FROM \`${Invoice.getTableName()}\` as \`invoice\`
                               WHERE \`invoice\`.\`sales_order_id\` = \`products->so_products->sales_order\`.\`id\`
                               AND \`invoice\`.\`status\` != '${InvoiceStatus.UNPAID}'
-                            )`)
-                          ]
-                        }
+                            )`),
+                          ],
+                        },
                       ],
                     },
                     attributes: ["id"],
@@ -565,11 +565,40 @@ module.exports = {
 
       res.sendResponse(
         { grouped: groupCategories(products) },
-        "Successfully fetched!",
+        "Successfully fetched!"
       );
     } catch (e) {
       console.log(e);
       res.sendError(e, "Something wen't wrong!");
+    }
+  },
+
+  salesByItem: async (req, res) => {
+    try {
+      const products = await Product.findAll({
+        where: {
+          type: ProductType.INVENTORY,
+        },
+        include: [
+          {
+            model: Invoice,
+            as: "invoices",
+            required: true,
+            include: [
+              {
+                model: ReceivedPayment,
+                as: "received_payments",
+                required: true,
+                attributes: ["id"]
+              }
+            ]
+          },
+        ],
+      });
+
+      res.sendResponse({ products }, "Successfully fetched!");
+    } catch (error) {
+      res.sendError(error, "Something wen't wrong!");
     }
   },
 };
