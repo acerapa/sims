@@ -3,8 +3,10 @@ const ProductCategoryController = require("../controllers/ProductCategoryControl
 
 router.get("/all", ProductCategoryController.all);
 router.get("/:id", ProductCategoryController.byId);
+router.get("/category-tree/:id", ProductCategoryController.getParent);
+
 router.put("/:id", ProductCategoryController.update);
-router.delete("/delete/:id", ProductCategoryController.delete);
 router.post("/register", ProductCategoryController.register);
+router.delete("/delete/:id", ProductCategoryController.delete);
 
 module.exports = router;

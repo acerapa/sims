@@ -2,9 +2,11 @@ import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useVendorStore } from './supplier'
+import { useSettingsStore } from './settings'
 
 export const useProductStore = defineStore('product', () => {
   const supplierStore = useVendorStore()
+  const settingsStore = useSettingsStore()
 
   const products = ref([])
   const product = ref(null)
@@ -160,9 +162,52 @@ export const useProductStore = defineStore('product', () => {
   const fetchSalesByItem = async () => {
     const res = await api('products/sales-by-item')
 
+    let data = {}
     if (res.status < 400) {
-      salesByItem.value = res.data.products
+      let toProcessData = res.data.products
+
+      function segregateProductByCategory(categories, grouped, products) {
+        if (categories.length === 1) {
+          const cat = categories.shift()
+          if (!grouped[cat.name]) {
+            grouped[cat.name] = {
+              products: []
+            }
+          }
+
+          if (!grouped[cat.name]?.products) {
+            grouped[cat.name].products = products
+          } else {
+            grouped[cat.name]['products'] = [
+              ...grouped[cat.name]['products'],
+              ...products
+            ]
+          }
+        } else {
+          const cat = categories.shift()
+          if (!grouped[cat.name]) {
+            grouped[cat.name] = {
+              products: []
+            }
+          }
+          grouped = segregateProductByCategory(
+            categories,
+            grouped[cat.name],
+            products
+          )
+        }
+      }
+
+      // processing
+      for (const category of toProcessData) {
+        const parent_cat_tree = await settingsStore.fetchCategoryTree(
+          category.id
+        )
+
+        segregateProductByCategory(parent_cat_tree, data, category.products)
+      }
     }
+    salesByItem.value = data
   }
 
   return {

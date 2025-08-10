@@ -1,6 +1,10 @@
 <template>
   <div ref="tableRef">
-    <CustomTable :data="[]">
+    <CustomTable
+      :data="filteredData"
+      :row-prop-init="rowPropInit"
+      :table-row-component="SalesByItemRow"
+    >
       <template #table_header>
         <div class="grid grid-cols-15 gap-3">
           <p class="col-span-3 table-header">Type</p>
@@ -19,15 +23,41 @@
 
 <script setup>
 import CustomTable from '@/components/shared/CustomTable.vue'
+import SalesByItemRow from '@/components/sales/SalesByItemRow.vue'
 import { useProductStore } from '@/stores/product'
 import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
+import { onMounted, computed, ref } from 'vue'
+import { useTableScroll } from '@/use/useTableScroll'
+import Event from '@/event'
+import { EventEnum } from '@/data/event'
 
+const tableRef = ref(null)
 const productStore = useProductStore()
 const { salesByItem } = storeToRefs(productStore)
 
+// composables
+useTableScroll(tableRef, false)
+/** ================================================
+ * EVENTS
+ ** ================================================*/
+const rowPropInit = 'sales-by-item-row-prop-init'
+Event.on(rowPropInit, (data) => {
+  return {
+    sales: data
+  }
+})
+
+Event.emit(EventEnum.IS_PAGE_LOADING, true)
+
+/** ================================================
+ * COMPUTED
+ ** ================================================*/
+const filteredData = computed(() => {
+  return [salesByItem.value].filter((item) => item)
+})
+
 onMounted(async () => {
   await productStore.fetchSalesByItem()
-  console.log(salesByItem.value)
+  Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 </script>

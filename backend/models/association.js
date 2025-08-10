@@ -28,6 +28,9 @@ const ReceivedPayment = require("./received-payment");
 const PhysicalInventoryAdjustments = require("./physical-inventory-adjustments");
 const ItemToAdjustments = require("./junction/item-to-adjustments");
 
+// Aliases
+const ALIASES = require("../const/alias");
+
 // adjustments to user
 PhysicalInventoryAdjustments.belongsTo(User, {
   foreignKey: "user_id",
@@ -74,7 +77,7 @@ Invoice.belongsToMany(Product, {
   through: InvoiceProducts,
   foreignKey: "invoice_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 Product.belongsToMany(Invoice, {
@@ -98,13 +101,13 @@ Product.hasMany(InvoiceProducts, {
 // Invoice Products to Invoices
 InvoiceProducts.belongsTo(Invoice, {
   foreignKey: "invoice_id",
-  as: "invoice"
-})
+  as: "invoice",
+});
 
 Invoice.hasMany(InvoiceProducts, {
   foreignKey: "invoice_id",
-  as: "invoice_products"
-})
+  as: "invoice_products",
+});
 
 // invoice to customer
 Invoice.belongsTo(Customer, {
@@ -133,7 +136,7 @@ SalesOrder.belongsToMany(Product, {
   through: SalesOrderProduct,
   foreignKey: "sales_order_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 Product.belongsToMany(SalesOrder, {
@@ -221,7 +224,7 @@ PurchaseOrder.belongsToMany(Product, {
   through: PurchaseOrderProducts,
   foreignKey: "purchase_order_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 Product.belongsToMany(PurchaseOrder, {
@@ -258,7 +261,7 @@ StockTransfer.belongsToMany(Product, {
   through: StockTransferProducts,
   foreignKey: "stock_transfer_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 Product.belongsToMany(StockTransfer, {
@@ -321,7 +324,7 @@ Product.belongsTo(Account, {
 
 Supplier.belongsToMany(Product, {
   through: ProductSupplier,
-  as: "products",
+  as: ALIASES.PRODUCTS,
   foreignKey: "supplier_id",
   otherKey: "product_id",
 });
@@ -339,7 +342,7 @@ PurchaseOrder.belongsTo(Supplier, {
 
 ProductSettings.hasMany(ProductDetails, {
   foreignKey: "product_setting_id",
-  as: "product_details",
+  as: ALIASES.PRODUCT_DETAILS,
   onDelete: "SET NULL",
 });
 
@@ -475,20 +478,20 @@ Product.belongsToMany(ProductCategory, {
   through: ProductToCategories,
   foreignKey: "product_id",
   otherKey: "category_id",
-  as: "categories",
+  as: ALIASES.CATEGORIES,
 });
 
 ProductCategory.belongsToMany(Product, {
   through: ProductToCategories,
   foreignKey: "category_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 // Item, Product and Service relationships
 Product.hasOne(ProductDetails, {
   foreignKey: "product_id",
-  as: "product_details",
+  as: ALIASES.PRODUCT_DETAILS,
 });
 
 Product.hasOne(ServiceDetails, {

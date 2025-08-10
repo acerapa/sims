@@ -27,6 +27,7 @@ const {
 const PurchaseOrder = require("../../models/purchase-order");
 const ReceivedPayment = require("../../models/received-payment");
 const Invoice = require("../../models/invoice");
+const ALIASES = require("../../const/alias");
 
 module.exports = {
   all: async (req, res) => {
@@ -575,23 +576,34 @@ module.exports = {
 
   salesByItem: async (req, res) => {
     try {
-      const products = await Product.findAll({
-        where: {
-          type: ProductType.INVENTORY,
-        },
+      const products = await ProductCategory.findAll({
         include: [
           {
-            model: Invoice,
-            as: "invoices",
+            model: Product,
+            as: ALIASES.PRODUCTS,
+            attributes: ["id"],
             required: true,
             include: [
               {
-                model: ReceivedPayment,
-                as: "received_payments",
+                model: ProductDetails,
+                as: ALIASES.PRODUCT_DETAILS,
+                attributes: ["id", "sales_description"],
+              },
+              {
+                model: Invoice,
+                as: "invoices",
                 required: true,
-                attributes: ["id"]
-              }
-            ]
+                attributes: ["id"],
+                include: [
+                  {
+                    model: ReceivedPayment,
+                    as: "received_payments",
+                    required: true,
+                    attributes: ["id"],
+                  },
+                ],
+              },
+            ],
           },
         ],
       });

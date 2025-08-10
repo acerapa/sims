@@ -1,3 +1,4 @@
+const { sequelize } = require("../models");
 const ProductCategory = require("../models/product-category");
 const { linkedCategories } = require("../services/ProductService");
 
@@ -21,6 +22,34 @@ module.exports = {
   byId: async (req, res) => {
     const category = await ProductCategory.findByPk(req.params.id);
     res.sendResponse({ category }, "Successfully fetched!", 200);
+  },
+
+  getParent: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const query = `
+        WITH RECURSIVE parent_tree AS (
+          SELECT id, name, general_cat, 1 as level
+          FROM productcategories
+          WHERE id = ${id}
+
+          UNION ALL
+
+          SELECT c.id, c.name, c.general_cat, pt.level + 1
+          FROM productcategories c
+          JOIN parent_tree pt ON pt.general_cat = c.id 
+        )
+        SELECT * FROM parent_tree ORDER BY level DESC;
+      `;
+
+      const categories = await sequelize.query(query, {
+        type: sequelize.QueryTypes.SELECT,
+      });
+
+      res.sendResponse({ categories }, "Successfully fetched!");
+    } catch (error) {
+      res.sendError({}, "Something went wrong!");
+    }
   },
 
   register: async (req, res) => {
