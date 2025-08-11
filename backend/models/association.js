@@ -53,7 +53,7 @@ PhysicalInventoryAdjustments.belongsToMany(PhysicalInventoryItem, {
 // receive payments to invoice
 Invoice.hasMany(ReceivedPayment, {
   foreignKey: "invoice_id",
-  as: "received_payments",
+  as: ALIASES.RECEIVED_PAYMENTS,
 });
 
 ReceivedPayment.belongsTo(Invoice, {
@@ -69,7 +69,7 @@ ReceivedPayment.belongsTo(User, {
 
 User.hasMany(ReceivedPayment, {
   foreignKey: "user_id",
-  as: "received_payments",
+  as: ALIASES.RECEIVED_PAYMENTS,
 });
 
 // invoice to products
@@ -84,7 +84,7 @@ Product.belongsToMany(Invoice, {
   through: InvoiceProducts,
   foreignKey: "product_id",
   otherKey: "invoice_id",
-  as: "invoices",
+  as: ALIASES.INVOICES,
 });
 
 // Invoice Products to products
@@ -117,7 +117,7 @@ Invoice.belongsTo(Customer, {
 
 Customer.hasMany(Invoice, {
   foreignKey: "customer_id",
-  as: "invoices",
+  as: ALIASES.INVOICES,
 });
 
 // invoice to user/sales person
@@ -128,7 +128,7 @@ Invoice.belongsTo(User, {
 
 User.hasMany(Invoice, {
   foreignKey: "employee_id",
-  as: "invoices",
+  as: ALIASES.INVOICES,
 });
 
 // Sales Order, Product, Address, Invoice and Sales Order Product Relations

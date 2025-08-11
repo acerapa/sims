@@ -1,7 +1,8 @@
 <template>
   <div ref="tableRef">
     <CustomTable
-      :data="filteredData"
+      :has-add-btn="false"
+      :data="Object.entries(salesByItem)"
       :row-prop-init="rowPropInit"
       :table-row-component="SalesByItemRow"
     >
@@ -12,10 +13,16 @@
           <p class="col-span-1 table-header"># Item</p>
           <p class="col-span-3 table-header">Memo</p>
           <p class="col-span-3 table-header">Name</p>
-          <p class="col-span-1 table-header">Qty</p>
-          <p class="col-span-1 table-header">Price</p>
-          <p class="col-span-1 table-header">Amount</p>
+          <p class="col-span-1 table-header text-center">Qty</p>
+          <p class="col-span-1 table-header text-end">Price</p>
+          <p class="col-span-1 table-header text-end">Amount</p>
         </div>
+      </template>
+      <template #buttons>
+        <button class="btn flex gap-3 items-center" @click="onPrint">
+          <img class="invert w-5" :src="Printer" />
+          <p>Print</p>
+        </button>
       </template>
     </CustomTable>
   </div>
@@ -30,6 +37,8 @@ import { onMounted, computed, ref } from 'vue'
 import { useTableScroll } from '@/use/useTableScroll'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
+
+import Printer from '@/assets/icons/printer.png'
 
 const tableRef = ref(null)
 const productStore = useProductStore()
@@ -55,6 +64,11 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
 const filteredData = computed(() => {
   return [salesByItem.value].filter((item) => item)
 })
+
+/** ================================================
+ * METHODS
+ ** ================================================*/
+const onPrint = () => {}
 
 onMounted(async () => {
   await productStore.fetchSalesByItem()

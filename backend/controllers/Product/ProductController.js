@@ -591,13 +591,19 @@ module.exports = {
               },
               {
                 model: Invoice,
-                as: "invoices",
+                as: ALIASES.INVOICES,
                 required: true,
-                attributes: ["id"],
+                attributes: ["id", "issue_date", "memo"],
                 include: [
                   {
                     model: ReceivedPayment,
                     as: "received_payments",
+                    required: true,
+                    attributes: ["id"],
+                  },
+                  {
+                    model: Product,
+                    as: ALIASES.PRODUCTS,
                     required: true,
                     attributes: ["id"],
                   },
@@ -607,6 +613,13 @@ module.exports = {
           },
         ],
       });
+
+      // Clean products under invoices
+      for (const cat of products) {
+        for (const prd of cat.products) {
+          prd.invoices = prd.invoices.filter((p) => p.id == prd.id);
+        }
+      }
 
       res.sendResponse({ products }, "Successfully fetched!");
     } catch (error) {
