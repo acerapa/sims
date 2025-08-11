@@ -204,6 +204,18 @@ export const useSettingsStore = defineStore('settings', () => {
     await handleCategoryAction(category, ProductCategoryAction.DELETE)
   }
 
+  // fetching methods
+  const fetchCategoryTree = async (category_id) => {
+    const res = await api(`product-category/category-tree/${category_id}`)
+
+    let data = []
+    if (res.status < 400) {
+      data = res.data.categories
+    }
+
+    return data
+  }
+
   // private product category methods
 
   /**
@@ -449,6 +461,7 @@ export const useSettingsStore = defineStore('settings', () => {
     fetchAllBranches,
     fetchAllAccounts,
     getCurrentBranch,
+    fetchCategoryTree,
     getReorderingPoints,
     getProductCategories,
     updateProductCategory,
