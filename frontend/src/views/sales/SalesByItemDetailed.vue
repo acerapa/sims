@@ -39,8 +39,11 @@ import Event from '@/event'
 import { EventEnum } from '@/data/event'
 
 import Printer from '@/assets/icons/printer.png'
+import { useRouter } from 'vue-router'
+import { ReportConst } from '@/const/route.constants'
 
 const tableRef = ref(null)
+const router = useRouter()
 const productStore = useProductStore()
 const { salesByItem } = storeToRefs(productStore)
 
@@ -68,7 +71,11 @@ const filteredData = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
-const onPrint = () => {}
+const onPrint = () => {
+  router.push({
+    name: ReportConst.PRINT_SALES_BY_ITEM_DETAILED
+  })
+}
 
 onMounted(async () => {
   await productStore.fetchSalesByItem()

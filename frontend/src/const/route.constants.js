@@ -65,5 +65,6 @@ export const ReportConst = Object.freeze({
   PRINT_REPORT: 'print-reports',
   PRINT_PURCHASE_BY_VENDOR_DETAILED: 'print-purchase-by-vendor-detailed',
   PRINT_PURCHASE_BY_VENDOR_SUMMARY: 'print-purchase-by-vendor-summary',
-  PRINT_SALES_BY_CUSTOMER_DETAILED: 'print-sales-by-customer-detailed'
+  PRINT_SALES_BY_CUSTOMER_DETAILED: 'print-sales-by-customer-detailed',
+  PRINT_SALES_BY_ITEM_DETAILED: 'print-sales-by-item-detailed'
 })
