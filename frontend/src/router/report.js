@@ -75,6 +75,17 @@ export default [
           requiresAuth: true,
           filename: 'Sales By Customer Detailed Report'
         }
+      },
+      {
+        name: ReportConst.PRINT_SALES_BY_ITEM_DETAILED,
+        path: 'sales-by-item-detailed',
+        component: () =>
+          import('@/views/sales/printables/SalesByItemDetailPrintable.vue'),
+        meta: {
+          title: 'Sales By Item Detailed Report',
+          requiresAuth: true,
+          filename: 'Sales By Item Detailed Report'
+        }
       }
     ]
   }
