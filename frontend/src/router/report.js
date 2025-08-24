@@ -44,6 +44,15 @@ export default [
           title: 'Sales By Item Detailed Report',
           requiresAuth: true
         }
+      },
+      {
+        name: SalesConst.SALES_BY_REP,
+        path: 'sales-by-rep',
+        component: () => import('@/views/sales/SalesByRep.vue'),
+        meta: {
+          title: 'Sales By Rep',
+          requiresAuth: true
+        }
       }
     ]
   },

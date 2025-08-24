@@ -1,4 +1,5 @@
 const ALIASES = Object.freeze({
+  CUSTOMER: "customer",
   PRODUCTS: "products",
   INVOICES: "invoices",
   CATEGORIES: "categories",

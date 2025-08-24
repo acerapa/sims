@@ -12,6 +12,7 @@ const ProductDetails = require("../models/product-details");
 
 const { findInvoiceById } = require("../services/InvoiceService");
 const { Op } = require("sequelize");
+const ALIASES = require("../const/alias");
 
 module.exports = {
   all: async (req, res) => {
@@ -76,7 +77,7 @@ module.exports = {
           );
         }
 
-        // Update invoice status to invoiced
+        // Update sales order status to invoiced
         if (invoice.sales_order_id) {
           await SalesOrder.update(
             { status: SalesOrderStatus.INVOICED },
@@ -204,6 +205,42 @@ module.exports = {
       customers = customers.filter((customer) => customer.invoices.length);
 
       res.sendResponse({ customers }, "Successfully fetched!");
+    } catch (error) {
+      res.sendError({ error }, "Something went wrong!");
+    }
+  },
+
+  salesByRep: async (req, res) => {
+    try {
+      const invoices = await User.findAll({
+        include: [
+          {
+            model: Invoice,
+            as: ALIASES.INVOICES,
+            required: true,
+            include: [
+              {
+                model: Customer,
+                as: ALIASES.CUSTOMER,
+                attributes: ["id", "first_name", "last_name"],
+              },
+              {
+                model: Product,
+                as: ALIASES.PRODUCTS,
+                attributes: ["id"],
+                include: [
+                  {
+                    model: ProductDetails,
+                    as: ALIASES.PRODUCT_DETAILS,
+                    attributes: ["sales_description"],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      res.sendResponse({ invoices }, "Successfully fetched!");
     } catch (error) {
       res.sendError({ error }, "Something went wrong!");
     }
