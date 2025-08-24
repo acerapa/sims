@@ -49,6 +49,9 @@
     </div>
     <div class="col-span-full grid grid-cols-20 gap-3">
       <p class="col-span-18 text-sm font-bold">Total {{ repFullName }}</p>
+      <p class="col-span-2 text-sm font-bold text-end">
+        {{ totalAmount.toFixed(2) }}
+      </p>
     </div>
   </div>
 </template>
@@ -69,5 +72,12 @@ const getFullName = (first_name, last_name) => {
 
 const repFullName = computed(() => {
   return getFullName(props.sales.first_name, props.sales.last_name)
+})
+
+const totalAmount = computed(() => {
+  return props.sales.invoices
+    .map((inv) => inv.total)
+    .map((t) => parseFloat(t))
+    .reduce((a, b) => a + b, 0)
 })
 </script>
