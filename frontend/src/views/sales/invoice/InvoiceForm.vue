@@ -435,11 +435,11 @@ const onSubmit = async () => {
   let isSuccess = false
 
   let data = { ...model.value }
-  if (isFromSalesOrder.value) {
-    delete data.invoice.customer_id
-    delete data.invoice.employee_id
-    delete data.products
-  }
+  // if (isFromSalesOrder.value) {
+  //   delete data.invoice.customer_id
+  //   delete data.invoice.employee_id
+  //   delete data.products
+  // }
   isSuccess = await invoiceStore.createInvoice(model.value)
 
   if (isSuccess) {

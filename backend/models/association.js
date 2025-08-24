@@ -112,7 +112,7 @@ Invoice.hasMany(InvoiceProducts, {
 // invoice to customer
 Invoice.belongsTo(Customer, {
   foreignKey: "customer_id",
-  as: "customer",
+  as: ALIASES.CUSTOMER,
 });
 
 Customer.hasMany(Invoice, {

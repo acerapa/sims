@@ -18,7 +18,8 @@ export default {
       gridColumn: {
         'span-13': 'span 13 / span 13',
         'span-14': 'span 14 / span 14',
-        'span-15': 'span 15 / span 15'
+        'span-15': 'span 15 / span 15',
+        'span-18': 'span 18 / span 18'
       },
       gridColumnStart: {
         13: '13'
@@ -35,7 +36,8 @@ export default {
         18: 'repeat(18, minmax(0, 1fr))',
         19: 'repeat(19, minmax(0, 1fr))',
         20: 'repeat(20, minmax(0, 1fr))',
-        21: 'repeat(21, minmax(0, 1fr))'
+        21: 'repeat(21, minmax(0, 1fr))',
+        22: 'repeat(22, minmax(0, 1fr))'
       }
     }
   },

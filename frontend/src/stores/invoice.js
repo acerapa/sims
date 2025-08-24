@@ -8,6 +8,7 @@ export const useInvoiceStore = defineStore('invoice', () => {
   const salesOrderStore = useSalesStore()
   const invoice = ref()
   const invoices = ref([])
+  const salesByRep = ref([])
   const invoicesByCustomer = ref([])
 
   const fetchInvoices = async () => {
@@ -75,6 +76,14 @@ export const useInvoiceStore = defineStore('invoice', () => {
     }
   }
 
+  const fetchInvoiceByRep = async () => {
+    const res = await api('invoices/by-sales-rep')
+
+    if (res.status < 400) {
+      salesByRep.value = res.data.invoices
+    }
+  }
+
   // getters
   const getInvoices = async () => {
     if (!invoices.value.length) {
@@ -95,6 +104,7 @@ export const useInvoiceStore = defineStore('invoice', () => {
   return {
     invoice,
     invoices,
+    salesByRep,
     invoicesByCustomer,
 
     getInvoices,
@@ -102,6 +112,7 @@ export const useInvoiceStore = defineStore('invoice', () => {
     fetchInvoices,
     getInvoiceById,
     fetchInvoiceById,
+    fetchInvoiceByRep,
     updateInvoiceStatus,
     fetchInvoiceByCustomer
   }
