@@ -2,7 +2,7 @@
   <div class="bg-white py-8 print:py-0 flex flex-col gap-5">
     <PrintableHeader
       name="Sales By Item Detailed Report"
-      sub_desctiption="No content"
+      :sub_desctiption="formattedDateRange"
     />
 
     <div class="flex flex-col gap-3 px-10 mt-10">
@@ -40,19 +40,23 @@ import SalesByItemPrintableRow from '@/components/sales/SalesByItemPrintableRow.
 import { useProductStore } from '@/stores/product'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted } from 'vue'
+import { formatDateRange } from '@/helper'
 
 // TODO: Will implement this soon when the filters are discussed
-// import { useRoute } from 'vue-router'
-// const route = useRoute()
+import { useRoute } from 'vue-router'
+const route = useRoute()
 
 const productStore = useProductStore()
 const { salesByItem } = storeToRefs(productStore)
 
 const data = computed(() => Object.entries(salesByItem.value))
 
+const formattedDateRange = computed(() =>
+  formatDateRange(route.query.from, route.query.to)
+)
+
 onMounted(async () => {
-  await productStore.fetchSalesByItem()
-  console.log(data.value)
+  await productStore.fetchSalesByItem(route.query.from, route.query.to)
 })
 </script>
 
