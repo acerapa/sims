@@ -3,8 +3,9 @@
     <CustomTable
       :has-tools="true"
       :has-add-btn="false"
+      :data="filteredData"
       :row-prop-init="rowPropInit"
-      :data="Object.entries(salesByItem)"
+      v-model:searchText="searchText"
       :table-row-component="SalesByItemRow"
     >
       <template #table_header>
@@ -74,6 +75,7 @@ const dateFilter = ref({
   from: '',
   to: ''
 })
+const searchText = ref('')
 
 // composables
 useTableScroll(tableRef, false)
@@ -94,7 +96,7 @@ Event.emit(EventEnum.IS_PAGE_LOADING, true)
  * COMPUTED
  ** ================================================*/
 const filteredData = computed(() => {
-  return [salesByItem.value].filter((item) => item)
+  return Object.entries(salesByItem.value)
 })
 
 /** ================================================
@@ -112,7 +114,10 @@ setFilterDate()
 
 const onPrint = () => {
   router.push({
-    name: ReportConst.PRINT_SALES_BY_ITEM_DETAILED
+    name: ReportConst.PRINT_SALES_BY_ITEM_DETAILED,
+    query: {
+      ...dateFilter.value
+    }
   })
 }
 
@@ -121,6 +126,7 @@ onMounted(async () => {
     dateFilter.value.from,
     dateFilter.value.to
   )
+
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
 
