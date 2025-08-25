@@ -576,6 +576,7 @@ module.exports = {
 
   salesByItem: async (req, res) => {
     try {
+      const { from, to } = req.query;
       const products = await ProductCategory.findAll({
         include: [
           {
@@ -594,6 +595,12 @@ module.exports = {
                 as: ALIASES.INVOICES,
                 required: true,
                 attributes: ["id", "issue_date", "memo"],
+                where: {
+                  issue_date: {
+                    [Op.gte]: new Date(from),
+                    [Op.lte]: new Date(to),
+                  },
+                },
                 include: [
                   {
                     model: ReceivedPayment,

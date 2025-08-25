@@ -159,8 +159,8 @@ export const useProductStore = defineStore('product', () => {
     return res.data.is_exist
   }
 
-  const fetchSalesByItem = async () => {
-    const res = await api('products/sales-by-item')
+  const fetchSalesByItem = async (from, to) => {
+    const res = await api(`products/sales-by-item?from=${from}&to=${to}`)
 
     let data = {}
     if (res.status < 400) {
