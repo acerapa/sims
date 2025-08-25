@@ -136,7 +136,7 @@ const onChange = () => {
     )
 
     if (product) {
-      model.value.cost = product.price
+      model.value.cost = product.product_details.cost
       model.value.quantity = 1
     }
   } else {
