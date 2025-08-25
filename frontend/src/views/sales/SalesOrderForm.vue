@@ -47,13 +47,13 @@
     <div class="flex flex-col gap-4 py-4">
       <div class="flex gap-3">
         <CustomInput
-          label="From"
           type="select"
           name="user_id"
           class="flex-1"
           :has-label="true"
           :can-search="true"
           :has-add-new="true"
+          label="Sales Person"
           :error-has-text="true"
           placeholder="Prepared By"
           :options="employeeOptions"

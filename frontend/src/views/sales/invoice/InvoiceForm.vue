@@ -44,10 +44,10 @@
         <div class="flex-1">
           <CustomInput
             type="select"
-            label="From"
             :has-label="true"
             :can-search="true"
             name="employee_id"
+            label="Sales Person"
             :error-has-text="true"
             :options="employeeOptions"
             placeholder="Select Employee"
