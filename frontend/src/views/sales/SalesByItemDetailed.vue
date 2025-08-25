@@ -1,13 +1,14 @@
 <template>
   <div ref="tableRef">
     <CustomTable
+      :has-tools="true"
       :has-add-btn="false"
-      :data="Object.entries(salesByItem)"
       :row-prop-init="rowPropInit"
+      :data="Object.entries(salesByItem)"
       :table-row-component="SalesByItemRow"
     >
       <template #table_header>
-        <div class="grid grid-cols-15 gap-3">
+        <div class="grid grid-cols-15 gap-3 min-w-[1240px]">
           <p class="col-span-3 table-header">Type</p>
           <p class="col-span-2 table-header">Date</p>
           <p class="col-span-1 table-header"># Item</p>
@@ -16,6 +17,26 @@
           <p class="col-span-1 table-header text-center">Qty</p>
           <p class="col-span-1 table-header text-end">Price</p>
           <p class="col-span-1 table-header text-end">Amount</p>
+        </div>
+      </template>
+      <template #tools>
+        <div class="flex gap-6">
+          <CustomInput
+            type="date"
+            label="From:"
+            name="date-from"
+            :has-label="true"
+            v-model="dateFilter.from"
+            class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
+          />
+          <CustomInput
+            type="date"
+            label="To:"
+            name="date-to"
+            :has-label="true"
+            v-model="dateFilter.to"
+            class="[&>div]:gap-3 [&>div]:items-center [&>div]:flex-row w-fit"
+          />
         </div>
       </template>
       <template #buttons>
@@ -30,10 +51,11 @@
 
 <script setup>
 import CustomTable from '@/components/shared/CustomTable.vue'
+import CustomInput from '@/components/shared/CustomInput.vue'
 import SalesByItemRow from '@/components/sales/SalesByItemRow.vue'
 import { useProductStore } from '@/stores/product'
 import { storeToRefs } from 'pinia'
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useTableScroll } from '@/use/useTableScroll'
 import Event from '@/event'
 import { EventEnum } from '@/data/event'
@@ -41,14 +63,21 @@ import { EventEnum } from '@/data/event'
 import Printer from '@/assets/icons/printer.png'
 import { useRouter } from 'vue-router'
 import { ReportConst } from '@/const/route.constants'
+import { DateHelpers } from 'shared'
 
 const tableRef = ref(null)
 const router = useRouter()
 const productStore = useProductStore()
 const { salesByItem } = storeToRefs(productStore)
 
+const dateFilter = ref({
+  from: '',
+  to: ''
+})
+
 // composables
 useTableScroll(tableRef, false)
+
 /** ================================================
  * EVENTS
  ** ================================================*/
@@ -71,6 +100,16 @@ const filteredData = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
+const setFilterDate = () => {
+  const current = new Date()
+  // Get the previous date and it's first date
+  dateFilter.value.to = DateHelpers.formatDate(current, 'YYYY-MM-DD')
+
+  const previous = new Date(current.getFullYear(), current.getMonth() - 1, 1)
+  dateFilter.value.from = DateHelpers.formatDate(previous, 'YYYY-MM-DD')
+}
+setFilterDate()
+
 const onPrint = () => {
   router.push({
     name: ReportConst.PRINT_SALES_BY_ITEM_DETAILED
@@ -78,7 +117,27 @@ const onPrint = () => {
 }
 
 onMounted(async () => {
-  await productStore.fetchSalesByItem()
+  await productStore.fetchSalesByItem(
+    dateFilter.value.from,
+    dateFilter.value.to
+  )
   Event.emit(EventEnum.IS_PAGE_LOADING, false)
 })
+
+/** ================================================
+ * WATCHERS
+ ** ================================================*/
+watch(
+  () => ({ from: dateFilter.value.from, to: dateFilter.value.to }),
+  async (newVal, oldVal) => {
+    if (newVal.from != oldVal.from || newVal.to != oldVal.to) {
+      // call api to handle date filter changes
+      await productStore.fetchSalesByItem(
+        dateFilter.value.from,
+        dateFilter.value.to
+      )
+    }
+  },
+  { deep: true }
+)
 </script>

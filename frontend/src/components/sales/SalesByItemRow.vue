@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-15 gap-3 gen-table-row">
+  <div class="grid grid-cols-15 gap-3 gen-table-row min-w-[1240px]">
     <p
       :style="{ paddingLeft: `${props.depth * 12}px` }"
       class="col-span-full text-sm font-bold"
