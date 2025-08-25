@@ -67,7 +67,6 @@
 <script setup>
 import SalesByItemRow from '@/components/sales/SalesByItemRow.vue'
 import { DateHelpers } from 'shared'
-import { computed, ref, watch } from 'vue'
 const props = defineProps({
   sales: {
     type: Object,
