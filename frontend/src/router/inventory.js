@@ -72,5 +72,23 @@ export default [
         }
       }
     ]
+  },
+  {
+    path: '/print/inventories',
+    name: InventoryConst.PRINT_INVENTORY,
+    component: () => import('@/layout/PrintableLayout.vue'),
+    children: [
+      {
+        name: InventoryConst.PRINT_PRODUCT_LIST,
+        path: '/products',
+        component: () =>
+          import('@/views/Inventory/printables/ProductPrintable.vue'),
+        meta: {
+          title: 'Product list',
+          requiresAuth: true,
+          filename: 'Product list'
+        }
+      }
+    ]
   }
 ]

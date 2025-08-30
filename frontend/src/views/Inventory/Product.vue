@@ -14,11 +14,19 @@
         :data="filteredData"
         :has-pagination="true"
         :has-check-box="false"
+        btn-custom-text="New product"
         @add-new-record="onNewRecord"
         v-model:search-text="searchText"
         :row-prop-init="productRowEvent"
         :table-row-component="ProductRow"
       >
+        <template #buttons>
+          <button class="btn flex gap-3 items-center" @click="onPrint">
+            <img class="invert w-5" :src="Printer" />
+            <p>Print</p>
+          </button>
+        </template>
+
         <template #table_header>
           <div class="grid grid-cols-9 gap-3 w-full min-w-[907px]">
             <div class="col-span-1 flex gap-3 items-center">
@@ -114,6 +122,9 @@ import { useSettingsStore } from '@/stores/settings'
 import router from '@/router'
 import { InventoryConst } from '@/const/route.constants'
 import { useTableScroll } from '@/use/useTableScroll'
+
+//  Icons
+import Printer from '@/assets/icons/printer.png'
 
 const selectedId = ref(0)
 const searchText = ref('')
@@ -216,6 +227,10 @@ const onView = (id) => {
     name: InventoryConst.PRODUCT_FORM,
     query: { id }
   })
+}
+
+const onPrint = () => {
+  // TODO: redirect to the product printable page
 }
 
 /** ================================================
