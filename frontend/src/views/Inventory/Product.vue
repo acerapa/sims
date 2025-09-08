@@ -206,7 +206,7 @@ const filteredData = computed(() => {
     )
     .filter((product) => {
       const searchCondition =
-        `${product.id} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
+        `${product.id} ${product.item_code} ${product.product_details.sales_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
       return searchText.value
         ? searchCondition.includes(searchText.value.toLowerCase())
         : product
@@ -230,7 +230,12 @@ const onView = (id) => {
 }
 
 const onPrint = () => {
-  // TODO: redirect to the product printable page
+  router.push({
+    name: InventoryConst.PRINT_PRODUCT_LIST,
+    query: {
+      searchText: searchText.value
+    }
+  })
 }
 
 /** ================================================
