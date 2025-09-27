@@ -105,6 +105,37 @@
         <div class="flex flex-col gap-3">
           <p class="text-base font-semibold">Inventory and Sales information</p>
           <div class="flex flex-col gap-3 cont">
+            <div class="flex gap-3 items-end">
+              <CustomInput
+                :rows="5"
+                class="flex-1"
+                type="textarea"
+                :has-label="true"
+                :error-has-text="true"
+                name="purchase_description"
+                label="Purchase Description"
+                placeholder="*Purchase Description"
+                @input="onInputPurchaseDescription"
+                v-model="model.details.purchase_description"
+                :error="errors.details?.purchase_description"
+                @focus="resetErrorValue('details.purchase_description')"
+              />
+
+              <CustomInput
+                :rows="5"
+                class="flex-1"
+                type="textarea"
+                :has-label="true"
+                name="sale_description"
+                label="Sales Description"
+                placeholder="*Sales Description"
+                @input="onInputSalesDescription"
+                v-model="model.details.sales_description"
+                :error="errors.details?.sales_description"
+                :error-has-text="true"
+                @focus="resetErrorValue('details.sales_description')"
+              />
+            </div>
             <div class="flex gap-3">
               <div class="flex flex-col gap-5 flex-1">
                 <CustomInput
@@ -181,37 +212,6 @@
               label="The same description?"
               class="[&>div]:flex-row-reverse [&>div]:justify-end"
             />
-            <div class="flex gap-3 items-end">
-              <CustomInput
-                :rows="5"
-                class="flex-1"
-                type="textarea"
-                :has-label="true"
-                :error-has-text="true"
-                name="purchase_description"
-                label="Purchase Description"
-                placeholder="*Purchase Description"
-                @input="onInputPurchaseDescription"
-                v-model="model.details.purchase_description"
-                :error="errors.details?.purchase_description"
-                @focus="resetErrorValue('details.purchase_description')"
-              />
-
-              <CustomInput
-                :rows="5"
-                class="flex-1"
-                type="textarea"
-                :has-label="true"
-                name="sale_description"
-                label="Sales Description"
-                placeholder="*Sales Description"
-                @input="onInputSalesDescription"
-                v-model="model.details.sales_description"
-                :error="errors.details?.sales_description"
-                :error-has-text="true"
-                @focus="resetErrorValue('details.sales_description')"
-              />
-            </div>
             <div class="flex gap-3 mt-4">
               <div class="flex-1">
                 <button
