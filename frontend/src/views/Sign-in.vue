@@ -27,18 +27,28 @@
           :error="errors.username"
           :error-has-text="true"
         />
-        <CustomInput
-          type="password"
-          placeholder="Password"
-          :has-label="true"
-          label="Password"
-          name="password"
-          @focus="() => resetErrorValue('password')"
-          input-class="w-full"
-          v-model="credentials.password"
-          :error="errors.password"
-          :error-has-text="true"
-        />
+        <div class="relative">
+          <CustomInput
+            :type="isShowPassword ? 'text' : 'password'"
+            placeholder="Password"
+            :has-label="true"
+            label="Password"
+            name="password"
+            @focus="() => resetErrorValue('password')"
+            input-class="w-full !pr-7"
+            v-model="credentials.password"
+            :error="errors.password"
+            :error-has-text="true"
+          />
+          <button
+            type="button"
+            class="absolute right-2 bottom-3"
+            @click="isShowPassword = !isShowPassword"
+          >
+            <Eye class="size-4" v-if="!isShowPassword" />
+            <EyeOff class="size-4" v-else />
+          </button>
+        </div>
         <button
           class="text-white bg-gray-600 max-w-fit mt-4 px-5 py-2 rounded mx-auto text-sm"
           type="submit"
@@ -59,9 +69,12 @@ import { AuthSchema } from 'shared'
 import CustomInput from '@/components/shared/CustomInput.vue'
 import { useValidation } from '@/composables/useValidation'
 import { useAuth } from '@/composables/useAuth'
+import Eye from '@/components/icons/Eye.vue'
+import EyeOff from '@/components/icons/EyeOff.vue'
 
 const router = useRouter()
 
+const isShowPassword = ref(false)
 const credentials = ref({
   username: '',
   password: ''
