@@ -1,10 +1,14 @@
 export const InventoryConst = Object.freeze({
   INVENTORY: 'inventory',
   INVENTORY_STOCK_STATUS: 'inventory-stock-status',
-  PHYSICAL_INVENTORY_DETAILS: 'physical-inventory-details',
+  PHYSICAL_INVENTORY_FORM: 'physical-inventory-form',
   PRODUCTS: 'products',
   PRODUCT_FORM: 'product-form',
-  SERVICES: 'services'
+  SERVICES: 'services',
+  PHYSICAL_INVENTORY: 'physical-inventory',
+  PHYSICAL_INVENTORY_ADJUSTMENT_FORM: 'physical-inventory-adjustment-form',
+  PRINT_INVENTORY: 'print-inventories',
+  PRINT_PRODUCT_LIST: 'print-product-list'
 })
 
 export const CommonConst = Object.freeze({
@@ -18,7 +22,9 @@ export const PurchaseConst = Object.freeze({
   PURCHASE_ORDER: 'purchase-order',
   PURCHASE_ORDER_FORM: 'purchase-order-form',
   PURCHASE_RECEIVING_ORDER: 'purchase-receiving-order',
-  VENDORS: 'vendors'
+  VENDORS: 'vendors',
+  PURCHASE_BY_VENDOR_SUMMARY_REPORT: 'purchase-by-vendor-summary-report',
+  PURCHASE_BY_VENDOR_DETAILED_REPORT: 'purchase-by-vendor-detailed-report'
 })
 
 export const SalesConst = Object.freeze({
@@ -32,7 +38,11 @@ export const SalesConst = Object.freeze({
   INVOICE_FORM: 'invoice-form',
   DELIVERIES: 'deliveries',
   RECEIVED_PAYMENTS: 'received-payments',
-  RECEIVED_PAYMENT_FORM: 'received-payment-form'
+  RECEIVED_PAYMENT_FORM: 'received-payment-form',
+  SALES_ORDER_PRINT: 'sales-order-print',
+  SALES_BY_ITEM_DETAILED: 'sales-by-item-detailed-report',
+  SALES_BY_CUSTOMER_DETAILED: 'sales-by-customer-detailed-report',
+  SALES_BY_REP: 'sales-by-rep'
 })
 
 export const TransferConst = Object.freeze({
@@ -52,4 +62,12 @@ export const SettingConst = Object.freeze({
   BRANCHES: 'branches',
   PRODUCT_SETTINGS: 'product-settings',
   ACCOUNT_SETTINGS: 'account-settings'
+})
+
+export const ReportConst = Object.freeze({
+  PRINT_REPORT: 'print-reports',
+  PRINT_PURCHASE_BY_VENDOR_DETAILED: 'print-purchase-by-vendor-detailed',
+  PRINT_PURCHASE_BY_VENDOR_SUMMARY: 'print-purchase-by-vendor-summary',
+  PRINT_SALES_BY_CUSTOMER_DETAILED: 'print-sales-by-customer-detailed',
+  PRINT_SALES_BY_ITEM_DETAILED: 'print-sales-by-item-detailed'
 })

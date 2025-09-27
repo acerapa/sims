@@ -4,6 +4,7 @@
       :data="filteredData"
       title="Fix Asset List"
       :has-pagination="true"
+      :has-check-box="false"
       :row-prop-init="rowPropInit"
       @add-new-record="onAddNewRecord"
       v-model:search-text="searchText"
@@ -13,7 +14,7 @@
       <template #table_header>
         <div class="grid grid-cols-7 gap-3 min-w-[740px]">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input type="checkbox" class="input" v-if="false" />
             <p class="table-header">#</p>
           </div>
           <p class="col-span-1 table-header">PO no.</p>

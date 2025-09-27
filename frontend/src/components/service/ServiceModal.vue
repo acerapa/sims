@@ -13,6 +13,7 @@
           class="flex-1"
           :has-label="true"
           name="service_name"
+          input-class="flex-1"
           label="Service Name"
           :error-has-text="true"
           placeholder="Service Name"
@@ -20,11 +21,13 @@
           :error="errors.service?.name"
         />
         <CustomInput
+          :icon="peso"
           type="number"
           label="Price"
           class="flex-1"
           :has-label="true"
           placeholder="Price"
+          input-class="flex-1"
           name="service_price"
           :error-has-text="true"
           v-model="model.service.price"
@@ -37,6 +40,7 @@
           class="flex-1"
           :has-label="true"
           :has-add-new="true"
+          input-class="flex-1"
           name="income_account"
           label="Income Account"
           :error-has-text="true"
@@ -97,6 +101,9 @@ import Event from '@/event'
 import { EventEnum } from '@/data/event'
 import { ToastTypes } from '@/data/types'
 import { useValidation } from '@/composables/useValidation'
+
+// icons
+import peso from '@/assets/icons/peso.png'
 
 const showDeleteModal = ref(false)
 
@@ -166,7 +173,13 @@ const onSubmit = async () => {
   // validate data
   validateData()
 
-  if (hasErrors.value) return
+  if (hasErrors.value) {
+    Event.emit(EventEnum.TOAST_MESSAGE, {
+      type: ToastTypes.ERROR,
+      message: 'Some fields are not properly inputed please check!'
+    })
+    return
+  }
 
   let isSuccess = false
   if (props.selectedId) {

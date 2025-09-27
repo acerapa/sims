@@ -44,10 +44,10 @@
         <div class="flex-1">
           <CustomInput
             type="select"
-            label="From"
             :has-label="true"
             :can-search="true"
             name="employee_id"
+            label="Sales Person"
             :error-has-text="true"
             :options="employeeOptions"
             placeholder="Select Employee"
@@ -343,7 +343,7 @@ const model = ref({
     employee_id: '',
     customer_id: '',
     memo: '',
-    sales_order_id: '',
+    sales_order_id: null,
     issue_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
     due_date: DateHelpers.formatDate(new Date(), 'YYYY-MM-DD'),
     discount: 0.0,
@@ -435,11 +435,11 @@ const onSubmit = async () => {
   let isSuccess = false
 
   let data = { ...model.value }
-  if (isFromSalesOrder.value) {
-    delete data.invoice.customer_id
-    delete data.invoice.employee_id
-    delete data.products
-  }
+  // if (isFromSalesOrder.value) {
+  //   delete data.invoice.customer_id
+  //   delete data.invoice.employee_id
+  //   delete data.products
+  // }
   isSuccess = await invoiceStore.createInvoice(model.value)
 
   if (isSuccess) {

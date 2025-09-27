@@ -22,23 +22,6 @@ export const useEmployeeStore = defineStore('employee', () => {
     }
   }
 
-  const getEmployees = async () => {
-    if (!employees.value.length) {
-      await fetchAllEmployees()
-    }
-
-    return employees.value
-  }
-
-  const employeeOptions = () => {
-    return employees.value.map((employee) => {
-      return {
-        text: `${employee.first_name} ${employee.last_name}`,
-        value: employee.id
-      }
-    })
-  }
-
   const registerEmployee = async (employee) => {
     const res = await api('users/register', Method.POST, employee)
     const isSuccess = res.status < 400
@@ -49,7 +32,11 @@ export const useEmployeeStore = defineStore('employee', () => {
         await fetchAllEmployees()
       }
     }
-    return isSuccess
+    return {
+      isSuccess,
+      data: res.data.user,
+      response: res
+    }
   }
 
   const updateEmployee = async (id, data) => {
@@ -71,7 +58,11 @@ export const useEmployeeStore = defineStore('employee', () => {
       }
     }
 
-    return isSuccess
+    return {
+      isSuccess,
+      data: employee,
+      response: res
+    }
   }
 
   const removeEmployee = async (id) => {
@@ -83,6 +74,24 @@ export const useEmployeeStore = defineStore('employee', () => {
     } else {
       await fetchAllEmployees()
     }
+  }
+
+  // getters
+  const employeeOptions = () => {
+    return employees.value.map((employee) => {
+      return {
+        text: `${employee.first_name} ${employee.last_name}`,
+        value: employee.id
+      }
+    })
+  }
+
+  const getEmployees = async () => {
+    if (!employees.value.length) {
+      await fetchAllEmployees()
+    }
+
+    return employees.value
   }
 
   return {

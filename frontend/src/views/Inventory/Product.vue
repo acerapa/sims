@@ -13,15 +13,24 @@
         :has-add-btn="true"
         :data="filteredData"
         :has-pagination="true"
+        :has-check-box="false"
+        btn-custom-text="New product"
         @add-new-record="onNewRecord"
         v-model:search-text="searchText"
         :row-prop-init="productRowEvent"
         :table-row-component="ProductRow"
       >
+        <template #buttons>
+          <button class="btn flex gap-3 items-center" @click="onPrint">
+            <img class="invert w-5" :src="Printer" />
+            <p>Print</p>
+          </button>
+        </template>
+
         <template #table_header>
           <div class="grid grid-cols-9 gap-3 w-full min-w-[907px]">
             <div class="col-span-1 flex gap-3 items-center">
-              <input type="checkbox" class="input" />
+              <input v-show="false" type="checkbox" class="input" />
               <p class="table-header">#</p>
             </div>
             <p class="col-span-3 table-header">Item Description</p>
@@ -114,6 +123,9 @@ import router from '@/router'
 import { InventoryConst } from '@/const/route.constants'
 import { useTableScroll } from '@/use/useTableScroll'
 
+//  Icons
+import Printer from '@/assets/icons/printer.png'
+
 const selectedId = ref(0)
 const searchText = ref('')
 const showModal = ref(false)
@@ -194,7 +206,7 @@ const filteredData = computed(() => {
     )
     .filter((product) => {
       const searchCondition =
-        `${product.id} ${product.item_code} ${product.purchase_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
+        `${product.id} ${product.item_code} ${product.product_details.sales_description} ${product.quantity_in_stock} ${DateHelpers.formatDate(product.createdAt, 'M/D/YYYY')}`.toLowerCase()
       return searchText.value
         ? searchCondition.includes(searchText.value.toLowerCase())
         : product
@@ -214,6 +226,15 @@ const onView = (id) => {
   router.push({
     name: InventoryConst.PRODUCT_FORM,
     query: { id }
+  })
+}
+
+const onPrint = () => {
+  router.push({
+    name: InventoryConst.PRINT_PRODUCT_LIST,
+    query: {
+      searchText: searchText.value
+    }
   })
 }
 

@@ -53,7 +53,7 @@ InvoiceProducts.init(
   {
     sequelize,
     timestamps: false,
-  }
+  },
 );
 
 module.exports = InvoiceProducts;

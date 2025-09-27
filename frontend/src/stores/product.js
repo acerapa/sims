@@ -2,12 +2,15 @@ import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useVendorStore } from './supplier'
+import { useSettingsStore } from './settings'
 
 export const useProductStore = defineStore('product', () => {
   const supplierStore = useVendorStore()
+  const settingsStore = useSettingsStore()
 
   const products = ref([])
   const product = ref(null)
+  const salesByItem = ref([])
 
   const supplierProducts = computed(() => {
     if (!supplierStore.selectedSupplier) return products.value
@@ -98,6 +101,12 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  const fetchInventoryStock = async () => {
+    const res = await api('products/stock-status')
+
+    return res.data.grouped
+  }
+
   const productOptions = computed(() => {
     return products.value.map((product) => {
       return {
@@ -150,11 +159,63 @@ export const useProductStore = defineStore('product', () => {
     return res.data.is_exist
   }
 
+  const fetchSalesByItem = async (from, to) => {
+    const res = await api(`products/sales-by-item?from=${from}&to=${to}`)
+
+    let data = {}
+    if (res.status < 400) {
+      let toProcessData = res.data.products
+
+      function segregateProductByCategory(categories, grouped, products) {
+        if (categories.length === 1) {
+          const cat = categories.shift()
+          if (!grouped[cat.name]) {
+            grouped[cat.name] = {
+              products: []
+            }
+          }
+
+          if (!grouped[cat.name]?.products) {
+            grouped[cat.name].products = products
+          } else {
+            grouped[cat.name]['products'] = [
+              ...grouped[cat.name]['products'],
+              ...products
+            ]
+          }
+        } else {
+          const cat = categories.shift()
+          if (!grouped[cat.name]) {
+            grouped[cat.name] = {
+              products: []
+            }
+          }
+          grouped = segregateProductByCategory(
+            categories,
+            grouped[cat.name],
+            products
+          )
+        }
+      }
+
+      // processing
+      for (const category of toProcessData) {
+        const parent_cat_tree = await settingsStore.fetchCategoryTree(
+          category.id
+        )
+
+        segregateProductByCategory(parent_cat_tree, data, category.products)
+      }
+    }
+    salesByItem.value = data
+  }
+
   return {
     product,
     products,
-    supplierProducts,
+    salesByItem,
     productOptions,
+    supplierProducts,
 
     getProduct,
     getProducts,
@@ -162,8 +223,10 @@ export const useProductStore = defineStore('product', () => {
     removeProduct,
     registerProduct,
     fetchAllProducts,
+    fetchSalesByItem,
     fetchProductByIds,
     getProductItemCode,
+    fetchInventoryStock,
     checkProductItemCodeExist
   }
 })

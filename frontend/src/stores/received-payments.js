@@ -2,11 +2,13 @@ import { api, Method } from '@/api'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useInvoiceStore } from './invoice'
+import { useProductStore } from './product'
 
 export const useReceivedPaymentsStore = defineStore('received-payments', () => {
   const receivedPayments = ref([])
   const receivedInvoicePayments = ref([])
   const invoiceStore = useInvoiceStore()
+  const productStore = useProductStore()
 
   const registerReceivedPayment = async (data) => {
     const res = await api('received-payments', Method.POST, data)
@@ -14,6 +16,9 @@ export const useReceivedPaymentsStore = defineStore('received-payments', () => {
     const isSuccess = res.status < 400
 
     if (isSuccess) {
+      // Fetch all products
+      await productStore.fetchAllProducts()
+
       const { received_payment } = res.data
 
       await fetchReceivedPayments()

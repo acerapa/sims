@@ -11,6 +11,7 @@
         :has-add-btn="true"
         :data="filteredData"
         :has-pagination="true"
+        :has-check-box="false"
         v-model:is-edit="isEdit"
         :row-prop-init="accountRowEvent"
         v-model:search-text="searchText"
@@ -21,7 +22,7 @@
         <template #table_header>
           <div class="grid grid-cols-8 gap-3 min-w-[495px]">
             <div class="col-span-1 flex gap-3 items-center">
-              <input type="checkbox" class="input" />
+              <input type="checkbox" class="input" v-if="false" />
               <p class="table-header">#</p>
             </div>
             <p class="col-span-3 table-header">Account Name</p>

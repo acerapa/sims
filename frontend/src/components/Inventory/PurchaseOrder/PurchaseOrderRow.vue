@@ -4,13 +4,13 @@
     @click="emit('view', props.order.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
-      <input type="checkbox" class="input" />
+      <input type="checkbox" class="input" v-if="props.hasCheckBox" />
       <p class="text-sm">{{ props.order.id }}</p>
     </div>
     <p class="col-span-2 text-sm">{{ props.order.ref_no }}</p>
     <p class="col-span-2 text-sm">{{ props.order.supplier.company_name }}</p>
-    <p class="col-span-1 text-sm">{{ props.order.amount }}</p>
-    <p class="col-span-2 text-sm">
+    <p class="col-span-1 text-sm text-end">₱ {{ props.order.amount }}</p>
+    <p class="col-span-2 text-sm ml-4">
       {{ DateHelpers.formatDate(props.order.date, 'M/D/YYYY') }}
     </p>
     <p class="col-span-2 text-sm">
@@ -36,6 +36,10 @@ const props = defineProps({
   order: {
     type: Object,
     default: () => ({})
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 

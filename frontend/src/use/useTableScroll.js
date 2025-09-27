@@ -1,5 +1,5 @@
 import { useAppStore } from '@/stores/app'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUpdated, ref, watch } from 'vue'
 
 export function useTableScroll(tableRef, isFormTable = true) {
   const appStore = useAppStore()
@@ -15,7 +15,10 @@ export function useTableScroll(tableRef, isFormTable = true) {
      */
 
     appStore.getCollpaseSideNav()
+    handleResize()
+  })
 
+  onUpdated(() => {
     handleResize()
   })
 
@@ -30,8 +33,7 @@ export function useTableScroll(tableRef, isFormTable = true) {
       : isFormTable
         ? 360
         : 328
-    const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth || 0
+    const scrollbarWidth = getScrollbarWidth()
 
     const mainTable = Array.from(tableRef.value.children).find((child) =>
       Array.from(child.classList).includes('main-table')
@@ -41,10 +43,8 @@ export function useTableScroll(tableRef, isFormTable = true) {
     if (mainTable) {
       generateKeyframeRules(
         mainTable.clientWidth,
-        scrollbarWidth + constantUntrackWidth
+        constantUntrackWidth + scrollbarWidth
       )
-      // 		overflow-x: auto;
-      // 	`
 
       mainTable.classList.add('resize-table')
       mainTable.classList.add('overflow-x-auto')
@@ -57,7 +57,7 @@ export function useTableScroll(tableRef, isFormTable = true) {
         removeCSSRules()
 
         // set the table width to the main table width
-        mainTable.style = `width: calc(100vw - ${scrollbarWidth + constantUntrackWidth}px);`
+        mainTable.style = `width: calc(100vw - ${constantUntrackWidth + scrollbarWidth}px);`
       })
     }
   }
@@ -104,6 +104,11 @@ export function useTableScroll(tableRef, isFormTable = true) {
     }
 
     keyCSSRulesIndexTracker.value = []
+  }
+
+  const getScrollbarWidth = () => {
+    const wrapper = document.querySelector('#app > div.overflow-auto')
+    return document.documentElement.offsetWidth - wrapper.clientWidth
   }
 
   /** ================================================

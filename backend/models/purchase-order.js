@@ -23,7 +23,7 @@ PurchaseOrder.init(
     },
     bill_due: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
     amount: {
       type: DataTypes.DECIMAL(10, 2),
@@ -61,6 +61,10 @@ PurchaseOrder.init(
     delivery_number: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    received_date: {
+      type: DataTypes.DATE,
+      allowNull: true
     },
     address_id: {
       type: DataTypes.INTEGER,

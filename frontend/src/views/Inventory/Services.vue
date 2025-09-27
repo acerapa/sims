@@ -4,6 +4,7 @@
       :has-filter="true"
       :data="filteredData"
       :has-pagination="true"
+      :has-check-box="false"
       v-model:search-text="searchText"
       :row-prop-init="serviceRowPropInit"
       :table-row-component="ServiceRow"
@@ -13,7 +14,7 @@
       <template #table_header>
         <div class="grid grid-cols-10 gap-3 min-w-[907px]">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input v-if="false" type="checkbox" class="input" />
             <p class="table-header">#</p>
           </div>
           <p class="col-span-2 table-header">Name</p>

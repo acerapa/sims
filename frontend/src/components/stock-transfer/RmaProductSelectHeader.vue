@@ -4,7 +4,11 @@
     :class="[props.isDisabled ? 'grid-cols-11' : 'grid-cols-12']"
   >
     <div class="col-span-3 flex gap-3 items-center">
-      <input type="checkbox" class="input" v-if="!props.isDisabled" />
+      <input
+        type="checkbox"
+        class="input"
+        v-if="!props.isDisabled && props.hasCheckBox"
+      />
       <p class="table-header pl-3">Item</p>
     </div>
     <p class="col-span-2 table-header pl-3">Serial number</p>
@@ -19,6 +23,10 @@
 <script setup>
 const props = defineProps({
   isDisabled: {
+    type: Boolean,
+    default: false
+  },
+  hasCheckBox: {
     type: Boolean,
     default: false
   }

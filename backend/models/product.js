@@ -2,6 +2,7 @@ const { Model, DataTypes } = require("sequelize");
 const { sequelize } = require(".");
 const { ItemType } = require("shared");
 const Account = require("./account");
+const Supplier = require("./supplier");
 
 class Product extends Model {}
 
@@ -41,10 +42,18 @@ Product.init(
         key: "id",
       },
     },
+    pref_sup_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: Supplier,
+        key: "id",
+      },
+    },
   },
   {
     sequelize,
-  }
+  },
 );
 
 module.exports = Product;

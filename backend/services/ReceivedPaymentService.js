@@ -4,6 +4,8 @@ const Invoice = require("../models/invoice");
 const ReceivedPayment = require("../models/received-payment");
 const SalesOrder = require("../models/sales-order");
 const User = require("../models/user");
+const ProductDetails = require("../models/product-details");
+const { Op } = require("sequelize");
 
 /**
  * Retrieves a detailed received payment record by its ID with associated invoice, customer, sales order, and cashier information.
@@ -87,7 +89,7 @@ const getInvoiceNewInvoiceStatus = async (invoice, receivedPayment) => {
     }
   } else if (invoice.status === InvoiceStatus.PARTIALLY_PAID) {
     const latestReceivedpayment = await getInvoiceLatestReceivedpayment(
-      invoice.id
+      invoice.id,
     );
 
     if (!latestReceivedpayment) {
@@ -104,15 +106,45 @@ const getInvoiceNewInvoiceStatus = async (invoice, receivedPayment) => {
       receivedPayment.amount > latestReceivedpayment.remaining_balance
     ) {
       throw new Error(
-        "Received payment is greater than the remaining balance!"
+        "Received payment is greater than the remaining balance!",
       );
     }
   }
   return invoice_status;
 };
 
+const setNewProductStockUponFirstPayment = async (products) => {
+  // Deduct product stock from what invoice recorded
+  // getting all product id stocks
+  const productStocks = await ProductDetails.findAll({
+    where: {
+      product_id: {
+        [Op.in]: products.map((p) => p.product_id),
+      },
+    },
+    attributes: ["product_id", "stock"],
+  });
+
+  await Promise.all(
+    products.map((product) => {
+      const productStock = productStocks.find(
+        (ps) => ps.product_id == product.product_id,
+      );
+      return ProductDetails.update(
+        { stock: productStock.stock - product.quantity },
+        {
+          where: {
+            product_id: product.product_id,
+          },
+        },
+      );
+    }),
+  );
+};
+
 module.exports = {
   getInvoiceNewInvoiceStatus,
   findreceivedPaymentDetailed,
   getInvoiceLatestReceivedpayment,
+  setNewProductStockUponFirstPayment,
 };

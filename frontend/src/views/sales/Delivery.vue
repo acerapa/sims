@@ -5,13 +5,14 @@
       :data="filteredData"
       :has-add-btn="false"
       :has-pagination="true"
+      :has-check-box="false"
       :row-prop-init="rowPropInit"
       :table-row-component="DeliveryRow"
     >
       <template #table_header>
         <div class="grid grid-cols-7">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input type="checkbox" class="input" v-if="false" />
             <p class="table-header">#</p>
           </div>
 

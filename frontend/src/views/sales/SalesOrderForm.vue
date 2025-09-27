@@ -26,7 +26,7 @@
         <SelectStatusDropdown
           v-model="model.sales_order.status"
           :status-map="SalesOrderStatusMap"
-          :class="isInvoicedOrCancelled ? 'pointer-events-none' : ''"
+          :class="'pointer-events-none'"
         />
         <button
           class="btn-green"
@@ -35,18 +35,25 @@
         >
           Generate Invoice
         </button>
+        <button
+          class="btn-danger-outline"
+          @click="onCancelOrder"
+          v-if="!isInvoicedOrCancelled"
+        >
+          Cancel Order
+        </button>
       </div>
     </div>
     <div class="flex flex-col gap-4 py-4">
       <div class="flex gap-3">
         <CustomInput
-          label="From"
           type="select"
           name="user_id"
           class="flex-1"
           :has-label="true"
           :can-search="true"
           :has-add-new="true"
+          label="Sales Person"
           :error-has-text="true"
           placeholder="Prepared By"
           :options="employeeOptions"
@@ -477,6 +484,11 @@ const isInvoicedOrCancelled = computed(() => {
 /** ================================================
  * METHODS
  ** ================================================*/
+
+const onCancelOrder = async () => {
+  model.value.sales_order.status = SalesOrderStatus.CANCELLED
+  await onSubmit()
+}
 
 const onSubmit = async (saveAndNew) => {
   // validation

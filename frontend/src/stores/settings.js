@@ -101,6 +101,29 @@ export const useSettingsStore = defineStore('settings', () => {
     return category
   }
 
+  const getFullCategoryHeirarchy = async (id) => {
+    if (!productCategories.value.length) {
+      await fetchAllProductCategories()
+    }
+
+    // inner function to find category in hierarchy
+    const hierarchy = []
+    const findAndGatherCategories = (id) => {
+      const category = productCategories.value.find((pc) => pc.id == id)
+      if (category) {
+        hierarchy.unshift(category)
+        if (category.general_cat) {
+          findAndGatherCategories(category.general_cat)
+        }
+      }
+    }
+
+    // Run the inner funtion
+    findAndGatherCategories(id)
+
+    return hierarchy
+  }
+
   const getProductCategories = async () => {
     if (!productCategories.value.length) {
       await fetchAllProductCategories()
@@ -157,7 +180,10 @@ export const useSettingsStore = defineStore('settings', () => {
       )
     }
 
-    return isSuccess
+    return {
+      isSuccess,
+      data: res.data.category
+    }
   }
 
   const updateProductCategory = async (id, model) => {
@@ -176,6 +202,18 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const removeProductCategory = async (category) => {
     await handleCategoryAction(category, ProductCategoryAction.DELETE)
+  }
+
+  // fetching methods
+  const fetchCategoryTree = async (category_id) => {
+    const res = await api(`product-category/category-tree/${category_id}`)
+
+    let data = []
+    if (res.status < 400) {
+      data = res.data.categories
+    }
+
+    return data
   }
 
   // private product category methods
@@ -423,6 +461,7 @@ export const useSettingsStore = defineStore('settings', () => {
     fetchAllBranches,
     fetchAllAccounts,
     getCurrentBranch,
+    fetchCategoryTree,
     getReorderingPoints,
     getProductCategories,
     updateProductCategory,
@@ -431,6 +470,7 @@ export const useSettingsStore = defineStore('settings', () => {
     registerProductCategory,
     findCategoryInHierarchy,
     registerReorderingPoint,
+    getFullCategoryHeirarchy,
     fetchAllProductCategories,
     fetchAllProductReorderingPoints
   }

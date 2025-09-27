@@ -21,7 +21,12 @@ const router = createRouter({
     ...reportRoutes,
     ...transferRoutes,
     ...salesRoutes,
-    ...purchaseRoutes
+    ...purchaseRoutes,
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('@/views/errors/404.vue')
+    }
   ]
 })
 

@@ -12,6 +12,7 @@
         class="flex-1"
         name="category"
         :has-label="true"
+        input-class="w-full"
         v-model="model.name"
         label="Category Name"
         :error-has-text="true"
@@ -43,6 +44,8 @@ const showModal = defineModel()
 const showConfirmModal = ref(false)
 const settingsStore = useSettingsStore()
 
+
+const emit = defineEmits(['id'])
 const props = defineProps({
   selectedId: {
     type: Number,
@@ -113,7 +116,9 @@ const onSubmit = async () => {
       model.value
     )
   } else {
-    isSuccess = await settingsStore.registerProductCategory(model.value)
+    const res = await settingsStore.registerProductCategory(model.value)
+    isSuccess = res.isSuccess
+    emit('id', res.data.id)
   }
 
   if (isSuccess) {

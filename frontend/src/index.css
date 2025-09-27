@@ -30,7 +30,7 @@
  ======================================================*/
 .input {
   @apply border rounded text-sm px-3 py-2 focus:!outline-0 focus:border-black group-focus:border-black group-focus:!outline-0;
-  @apply disabled:border-none disabled:opacity-100 disabled:bg-white;
+  @apply disabled:border-transparent disabled:opacity-100 disabled:bg-white;
 }
 
 /* TODO: Update the styling for checkbox later on */
@@ -90,12 +90,16 @@ select.input {
   @apply btn !bg-green-500 !text-white;
 }
 
+.btn-green-outline {
+  @apply btn-outline !border-green-500 !text-green-500 hover:!bg-green-500 hover:!text-white;
+}
+
 .btn-gray {
   @apply btn !bg-gray-600 !text-white;
 }
 
 .btn-gray-outline {
-  @apply btn-outline !border-gray-600 !text-gray-600 hover:!text-white hover:!border-white;
+  @apply btn-outline !border-gray-600 !text-gray-600 hover:!bg-gray-600 hover:!text-white hover:!border-white;
 }
 
 .status {

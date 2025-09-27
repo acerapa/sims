@@ -13,7 +13,7 @@
       <template #table_header>
         <div class="grid grid-cols-10 gap-3 min-w-[790px]">
           <div class="col-span-1 flex gap-3 items-center">
-            <input type="checkbox" class="input" />
+            <input type="checkbox" class="input" v-if="false" />
             <p class="table-header">#</p>
           </div>
           <p class="col-span-3 table-header">Supplier</p>

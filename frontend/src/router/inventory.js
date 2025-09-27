@@ -20,10 +20,9 @@ export default [
         }
       },
       {
-        path: '/physical-inventory-details/:id',
-        name: InventoryConst.PHYSICAL_INVENTORY_DETAILS,
-        component: () =>
-          import('@/views/Inventory/PhysicalInventoryDetails.vue'),
+        path: '/physical-inventory-form',
+        name: InventoryConst.PHYSICAL_INVENTORY_FORM,
+        component: () => import('@/views/Inventory/PhysicalInventoryForm.vue'),
         meta: {
           title: 'Physical Inventory',
           requiresAuth: true
@@ -51,6 +50,43 @@ export default [
         component: () => import('@/views/Inventory/Services.vue'),
         meta: {
           requiresAuth: true
+        }
+      },
+      {
+        path: '/physical-inventory',
+        name: InventoryConst.PHYSICAL_INVENTORY,
+        component: () => import('@/views/Inventory/PhysicalInventory.vue'),
+        meta: {
+          title: 'Physical Inventories',
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/physical-inventory-adjustment-form/:physical_inventory_id',
+        name: InventoryConst.PHYSICAL_INVENTORY_ADJUSTMENT_FORM,
+        component: () =>
+          import('@/views/Inventory/PhysicalInventoryAdjustmentForm.vue'),
+        meta: {
+          title: 'Physical Inventory Adjustment Form',
+          requiresAuth: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/inventory/print',
+    name: InventoryConst.PRINT_INVENTORY,
+    component: () => import('@/layout/PrintableLayout.vue'),
+    children: [
+      {
+        name: InventoryConst.PRINT_PRODUCT_LIST,
+        path: '/product-list',
+        component: () =>
+          import('@/views/Inventory/printables/ProductPrintable.vue'),
+        meta: {
+          title: 'Product list',
+          requiresAuth: true,
+          filename: 'Product list'
         }
       }
     ]

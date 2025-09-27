@@ -1,12 +1,19 @@
+const { PhysicalInventoryStatus } = require("shared/enums");
 const { sequelize } = require("../models");
 const PhysicalInventory = require("../models/physical-inventory");
 const PhysicalInventoryItem = require("../models/physical-inventory-item");
 const Product = require("../models/product");
+const ProductDetails = require("../models/product-details");
+const {
+  reflectPhysicalProductCount,
+} = require("../services/PhysicalInventoryService");
 
 module.exports = {
   all: async (req, res) => {
     try {
-      const physical_inventories = await PhysicalInventory.findAll();
+      const physical_inventories = await PhysicalInventory.findAll({
+        order: [["createdAt", "DESC"]],
+      });
 
       res.sendResponse({ physical_inventories }, "Successfully Fetched!", 200);
     } catch (e) {
@@ -18,37 +25,33 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      let physicalInventory = null;
-      if (data.physical_inventory) {
-        physicalInventory = await PhysicalInventory.create(
-          data.physical_inventory,
-          {
-            transaction: transaction,
-          }
-        );
-      }
+      const createdPhysicalInventory = await PhysicalInventory.create(
+        data.physical_inventory,
+        { transaction }
+      );
 
-      if (physicalInventory && data.items) {
-        await Promise.all(
-          data.items.map((item) => {
-            item.physical_inventory_id = physicalInventory.id;
-            return PhysicalInventoryItem.create(item, {
-              transaction: transaction,
-            });
-          })
-        );
+      const items = data.items.map((item) => {
+        return {
+          ...item,
+          physical_inventory_id: createdPhysicalInventory.id,
+        };
+      });
+
+      await PhysicalInventoryItem.bulkCreate(items, { transaction });
+
+      if (data.physical_inventory.status === PhysicalInventoryStatus.DONE) {
+        await reflectPhysicalProductCount(data.items, transaction);
       }
 
       await transaction.commit();
 
       res.sendResponse(
-        { physical_inventory: physicalInventory },
-        "Successfully created!",
-        200
+        { physical_inventory: createdPhysicalInventory },
+        "Successfully registered!"
       );
-    } catch (e) {
+    } catch (error) {
       await transaction.rollback();
-      res.sendError(e, "Something wen't wrong", 400);
+      res.sendError(e, "Something went wrong! => " + e.message, 400);
     }
   },
 
@@ -56,7 +59,6 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-
       const physicalInventory = await PhysicalInventory.findOne({
         where: {
           id: req.params.id,
@@ -66,26 +68,28 @@ module.exports = {
       if (physicalInventory) {
         if (data.physical_inventory) {
           await physicalInventory.update(data.physical_inventory, {
-            transaction: transaction,
+            transaction,
           });
         }
 
         if (data.items) {
-          await Promise.all([
-            data.items.map((item) => {
-              const item_copy = { ...item };
-              delete item_copy;
-              return PhysicalInventoryItem.update(item_copy, {
+          await Promise.all(
+            data.items.map((item) =>
+              PhysicalInventoryItem.update(item, {
                 where: {
-                  id: item.id,
+                  product_id: item.product_id,
+                  physical_inventory_id: physicalInventory.id,
                 },
-                transaction: transaction,
-              });
-            }),
-          ]);
+              })
+            )
+          );
+
+          if (data.physical_inventory.status === PhysicalInventoryStatus.DONE) {
+            await reflectPhysicalProductCount(data.items, transaction);
+          }
         }
       } else {
-        throw "Not found!";
+        throw new Error("Physical Inventory not found!");
       }
 
       await transaction.commit();

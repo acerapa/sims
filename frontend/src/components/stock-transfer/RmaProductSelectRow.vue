@@ -8,7 +8,7 @@
         <CustomInput
           type="checkbox"
           name="checkbox"
-          v-if="!props.isDisabled"
+          v-if="!props.isDisabled && props.hasCheckBox"
           class="flex-shrink-0 mt-[10px]"
         />
         <CustomInput
@@ -51,6 +51,7 @@
         class="col-span-1"
         type="number"
         name="quantity"
+        input-class="w-full"
         placeholder="Quantity"
         :disabled="true"
         v-model="model.quantity"
@@ -61,6 +62,8 @@
         class="col-span-1"
         type="number"
         name="cost"
+        :icon="peso"
+        input-class="w-full"
         placeholder="Cost"
         :disabled="props.isDisabled"
         v-model="model.cost"
@@ -71,6 +74,8 @@
         class="col-span-1"
         type="number"
         name="amount"
+        :icon="peso"
+        input-class="w-full"
         placeholder="Amount"
         :disabled="props.isDisabled"
         v-model="model.amount"
@@ -99,6 +104,8 @@ import { onMounted, ref, watch } from 'vue'
 import Event from '@/event'
 import { useRouter } from 'vue-router'
 import { InventoryConst, TransferConst } from '@/const/route.constants'
+import peso from '@/assets/icons/peso.png'
+
 const props = defineProps({
   ndx: {
     type: Number,
@@ -111,6 +118,10 @@ const props = defineProps({
   eventName: {
     type: String,
     required: false
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 

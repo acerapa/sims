@@ -95,5 +95,22 @@ export default [
         }
       }
     ]
+  },
+  {
+    path: '/sales',
+    component: () => import('@/layout/PrintableLayout.vue'),
+    children: [
+      {
+        name: SalesConst.SALES_ORDER_PRINT,
+        path: 'sales-order/:id/print',
+        component: () =>
+          import('@/views/sales/printables/SalesOrderPrintable.vue'),
+        meta: {
+          title: 'Item Details',
+          requiresAuth: true,
+          filename: 'Sales Order'
+        }
+      }
+    ]
   }
 ]

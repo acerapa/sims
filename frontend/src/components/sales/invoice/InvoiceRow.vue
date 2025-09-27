@@ -4,7 +4,7 @@
     @click="emit('view', props.invoice.id)"
   >
     <div class="col-span-1 flex gap-3 items-center">
-      <input type="checkbox" class="input" />
+      <input type="checkbox" class="input" v-if="props.hasCheckBox" />
       <p class="text-sm">{{ props.invoice.id }}</p>
     </div>
     <p class="col-span-2 text-sm">{{ customerName }}</p>
@@ -33,7 +33,7 @@
         :custom-class="InvoiceStatusMap[props.invoice.status].class"
       />
     </div>
-    <p class="col-span-1 text-sm">₱ {{ props.invoice.total }}</p>
+    <p class="col-span-1 text-sm text-end">₱ {{ props.invoice.total }}</p>
   </div>
 </template>
 
@@ -50,6 +50,10 @@ const props = defineProps({
   invoice: {
     type: Object,
     default: () => ({})
+  },
+  hasCheckBox: {
+    type: Boolean,
+    default: false
   }
 })
 

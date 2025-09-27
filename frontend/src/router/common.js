@@ -25,8 +25,8 @@ export default [
         }
       },
       {
-        path: '/product-list',
-        name: 'product-list',
+        path: '/hidden/product-list',
+        name: 'hidden-product-list',
         component: () => import('@/views/public/ProductList.vue'),
         meta: {
           requiresAuth: true
@@ -43,8 +43,8 @@ export default [
     ]
   },
   {
-    path: '/product-list',
-    name: 'product-list',
+    path: '/hidden/product-list',
+    name: 'hidden-product-list',
     component: () => import('@/views/public/ProductList.vue'),
     meta: {
       requiresAuth: true

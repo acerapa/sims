@@ -67,16 +67,21 @@ const ProductSchema = Joi.object({
   expense_account: Joi.number().required().messages({
     "*": "Expense account is required",
   }),
+  pref_sup_id: Joi.when("type", {
+    is: ItemType.INVENTORY,
+    then: Joi.number().required().messages({ "*": "Preferred Supplier is required!" }),
+    otherwise: Joi.allow(null, '').optional().strip()
+  })
 });
 
 const ProductItemSchema = Joi.object({
   product: ProductSchema,
   details: ProductDetailsSchema,
   suppliers: Joi.array().items(ProductSupplierSchema).min(1),
-  categories: Joi.array().items(Joi.number()).min(1).messages({
-    "*": "Categories are required",
+  category: Joi.number().required().messages({
+    "any.required": "Category is required!",
   }),
-});
+}).options({ stripUnknown: true });
 
 const ServiceItemSchema = Joi.object({
   service: ProductSchema,

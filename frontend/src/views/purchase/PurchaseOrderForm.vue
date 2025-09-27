@@ -189,6 +189,7 @@
           :row-component="PurchaseOrderFormRow"
           :format="productFormat"
           v-model="model.products"
+          :has-check-box="false"
           :is-disabled="model.order.supplier_id && !isCompleted ? false : true"
           :row-props="{
             sup_id: model.order.supplier_id.toString(),

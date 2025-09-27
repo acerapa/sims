@@ -1,3 +1,4 @@
+
 const { InvoiceStatus } = require("shared/enums");
 const { sequelize } = require("../models");
 const Customer = require("../models/customer");
@@ -9,7 +10,9 @@ const {
   findreceivedPaymentDetailed,
   getInvoiceNewInvoiceStatus,
   getInvoiceLatestReceivedpayment,
+  setNewProductStockUponFirstPayment,
 } = require("../services/ReceivedPaymentService");
+const InvoiceProducts = require("../models/junction/invoice-products");
 
 module.exports = {
   all: async (req, res) => {
@@ -110,7 +113,18 @@ module.exports = {
     const transaction = await sequelize.transaction();
     try {
       const data = req.body.validated;
-      const invoiceToPay = await Invoice.findByPk(data.invoice_id);
+      const invoiceToPay = await Invoice.findByPk(data.invoice_id, {
+        include: [
+          {
+            model: ReceivedPayment,
+            as: "received_payments"
+          },
+          {
+            model: InvoiceProducts,
+            as: "invoice_products"
+          }
+        ]
+      });
       if (!invoiceToPay) throw new Error("Invoice not found");
 
       if (
@@ -132,6 +146,11 @@ module.exports = {
         { invoice_status: invoice_status, ...data },
         { transaction }
       );
+
+      // Check if this is the first payment
+      if (invoiceToPay.received_payments.length == 0) {
+        await setNewProductStockUponFirstPayment(invoiceToPay.invoice_products)
+      }
 
       if (invoiceToPay.status != invoice_status) {
         await invoiceToPay.update({ status: invoice_status }, { transaction });

@@ -17,7 +17,7 @@ const {
 router.get("/all", all);
 router.get("/:id", getOne);
 router.delete("/delete/:id", destroy);
-router.post("/update/:id", validateBody(PhysicalInventoryUpdateSchema), update);
+router.put("/update/:id", validateBody(PhysicalInventoryUpdateSchema), update);
 router.post("/register", validateBody(PhysicalInventoryCreateSchema), register);
 router.post(
   "/item/:id",

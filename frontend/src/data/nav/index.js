@@ -38,6 +38,15 @@ export default [
         icon: outlineDot
       },
       {
+        text: 'Physical Inventory',
+        route: InventoryConst.PHYSICAL_INVENTORY,
+        icon: outlineDot,
+        includes_active: [
+          InventoryConst.PHYSICAL_INVENTORY_FORM,
+          InventoryConst.PHYSICAL_INVENTORY_ADJUSTMENT_FORM
+        ]
+      },
+      {
         text: 'Inventory Stock Status',
         route: InventoryConst.INVENTORY_STOCK_STATUS,
         icon: outlineDot
@@ -147,8 +156,28 @@ export default [
     icon: reports,
     children: [
       {
-        text: 'Physical Inventories',
-        route: 'physical-inventory',
+        text: 'Purchase By Vendor Detailed Report',
+        route: PurchaseConst.PURCHASE_BY_VENDOR_DETAILED_REPORT,
+        icon: outlineDot
+      },
+      {
+        text: 'Purchase By Vendor Summary Report',
+        route: PurchaseConst.PURCHASE_BY_VENDOR_SUMMARY_REPORT,
+        icon: outlineDot
+      },
+      {
+        text: 'Sales By Customer Detailed Report',
+        route: SalesConst.SALES_BY_CUSTOMER_DETAILED,
+        icon: outlineDot
+      },
+      {
+        text: 'Sales By Item Detailed Report',
+        route: SalesConst.SALES_BY_ITEM_DETAILED,
+        icon: outlineDot
+      },
+      {
+        text: 'Sales By Representative',
+        route: SalesConst.SALES_BY_REP,
         icon: outlineDot
       }
     ]

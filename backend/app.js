@@ -17,7 +17,6 @@ const io = initializeSocket(server);
 const {
   startNotificationSocketNamespace,
 } = require("./socket/namespaces/notification");
-
 // notification socket
 startNotificationSocketNamespace(io);
 

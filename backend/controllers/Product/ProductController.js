@@ -8,16 +8,32 @@ const ProductToCategories = require("../../models/junction/product-to-categories
 const ProductDetails = require("../../models/product-details");
 const ProductSupplier = require("../../models/product-supplier");
 
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const { ProductType } = require("shared");
 const { sequelize } = require("../../models/index");
-const { findProduct } = require("../../services/ProductService");
+const {
+  findProduct,
+  groupCategories,
+} = require("../../services/ProductService");
+const InvoiceProducts = require("../../models/junction/invoice-products");
+const SalesOrderProduct = require("../../models/junction/sales-order-product");
+const PurchaseOrderProducts = require("../../models/junction/purchase-order-products");
+const SalesOrder = require("../../models/sales-order");
+const {
+  SalesOrderStatus,
+  PurchaseOrderStatus,
+  InvoiceStatus,
+} = require("shared/enums");
+const PurchaseOrder = require("../../models/purchase-order");
+const ReceivedPayment = require("../../models/received-payment");
+const Invoice = require("../../models/invoice");
+const ALIASES = require("../../const/alias");
 
 module.exports = {
   all: async (req, res) => {
     try {
       const items = await Product.findAll({
-        order: [["updatedAt", "DESC"]],
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: Supplier,
@@ -56,12 +72,12 @@ module.exports = {
   getProducts: async (req, res) => {
     try {
       const products = await Product.findAll({
-        order: [["updatedAt", "DESC"]],
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: Supplier,
             as: "suppliers",
-            attributes: ["id"],
+            attributes: ["id", "company_name"],
             through: { attributes: ["cost"] },
           },
           {
@@ -170,13 +186,8 @@ module.exports = {
         transaction,
       });
 
-      if (req.body.validated.categories) {
-        const categories = req.body.validated.categories;
-        await Promise.all(
-          categories.map((category) => {
-            return product.addCategory(category, { transaction });
-          })
-        );
+      if (req.body.validated.category) {
+        product.addCategory(req.body.validated.category, { transaction });
       }
 
       if (req.body.validated.suppliers) {
@@ -455,38 +466,171 @@ module.exports = {
 
   inventoryStockStatus: async (req, res) => {
     try {
-      const products = await Product.findAll({
-        where: {
-          status: "active",
-          type: "inventory",
-        },
-        attributes: ["id", "name", "quantity_in_stock"],
+      const products = await ProductCategory.findAll({
         include: [
           {
-            model: ProductCategory,
-            as: "category",
+            model: Product,
+            as: "products",
+            include: [
+              {
+                model: ProductDetails,
+                as: "product_details",
+                attributes: ["id", "purchase_description", "stock"],
+              },
+              {
+                model: Supplier,
+                as: "preferred_supplier",
+                attributes: ["id", "company_name"],
+              },
+              {
+                model: InvoiceProducts,
+                as: "invoice_products",
+                attributes: ["id", "invoice_id", "quantity"],
+                include: [
+                  {
+                    model: Invoice,
+                    as: "invoice",
+                    required: true,
+                    include: [
+                      {
+                        model: ReceivedPayment,
+                        as: "received_payments",
+                        required: true,
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                model: SalesOrderProduct,
+                as: "so_products",
+                include: [
+                  {
+                    model: SalesOrder,
+                    as: "sales_order",
+                    required: true,
+                    where: {
+                      [Op.and]: [
+                        { status: { [Op.ne]: SalesOrderStatus.CANCELLED } },
+                        {
+                          [Op.or]: [
+                            // No invoice
+                            Sequelize.literal(`NOT EXISTS (
+                              SELECT 1 FROM \`${Invoice.getTableName()}\` AS \`invoice\`
+                              WHERE \`invoice\`.\`sales_order_id\` = \`products->so_products->sales_order\`.\`id\`
+                            )`),
+
+                            // Has in invoice but should only have unpaid status
+                            Sequelize.literal(`EXISTS (
+                              SELECT 1 FROM \`${Invoice.getTableName()}\` as \`invoice\`
+                              WHERE \`invoice\`.\`sales_order_id\` = \`products->so_products->sales_order\`.\`id\`
+                              AND invoice.status = '${InvoiceStatus.UNPAID}'
+                            ) AND NOT EXISTS (
+                              SELECT 1 FROM \`${Invoice.getTableName()}\` as \`invoice\`
+                              WHERE \`invoice\`.\`sales_order_id\` = \`products->so_products->sales_order\`.\`id\`
+                              AND \`invoice\`.\`status\` != '${InvoiceStatus.UNPAID}'
+                            )`),
+                          ],
+                        },
+                      ],
+                    },
+                    attributes: ["id"],
+                  },
+                ],
+                attributes: ["id", "sales_order_id", "quantity"],
+              },
+              {
+                model: PurchaseOrderProducts,
+                as: "po_products",
+                attributes: ["id", "purchase_order_id", "quantity"],
+                include: [
+                  {
+                    model: PurchaseOrder,
+                    as: "purchase_order",
+                    where: {
+                      status: {
+                        [Op.in]: [
+                          PurchaseOrderStatus.OPEN,
+                          PurchaseOrderStatus.CONFIRMED,
+                        ],
+                      },
+                    },
+                    attributes: ["id"],
+                  },
+                ],
+              },
+            ],
           },
         ],
       });
 
-      const groupedByCat = Object.entries(
-        Object.groupBy(products, ({ category }) => category.id)
-      ).map((item) => {
-        return {
-          category: item[1][0].category,
-          products: item[1],
-        };
-      });
-
-      // TODO: Need to query from PO and Sales
-
       res.sendResponse(
-        { grouped_by_gategory: groupedByCat },
-        "Successfully fetched",
-        200
+        { grouped: groupCategories(products) },
+        "Successfully fetched!"
       );
     } catch (e) {
+      console.log(e);
       res.sendError(e, "Something wen't wrong!");
+    }
+  },
+
+  salesByItem: async (req, res) => {
+    try {
+      const { from, to } = req.query;
+      const products = await ProductCategory.findAll({
+        include: [
+          {
+            model: Product,
+            as: ALIASES.PRODUCTS,
+            attributes: ["id"],
+            required: true,
+            include: [
+              {
+                model: ProductDetails,
+                as: ALIASES.PRODUCT_DETAILS,
+                attributes: ["id", "sales_description"],
+              },
+              {
+                model: Invoice,
+                as: ALIASES.INVOICES,
+                required: true,
+                attributes: ["id", "issue_date", "memo"],
+                where: {
+                  issue_date: {
+                    [Op.gte]: new Date(from),
+                    [Op.lte]: new Date(to),
+                  },
+                },
+                include: [
+                  {
+                    model: ReceivedPayment,
+                    as: "received_payments",
+                    required: true,
+                    attributes: ["id"],
+                  },
+                  {
+                    model: Product,
+                    as: ALIASES.PRODUCTS,
+                    required: true,
+                    attributes: ["id"],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      // Clean products under invoices
+      for (const cat of products) {
+        for (const prd of cat.products) {
+          prd.invoices = prd.invoices.filter((p) => p.id == prd.id);
+        }
+      }
+
+      res.sendResponse({ products }, "Successfully fetched!");
+    } catch (error) {
+      res.sendError(error, "Something wen't wrong!");
     }
   },
 };

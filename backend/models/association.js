@@ -25,11 +25,35 @@ const PaymentMethod = require("./payment-method");
 const Delivery = require("./delivery");
 const InvoiceProducts = require("./junction/invoice-products");
 const ReceivedPayment = require("./received-payment");
+const PhysicalInventoryAdjustments = require("./physical-inventory-adjustments");
+const ItemToAdjustments = require("./junction/item-to-adjustments");
+
+// Aliases
+const ALIASES = require("../const/alias");
+
+// adjustments to user
+PhysicalInventoryAdjustments.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "adjusted_by",
+});
+
+// adjustments to itemtoadjust
+PhysicalInventoryAdjustments.hasMany(ItemToAdjustments, {
+  foreignKey: "adjustment_id",
+  as: "items",
+});
+
+PhysicalInventoryAdjustments.belongsToMany(PhysicalInventoryItem, {
+  through: ItemToAdjustments,
+  foreignKey: "adjustment_id",
+  otherKey: "item_id",
+  as: "adjustment_items",
+});
 
 // receive payments to invoice
 Invoice.hasMany(ReceivedPayment, {
   foreignKey: "invoice_id",
-  as: "received_payments",
+  as: ALIASES.RECEIVED_PAYMENTS,
 });
 
 ReceivedPayment.belongsTo(Invoice, {
@@ -45,7 +69,7 @@ ReceivedPayment.belongsTo(User, {
 
 User.hasMany(ReceivedPayment, {
   foreignKey: "user_id",
-  as: "received_payments",
+  as: ALIASES.RECEIVED_PAYMENTS,
 });
 
 // invoice to products
@@ -53,25 +77,47 @@ Invoice.belongsToMany(Product, {
   through: InvoiceProducts,
   foreignKey: "invoice_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 Product.belongsToMany(Invoice, {
   through: InvoiceProducts,
   foreignKey: "product_id",
   otherKey: "invoice_id",
-  as: "invoices",
+  as: ALIASES.INVOICES,
+});
+
+// Invoice Products to products
+InvoiceProducts.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+Product.hasMany(InvoiceProducts, {
+  foreignKey: "product_id",
+  as: "invoice_products",
+});
+
+// Invoice Products to Invoices
+InvoiceProducts.belongsTo(Invoice, {
+  foreignKey: "invoice_id",
+  as: "invoice",
+});
+
+Invoice.hasMany(InvoiceProducts, {
+  foreignKey: "invoice_id",
+  as: "invoice_products",
 });
 
 // invoice to customer
 Invoice.belongsTo(Customer, {
   foreignKey: "customer_id",
-  as: "customer",
+  as: ALIASES.CUSTOMER,
 });
 
 Customer.hasMany(Invoice, {
   foreignKey: "customer_id",
-  as: "invoices",
+  as: ALIASES.INVOICES,
 });
 
 // invoice to user/sales person
@@ -82,7 +128,7 @@ Invoice.belongsTo(User, {
 
 User.hasMany(Invoice, {
   foreignKey: "employee_id",
-  as: "invoices",
+  as: ALIASES.INVOICES,
 });
 
 // Sales Order, Product, Address, Invoice and Sales Order Product Relations
@@ -90,7 +136,7 @@ SalesOrder.belongsToMany(Product, {
   through: SalesOrderProduct,
   foreignKey: "sales_order_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 Product.belongsToMany(SalesOrder, {
@@ -98,6 +144,28 @@ Product.belongsToMany(SalesOrder, {
   foreignKey: "product_id",
   otherKey: "sales_order_id",
   as: "sales_orders",
+});
+
+// SalesOrderProduct to Product
+Product.hasMany(SalesOrderProduct, {
+  foreignKey: "product_id",
+  as: "so_products",
+});
+
+SalesOrderProduct.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+// SalesOrderProduct to SalesOrder
+SalesOrder.hasMany(SalesOrderProduct, {
+  foreignKey: "sales_order_id",
+  as: "so_products",
+});
+
+SalesOrderProduct.belongsTo(SalesOrder, {
+  foreignKey: "sales_order_id",
+  as: "sales_order",
 });
 
 SalesOrder.belongsTo(PaymentMethod, {
@@ -156,7 +224,7 @@ PurchaseOrder.belongsToMany(Product, {
   through: PurchaseOrderProducts,
   foreignKey: "purchase_order_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 Product.belongsToMany(PurchaseOrder, {
@@ -166,12 +234,34 @@ Product.belongsToMany(PurchaseOrder, {
   as: "purchase_orders",
 });
 
+// PurchaseOrderProducts to Product
+PurchaseOrderProducts.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+Product.hasMany(PurchaseOrderProducts, {
+  foreignKey: "product_id",
+  as: "po_products",
+});
+
+// PurchaseOrderProducts to PurchaseOrder
+PurchaseOrderProducts.belongsTo(PurchaseOrder, {
+  foreignKey: "purchase_order_id",
+  as: "purchase_order",
+});
+
+PurchaseOrder.hasMany(PurchaseOrderProducts, {
+  foreignKey: "purchase_order_id",
+  as: "po_products",
+});
+
 // Stock Transfer, Product and Stock Transfer Product Relations
 StockTransfer.belongsToMany(Product, {
   through: StockTransferProducts,
   foreignKey: "stock_transfer_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 Product.belongsToMany(StockTransfer, {
@@ -234,7 +324,7 @@ Product.belongsTo(Account, {
 
 Supplier.belongsToMany(Product, {
   through: ProductSupplier,
-  as: "products",
+  as: ALIASES.PRODUCTS,
   foreignKey: "supplier_id",
   otherKey: "product_id",
 });
@@ -252,7 +342,7 @@ PurchaseOrder.belongsTo(Supplier, {
 
 ProductSettings.hasMany(ProductDetails, {
   foreignKey: "product_setting_id",
-  as: "product_details",
+  as: ALIASES.PRODUCT_DETAILS,
   onDelete: "SET NULL",
 });
 
@@ -388,20 +478,20 @@ Product.belongsToMany(ProductCategory, {
   through: ProductToCategories,
   foreignKey: "product_id",
   otherKey: "category_id",
-  as: "categories",
+  as: ALIASES.CATEGORIES,
 });
 
 ProductCategory.belongsToMany(Product, {
   through: ProductToCategories,
   foreignKey: "category_id",
   otherKey: "product_id",
-  as: "products",
+  as: ALIASES.PRODUCTS,
 });
 
 // Item, Product and Service relationships
 Product.hasOne(ProductDetails, {
   foreignKey: "product_id",
-  as: "product_details",
+  as: ALIASES.PRODUCT_DETAILS,
 });
 
 Product.hasOne(ServiceDetails, {
@@ -417,6 +507,12 @@ ProductDetails.belongsTo(Product, {
 ServiceDetails.belongsTo(Product, {
   foreignKey: "product_id",
   as: "product",
+});
+
+// Product to Preferred Supplier
+Product.belongsTo(Supplier, {
+  foreignKey: "pref_sup_id",
+  as: "preferred_supplier",
 });
 
 // Models that need to be exported for updated associations
